@@ -1,0 +1,69 @@
+name: PR checks (main)
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-main-check-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Verify merge + basic checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR head
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Fetch base branch
+        run: git fetch --no-tags --prune origin ${{ github.event.pull_request.base.ref }}
+
+      - name: Configure git identity (required for merge)
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Ensure PR merges into base (no conflicts)
+        run: |
+          set -euo pipefail
+          git checkout -B base origin/${{ github.event.pull_request.base.ref }}
+          git merge --no-commit --no-ff ${{ github.event.pull_request.head.sha }}
+
+      - name: Check for leftover conflict markers
+        run: |
+          set -euo pipefail
+          if git grep -n -E '^(<<<<<<<|=======|>>>>>>>)' -- .; then
+            echo "Found conflict markers in tracked files."
+            exit 1
+          fi
+
+      - name: Git whitespace checks
+        run: |
+          set -euo pipefail
+          git diff --check
+
+      - name: Setup PHP (for lint)
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+
+      - name: PHP syntax lint (if any)
+        run: |
+          set -euo pipefail
+          shopt -s globstar nullglob
+          php_files=(**/*.php)
+          if [ ${#php_files[@]} -eq 0 ]; then
+            echo "No PHP files found."
+            exit 0
+          fi
+          php -v
+          for f in "${php_files[@]}"; do
+            php -l "$f"
+          done
