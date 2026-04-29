@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil | DUALEX</title>
+    <link rel="stylesheet" href="../styles/styles.css">
+    <link rel="icon" type="image/png" href="../public/img/LogoDualex.png">
+</head>
+<body>
+    <header id="main-header">
+        <a href="dashboard.html" class="icon-btn" title="Volver al Dashboard">←</a>
+        <div class="logo-container">
+            <h1>DUALEX</h1>
+        </div>
+        <div style="width: 44px;"></div> <!-- Spacer to center logo -->
+    </header>
+
+    <main>
+        <div id="profile-container">
+            <div id="profile-card">
+                <button class="icon-btn help-profile" title="Ayuda">?</button>
+                
+                <div class="profile-header">
+                    <div id="large-avatar">PR</div>
+                </div>
+
+                <div class="profile-form">
+                    <div class="form-group">
+                        <label for="nombre">Nombre:</label>
+                        <input type="text" id="nombre" value="Pedro" readonly>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="apellidos">Apellidos:</label>
+                        <input type="text" id="apellidos" value="Risco" readonly>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Correo Electrónico:</label>
+                        <input type="email" id="email" value="Prisco.gmail.com" readonly>
+                    </div>
+                </div>
+
+                <div class="profile-actions">
+                    <button id="edit-profile-btn">
+                        <span>✏️</span> Editar
+                    </button>
+                    <span class="role-tag profile-role">rol: coordinador</span>
+                </div>
+
+                <div class="profile-footer">
+                    <a href="logout.html" id="logout-link">Cerrar Sesión</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer id="main-footer">
+        <div class="footer-logo">
+            <img src="../public/img/LogoDualex.png" alt="Logo Escuela Dualex">
+        </div>
+        <p class="footer-text">Escuela Virgen de Guadalupe Fundación Loyola &copy; Todos los derechos reservados</p>
+    </footer>
+</body>
+</html>
