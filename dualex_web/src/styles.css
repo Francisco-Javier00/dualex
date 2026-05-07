@@ -1,77 +1,290 @@
 :root {
-  --primary: #6366f1;
-  --primary-hover: #4f46e5;
-  --secondary: #a855f7;
-  --accent: #06b6d4;
-  --bg: #0a0a0c;
-  --surface: rgba(255, 255, 255, 0.03);
-  --surface-border: rgba(255, 255, 255, 0.08);
-  --text: #f8fafc;
-  --text-muted: #94a3b8;
-  --glass: rgba(15, 15, 20, 0.7);
-  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --primary: #006293;
+  --primary-hover: #004d74;
+  --secondary: #0693e3;
+  --bg: #e3f2fd;
+  --surface: #ffffff;
+  --surface-border: #e2e2e2;
+  --text: #222222;
+  --text-muted: #9b9b9b;
+  --link-hover: #545454;
+  --transition: all 300ms ease;
 }
 
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Inter', sans-serif;
 }
 
 html, body {
   background-color: var(--bg);
   color: var(--text);
+  font-family: 'Open Sans', sans-serif;
+  font-size: 16px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   scroll-behavior: smooth;
   overflow-x: hidden;
 }
 
-h1, h2, h3, .brand {
-  font-family: 'Outfit', sans-serif;
+h1, h2, h3, h4, h5, h6, .navbar-brand, .nav-link {
+  font-family: 'Roboto', sans-serif;
 }
 
-/* Glassmorphism utility */
-.glass {
-  background: var(--glass);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--surface-border);
+/* Enlaces y botones (transición suave 300ms) */
+a, button, .btn {
+  transition: var(--transition);
 }
 
-/* Animations */
+a:hover {
+  color: var(--link-hover);
+}
+
+/* Header Fijo */
+.fixed-top {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 1030;
+}
+
+body {
+  padding-top: 80px; /* Altura del header para que el contenido no quede debajo */
+}
+
+/* Animaciones */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes float {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-  100% { transform: translateY(0px); }
 }
 
 .animate-fade-in {
   animation: fadeIn 0.8s ease-out forwards;
 }
 
-.animate-float {
-  animation: float 4s ease-in-out infinite;
+/* --- ESTILOS COMPONENTES COMPARTIDOS (Refactorizados a Global) --- */
+
+/* Header Styles */
+.navbar-brand {
+  letter-spacing: 1px;
 }
 
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
+.nav-link {
+  font-weight: 700;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-::-webkit-scrollbar-track {
-  background: var(--bg);
+/* Role Badges */
+.badge-coordinador {
+  background-color: var(--primary); /* Azul oscuro institucional */
 }
 
-::-webkit-scrollbar-thumb {
-  background: var(--surface-border);
-  border-radius: 10px;
+.badge-profesor {
+  background-color: var(--secondary); /* Azul más vibrante */
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: var(--text-muted);
+.badge-alumno {
+  background-color: #5bb3eb; /* Azul claro */
+}
+
+.avatar {
+  cursor: pointer;
+}
+
+.btn-link:hover {
+  color: var(--primary) !important;
+}
+
+/* Footer Styles */
+footer a:hover {
+  color: var(--primary) !important;
+}
+
+.footer-text p {
+  font-size: 0.95rem;
+  font-weight: 400;
+}
+
+/* Dashboard Styles */
+.management-panel {
+  min-height: calc(100vh - 160px);
+}
+
+.category-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.category-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.08) !important;
+}
+
+.card-img-container {
+  border-bottom: 1px solid #f0f0f0;
+  background-color: #f8f9fa;
+  overflow: hidden;
+}
+
+.card-img-container img {
+  transition: transform 0.5s ease;
+}
+
+.category-card:hover .card-img-container img {
+  transform: scale(1.05);
+}
+
+.btn-primary-light {
+  background-color: #eef7ff;
+  color: #006293;
+  font-weight: 700;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.btn-primary-light:hover {
+  background-color: #b3d9ff;
+  color: #004d74;
+}
+
+/* --- DUALEX ALERTS --- */
+.dualex-alerts-container {
+  position: fixed;
+  top: 95px;
+  right: 20px;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 400px;
+  width: 90%;
+}
+
+.dualex-alert {
+  position: relative;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  border: 1px solid #e0e0e0;
+}
+
+.dualex-alert-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+}
+
+.dualex-alert-body {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.dualex-alert-icon {
+  font-size: 1.25rem;
+  display: flex;
+  align-items: center;
+}
+
+.dualex-alert-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.dualex-alert-title {
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.dualex-alert-description {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.dualex-alert-close {
+  background: none;
+  border: none;
+  color: #999;
+  cursor: pointer;
+  padding: 4px;
+  font-size: 1.2rem;
+  transition: color 0.2s;
+}
+
+.dualex-alert-close:hover {
+  color: #333;
+}
+
+.dualex-alert-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.1);
+  animation: shrinkWidth linear forwards;
+}
+
+@keyframes shrinkWidth {
+  from { width: 100%; }
+  to { width: 0%; }
+}
+
+.dualex-alert-info .dualex-alert-icon { color: #006293; }
+.dualex-alert-info .dualex-alert-progress { background: #006293; }
+.dualex-alert-info { border-left: 4px solid #006293; }
+
+.dualex-alert-success .dualex-alert-icon { color: #28a745; }
+.dualex-alert-success .dualex-alert-progress { background: #28a745; }
+.dualex-alert-success { border-left: 4px solid #28a745; }
+
+.dualex-alert-warning .dualex-alert-icon { color: #ffc107; }
+.dualex-alert-warning .dualex-alert-progress { background: #ffc107; }
+.dualex-alert-warning { border-left: 4px solid #ffc107; }
+
+.dualex-alert-danger .dualex-alert-icon { color: #dc3545; }
+.dualex-alert-danger .dualex-alert-progress { background: #dc3545; }
+.dualex-alert-danger { border-left: 4px solid #dc3545; }
+
+/* ========================================
+   ANIMACIONES GLOBALES DE MODALES
+   ======================================== */
+
+/* Fondo oscuro del modal */
+.modal.d-block {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+/* Animación de entrada del contenido del modal */
+.modal-content {
+  border-radius: 1rem;
+  animation: modalScale 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes modalScale {
+  from {
+    transform: scale(0.85) translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Animación de aparición suave general */
+.modal-backdrop.fade {
+  animation: overlayFadeIn 0.25s ease-in-out;
+}
+
+@keyframes overlayFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 0.5; }
 }

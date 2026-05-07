@@ -1,0 +1,50 @@
+export interface Alerta {
+  id: string;
+  tipo: 'info' | 'warning' | 'success' | 'danger';
+  titulo: string;
+  mensaje: string;
+  fecha: Date;
+  autoCierre?: boolean;
+  duracion?: number; // milisegundos
+}
+
+export interface PerfilUsuario {
+  id: number;
+  nombre: string;
+  apellidos: string;
+  email: string;
+  foto?: string;
+  rol: string;
+}
+
+export interface JwtPayload {
+  id: number;
+  nombre: string;
+  apellidos: string;
+  email: string;
+  foto?: string;
+  roles: {
+    global?: string;
+    dualex?: string;
+    [key: string]: string | undefined;
+  };
+  exp?: number;
+  iat?: number;
+}
+
+export interface Categoria {
+  titulo: string;
+  icono: string;
+  imagen: string;
+  colorIcono?: string;
+  ruta?: string;
+}
+
+export interface ModuloProfesor {
+  idModulo: number;
+  nombre: string;
+  sigla: string;
+  color: string;
+  numAlumnos?: number;
+  numActividades?: number;
+}

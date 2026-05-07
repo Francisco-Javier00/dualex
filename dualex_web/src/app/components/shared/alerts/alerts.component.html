@@ -1,0 +1,40 @@
+<!-- Contenedor de alertas fijo en esquina superior derecha -->
+<div class="dualex-alerts-container">
+  <div *ngFor="let alerta of alertas" class="alert-item" [@slideInOut]>
+
+    <!-- Alerta segun estilo Libreria Vitaly 2025 -->
+    <div class="dualex-alert dualex-alert-{{ alerta.tipo }}" role="alert">
+
+      <!-- Contenido principal -->
+      <div class="dualex-alert-content">
+
+        <!-- Icono y texto -->
+        <div class="dualex-alert-body">
+          <div class="dualex-alert-icon">
+            <i class="fa-solid" [ngClass]="{
+              'fa-circle-info': alerta.tipo === 'info',
+              'fa-triangle-exclamation': alerta.tipo === 'warning', 
+              'fa-circle-check': alerta.tipo === 'success',
+              'fa-circle-xmark': alerta.tipo === 'danger'
+              }"></i>
+          </div>
+
+          <div class="dualex-alert-text">
+            <span class="dualex-alert-title">{{ alerta.titulo }}</span>
+            <span class="dualex-alert-description" *ngIf="alerta.mensaje">{{ alerta.mensaje }}</span>
+          </div>
+        </div>
+
+        <!-- Botón cerrar -->
+        <button type="button" class="dualex-alert-close" aria-label="Close" (click)="quitarAlerta(alerta.id)">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+
+      </div>
+
+      <!-- Barra de progreso para auto-cierre -->
+      <div *ngIf="alerta.autoCierre" class="dualex-alert-progress" [style.animation-duration]="alerta.duracion + 'ms'">
+      </div>
+    </div>
+  </div>
+</div>

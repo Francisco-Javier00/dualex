@@ -1,0 +1,14 @@
+<div class="table-responsive bg-white rounded-3 shadow-sm border overflow-hidden p-3">
+  <table [id]="tableId" datatable [dtOptions]="dtOptions" class="table table-hover table-striped align-middle mb-0 w-100">
+    <thead class="table-light">
+      <tr>
+        <th *ngFor="let title of columnTitles" class="fw-semibold text-secondary" style="border-bottom: 2px solid #006293;">
+          {{ title }}
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- DataTables se encarga de rellenar el tbody cuando usamos AJAX -->
+    </tbody>
+  </table>
+</div>

@@ -1,0 +1,63 @@
+<!-- Overlay del modal: visible/oculto con ngClass, backdrop estático para evitar cierre al hacer clic fuera -->
+@if (visible) {
+  <div class="modal d-block" tabindex="-1" role="dialog" aria-modal="true">
+    <!-- Fondo oscuro -->
+    <div class="modal-backdrop-custom" (click)="$event.stopPropagation()"></div>
+
+    <!-- Diálogo del modal -->
+    <div class="modal-dialog modal-dialog-centered modal-sm" role="document" style="z-index: 1056; position: relative;">
+      <div class="modal-content border-0 shadow-lg">
+
+        <!-- Cabecera -->
+        <div class="modal-header border-0 pb-0 pt-3 px-4">
+          <div class="d-flex align-items-center gap-2">
+            <div class="modal-icon-wrapper">
+              <i class="fa-solid fa-triangle-exclamation text-danger"></i>
+            </div>
+            <h5 class="modal-title fw-bold text-danger mb-0">{{ titulo }}</h5>
+          </div>
+          <button type="button" class="btn-close btn-close-sm" (click)="onCancelar()" aria-label="Cerrar"></button>
+        </div>
+
+        <!-- Línea separadora -->
+        <hr class="mx-4 my-2 text-danger opacity-25">
+
+        <!-- Cuerpo -->
+        <div class="modal-body px-4 pb-2 pt-1">
+          <p class="text-secondary mb-3" style="font-size: 0.88rem; line-height: 1.5;">
+            {{ mensaje }}
+          </p>
+          <p class="text-muted mb-2" style="font-size: 0.82rem;">
+            Escribe <strong class="text-danger">"{{ palabraClave }}"</strong> para continuar.
+          </p>
+          <input
+            type="text"
+            class="form-control form-control-sm confirm-input"
+            [(ngModel)]="textoInput"
+            [class.is-valid]="puedeConfirmar"
+            placeholder="{{ palabraClave }}"
+            autocomplete="off"
+          />
+        </div>
+
+        <!-- Pie de botones -->
+        <div class="modal-footer border-0 px-4 pb-4 pt-2 d-flex gap-2 justify-content-end">
+          <button
+            type="button"
+            class="btn btn-sm btn-success px-3"
+            [disabled]="!puedeConfirmar"
+            (click)="onConfirmar()">
+            <i class="fa-solid fa-check me-1"></i> Aceptar
+          </button>
+          <button
+            type="button"
+            class="btn btn-sm btn-outline-secondary px-3"
+            (click)="onCancelar()">
+            <i class="fa-solid fa-xmark me-1"></i> Cancelar
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+}

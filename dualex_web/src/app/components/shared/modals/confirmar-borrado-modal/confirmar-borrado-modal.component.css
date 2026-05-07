@@ -1,0 +1,48 @@
+/* Backdrop personalizado: cubre toda la pantalla pero no tiene captura de eventos */
+.modal-backdrop-custom {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.55);
+  z-index: 1055;
+  cursor: not-allowed; /* Indica visualmente que no se puede cerrar aquí */
+}
+
+/* Ajuste para que el icono de cabecera destaque */
+.modal-icon-wrapper {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #fff5f5;
+  border-radius: 50%;
+}
+
+.modal-icon-wrapper i {
+  font-size: 0.9rem;
+}
+
+/* Input de confirmación: resalta en rojo si el texto no coincide aún */
+.confirm-input {
+  border: 1.5px solid #dee2e6;
+  border-radius: 8px;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  font-size: 0.88rem;
+  letter-spacing: 0.05em;
+}
+
+.confirm-input:focus {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.15);
+}
+
+.confirm-input.is-valid {
+  border-color: #28a745;
+  box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.15);
+}
+
+/* Botón deshabilitado: gris apagado con cursor bloqueado */
+.btn-success:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}

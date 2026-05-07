@@ -1,0 +1,30 @@
+<div class="container-fluid py-4 animate-fade-in mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold text-dark mb-1">
+        <i class="fa-solid fa-list-check text-primary me-2"></i> Registro de Actividades
+      </h2>
+      <p class="text-muted mb-0">Consulta y gestiona las actividades realizadas durante las prácticas en empresa</p>
+    </div>
+    <button class="btn btn-primary" (click)="crearNueva()">
+      <i class="fa-solid fa-plus me-1"></i> Nueva Actividad
+    </button>
+  </div>
+
+  <app-shared-datatable
+    tableId="tabla-actividades"
+    [dtOptions]="dtOptions"
+    [columnTitles]="['Título', 'Descripción', 'Módulo', 'Acciones']"
+    (actionClick)="onTableAction($event)">
+  </app-shared-datatable>
+</div>
+
+<!-- Modal de confirmación de borrado -->
+<app-confirmar-borrado-modal
+  [visible]="modalBorradoVisible"
+  [titulo]="'Eliminar Actividad'"
+  [mensaje]="'¿Estás seguro de que deseas eliminar la actividad &quot;' + (actividadSeleccionada?.titulo ?? '') + '&quot;? Esta acción no se puede deshacer.'"
+  [palabraClave]="'confirmar'"
+  (confirmarEvent)="onConfirmarBorrado()"
+  (cancelarEvent)="onCancelarBorrado()">
+</app-confirmar-borrado-modal>
