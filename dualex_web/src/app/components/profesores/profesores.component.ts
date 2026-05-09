@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { Config } from 'datatables.net';
 import { DatatableComponent } from '../shared/datatable/datatable.component';
@@ -11,7 +12,7 @@ import { ProfesorDTO } from '../../dto/dualex.dto';
 @Component({
   selector: 'app-profesores',
   standalone: true,
-  imports: [CommonModule, FormsModule, DatatableComponent, ConfirmarBorradoModalComponent],
+  imports: [CommonModule, RouterModule, FormsModule, DatatableComponent, ConfirmarBorradoModalComponent],
   templateUrl: './profesores.component.html',
   styleUrl: './profesores.component.css'
 })

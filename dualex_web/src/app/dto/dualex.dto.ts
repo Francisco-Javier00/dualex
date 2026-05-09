@@ -58,3 +58,20 @@ export interface ProfesorDTO {
   modulos: string;
   ciclos: string;
 }
+
+export interface EmpresaDTO {
+  id: number;
+  siglas: string;
+  nombre: string;
+  convenioUrl: string;
+  inicioConvenio: string;
+  finConvenio: string;
+  contacto: string;
+  numeroContacto: string;
+  contactosAdicionales?: ContactoEmpresaDTO[];
+}
+
+export interface ContactoEmpresaDTO {
+  contacto: string;
+  numeroContacto: string;
+}

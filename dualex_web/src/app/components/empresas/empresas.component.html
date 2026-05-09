@@ -1,10 +1,215 @@
-<div class="container-fluid py-5 text-center animate-fade-in">
-  <div class="py-5 mt-5">
-    <i class="fa-solid fa-building fs-1 text-primary mb-4"></i>
-    <h2 class="fw-bold text-dark">Gestión de Empresas</h2>
-    <p class="text-muted">Vista en desarrollo. Pronto podrás gestionar los convenios y contactos con las empresas colaboradoras.</p>
-    <a routerLink="/" class="btn btn-primary-light mt-4 px-4 py-2">
-      <i class="fa-solid fa-arrow-left me-2"></i> Volver al Inicio
-    </a>
+﻿<div class="container-fluid py-4 animate-fade-in mt-4">
+  <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+    <div class="d-flex align-items-start gap-3">
+      <a routerLink="/dashboard" class="btn btn-outline-secondary btn-sm empresas-back-btn mt-1" title="Volver">
+        <i class="fa-solid fa-arrow-left"></i>
+      </a>
+      <div>
+        <h2 class="fw-bold text-dark mb-1">
+          <i class="fa-solid fa-building text-primary me-2"></i> Empresa
+        </h2>
+        <p class="text-muted mb-0">Selecciona una empresa para gestionar</p>
+      </div>
+    </div>
+
+    <div class="d-flex align-items-center gap-3">
+      <button class="btn btn-outline-secondary rounded-circle empresas-gear" type="button" title="Configuración" (click)="abrirConfiguracion()">
+        <i class="fa-solid fa-gear"></i>
+      </button>
+      <button class="btn btn-primary" (click)="crearNuevaEntrada()">
+        <i class="fa-solid fa-plus me-1"></i> Crear nueva entrada
+      </button>
+    </div>
   </div>
+
+  <app-shared-datatable
+    tableId="tabla-empresas"
+    [dtOptions]="dtOptions"
+    [columnTitles]="['Siglas', 'Nombre', 'Convenio', 'Inicio Convenio', 'Fin Convenio', 'Contacto', 'Numero Contacto', 'Acciones']"
+    (actionClick)="onTableAction($event)">
+  </app-shared-datatable>
 </div>
+
+<app-confirmar-borrado-modal
+  [visible]="modalBorradoVisible"
+  [titulo]="'Eliminar Empresa'"
+  [mensaje]="'¿Estás seguro de que deseas eliminar la empresa ' + (empresaSeleccionada?.nombre ?? '') + '? Esta acción no se puede deshacer.'"
+  [palabraClave]="'confirmar'"
+  (confirmarEvent)="onConfirmarBorrado()"
+  (cancelarEvent)="onCancelarBorrado()">
+</app-confirmar-borrado-modal>
+
+@if (modalConfiguracionVisible) {
+  <div class="modal d-block empresas-config-modal" tabindex="-1" role="dialog" aria-modal="true">
+    <div class="empresas-config-backdrop"></div>
+
+    <div class="modal-dialog modal-dialog-centered empresas-config-dialog" role="document">
+      <div class="modal-content empresas-config-content">
+        <div class="modal-header border-0 pb-0 px-4 pt-4">
+          <div>
+            <h5 class="modal-title fw-bold mb-1 empresas-config-title">Configuración</h5>
+            <p class="text-muted mb-0 empresas-config-subtitle">Aquí puedes ajustar los parámetros de aviso y duración del convenio.</p>
+          </div>
+          <button type="button" class="btn-close" aria-label="Cerrar" (click)="cerrarConfiguracion()"></button>
+        </div>
+
+        <div class="modal-body px-4 pb-4 pt-3">
+          <div class="table-responsive empresas-config-table">
+            <table class="table align-middle mb-0">
+              <thead>
+                <tr>
+                  <th>Nombre</th>
+                  <th>Valor</th>
+                  <th>Descripción</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="fw-semibold">Dias aviso caducidad</td>
+                  <td class="empresas-config-value-cell">
+                    <div class="empresas-config-value-wrap">
+                      <input
+                        type="number"
+                        class="form-control empresas-config-input"
+                        [(ngModel)]="configuracionEmpresa.diasAvisoCaducidad"
+                        min="1"
+                        required>
+                      <span class="empresas-config-unit">días</span>
+                    </div>
+                  </td>
+                  <td>Tiempo de aviso previo antes de que caduque un convenio.</td>
+                </tr>
+                <tr>
+                  <td class="fw-semibold">Tiempo finalización convenio</td>
+                  <td class="empresas-config-value-cell">
+                    <div class="empresas-config-value-wrap">
+                      <input
+                        type="number"
+                        class="form-control empresas-config-input"
+                        [(ngModel)]="configuracionEmpresa.tiempoFinalizacionConvenio"
+                        min="1"
+                        required>
+                      <span class="empresas-config-unit">años</span>
+                    </div>
+                  </td>
+                  <td>Duración máxima del convenio antes de considerar su finalización.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="d-flex justify-content-end gap-3 mt-4 empresas-config-actions">
+            <button class="btn btn-empresa-save btn-lg px-4" (click)="guardarConfiguracion()">
+              GUARDAR
+            </button>
+            <button class="btn btn-empresa-cancel btn-lg px-4" (click)="cerrarConfiguracion()">
+              CERRAR
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+@if (modalCrearVisible) {
+  <div class="modal d-block empresas-create-modal" tabindex="-1" role="dialog" aria-modal="true">
+    <div class="empresas-create-backdrop"></div>
+
+    <div class="modal-dialog modal-dialog-centered modal-xl empresas-create-dialog" role="document">
+      <div class="modal-content empresas-create-content">
+        <div class="modal-header border-0 pb-0 px-4 pt-4">
+          <div class="d-flex align-items-center gap-2">
+            <div class="empresas-create-icon">
+              <i class="fa-solid fa-building"></i>
+            </div>
+            <h5 class="modal-title fw-bold mb-0 empresas-create-title">
+              {{ modoFormulario === 'editar' ? 'Editar empresa' : 'Crear nueva entrada' }}
+            </h5>
+          </div>
+          <button type="button" class="btn-close" aria-label="Cerrar" (click)="onCancelarCreacion()"></button>
+        </div>
+
+        <div class="modal-body px-4 pb-4 pt-2">
+          <div class="row g-4">
+            <div class="col-lg-7">
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <label class="form-label empresas-label">Siglas</label>
+                  <input type="text" class="form-control empresas-input" [(ngModel)]="nuevaEmpresa.siglas" placeholder="ABC" required>
+                </div>
+                <div class="col-md-8">
+                  <label class="form-label empresas-label">Nombre</label>
+                  <input type="text" class="form-control empresas-input" [(ngModel)]="nuevaEmpresa.nombre" placeholder="Nombre de la empresa" required>
+                </div>
+                <div class="col-md-12">
+                  <label class="form-label empresas-label">Convenio URL</label>
+                  <input type="url" class="form-control empresas-input" [(ngModel)]="nuevaEmpresa.convenioUrl" placeholder="https://..." required>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label empresas-label">Inicio Convenio</label>
+                  <input type="date" class="form-control empresas-input" [(ngModel)]="nuevaEmpresa.inicioConvenio" required>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label empresas-label">Fin Convenio</label>
+                  <input type="text" class="form-control empresas-input" [value]="obtenerFinConvenioCalculado()" readonly>
+                </div>
+                <div class="col-md-6">
+                  <div class="d-flex align-items-center justify-content-between mb-1">
+                    <label class="form-label empresas-label mb-0">Contacto</label>
+                    <button type="button" class="btn btn-outline-primary btn-sm empresas-add-contact" title="Añadir otro contacto" (click)="agregarContactoAdicional()">
+                      <i class="fa-solid fa-plus"></i>
+                    </button>
+                  </div>
+                  <input type="text" class="form-control empresas-input" [(ngModel)]="nuevaEmpresa.contacto" placeholder="Nombre del contacto" required>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label empresas-label">Numero Contacto</label>
+                  <input type="text" class="form-control empresas-input" [(ngModel)]="nuevaEmpresa.numeroContacto" placeholder="600000000" required>
+                </div>
+
+                @for (contactoExtra of contactosAdicionales; track $index; let i = $index) {
+                  <div class="col-12">
+                    <div class="row g-3 align-items-end">
+                      <div class="col-md-6">
+                        <div class="d-flex align-items-center justify-content-between mb-1">
+                          <label class="form-label empresas-label mb-0">Contacto adicional</label>
+                          <button type="button" class="btn btn-link text-danger p-0 empresas-remove-contact" title="Quitar contacto" (click)="quitarContactoAdicional(i)">
+                            <i class="fa-solid fa-circle-xmark"></i>
+                          </button>
+                        </div>
+                        <input type="text" class="form-control empresas-input" [(ngModel)]="contactoExtra.contacto" placeholder="Nombre del contacto" required>
+                      </div>
+                      <div class="col-md-6">
+                        <label class="form-label empresas-label">Número de contacto adicional</label>
+                        <input type="text" class="form-control empresas-input" [(ngModel)]="contactoExtra.numeroContacto" placeholder="600000000" required>
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <div class="col-lg-5">
+              <div class="empresas-side-card">
+                <p class="fw-semibold empresas-side-title mb-3">Datos del convenio</p>
+                <p class="text-muted mb-0 empresas-side-text">
+                  Aquí puedes crear o editar la empresa con toda la información básica del convenio, contacto y fechas para mantener el listado organizado.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="d-flex flex-wrap gap-4 mt-5">
+            <button class="btn btn-empresa-save btn-lg px-5" (click)="guardarEmpresa()">
+              {{ modoFormulario === 'editar' ? 'GUARDAR CAMBIOS' : 'CREAR' }}
+            </button>
+            <button class="btn btn-empresa-cancel btn-lg px-5" (click)="onCancelarCreacion()">
+              CANCELAR
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+}
