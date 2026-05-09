@@ -7,6 +7,12 @@ import { ProfesorDTO } from '../dto/dualex.dto';
   providedIn: 'root'
 })
 export class ProfesoresMockService {
+  readonly ciclosDisponibles = [
+    'Sistemas Microinformáticos y Redes',
+    'Desarrollo de Aplicaciones Web',
+    'Gestión Administrativa'
+  ];
+
   private profesoresMock: ProfesorDTO[] = [
     { id: 1, nombre: 'Isabel', apellidos: 'García López', correo: 'isabel.garcia@dualex.com', rol: 'PROFESOR', modulos: 'S.I., SER., B.D.', ciclos: 'SMR, DAW' },
     { id: 2, nombre: 'Alberto', apellidos: 'Martín Pérez', correo: 'alberto.martin@dualex.com', rol: 'PROFESOR', modulos: 'S.I., SER., B.D.', ciclos: 'SMR DAW' },
@@ -67,5 +73,22 @@ export class ProfesoresMockService {
 
   eliminarProfesor(id: number): void {
     this.profesoresMock = this.profesoresMock.filter(profesor => profesor.id !== id);
+  }
+
+  actualizarProfesor(id: number, profesor: Omit<ProfesorDTO, 'id'>): void {
+    this.profesoresMock = this.profesoresMock.map(actual =>
+      actual.id === id ? { id, ...profesor } : actual
+    );
+  }
+
+  agregarProfesor(profesor: Omit<ProfesorDTO, 'id'>): void {
+    const nextId = this.profesoresMock.length > 0 ? Math.max(...this.profesoresMock.map(p => p.id)) + 1 : 1;
+    this.profesoresMock = [
+      {
+        id: nextId,
+        ...profesor
+      },
+      ...this.profesoresMock
+    ];
   }
 }

@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Config } from 'datatables.net';
 import { DatatableComponent } from '../shared/datatable/datatable.component';
 import { ConfirmarBorradoModalComponent } from '../shared/modals/confirmar-borrado-modal/confirmar-borrado-modal.component';
@@ -10,7 +11,7 @@ import { ProfesorDTO } from '../../dto/dualex.dto';
 @Component({
   selector: 'app-profesores',
   standalone: true,
-  imports: [CommonModule, DatatableComponent, ConfirmarBorradoModalComponent],
+  imports: [CommonModule, FormsModule, DatatableComponent, ConfirmarBorradoModalComponent],
   templateUrl: './profesores.component.html',
   styleUrl: './profesores.component.css'
 })
@@ -22,7 +23,25 @@ export class ProfesoresComponent implements OnInit {
 
   dtOptions: Config = {};
   modalBorradoVisible = false;
+  modalCrearVisible = false;
+  modoFormulario: 'crear' | 'editar' = 'crear';
+  profesorEditandoId: number | null = null;
   profesorSeleccionado: ProfesorDTO | null = null;
+  archivoExcelSeleccionado: File | null = null;
+  nuevoProfesor = {
+    nombre: '',
+    apellidos: '',
+    correo: '',
+    rol: 'PROFESOR',
+    ciclos: [] as string[]
+  };
+
+  ciclosDisponibles = this.profesoresMockService.ciclosDisponibles;
+  private readonly mapeoCiclos: Record<string, string> = {
+    'SMR': 'Sistemas Microinformáticos y Redes',
+    'DAW': 'Desarrollo de Aplicaciones Web',
+    'GA': 'Gestión Administrativa'
+  };
 
   ngOnInit(): void {
     this.dtOptions = {
@@ -85,16 +104,46 @@ export class ProfesoresComponent implements OnInit {
   }
 
   subirExcel(): void {
-    this.alertService.informacion('Subir Excel', 'Aquí se conectará la importación masiva de profesores desde un archivo Excel.');
+    const input = document.getElementById('profesores-excel-input') as HTMLInputElement | null;
+    input?.click();
+  }
+
+  onExcelSeleccionado(event: Event): void {
+    const input = event.target as HTMLInputElement | null;
+    const archivo = input?.files?.[0] ?? null;
+
+    if (!archivo) return;
+
+    const nombre = archivo.name.toLowerCase();
+    const esExcel = nombre.endsWith('.xls') || nombre.endsWith('.xlsx');
+
+    if (!esExcel) {
+      this.alertService.error('Formato no válido', 'Solo se permiten archivos Excel con extensión .xls o .xlsx.');
+      if (input) input.value = '';
+      return;
+    }
+
+    this.archivoExcelSeleccionado = archivo;
+    this.alertService.exito('Archivo seleccionado', `Se ha seleccionado "${archivo.name}" correctamente.`);
+    if (input) input.value = '';
   }
 
   crearNuevaEntrada(): void {
-    this.alertService.informacion('Nueva entrada', 'Aquí se abrirá el formulario para crear un nuevo profesor.');
+    this.modoFormulario = 'crear';
+    this.profesorEditandoId = null;
+    this.nuevoProfesor = {
+      nombre: '',
+      apellidos: '',
+      correo: '',
+      rol: 'PROFESOR',
+      ciclos: []
+    };
+    this.modalCrearVisible = true;
   }
 
   onTableAction(event: { action: string, data: any }): void {
     if (event.action === 'edit') {
-      this.alertService.informacion('Editar profesor', `Editando a ${event.data.nombre} ${event.data.apellidos}.`);
+      this.abrirEdicionProfesor(event.data);
       return;
     }
 
@@ -117,6 +166,89 @@ export class ProfesoresComponent implements OnInit {
   onCancelarBorrado(): void {
     this.modalBorradoVisible = false;
     this.profesorSeleccionado = null;
+  }
+
+  onToggleCiclo(ciclo: string, checked: boolean): void {
+    if (checked) {
+      if (!this.nuevoProfesor.ciclos.includes(ciclo)) {
+        this.nuevoProfesor.ciclos = [...this.nuevoProfesor.ciclos, ciclo];
+      }
+      return;
+    }
+
+    this.nuevoProfesor.ciclos = this.nuevoProfesor.ciclos.filter(item => item !== ciclo);
+  }
+
+  guardarNuevoProfesor(): void {
+    if (
+      !this.nuevoProfesor.nombre.trim() ||
+      !this.nuevoProfesor.apellidos.trim() ||
+      !this.nuevoProfesor.correo.trim() ||
+      this.nuevoProfesor.ciclos.length === 0
+    ) {
+      this.alertService.error('Datos incompletos', 'Rellena todos los campos y selecciona al menos un ciclo antes de guardar.');
+      return;
+    }
+
+    const profesorPayload = {
+      nombre: this.nuevoProfesor.nombre.trim(),
+      apellidos: this.nuevoProfesor.apellidos.trim(),
+      correo: this.nuevoProfesor.correo.trim(),
+      rol: this.nuevoProfesor.rol as 'PROFESOR' | 'COORDINADOR',
+      modulos: 'S.I., SER., B.D.',
+      ciclos: this.convertirCiclosAAbreviaturas(this.nuevoProfesor.ciclos)
+    };
+
+    if (this.modoFormulario === 'editar' && this.profesorEditandoId !== null) {
+      this.profesoresMockService.actualizarProfesor(this.profesorEditandoId, profesorPayload);
+      this.alertService.exito('Profesor actualizado', `${this.nuevoProfesor.nombre} ${this.nuevoProfesor.apellidos} se ha actualizado correctamente.`);
+    } else {
+      this.profesoresMockService.agregarProfesor(profesorPayload);
+      this.alertService.exito('Profesor creado', `${this.nuevoProfesor.nombre} ${this.nuevoProfesor.apellidos} se ha añadido correctamente.`);
+    }
+
+    this.modalCrearVisible = false;
+    this.profesorEditandoId = null;
+    this.refrescarTabla();
+  }
+
+  onCancelarCreacion(): void {
+    this.modalCrearVisible = false;
+    this.profesorEditandoId = null;
+    this.modoFormulario = 'crear';
+  }
+
+  abrirEdicionProfesor(profesor: ProfesorDTO): void {
+    this.modoFormulario = 'editar';
+    this.profesorEditandoId = profesor.id;
+    this.nuevoProfesor = {
+      nombre: profesor.nombre,
+      apellidos: profesor.apellidos,
+      correo: profesor.correo,
+      rol: profesor.rol,
+      ciclos: this.convertirAbreviaturasACiclos(profesor.ciclos)
+    };
+    this.modalCrearVisible = true;
+  }
+
+  private convertirAbreviaturasACiclos(ciclos: string): string[] {
+    if (!ciclos.trim()) return [];
+
+    return ciclos
+      .split(',')
+      .map(ciclo => ciclo.trim())
+      .map(ciclo => this.mapeoCiclos[ciclo] ?? ciclo)
+      .filter(ciclo => this.ciclosDisponibles.includes(ciclo));
+  }
+
+  private convertirCiclosAAbreviaturas(ciclos: string[]): string {
+    const inverso: Record<string, string> = {
+      'Sistemas Microinformáticos y Redes': 'SMR',
+      'Desarrollo de Aplicaciones Web': 'DAW',
+      'Gestión Administrativa': 'GA'
+    };
+
+    return ciclos.map(ciclo => inverso[ciclo] ?? ciclo).join(', ');
   }
 
   private refrescarTabla(): void {
