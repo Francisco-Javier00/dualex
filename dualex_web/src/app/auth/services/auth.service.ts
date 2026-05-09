@@ -105,4 +105,15 @@ export class AuthService {
   public forzarPerfilPrueba(perfil: PerfilUsuario): void {
     this.sujetoPerfilUsuario.next(perfil);
   }
+
+  /**
+   * Cierra la sesión local eliminando la cookie y limpiando el perfil en memoria.
+   */
+  public cerrarSesion(): void {
+    if (isPlatformBrowser(this.platformId)) {
+      document.cookie = `${this.COOKIE_NAME}=; Max-Age=0; path=/`;
+    }
+
+    this.sujetoPerfilUsuario.next(null);
+  }
 }
