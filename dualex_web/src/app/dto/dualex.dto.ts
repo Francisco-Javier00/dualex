@@ -48,3 +48,13 @@ export interface ModuloProfesor {
   numAlumnos?: number;
   numActividades?: number;
 }
+
+export interface ProfesorDTO {
+  id: number;
+  nombre: string;
+  apellidos: string;
+  correo: string;
+  rol: 'PROFESOR' | 'COORDINADOR';
+  modulos: string;
+  ciclos: string;
+}

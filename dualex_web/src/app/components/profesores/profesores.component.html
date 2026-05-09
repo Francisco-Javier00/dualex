@@ -1,17 +1,35 @@
-<div class="container-fluid py-5 text-center animate-fade-in position-relative">
-  <!-- Botón Edificio en la esquina -->
-  <div class="position-absolute top-0 end-0 p-4">
-    <button class="btn btn-building shadow-sm" data-tooltip="Ver listado de empresas">
-      <i class="fa-solid fa-building"></i>
-    </button>
+<div class="container-fluid py-4 animate-fade-in mt-4">
+  <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+    <div>
+      <h2 class="fw-bold text-dark mb-1 profesores-title">
+        <i class="fa-solid fa-chalkboard-user text-primary me-2"></i>Registro de Profesores
+      </h2>
+      <p class="text-muted mb-0 profesores-subtitle">Selecciona un profesor para gestionar</p>
+    </div>
+
+    <div class="d-flex flex-wrap gap-3">
+      <button class="btn btn-primary btn-lg profesores-action-primary" (click)="subirExcel()">
+        <i class="fa-solid fa-file-excel me-2"></i>Subir excel
+      </button>
+      <button class="btn btn-outline-primary btn-lg profesores-action-secondary" (click)="crearNuevaEntrada()">
+        <i class="fa-solid fa-circle-plus me-2"></i>Crear nueva entrada
+      </button>
+    </div>
   </div>
 
-  <div class="py-5 mt-5">
-    <i class="fa-solid fa-chalkboard-user fs-1 text-primary mb-4"></i>
-    <h2 class="fw-bold text-dark">Gestión de Profesores</h2>
-    <p class="text-muted">Vista en desarrollo. Pronto podrás gestionar aquí a todo el equipo docente.</p>
-    <a routerLink="/" class="btn btn-primary-light mt-4 px-4 py-2">
-      <i class="fa-solid fa-arrow-left me-2"></i> Volver al Inicio
-    </a>
-  </div>
+  <app-shared-datatable
+    tableId="tabla-profesores"
+    [dtOptions]="dtOptions"
+    [columnTitles]="['Nombre', 'Apd', 'Correo', 'ROL', 'Modulos', 'Ciclos', 'Acciones']"
+    (actionClick)="onTableAction($event)">
+  </app-shared-datatable>
 </div>
+
+<app-confirmar-borrado-modal
+  [visible]="modalBorradoVisible"
+  [titulo]="'Eliminar Profesor'"
+  [mensaje]="'¿Estás seguro de que deseas eliminar al profesor ' + (profesorSeleccionado?.nombre ?? '') + ' ' + (profesorSeleccionado?.apellidos ?? '') + '? Esta acción no se puede deshacer.'"
+  [palabraClave]="'confirmar'"
+  (confirmarEvent)="onConfirmarBorrado()"
+  (cancelarEvent)="onCancelarBorrado()">
+</app-confirmar-borrado-modal>
