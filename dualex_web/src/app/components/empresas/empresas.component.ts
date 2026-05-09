@@ -233,6 +233,13 @@ export class EmpresasComponent implements OnInit {
     this.modalConfiguracionVisible = true;
   }
 
+  explicarConvenioUrl(): void {
+    this.alertService.informacion(
+      'Convenio URL',
+      'Aquí va la ubicación del convenio. Por ahora estoy a la espera de que me indiquen dónde está exactamente.'
+    );
+  }
+
   guardarConfiguracion(): void {
     const diasAviso = Number(this.configuracionEmpresa.diasAvisoCaducidad);
     const tiempoFinalizacion = Number(this.configuracionEmpresa.tiempoFinalizacionConvenio);

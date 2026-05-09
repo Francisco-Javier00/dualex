@@ -143,7 +143,12 @@
                   <input type="text" class="form-control empresas-input" [(ngModel)]="nuevaEmpresa.nombre" placeholder="Nombre de la empresa" required>
                 </div>
                 <div class="col-md-12">
-                  <label class="form-label empresas-label">Convenio URL</label>
+                  <div class="d-flex align-items-center justify-content-between mb-1">
+                    <label class="form-label empresas-label mb-0">Convenio URL</label>
+                    <button type="button" class="btn btn-link text-secondary p-0 empresas-help-btn" title="Ayuda sobre Convenio URL" (click)="explicarConvenioUrl()">
+                      <i class="fa-regular fa-circle-question"></i>
+                    </button>
+                  </div>
                   <input type="url" class="form-control empresas-input" [(ngModel)]="nuevaEmpresa.convenioUrl" placeholder="https://..." required>
                 </div>
                 <div class="col-md-6">

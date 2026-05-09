@@ -217,6 +217,21 @@
   text-decoration: none;
 }
 
+.empresas-help-btn {
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  opacity: 0.8;
+}
+
+.empresas-help-btn:hover {
+  opacity: 1;
+  color: #2563eb;
+}
+
 .empresas-config-actions {
   margin-top: 2rem;
 }
