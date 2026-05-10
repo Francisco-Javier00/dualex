@@ -1,10 +1,146 @@
-<div class="container-fluid py-5 text-center animate-fade-in">
-  <div class="py-5 mt-5">
-    <i class="fa-solid fa-graduation-cap fs-1 text-primary mb-4"></i>
-    <h2 class="fw-bold text-dark">Gestión de Ciclos</h2>
-    <p class="text-muted">Vista en desarrollo. Aquí aparecerán los diferentes ciclos formativos ofrecidos por el centro.</p>
-    <a routerLink="/" class="btn btn-primary-light mt-4 px-4 py-2">
-      <i class="fa-solid fa-arrow-left me-2"></i> Volver al Inicio
-    </a>
+<div class="ciclos-container">
+  <h1 class="page-title">Listado de Ciclos</h1>
+
+  <div class="card-container">
+    <div class="card-header" style="justify-content: flex-end;">
+      <!-- Search is handled automatically by the Datatable component -->
+      <button class="btn-create" (click)="abrirEditModal()">Crear nueva entrada</button>
+    </div>
+
+    <div class="table-container">
+      <app-shared-datatable
+        [dtOptions]="dtOptions"
+        [columnTitles]="columnTitles"
+        (actionClick)="handleAction($event)">
+      </app-shared-datatable>
+    </div>
   </div>
 </div>
+
+@if (isModalOpen) {
+<div class="custom-modal-overlay" (click)="cerrarModal()">
+  <div class="custom-modal" (click)="$event.stopPropagation()">
+    <div class="modal-content-blue">
+      <h3 class="modal-title">¿A qué curso quieres acceder?</h3>
+      <div class="select-container">
+        <select class="form-select custom-select" [(ngModel)]="cursoSeleccionado">
+          <option value="1">1º {{selectedCiclo?.siglas}}</option>
+          <option value="2">2º {{selectedCiclo?.siglas}}</option>
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-modal btn-aceptar" (click)="accederCurso()">ACEPTAR</button>
+        <button class="btn-modal btn-salir" (click)="cerrarModal()">SALIR</button>
+      </div>
+    </div>
+  </div>
+</div>
+}
+
+@if (isDeleteModalOpen) {
+<div class="custom-modal-overlay" (click)="cerrarDeleteModal()">
+  <div class="custom-modal" (click)="$event.stopPropagation()">
+    <div class="modal-content-blue">
+      <h3 class="modal-title text-center px-3 lh-base">
+        ¿Seguro que quieres eliminar el ciclo<br>
+        <strong>{{cicloToDelete?.nombre}}</strong>?<br>
+        Una vez eliminado, no se podrá volver atrás.
+      </h3>
+      <div class="modal-actions mt-4">
+        <button class="btn-modal btn-aceptar" (click)="confirmarEliminar()">ACEPTAR</button>
+        <button class="btn-modal btn-salir" (click)="cerrarDeleteModal()">SALIR</button>
+      </div>
+    </div>
+  </div>
+</div>
+}
+
+@if (isEditModalOpen) {
+<div class="custom-modal-overlay" (click)="cerrarEditModal()">
+  <div class="custom-modal form-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3 class="modal-title m-0 fw-bold">Añadir / Modificar Ciclo</h3>
+      <button class="btn-close-custom" (click)="cerrarEditModal()">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    
+    <div class="modal-body text-start">
+      <div class="form-group row mb-3 align-items-center">
+        <label class="col-sm-3 col-form-label pb-0">Nombre:</label>
+        <div class="col-sm-9">
+          <input type="text" class="form-control" [(ngModel)]="cicloForm.nombre">
+        </div>
+      </div>
+      <div class="form-group row mb-3 align-items-center">
+        <label class="col-sm-3 col-form-label pb-0">Siglas:</label>
+        <div class="col-sm-9">
+          <input type="text" class="form-control" [(ngModel)]="cicloForm.siglas">
+        </div>
+      </div>
+      <div class="form-group row mb-3 align-items-center">
+        <label class="col-sm-3 col-form-label pb-0">Grado:</label>
+        <div class="col-sm-9 d-flex align-items-center gap-4">
+          <label class="d-flex align-items-center m-0 gap-1"><input type="radio" name="grado" value="Grado Medio" [(ngModel)]="cicloForm.grado"> Medio</label>
+          <label class="d-flex align-items-center m-0 gap-1"><input type="radio" name="grado" value="Grado Superior" [(ngModel)]="cicloForm.grado"> Superior</label>
+        </div>
+      </div>
+      <div class="form-group row mb-4 align-items-center">
+        <label class="col-sm-3 col-form-label pb-0">Año escolar:</label>
+        <div class="col-sm-9">
+          <input type="text" class="form-control" [(ngModel)]="cicloForm.anoEscolar">
+        </div>
+      </div>
+      
+      <hr style="border-color: #666; margin-bottom: 20px;">
+      
+      <div class="form-group row mb-3 align-items-center">
+        <label class="col-sm-3 col-form-label pb-0">Siglas primero:</label>
+        <div class="col-sm-7">
+          <input type="text" class="form-control text-center bg-white" [value]="cicloForm.siglas ? '1º ' + cicloForm.siglas : ''" disabled>
+        </div>
+        <div class="col-sm-2 text-dark small px-0" style="font-size: 12px;">Automático</div>
+      </div>
+      <div class="form-group row mb-3 align-items-center">
+        <label class="col-sm-3 col-form-label pb-0">Color fondo:</label>
+        <div class="col-sm-9">
+          <input type="color" class="form-control form-control-color p-0 border-0" [(ngModel)]="cicloForm.colorFondo1">
+        </div>
+      </div>
+      <div class="form-group row mb-4 align-items-center">
+        <label class="col-sm-3 col-form-label pb-0">Color texto:</label>
+        <div class="col-sm-9">
+          <input type="color" class="form-control form-control-color p-0 border-0" [(ngModel)]="cicloForm.colorTexto1">
+        </div>
+      </div>
+
+      <hr style="border-color: #666; margin-bottom: 20px;">
+
+      <div class="form-group row mb-3 align-items-center">
+        <label class="col-sm-3 col-form-label pb-0">Siglas segundo:</label>
+        <div class="col-sm-7">
+          <input type="text" class="form-control text-center bg-white" [value]="cicloForm.siglas ? '2º ' + cicloForm.siglas : ''" disabled>
+        </div>
+        <div class="col-sm-2 text-dark small px-0" style="font-size: 12px;">Automático</div>
+      </div>
+      <div class="form-group row mb-3 align-items-center">
+        <label class="col-sm-3 col-form-label pb-0">Color fondo:</label>
+        <div class="col-sm-9">
+          <input type="color" class="form-control form-control-color p-0 border-0" [(ngModel)]="cicloForm.colorFondo2">
+        </div>
+      </div>
+      <div class="form-group row mb-3 align-items-center">
+        <label class="col-sm-3 col-form-label pb-0">Color texto:</label>
+        <div class="col-sm-9">
+          <input type="color" class="form-control form-control-color p-0 border-0" [(ngModel)]="cicloForm.colorTexto2">
+        </div>
+      </div>
+    </div>
+    
+    <div class="modal-actions mt-4 d-flex justify-content-center gap-4">
+      <button class="btn-modal btn-salir px-4" (click)="cerrarEditModal()">CANCELAR</button>
+      <button class="btn-modal btn-aceptar px-4" (click)="guardarCiclo()">ACEPTAR</button>
+    </div>
+  </div>
+</div>
+}
