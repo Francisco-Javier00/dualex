@@ -21,14 +21,14 @@ export class DatatableComponent implements AfterViewInit, OnDestroy {
   dtElement!: DataTableDirective;
 
   ngAfterViewInit(): void {
-    // Retraso ligero para asegurar que DataTables ha renderizado el DOM
+    // Esperamos un momento para que DataTables pinte el DOM antes de enganchar eventos.
     setTimeout(() => {
       this.configurarOyentes();
     }, 500);
   }
 
   ngOnDestroy(): void {
-    // Limpiar el evento de jQuery para evitar fugas de memoria
+    // Desenganchamos el listener de jQuery para evitar fugas de memoria.
     if (typeof $ !== 'undefined') {
       $(`#${this.tableId}`).off('click');
     }
@@ -37,15 +37,14 @@ export class DatatableComponent implements AfterViewInit, OnDestroy {
   private configurarOyentes(): void {
     if (typeof $ === 'undefined') return;
 
-    // Escuchar clics en cualquier elemento dentro de la tabla que tenga data-action
+    // Solo escuchamos acciones marcadas con data-action para no interferir con el resto de la tabla.
     $(`#${this.tableId}`).off('click').on('click', '[data-action]', (event: any) => {
       const action = $(event.currentTarget).data('action');
       
       this.dtElement.dtInstance.then((dtInstance: any) => {
-        // Extraer los datos de la fila (tr) donde se hizo clic
+        // Tomamos la fila pulsada y reenviamos la acción al componente padre.
         const rowData = dtInstance.row($(event.currentTarget).parents('tr')).data();
         
-        // Emitir hacia Angular
         this.actionClick.emit({ action, data: rowData });
       });
     });

@@ -8,6 +8,8 @@ import { PerfilUsuario, JwtPayload } from '../../dto/dualex.dto';
 })
 export class AuthService {
   private readonly COOKIE_NAME = 'dualex_jwt'; // Nombre supuesto de la cookie
+  // La sesión se mantiene en memoria para que el header, el perfil y las vistas
+  // compartan el mismo usuario sin depender de llamadas repetidas al backend.
   private sujetoPerfilUsuario = new BehaviorSubject<PerfilUsuario | null>(null);
   
   perfilUsuario$ = this.sujetoPerfilUsuario.asObservable();
@@ -104,5 +106,17 @@ export class AuthService {
    */
   public forzarPerfilPrueba(perfil: PerfilUsuario): void {
     this.sujetoPerfilUsuario.next(perfil);
+  }
+
+  /**
+   * Cierra la sesión local limpiando la cookie y el estado en memoria.
+   * De momento solo afecta a la sesión del navegador, no a un backend real.
+   */
+  public cerrarSesion(): void {
+    if (isPlatformBrowser(this.platformId)) {
+      document.cookie = `${this.COOKIE_NAME}=; Max-Age=0; path=/`;
+    }
+
+    this.sujetoPerfilUsuario.next(null);
   }
 }

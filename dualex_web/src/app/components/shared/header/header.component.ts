@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../auth/services/auth.service';
 import { PerfilUsuario } from '../../../dto/dualex.dto';
 import { Observable } from 'rxjs';
@@ -13,6 +13,7 @@ import { Observable } from 'rxjs';
 })
 export class HeaderComponent {
   private authService = inject(AuthService);
+  private router = inject(Router);
 
   usuario$: Observable<PerfilUsuario | null> = this.authService.perfilUsuario$;
 
@@ -27,6 +28,15 @@ export class HeaderComponent {
     }
 
     return [{ ruta: '/dashboard', etiqueta: 'Dashboard' }, ...enlacesBase];
+  }
+
+  cerrarSesion(): void {
+    this.authService.cerrarSesion();
+    this.router.navigate(['/']);
+  }
+
+  irAPerfil(): void {
+    this.router.navigate(['/perfil']);
   }
 
 }

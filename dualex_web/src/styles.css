@@ -94,6 +94,43 @@ body {
 
 .avatar {
   cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+button.avatar {
+  border: 0;
+  background-image: none;
+}
+
+button.avatar:hover,
+button.avatar:focus,
+button.avatar:active {
+  opacity: 1 !important;
+  transform: none !important;
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+button.avatar.badge-coordinador:hover,
+button.avatar.badge-coordinador:focus,
+button.avatar.badge-coordinador:active {
+  background-color: var(--primary) !important;
+  color: #fff !important;
+}
+
+button.avatar.badge-profesor:hover,
+button.avatar.badge-profesor:focus,
+button.avatar.badge-profesor:active {
+  background-color: var(--secondary) !important;
+  color: #fff !important;
+}
+
+button.avatar.badge-alumno:hover,
+button.avatar.badge-alumno:focus,
+button.avatar.badge-alumno:active {
+  background-color: #5bb3eb !important;
+  color: #fff !important;
 }
 
 .btn-link:hover {

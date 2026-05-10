@@ -1,4 +1,4 @@
-<header class="navbar navbar-expand-lg bg-white border-bottom fixed-top py-3 px-4" style="height: 80px;">
+﻿<header class="navbar navbar-expand-lg bg-white border-bottom fixed-top py-3 px-4" style="height: 80px;">
   <div class="container-fluid d-flex justify-content-between align-items-center h-100">
     <a class="navbar-brand d-flex align-items-center gap-0" routerLink="/" title="Inicio" style="line-height: 1;">
       <img src="/dualex-logo.svg" alt="Logo Dualex" style="height: 50px; margin-right: -2px; margin-bottom: 17px;">
@@ -15,11 +15,11 @@
         </span>
       </div>
 
-      <div class="avatar text-white d-flex align-items-center justify-content-center rounded-circle fw-bold"
+      <button type="button" (click)="irAPerfil()" class="avatar text-white d-flex align-items-center justify-content-center rounded-circle fw-bold text-decoration-none border-0"
         [ngClass]="'badge-' + usuario.rol.toLowerCase()"
         style="width: 38px; height: 38px; font-size: 1.1rem; cursor: pointer;" title="Perfil">
         {{ usuario.nombre.substring(0, 1).toUpperCase() }}
-      </div>
+      </button>
 
       <div class="vr mx-2" style="height: 32px;"></div>
 
@@ -27,7 +27,7 @@
         <i class="fa-solid fa-question"></i>
       </button>
 
-      <button class="btn btn-link text-secondary p-1 fs-4 lh-1" title="Cerrar Sesión">
+      <button class="btn btn-link text-secondary p-1 fs-4 lh-1" title="Cerrar Sesion" type="button">
         <i class="fa-solid fa-sign-out-alt"></i>
       </button>
     </div>

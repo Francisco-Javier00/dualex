@@ -1,0 +1,296 @@
+.profesores-title {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.profesores-back-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border-color: #d1d5db;
+  color: #374151;
+  background: #fff;
+}
+
+.profesores-back-btn:hover {
+  background: #f8fafc;
+  border-color: #94a3b8;
+  color: #0f172a;
+}
+
+.profesores-subtitle {
+  font-size: 1rem;
+  color: #6b7280;
+}
+
+.profesores-action-primary {
+  border-radius: 8px;
+  min-width: 230px;
+}
+
+.profesores-action-secondary {
+  border-radius: 8px;
+  min-width: 270px;
+}
+
+:host ::ng-deep .table-responsive.bg-white {
+  border: 1px solid #d9d9d9 !important;
+  border-radius: 8px;
+  padding: 0.75rem !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+}
+
+:host ::ng-deep .table {
+  font-size: 0.92rem;
+  color: #111827;
+}
+
+:host ::ng-deep .table thead th {
+  color: #6b7280;
+  font-weight: 700;
+  text-align: left;
+  padding-top: 0.8rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 2px solid #0b6ba8 !important;
+}
+
+:host ::ng-deep .table thead th:last-child {
+  text-align: center;
+}
+
+:host ::ng-deep .table tbody td {
+  text-align: left;
+  vertical-align: middle;
+  padding-top: 0.9rem;
+  padding-bottom: 0.9rem;
+}
+
+:host ::ng-deep .table tbody td:last-child {
+  text-align: center;
+}
+
+:host ::ng-deep .table-striped > tbody > tr:nth-of-type(odd) > * {
+  --bs-table-accent-bg: #f6f6f6;
+  background-color: #f6f6f6;
+}
+
+:host ::ng-deep .table-striped > tbody > tr:nth-of-type(even) > * {
+  --bs-table-accent-bg: #ffffff;
+  background-color: #ffffff;
+}
+
+:host ::ng-deep .table-striped > tbody > tr:hover > * {
+  background-color: #e9f4ff;
+}
+
+:host ::ng-deep .dataTables_wrapper .dataTables_filter {
+  margin-bottom: 0;
+}
+
+:host ::ng-deep .dataTables_wrapper .dataTables_filter label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  color: #111827;
+  margin-bottom: 0;
+}
+
+:host ::ng-deep .dataTables_wrapper .dataTables_filter input {
+  min-width: 260px;
+  border-radius: 8px;
+  border: 1px solid #8aa0b7;
+  padding: 0.45rem 0.65rem;
+  background: #fff;
+  outline: none;
+}
+
+:host ::ng-deep .dataTables_wrapper .dataTables_filter input:focus {
+  border-color: #5a7ea8;
+  box-shadow: 0 0 0 0.2rem rgba(90, 126, 168, 0.15);
+}
+
+:host ::ng-deep .dataTables_wrapper .dataTables_info,
+:host ::ng-deep .dataTables_wrapper .dataTables_paginate {
+  color: #111827 !important;
+  font-size: 0.9rem;
+}
+
+:host ::ng-deep .dataTables_wrapper .page-item.active .page-link {
+  background-color: #6f8fb2;
+  border-color: #6f8fb2;
+}
+
+:host ::ng-deep .dataTables_wrapper .page-link {
+  color: #111827;
+}
+
+:host ::ng-deep .action-buttons {
+  gap: 0.35rem !important;
+}
+
+:host ::ng-deep .action-edit,
+:host ::ng-deep .action-delete {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 5px;
+}
+
+:host ::ng-deep .action-edit i,
+:host ::ng-deep .action-delete i {
+  font-size: 0.95rem;
+}
+
+.profesores-create-modal {
+  background: transparent;
+}
+
+.profesores-create-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.profesores-create-dialog {
+  position: relative;
+  z-index: 1056;
+  max-width: 920px;
+  margin: 1.5rem auto;
+}
+
+.profesores-create-content {
+  border: 1px solid #e5e7eb;
+  border-radius: 28px;
+  background: #ffffff;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.18);
+}
+
+.profesores-create-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #eff6ff;
+  color: #2563eb;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profesores-create-title {
+  color: #1f2937;
+  font-size: 1.35rem;
+}
+
+.profesores-label,
+.profesores-ciclos-title {
+  color: #374151;
+  font-weight: 600;
+}
+
+.profesores-input {
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  background: #fff;
+  min-height: 42px;
+  box-shadow: none;
+}
+
+.profesores-input:focus {
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.12);
+}
+
+.profesores-check-row {
+  font-size: 0.95rem;
+  color: #374151;
+  line-height: 1.35;
+}
+
+.profesores-check {
+  width: 1.2rem;
+  height: 1.2rem;
+  margin-top: 0.15rem;
+  flex: 0 0 auto;
+}
+
+.profesores-cycle-label {
+  max-width: 100%;
+}
+
+.btn-profesores-save {
+  background: linear-gradient(180deg, #dff0c8 0%, #c9e6b0 100%);
+  border: 1px solid #b8d595;
+  color: #1f2937;
+  border-radius: 12px;
+  min-width: 240px;
+}
+
+.btn-profesores-save:hover {
+  background: linear-gradient(180deg, #d3ebbc 0%, #bddfa0 100%);
+}
+
+.btn-profesores-cancel {
+  background: linear-gradient(180deg, #f9d2ce 0%, #f6c0bb 100%);
+  border: 1px solid #e8a8a2;
+  color: #1f2937;
+  border-radius: 12px;
+  min-width: 240px;
+}
+
+.btn-profesores-cancel:hover {
+  background: linear-gradient(180deg, #f6c8c3 0%, #f2b1ab 100%);
+}
+
+.profesores-cycle-panel {
+  padding: 0.25rem 0 0.25rem 0.25rem;
+}
+
+:host ::ng-deep .profesores-cycle-panel .form-check-input {
+  border: 1px solid #cbd5e1;
+  box-shadow: none;
+}
+
+:host ::ng-deep .profesores-cycle-panel .form-check-input:checked {
+  background-color: #2563eb;
+  border-color: #2563eb;
+}
+
+:host ::ng-deep .profesores-length,
+:host ::ng-deep .profesores-search {
+  display: flex;
+  align-items: center;
+}
+
+:host ::ng-deep .profesores-length label,
+:host ::ng-deep .profesores-search label {
+  margin-bottom: 0;
+}
+
+:host ::ng-deep .dataTables_wrapper .dataTables_length select {
+  border-radius: 4px;
+  border: 1px solid #dee2e6;
+  padding: 4px;
+}
+
+:host ::ng-deep .dataTables_wrapper .dataTables_filter input {
+  border-radius: 4px;
+  border: 1px solid #dee2e6;
+  padding: 4px 8px;
+  margin-left: 8px;
+}
+
+:host ::ng-deep .dataTables_wrapper .paginate_button.current,
+:host ::ng-deep .dataTables_wrapper .paginate_button.current:hover {
+  background: #0b6ba8 !important;
+  color: #fff !important;
+  border-color: #0b6ba8 !important;
+}
