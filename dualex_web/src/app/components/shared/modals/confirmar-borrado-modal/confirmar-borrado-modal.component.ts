@@ -12,7 +12,7 @@ import { FormsModule } from '@angular/forms';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './confirmar-borrado-modal.component.html',
-  styleUrls: ['./confirmar-borrado-modal.component.css']
+  styleUrl: './confirmar-borrado-modal.component.css'
 })
 export class ConfirmarBorradoModalComponent implements OnChanges, OnDestroy {
   // Renderer2 se utiliza para manipular el DOM de forma segura (añadir/quitar clases al body)

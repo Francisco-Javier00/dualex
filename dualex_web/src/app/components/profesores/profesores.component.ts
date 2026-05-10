@@ -12,7 +12,13 @@ import { ProfesorDTO } from '../../dto/dualex.dto';
 @Component({
   selector: 'app-profesores',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, DatatableComponent, ConfirmarBorradoModalComponent],
+  imports: [
+    CommonModule, 
+    RouterModule, 
+    FormsModule, 
+    DatatableComponent, 
+    ConfirmarBorradoModalComponent
+  ],
   templateUrl: './profesores.component.html',
   styleUrl: './profesores.component.css'
 })
@@ -33,7 +39,7 @@ export class ProfesoresComponent implements OnInit {
     nombre: '',
     apellidos: '',
     correo: '',
-    rol: 'PROFESOR',
+    rol: 'PROFESOR' as 'PROFESOR' | 'COORDINADOR',
     ciclos: [] as string[]
   };
 

@@ -1,4 +1,4 @@
-﻿.empresas-gear {
+.empresas-gear {
   width: 42px;
   height: 42px;
   display: inline-flex;
@@ -236,27 +236,6 @@
   margin-top: 2rem;
 }
 
-.empresas-back-btn {
-  min-width: 34px;
-  width: 34px;
-  height: 34px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 10px;
-  padding: 0;
-  border-color: #d1d5db;
-  color: #374151;
-  background: #fff;
-  transition: background-color 180ms ease, border-color 180ms ease, color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
-}
-
-.empresas-back-btn:hover {
-  background: #f8fafc;
-  border-color: #94a3b8;
-  color: #0f172a;
-  transform: translateY(-1px);
-}
 
 .empresas-gear:hover {
   transform: translateY(-2px) rotate(12deg);

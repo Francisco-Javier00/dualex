@@ -13,7 +13,7 @@ import { ActividadDTO } from '../../../../dto/dualex.dto';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './actividad-modal.component.html',
-  styleUrls: ['./actividad-modal.component.css']
+  styleUrl: './actividad-modal.component.css'
 })
 export class ActividadModalComponent implements OnChanges, OnDestroy {
   private fb = inject(FormBuilder);

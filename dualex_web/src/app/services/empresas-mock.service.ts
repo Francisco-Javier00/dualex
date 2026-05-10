@@ -34,7 +34,7 @@ export class EmpresasMockService {
         empresa.finConvenio.toLowerCase().includes(search) ||
         empresa.contacto.toLowerCase().includes(search) ||
         empresa.numeroContacto.toLowerCase().includes(search) ||
-        (empresa.contactosAdicionales?.some(contacto =>
+        (empresa.contactosAdicionales?.some((contacto: any) =>
           contacto.contacto.toLowerCase().includes(search) ||
           contacto.numeroContacto.toLowerCase().includes(search)
         ) ?? false)

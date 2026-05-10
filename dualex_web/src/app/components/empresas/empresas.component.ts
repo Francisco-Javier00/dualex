@@ -136,7 +136,7 @@ export class EmpresasComponent implements OnInit {
   abrirEdicionEmpresa(empresa: EmpresaDTO): void {
     this.modoFormulario = 'editar';
     this.empresaEditandoId = empresa.id;
-    this.contactosAdicionales = (empresa.contactosAdicionales ?? []).map(contacto => ({ ...contacto }));
+    this.contactosAdicionales = (empresa.contactosAdicionales ?? []).map((contacto: ContactoEmpresaDTO) => ({ ...contacto }));
     this.nuevaEmpresa = {
       siglas: empresa.siglas,
       nombre: empresa.nombre,

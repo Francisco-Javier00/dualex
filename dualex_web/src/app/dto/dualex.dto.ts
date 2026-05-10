@@ -104,3 +104,31 @@ export interface ModuloDTO {
   siglas: string;
   ciclo: string;
 }
+
+export interface ContactoEmpresaDTO {
+  contacto: string;
+  numeroContacto: string;
+}
+
+export interface EmpresaDTO {
+  id: number;
+  siglas: string;
+  nombre: string;
+  convenioUrl: string;
+  inicioConvenio: string;
+  finConvenio: string;
+  contacto: string;
+  numeroContacto: string;
+  contactosAdicionales?: ContactoEmpresaDTO[];
+}
+
+export interface ProfesorDTO {
+  id: number;
+  nombre: string;
+  apellidos: string;
+  correo: string;
+  rol: 'PROFESOR' | 'COORDINADOR';
+  modulos: string;
+  ciclos: string;
+}
+

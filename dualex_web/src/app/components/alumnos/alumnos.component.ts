@@ -89,8 +89,8 @@ export class AlumnosComponent implements OnInit {
     this.alertService.informacion('Nuevo Alumno', 'Se abrirá el formulario para registrar un nuevo estudiante en el sistema.');
   }
 
-  importarCSV(): void {
-    this.alertService.informacion('Importar CSV', 'Aquí podrás seleccionar un archivo .csv para cargar alumnos de forma masiva.');
+  importarExcel(): void {
+    this.alertService.informacion('Importar Excel', 'Aquí podrás seleccionar un archivo Excel (.xls o .xlsx) para cargar alumnos de forma masiva.');
   }
 
   onTableAction(event: { action: string, data: any }): void {

@@ -11,7 +11,13 @@ import { Ciclo } from '../../dto/ciclo.dto';
 @Component({
   selector: 'app-ciclos',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, DatatableComponent, ConfirmarBorradoModalComponent],
+  imports: [
+    CommonModule, 
+    RouterModule, 
+    FormsModule, 
+    DatatableComponent, 
+    ConfirmarBorradoModalComponent
+  ],
   templateUrl: './ciclos.component.html',
   styleUrl: './ciclos.component.css'
 })

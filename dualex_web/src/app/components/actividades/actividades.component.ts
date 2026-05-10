@@ -13,11 +13,11 @@ import { Config } from 'datatables.net';
   selector: 'app-actividades',
   standalone: true,
   imports: [
-    CommonModule, 
-    RouterModule, 
-    DatatableComponent, 
-    ConfirmarBorradoModalComponent,
-    ActividadModalComponent
+    CommonModule,
+    RouterModule,
+    ActividadModalComponent,
+    DatatableComponent,
+    ConfirmarBorradoModalComponent
   ],
   templateUrl: './actividades.component.html'
 })
