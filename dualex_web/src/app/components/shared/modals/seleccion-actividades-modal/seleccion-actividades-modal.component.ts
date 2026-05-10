@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, OnInit, OnDestroy, OnChanges, inject, Renderer2 } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnInit, OnDestroy, OnChanges, inject, Renderer2, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActividadDTO } from '../../../../dto/dualex.dto';
@@ -14,11 +14,13 @@ import { ActividadDTO } from '../../../../dto/dualex.dto';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './seleccion-actividades-modal.component.html',
-  styleUrl: './seleccion-actividades-modal.component.css'
+  styleUrl: './seleccion-actividades-modal.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SeleccionActividadesModalComponent implements OnInit, OnDestroy, OnChanges {
   // Renderer2 permite manipular clases del body/html de forma compatible con SSR
   private renderer = inject(Renderer2);
+  private cdr = inject(ChangeDetectorRef);
 
   // ENTRADAS
   @Input() visible = false;                       // Control de visibilidad desde el padre
@@ -32,21 +34,30 @@ export class SeleccionActividadesModalComponent implements OnInit, OnDestroy, On
   // ESTADO LOCAL
   busqueda = '';                        // Texto del buscador
   actividadesFiltradas: ActividadDTO[] = []; // Lista reducida tras aplicar el filtro
+  seleccionadasSet = new Set<number>();      // Set optimizado para búsquedas rápidas (O(1))
 
   /**
    * Inicialización del componente
    */
   ngOnInit(): void {
     // Al arrancar, mostramos todas las actividades disponibles
-    this.actividadesFiltradas = this.todasLasActividades;
+    this.filtrar();
   }
 
   /**
    * Se ejecuta cada vez que el padre cambia alguna propiedad de entrada.
    */
   ngOnChanges(): void {
-    this.filtrar();          // Re-filtramos por si han cambiado las actividades base
-    this.toggleBodyScroll(); // Bloqueamos o liberamos el scroll según visibilidad
+    // Actualizamos el Set de IDs para búsquedas eficientes en el HTML
+    this.seleccionadasSet = new Set(this.seleccionadas || []);
+    
+    if (this.visible) {
+      this.filtrar();          
+      this.toggleBodyScroll(); 
+    } else {
+      this.toggleBodyScroll();
+    }
+    this.cdr.markForCheck();
   }
 
   /**
@@ -66,20 +77,26 @@ export class SeleccionActividadesModalComponent implements OnInit, OnDestroy, On
   /**
    * Aplica un filtro de texto sobre el catálogo de actividades.
    * Busca coincidencias en el Título o en el Módulo asociado.
+   * Limita a 100 resultados para mantener rendimiento.
    */
   filtrar(): void {
     const term = this.busqueda.toLowerCase().trim();
     this.actividadesFiltradas = this.todasLasActividades.filter(a =>
       a.titulo.toLowerCase().includes(term) ||
       a.modulo.toLowerCase().includes(term)
-    );
+    ).slice(0, 100);
+    this.cdr.markForCheck();
+  }
+
+  estaSeleccionada(id: number): boolean {
+    return this.seleccionadasSet.has(id);
   }
 
   /**
-   * Helper para la UI: Determina si una actividad específica está en la lista de seleccionadas.
+   * trackBy para optimizar el renderizado del listado de actividades
    */
-  estaSeleccionada(id: number): boolean {
-    return this.seleccionadas?.includes(id) || false;
+  trackByActividadId(index: number, actividad: ActividadDTO): number {
+    return actividad.id;
   }
 
   /**
@@ -97,8 +114,10 @@ export class SeleccionActividadesModalComponent implements OnInit, OnDestroy, On
       this.seleccionadas.push(id);         // Añadir
     }
     
+    this.seleccionadasSet = new Set(this.seleccionadas);
     // Emitimos una copia del array para que Angular detecte el cambio de referencia
     this.seleccionChange.emit([...this.seleccionadas]);
+    this.cdr.markForCheck();
   }
 
   /**

@@ -1,5 +1,5 @@
 <!-- CONTENEDOR DEL MODAL: Se muestra u oculta según la propiedad 'visible' -->
-<div class="modal-overlay" *ngIf="visible" (click)="cerrar()">
+<div class="modal-overlay" *ngIf="visible">
   
   <!-- CUERPO DEL MODAL: Detiene la propagación del click para no cerrarse al tocar dentro -->
   <div class="modal-content animate-slide-up" (click)="$event.stopPropagation()">
@@ -29,7 +29,7 @@
       <div class="actividades-list">
         
         <!-- CARD DE ACTIVIDAD: Estilo interactivo que cambia al estar seleccionada -->
-        <div *ngFor="let actividad of actividadesFiltradas" 
+        <div *ngFor="let actividad of actividadesFiltradas; trackBy: trackByActividadId" 
              class="actividad-item d-flex align-items-center gap-3 p-3 mb-2 rounded-3 border transition-all"
              [class.selected]="estaSeleccionada(actividad.id)"
              (click)="toggle(actividad.id)">
@@ -41,13 +41,16 @@
           </div>
 
           <!-- INFORMACIÓN DE LA ACTIVIDAD -->
-          <div class="flex-grow-1">
-            <h6 class="mb-0 fw-bold small text-dark">{{ actividad.titulo }}</h6>
-            <div class="d-flex align-items-center gap-2 mt-1">
+          <div class="flex-grow-1 overflow-hidden">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <h6 class="mb-0 fw-bold small text-dark text-truncate me-2">{{ actividad.titulo }}</h6>
               <span class="badge bg-light text-primary border border-primary-subtle extra-small rounded-pill">
                 {{ actividad.modulo }}
               </span>
             </div>
+            <p class="text-muted extra-small mb-0 text-truncate" *ngIf="actividad.descripcion">
+              {{ actividad.descripcion }}
+            </p>
           </div>
         </div>
 
@@ -64,7 +67,7 @@
       <div class="text-muted small">
         <span class="fw-bold text-primary">{{ seleccionadas.length }}</span> actividades seleccionadas
       </div>
-      <button class="btn btn-primary px-4 rounded-pill shadow-sm" (click)="cerrar()">
+      <button class="btn btn-primary px-4 rounded-3 shadow-sm" (click)="cerrar()">
         Aceptar
       </button>
     </div>

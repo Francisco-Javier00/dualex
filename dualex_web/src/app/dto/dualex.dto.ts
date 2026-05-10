@@ -97,3 +97,10 @@ export interface AlumnoDTO {
   curso: string;
   estado: 'Activo' | 'Inactivo';
 }
+
+export interface ModuloDTO {
+  id: number;
+  nombre: string;
+  siglas: string;
+  ciclo: string;
+}

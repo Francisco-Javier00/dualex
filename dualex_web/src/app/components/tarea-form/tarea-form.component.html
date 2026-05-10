@@ -1,176 +1,167 @@
-<!-- CONTENEDOR PRINCIPAL DEL FORMULARIO -->
-<div class="container-fluid py-4 animate-fade-in" [formGroup]="tareaForm">
-  
-  <!-- CABECERA DE ACCIÓN: Título dinámico y botones de control -->
-  <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+<div class="container-fluid py-4 mt-4 px-md-5 px-3" [formGroup]="tareaForm">
+  <!-- Cabecera de Acción -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-      <h3 class="fw-bold text-dark mb-0">
-        <i class="fa-solid fa-file-signature text-primary me-2"></i>
-        {{ esEdicion ? 'Editar Tarea del Cuaderno' : 'Nueva Tarea en Cuaderno' }}
-      </h3>
-      <p class="text-muted small mb-0">Registra el progreso diario y las evaluaciones correspondientes</p>
+      <h2 class="fw-bold text-dark mb-1">
+        <i class="fa-solid fa-file-pen text-primary me-2"></i>
+        {{ esEdicion ? 'Editar Tarea' : 'Nueva Tarea' }}
+      </h2>
+      <p class="text-muted">Gestiona la información, actividades y evaluaciones de la tarea seleccionada</p>
     </div>
-    
     <div class="d-flex gap-2">
-      <!-- Botón Volver: Utiliza el historial del navegador para regresar -->
-      <button class="btn btn-light border px-3 shadow-sm hover-lift" (click)="volver()">
+      <button class="btn btn-light border rounded-3 px-4" (click)="volver()">
         <i class="fa-solid fa-arrow-left me-2"></i> Volver
       </button>
-      <!-- Botón Guardar: Ejecuta la lógica de persistencia del TS -->
-      <button class="btn btn-primary px-4 shadow-sm hover-lift" (click)="guardar()" [disabled]="tareaForm.invalid">
-        <i class="fa-solid fa-cloud-arrow-up me-2"></i> 
-        {{ esEdicion ? 'Actualizar' : 'Guardar Tarea' }}
+      <button class="btn btn-primary rounded-3 px-4 shadow-sm" (click)="guardar()" [disabled]="tareaForm.invalid">
+        <i class="fa-solid fa-save me-2"></i> Guardar Tarea
       </button>
     </div>
   </div>
 
-  <div class="row g-4">
-    
-    <!-- COLUMNA IZQUIERDA (4): Datos básicos y Actividades -->
-    <div class="col-lg-4">
-      <div class="card border-0 shadow-sm rounded-4 h-100 overflow-hidden">
-        <div class="card-header bg-white border-bottom py-3">
-          <h6 class="fw-bold mb-0 text-primary">
-            <i class="fa-solid fa-list-check me-2"></i> Actividades Relacionadas
-          </h6>
+  <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+    <!-- Primera Fila: Título y Fechas -->
+    <div class="row g-3 mb-4">
+      <div class="col-lg-6">
+        <label class="form-label fw-bold text-muted small text-uppercase">Título de la Tarea</label>
+        <div class="input-group">
+          <span class="input-group-text bg-white text-primary"
+            style="width: 40px; justify-content: center; font-weight: 900; font-family: 'Times New Roman', serif; font-size: 1.2rem; height: 45px;">H</span>
+          <input type="text" class="form-control bg-light-subtle" formControlName="titulo"
+            placeholder="Ej: Implementación de ..." style="height: 45px;">
         </div>
-        <div class="card-body bg-light-subtle">
-          
-          <!-- Botón para invocar el modal de selección múltiple -->
-          <button type="button" class="btn btn-outline-primary btn-sm w-100 mb-3 rounded-pill py-2 shadow-sm" (click)="abrirModalActividades()">
-            <i class="fa-solid fa-plus-circle me-1"></i> Añadir actividad
-          </button>
+      </div>
+      <div class="col-lg-3 col-md-6">
+        <label class="form-label fw-bold text-muted small text-uppercase">Fecha Inicio</label>
+        <div class="input-group">
+          <span class="input-group-text bg-white" style="height: 45px;"><i
+              class="fa-solid fa-calendar-day text-primary"></i></span>
+          <input type="date" class="form-control bg-light-subtle" formControlName="fechaIni" style="height: 45px;">
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6">
+        <label class="form-label fw-bold text-muted small text-uppercase">Fecha Fin</label>
+        <div class="input-group">
+          <span class="input-group-text bg-white" style="height: 45px;"><i
+              class="fa-solid fa-calendar-check text-primary"></i></span>
+          <input type="date" class="form-control bg-light-subtle" formControlName="fechaFin" style="height: 45px;">
+        </div>
+      </div>
+    </div>
 
-          <!-- Listado de Badges: Muestra las actividades seleccionadas actualmente -->
-          <div class="d-flex flex-wrap gap-2">
+    <!-- Segunda Fila: Actividades y Descripción -->
+    <div class="row g-4">
+      <!-- Actividades Relacionadas -->
+      <div class="col-lg-4">
+        <label class="form-label fw-bold text-muted small text-uppercase">Actividades Relacionadas</label>
+        <div class="card border-0 rounded-3 p-3"
+          style="min-height: 250px; background-color: #f1f4f8; border: 1px solid #e2e8f0 !important;">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="d-flex align-items-center gap-2">
+              <div class="bg-white p-2 rounded-3 shadow-sm d-flex align-items-center justify-content-center"
+                style="width: 35px; height: 35px;">
+                <i class="fa-solid fa-layer-group text-primary"></i>
+              </div>
+              <span class="fw-bold small text-dark">Seleccionadas</span>
+            </div>
+            <button type="button" class="btn btn-primary btn-sm px-3 rounded-2 shadow-sm" style="height: 35px;"
+              (click)="abrirModalActividades()">
+              <i class="fa-solid fa-plus me-1"></i> Añadir
+            </button>
+          </div>
+
+          <div class="d-flex flex-column gap-2 overflow-auto" style="max-height: 250px;">
             <div *ngFor="let act of getActividadesSeleccionadas()"
-              class="badge bg-white border text-dark px-3 py-2 rounded-pill shadow-sm d-flex align-items-center gap-2 animate-fade-in">
-              {{ act.titulo }}
-              <!-- Permite eliminar la actividad individualmente sin abrir el modal -->
-              <i class="fa-solid fa-xmark text-muted pointer hover-danger ms-1" (click)="toggleActividad(act.id)"></i>
+              class="bg-white p-2 px-3 rounded-3 border d-flex justify-content-between align-items-center shadow-sm animate-fade-in">
+              <span class="small text-truncate me-2">{{ act.titulo }}</span>
+              <i class="fa-solid fa-xmark text-muted pointer hover-danger" (click)="toggleActividad(act.id)"></i>
             </div>
-            
-            <!-- Estado vacío: Feedback visual si no hay selección -->
-            <div *ngIf="getActividadesSeleccionadas().length === 0" class="text-center w-100 py-3">
-              <i class="fa-solid fa-folder-open text-muted opacity-25 d-block fs-2 mb-2"></i>
-              <span class="text-muted extra-small italic">Ninguna actividad vinculada</span>
+            <div *ngIf="getActividadesSeleccionadas().length === 0" class="text-muted small italic py-5 text-center">
+              Ninguna seleccionada
             </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- COLUMNA DERECHA (8): Editor de Contenido -->
-    <div class="col-lg-8">
-      <div class="card border-0 shadow-sm rounded-4 h-100 overflow-hidden">
-        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
-          <h6 class="fw-bold mb-0 text-primary">
-            <i class="fa-solid fa-pen-to-square me-2"></i> Descripción Detallada
-          </h6>
-          <span class="badge bg-primary-light text-primary border border-primary px-3 rounded-pill small">Modo Escritura</span>
-        </div>
-        <div class="card-body p-0">
-          <!-- CKEditor 5: Configurado para soportar imágenes base64 y tablas redimensionables -->
-          <div class="editor-container">
-            <ckeditor [editor]="Editor" [config]="config" formControlName="descripcion"></ckeditor>
-          </div>
+      <!-- Descripción Detallada -->
+      <div class="col-lg-8">
+        <label class="form-label fw-bold text-muted small text-uppercase">Descripción Detallada</label>
+        <div class="editor-container border rounded-3 overflow-hidden shadow-sm bg-white">
+          <ckeditor [editor]="Editor" [config]="config" formControlName="descripcion"></ckeditor>
         </div>
       </div>
     </div>
 
-    <!-- SECCIÓN DE EVALUACIONES Y SEGUIMIENTO -->
-    <div class="col-12">
-      <hr class="my-4 opacity-50">
-      
+
+    <hr class="my-4 opacity-25">
+
+    <!-- Sección de Evaluación Empresa -->
+    <div class="mb-4">
+      <h5 class="fw-bold mb-3"><i class="fa-solid fa-building text-secondary me-2"></i>Evaluación Empresa</h5>
       <div class="row g-4">
-        <!-- BLOQUE EMPRESA: Calificación y Feedback del tutor laboral -->
-        <div class="col-md-6">
-          <div class="card border-0 shadow-sm rounded-4">
-            <div class="card-header bg-white py-3 border-bottom">
-              <h6 class="fw-bold mb-0 text-secondary">
-                <i class="fa-solid fa-building-user me-2"></i> Evaluación de la Empresa
-              </h6>
-            </div>
-            <div class="card-body">
-              <div class="mb-3">
-                <label class="form-label small fw-bold opacity-75">CALIFICACIÓN</label>
-                <select class="form-select border shadow-sm bg-light-subtle" formControlName="evaluacionEmpresa">
-                  <option *ngFor="let opt of evaluacionEmpresaOptions" [value]="opt">{{ opt }}</option>
-                </select>
-              </div>
-              <div>
-                <label class="form-label small fw-bold opacity-75">OBSERVACIONES DEL TUTOR</label>
-                <textarea class="form-control border shadow-sm bg-light-subtle" rows="6" formControlName="comentarioEmpresa" 
-                  placeholder="Comentarios sobre el desempeño en la empresa..."></textarea>
-              </div>
-            </div>
+        <!-- Calificación (Izquierda) -->
+        <div class="col-lg-4">
+          <label class="form-label fw-bold text-muted small text-uppercase">Calificación</label>
+          <select class="form-select bg-light-subtle rounded-3" formControlName="evaluacionEmpresa"
+            style="height: 45px;">
+            <option *ngFor="let opt of evaluacionEmpresaOptions" [value]="opt">{{ opt }}</option>
+          </select>
+        </div>
+        <!-- Comentario con Rich Text (Derecha) -->
+        <div class="col-lg-8">
+          <label class="form-label fw-bold text-muted small text-uppercase">Comentario Empresa</label>
+          <div class="editor-container border rounded-3 overflow-hidden shadow-sm bg-white">
+            <ckeditor [editor]="Editor" [config]="config" formControlName="comentarioEmpresa"></ckeditor>
           </div>
         </div>
+      </div>
+    </div>
 
-        <!-- BLOQUE PROFESOR: Revisión modular y Comentarios del docente -->
-        <div class="col-md-6">
-          <div class="card border-0 shadow-sm rounded-4">
-            <div class="card-header bg-white py-3 border-bottom">
-              <h6 class="fw-bold mb-0 text-secondary">
-                <i class="fa-solid fa-chalkboard-user me-2"></i> Comentario del Profesor
-              </h6>
-            </div>
-            <div class="card-body">
-              <!-- Módulos Detectados: Lista de checkboxes generada dinámicamente según las actividades -->
-              <div class="mb-3" *ngIf="revisionesModulosArray.length > 0">
-                <label class="form-label small fw-bold opacity-75 d-block mb-2">REVISIÓN POR MÓDULOS</label>
-                <div class="d-flex flex-wrap gap-3 p-2 bg-light-subtle rounded border border-dashed" formArrayName="revisionesModulos">
-                  <div *ngFor="let mod of revisionesModulosArray.controls; let i=index" [formGroupName]="i" class="form-check">
-                    <input class="form-check-input" type="checkbox" formControlName="revisado" [id]="'mod-check-' + i">
-                    <label class="form-check-label small fw-semibold" [for]="'mod-check-' + i">
-                      {{ mod.value.modulo }}
-                    </label>
-                  </div>
+    <hr class="my-4 opacity-25">
+
+    <!-- Sección de Evaluación Profesor -->
+    <div class="row g-4">
+      <div class="col-12">
+        <h5 class="fw-bold mb-3"><i class="fa-solid fa-chalkboard-user text-secondary me-2"></i>Evaluación Profesor</h5>
+
+        <div class="row">
+          <!-- Revisión por Módulos (Izquierda) -->
+          <div class="col-lg-4">
+            <label class="form-label fw-bold text-muted small text-uppercase mb-2">Modulos</label>
+            <div class="d-flex flex-column gap-2" formArrayName="revisionesModulos"
+              *ngIf="revisionesModulosArray.length > 0; else noModulos">
+              <div *ngFor="let mod of revisionesModulosArray.controls; let i=index" [formGroupName]="i"
+                class="d-flex justify-content-between align-items-center bg-light-subtle px-3 py-2 rounded-3 border shadow-sm">
+                <span class="small fw-bold">{{ mod.value.modulo }}</span>
+                <div class="form-check form-switch mb-0 d-flex align-items-center gap-2">
+                  <input class="form-check-input" type="checkbox" formControlName="revisado" [id]="'mod-check-' + i">
+                  <label class="form-check-label extra-small text-muted" [for]="'mod-check-' + i">
+                    {{ mod.get('revisado')?.value ? 'Revisado' : 'Pendiente' }}
+                  </label>
                 </div>
               </div>
-              
-              <div>
-                <label class="form-label small fw-bold opacity-75 text-uppercase">Feedback Docente</label>
-                <textarea class="form-control border shadow-sm bg-light-subtle" rows="6" formControlName="comentarioProfesor" 
-                  placeholder="Indique correcciones o sugerencias de mejora..."></textarea>
+            </div>
+            <ng-template #noModulos>
+              <div
+                class="bg-light-subtle p-3 rounded-3 border border-dashed text-center d-flex align-items-center justify-content-center"
+                style="min-height: 50px;">
+                <span class="text-muted small italic">No hay módulos vinculados</span>
               </div>
-            </div>
+            </ng-template>
           </div>
-        </div>
-      </div>
-    </div>
-  </div>
 
-  <!-- SECCIÓN DE FECHAS: Control temporal de la tarea -->
-  <div class="row mt-4">
-    <div class="col-12">
-      <div class="card border-0 shadow-sm rounded-4 bg-dark text-white p-4">
-        <div class="row align-items-center">
-          <div class="col-md-6 d-flex align-items-center gap-4">
-            <div class="flex-grow-1">
-              <label class="form-label extra-small text-uppercase opacity-50 mb-1">Fecha de Inicio</label>
-              <input type="date" class="form-control form-control-lg bg-transparent text-white border-0 border-bottom rounded-0 px-0" formControlName="fechaIni">
+          <!-- Comentario Profesor (Derecha) -->
+          <div class="col-lg-8">
+            <label class="form-label fw-bold text-muted small text-uppercase">Comentario profesor</label>
+            <div class="editor-container border rounded-3 overflow-hidden shadow-sm bg-white">
+              <ckeditor [editor]="Editor" [config]="config" formControlName="comentarioProfesor"></ckeditor>
             </div>
-            <div class="flex-grow-1">
-              <label class="form-label extra-small text-uppercase opacity-50 mb-1">Fecha de Finalización</label>
-              <input type="date" class="form-control form-control-lg bg-transparent text-white border-0 border-bottom rounded-0 px-0" formControlName="fechaFin">
-            </div>
-          </div>
-          <div class="col-md-6 text-md-end mt-3 mt-md-0">
-             <span class="text-muted small italic me-3">Asegúrese de que las fechas coincidan con su diario de prácticas</span>
-             <i class="fa-solid fa-calendar-check fs-2 text-primary opacity-50"></i>
           </div>
         </div>
       </div>
     </div>
   </div>
 </div>
-
-<!-- MODAL DE SELECCIÓN DE ACTIVIDADES -->
-<!-- Componente standalone que permite filtrar y elegir del catálogo maestro -->
-<app-seleccion-actividades-modal
-  [(visible)]="modalActividadesVisible"
-  [todasLasActividades]="actividades"
-  [seleccionadas]="tareaForm.get('actividadesSeleccionadas')?.value"
-  (seleccionChange)="onSeleccionChange($event)">
+<!-- Modal -->
+<app-seleccion-actividades-modal [(visible)]="modalActividadesVisible" [todasLasActividades]="actividades"
+  [seleccionadas]="tareaForm.get('actividadesSeleccionadas')?.value" (seleccionChange)="onSeleccionChange($event)">
 </app-seleccion-actividades-modal>

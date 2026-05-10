@@ -35,26 +35,5 @@
 
 /* Make icons look crisp */
 .action-btn {
-  transition: transform 0.2s ease-in-out, opacity 0.2s ease-in-out;
-  opacity: 0.8;
-}
-
-.action-btn:hover {
-  transform: scale(1.15);
-  opacity: 1;
-}
-
-/* Estilos de badges específicos para que el borde se vea sólido */
-.bg-success-subtle.border-success {
-  background-color: #d1e7dd !important;
-  border-color: #8ac9a3 !important;
-}
-
-.bg-danger-subtle.border-danger {
-  background-color: #f8d7da !important;
-  border-color: #e5939a !important;
-}
-
-.bg-white.border-secondary {
-  border-color: #adb5bd !important;
+  opacity: 1 !important;
 }
