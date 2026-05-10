@@ -17,7 +17,8 @@
   box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
   background-color: var(--bg);
   color: var(--text);
   font-family: 'Open Sans', sans-serif;
@@ -29,12 +30,21 @@ html, body {
   overflow-x: hidden;
 }
 
-h1, h2, h3, h4, h5, h6, .navbar-brand, .nav-link {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.navbar-brand,
+.nav-link {
   font-family: 'Roboto', sans-serif;
 }
 
 /* Enlaces y botones (transición suave 300ms) */
-a, button, .btn {
+a,
+button,
+.btn {
   transition: var(--transition);
 }
 
@@ -52,13 +62,21 @@ a:hover {
 }
 
 body {
-  padding-top: 80px; /* Altura del header para que el contenido no quede debajo */
+  padding-top: 80px;
+  /* Altura del header para que el contenido no quede debajo */
 }
 
 /* Animaciones */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .animate-fade-in {
@@ -81,15 +99,18 @@ body {
 
 /* Role Badges */
 .badge-coordinador {
-  background-color: var(--primary); /* Azul oscuro institucional */
+  background-color: var(--primary);
+  /* Azul oscuro institucional */
 }
 
 .badge-profesor {
-  background-color: var(--secondary); /* Azul más vibrante */
+  background-color: var(--secondary);
+  /* Azul más vibrante */
 }
 
 .badge-alumno {
-  background-color: #5bb3eb; /* Azul claro */
+  background-color: #5bb3eb;
+  /* Azul claro */
 }
 
 .avatar {
@@ -270,25 +291,87 @@ footer a:hover {
 }
 
 @keyframes shrinkWidth {
-  from { width: 100%; }
-  to { width: 0%; }
+  from {
+    width: 100%;
+  }
+
+  to {
+    width: 0%;
+  }
 }
 
-.dualex-alert-info .dualex-alert-icon { color: #006293; }
-.dualex-alert-info .dualex-alert-progress { background: #006293; }
-.dualex-alert-info { border-left: 4px solid #006293; }
+.dualex-alert-info .dualex-alert-icon {
+  color: #006293;
+}
 
-.dualex-alert-success .dualex-alert-icon { color: #28a745; }
-.dualex-alert-success .dualex-alert-progress { background: #28a745; }
-.dualex-alert-success { border-left: 4px solid #28a745; }
+.dualex-alert-info .dualex-alert-progress {
+  background: #006293;
+}
 
-.dualex-alert-warning .dualex-alert-icon { color: #ffc107; }
-.dualex-alert-warning .dualex-alert-progress { background: #ffc107; }
-.dualex-alert-warning { border-left: 4px solid #ffc107; }
+.dualex-alert-info {
+  border-left: 4px solid #006293;
+}
 
-.dualex-alert-danger .dualex-alert-icon { color: #dc3545; }
-.dualex-alert-danger .dualex-alert-progress { background: #dc3545; }
-.dualex-alert-danger { border-left: 4px solid #dc3545; }
+.dualex-alert-success .dualex-alert-icon {
+  color: #28a745;
+}
+
+.dualex-alert-success .dualex-alert-progress {
+  background: #28a745;
+}
+
+.dualex-alert-success {
+  border-left: 4px solid #28a745;
+}
+
+.dualex-alert-warning .dualex-alert-icon {
+  color: #ffc107;
+}
+
+.dualex-alert-warning .dualex-alert-progress {
+  background: #ffc107;
+}
+
+.dualex-alert-warning {
+  border-left: 4px solid #ffc107;
+}
+
+.dualex-alert-danger .dualex-alert-icon {
+  color: #dc3545;
+}
+
+.dualex-alert-danger .dualex-alert-progress {
+  background: #dc3545;
+}
+
+.dualex-alert-danger {
+  border-left: 4px solid #dc3545;
+}
+
+/* Badges Premium (Light Colors) */
+.badge-success-light {
+  background-color: rgba(25, 135, 84, 0.1);
+  color: #198754;
+}
+
+.badge-secondary-light {
+  background-color: rgba(108, 117, 125, 0.1);
+  color: #6c757d;
+}
+
+.badge-primary-light {
+  background-color: rgba(13, 110, 253, 0.1);
+  color: #0d6efd;
+}
+
+.badge-warning-light {
+  background-color: rgba(255, 193, 7, 0.1);
+  color: #997404;
+}
+
+.fs-extra-small {
+  font-size: 0.6rem;
+}
 
 /* ========================================
    ANIMACIONES GLOBALES DE MODALES
@@ -310,6 +393,7 @@ footer a:hover {
     transform: scale(0.85) translateY(-20px);
     opacity: 0;
   }
+
   to {
     transform: scale(1) translateY(0);
     opacity: 1;
@@ -322,8 +406,35 @@ footer a:hover {
 }
 
 @keyframes overlayFadeIn {
-  from { opacity: 0; }
-  to   { opacity: 0.5; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 0.5;
+  }
+}
+
+/* Evitar doble scroll cuando hay un modal abierto */
+.modal-open {
+  overflow: hidden !important;
+  height: 100%;
+}
+
+/* ==========================================================================
+   CKEditor 5 Global Styles
+   ========================================================================== */
+.ck-powered-by-balloon,
+.ck.ck-balloon-panel.ck-powered-by-balloon,
+.ck.ck-powered-by {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  z-index: -1 !important;
+}
+/* Forzar que los iconos hereden el color del bot�n en hover */
+.btn:hover i {
+  color: inherit !important;
 }
 
 /* --- BOTONES DE ACCIÓN (DASHBOARD) --- */

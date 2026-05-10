@@ -1,0 +1,130 @@
+/* Estilos para CKEditor 5 */
+:host ::ng-deep .ck-editor__editable_inline {
+  min-height: 250px; /* Aumentado de 200px */
+  padding: 0 20px !important;
+  background-color: #ffffff !important;
+  font-family: 'Open Sans', sans-serif !important;
+  font-size: 1rem !important;
+  resize: vertical;
+  overflow: auto !important;
+  border-radius: 0 !important;
+}
+
+/* Editores secundarios (comentarios) */
+.editor-comment-height :host ::ng-deep .ck-editor__editable_inline,
+.bg-light :host ::ng-deep .ck-editor__editable_inline,
+.mb-3 :host ::ng-deep .ck-editor__editable_inline {
+  min-height: 150px; /* Aumentado de 100px */
+}
+
+:host ::ng-deep .ck-toolbar {
+  border: none !important;
+  border-bottom: 1px solid #f1f3f5 !important;
+  background-color: #ffffff !important;
+}
+
+:host ::ng-deep .ck.ck-editor__main>.ck-editor__editable {
+  border: none !important;
+  box-shadow: none !important;
+}
+
+:host ::ng-deep .ck.ck-editor__top .ck-sticky-panel .ck-toolbar {
+  border-radius: 0.9rem 0.9rem 0 0 !important;
+}
+
+.editor-container {
+  transition: border-color 0.2s ease;
+  border: 1px solid #dee2e6 !important;
+}
+
+.editor-container:focus-within {
+  border-color: var(--bs-primary) !important;
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.1);
+}
+
+/* Inputs Premium */
+.input-group-text {
+  border-color: #dee2e6 !important;
+}
+
+.form-control, .form-select {
+  transition: all 0.2s ease;
+  border-color: #dee2e6 !important;
+}
+
+.form-control:focus, .form-select:focus {
+  background-color: #ffffff !important;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+/* Panel de Actividades */
+.activities-box {
+  min-height: 200px;
+  background-color: #f8f9fa;
+}
+
+.shadow-inner {
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.03);
+}
+
+.hover-scale {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hover-scale:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.08) !important;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+/* Switches */
+.form-switch .form-check-input {
+  width: 2.5em;
+  height: 1.25em;
+  cursor: pointer;
+}
+
+/* Animaciones */
+.transition-all {
+  transition: all 0.2s ease;
+}
+
+.border-dashed {
+  border-style: dashed !important;
+  border-width: 2px !important;
+}
+
+.hover-danger:hover {
+  color: #dc3545 !important;
+  transform: scale(1.2);
+}
+
+.activities-box {
+  min-height: 180px;
+  background-color: #f8f9fa;
+  display: flex;
+  flex-direction: column;
+}
+
+.activities-summary {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.icon-box-xs {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

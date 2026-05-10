@@ -1,0 +1,39 @@
+.task-card {
+  min-height: 130px;
+  background-color: #ffffff;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.task-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+}
+
+.modules-col {
+  width: 160px;
+}
+
+.task-title {
+  font-size: 1.4rem;
+  margin-top: -0.5rem;
+}
+
+.task-details {
+  margin-bottom: -0.5rem;
+}
+
+/* Fixes for badges */
+.badge {
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+}
+
+.calificacion-badge {
+  font-size: 0.9rem;
+  min-width: 110px;
+}
+
+/* Make icons look crisp */
+.action-btn {
+  opacity: 1 !important;
+}

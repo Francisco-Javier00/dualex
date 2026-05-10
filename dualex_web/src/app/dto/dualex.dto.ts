@@ -49,29 +49,58 @@ export interface ModuloProfesor {
   numActividades?: number;
 }
 
-export interface ProfesorDTO {
+export interface Tarea {
+  id: number;
+  modulos: string[];
+  titulo: string;
+  fechaLimite: string;
+  calificacion: string;
+  progreso: {
+    actual: number;
+    total: number;
+  };
+  fechaIni?: string;
+  fechaFin?: string;
+  descripcion?: string;
+  actividadesSeleccionadas?: number[];
+  evaluacionEmpresa?: string;
+  comentarioEmpresa?: string;
+  moduloEvaluacion?: string;
+  revisadoProfesor?: boolean;
+  comentarioProfesor?: string;
+  revisionesModulos?: ModuloRevision[];
+  idAlumno?: number;
+}
+
+export interface ModuloRevision {
+  modulo: string;
+  revisado: boolean;
+}
+
+export interface ActividadDTO {
+  id: number;
+  titulo: string;
+  descripcion: string;
+  modulo: string;
+}
+
+export interface AlumnoDTO {
   id: number;
   nombre: string;
   apellidos: string;
-  correo: string;
-  rol: 'PROFESOR' | 'COORDINADOR';
-  modulos: string;
-  ciclos: string;
+  email: string;
+  nia: string;
+  nuss: string;
+  dni: string;
+  telefono: string;
+  ciclo: string;
+  curso: string;
+  estado: 'Activo' | 'Inactivo';
 }
 
-export interface EmpresaDTO {
+export interface ModuloDTO {
   id: number;
-  siglas: string;
   nombre: string;
-  convenioUrl: string;
-  inicioConvenio: string;
-  finConvenio: string;
-  contacto: string;
-  numeroContacto: string;
-  contactosAdicionales?: ContactoEmpresaDTO[];
-}
-
-export interface ContactoEmpresaDTO {
-  contacto: string;
-  numeroContacto: string;
+  siglas: string;
+  ciclo: string;
 }

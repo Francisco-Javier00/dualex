@@ -1,11 +1,119 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { ConfirmarBorradoModalComponent } from '../shared/modals/confirmar-borrado-modal/confirmar-borrado-modal.component';
+import { TareasService } from '../../services/tareas.service';
+import { Tarea } from '../../dto/dualex.dto';
 
+/**
+ * TareasComponent
+ * Componente que muestra el listado de tareas (cuaderno del alumno).
+ * Puede funcionar como un listado global o filtrado por un alumno específico
+ * si recibe el parámetro 'alumnoId' en la URL.
+ */
 @Component({
   selector: 'app-tareas',
   standalone: true,
-  imports: [CommonModule, RouterModule],
-  templateUrl: './tareas.component.html'
+  imports: [CommonModule, RouterModule, ConfirmarBorradoModalComponent],
+  templateUrl: './tareas.component.html',
+  styleUrls: ['./tareas.component.css']
 })
-export class TareasComponent {}
+export class TareasComponent implements OnInit {
+  // Inyección de servicios
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private tareasService = inject(TareasService);
+  
+  // ESTADO DEL COMPONENTE
+  modalBorradoVisible = false;           // Controla el modal de confirmación
+  tareaSeleccionada: Tarea | null = null; // Tarea que se pretende borrar o editar
+  tareas: Tarea[] = [];                 // Lista de tareas cargadas
+  alumnoId: number | null = null;       // ID del alumno si la ruta es /tareas/:alumnoId
+
+  /**
+   * Inicialización: Suscripción a los parámetros de la ruta para detectar cambios dinámicos.
+   */
+  ngOnInit(): void {
+    this.route.paramMap.subscribe(params => {
+      const id = params.get('alumnoId');
+      this.alumnoId = id ? +id : null;
+      this.cargarTareas();
+    });
+  }
+
+  /**
+   * Carga de Datos: Decide si llamar al listado global o al filtrado por alumno.
+   */
+  cargarTareas(): void {
+    if (this.alumnoId) {
+      // Vista filtrada por alumno
+      this.tareasService.getTareasByAlumno(this.alumnoId).subscribe(data => {
+        this.tareas = data;
+      });
+    } else {
+      // Vista global (Coordinador / Profesor)
+      this.tareasService.getTareas().subscribe(data => {
+        this.tareas = data;
+      });
+    }
+  }
+
+  /**
+   * Helper de UI: Retorna las clases de Bootstrap según el texto de la calificación.
+   * Utiliza variantes '-subtle' para un diseño más moderno y legible.
+   */
+  getCalificacionClases(calificacion: string): string {
+    switch(calificacion) {
+      case 'Bien': 
+      case 'Superado': return 'bg-success-subtle border-success text-success';
+      case 'No superado': return 'bg-danger-subtle border-danger text-danger';
+      case 'Notable': return 'bg-info-subtle border-info text-info';
+      case 'Excelente': return 'bg-primary-subtle border-primary text-primary';
+      case 'Sin calificar': return 'bg-white border-secondary text-secondary';
+      default: return 'bg-light border-secondary text-dark';
+    }
+  }
+
+  /**
+   * Navegación al formulario de creación.
+   */
+  crearTarea(): void {
+    this.router.navigate(['/tarea/nueva']);
+  }
+
+  /**
+   * Navegación al formulario de edición/vista de una tarea específica.
+   */
+  verTarea(tarea: Tarea): void {
+    this.router.navigate(['/tarea', tarea.id]);
+  }
+
+  /**
+   * Activa el flujo de borrado mostrando el modal de confirmación.
+   */
+  eliminarTarea(tarea: Tarea): void {
+    this.tareaSeleccionada = tarea;
+    this.modalBorradoVisible = true;
+  }
+
+  /**
+   * Ejecuta el borrado real tras la confirmación del usuario en el modal.
+   */
+  onConfirmarBorrado(): void {
+    if (this.tareaSeleccionada) {
+      this.tareasService.deleteTarea(this.tareaSeleccionada.id).subscribe(() => {
+        this.cargarTareas(); // Recargamos la lista tras el borrado
+      });
+    }
+    this.modalBorradoVisible = false;
+    this.tareaSeleccionada = null;
+  }
+
+  /**
+   * Cierra el modal de borrado sin realizar ninguna acción.
+   */
+  onCancelarBorrado(): void {
+    this.modalBorradoVisible = false;
+    this.tareaSeleccionada = null;
+  }
+}

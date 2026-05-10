@@ -1,0 +1,75 @@
+<!-- OVERLAY: Fondo oscuro traslúcido (estático, no se cierra al hacer clic) -->
+<div class="modal-overlay" *ngIf="visible">
+  
+  <!-- CONTENEDOR DEL MODAL -->
+  <div class="modal-content animate-slide-up" (click)="$event.stopPropagation()">
+    
+    <!-- CABECERA: Título dinámico -->
+    <div class="modal-header d-flex justify-content-between align-items-center">
+      <h5 class="mb-0 fw-bold text-dark">
+        <i class="fa-solid" [ngClass]="actividad ? 'fa-pen-to-square text-primary' : 'fa-plus-circle text-success'"></i>
+        {{ actividad ? 'Modificar Actividad' : 'Nueva Actividad' }}
+      </h5>
+      <button class="btn-close" (click)="cerrar()"></button>
+    </div>
+
+    <!-- CUERPO: Formulario reactivo -->
+    <div class="modal-body py-4">
+      <form [formGroup]="actividadForm" (ngSubmit)="onSubmit()">
+        
+        <!-- CAMPO: Título -->
+        <div class="mb-4">
+          <label class="form-label small fw-bold text-uppercase opacity-75">Título de la Actividad</label>
+          <div class="input-group shadow-sm rounded-3 overflow-hidden border">
+            <span class="input-group-text bg-white border-0"><i class="fa-solid fa-heading text-muted"></i></span>
+            <input type="text" 
+                   formControlName="titulo" 
+                   class="form-control border-0 px-3" 
+                   placeholder="Ej: Instalación de servidor Apache"
+                   [class.is-invalid]="actividadForm.get('titulo')?.invalid && actividadForm.get('titulo')?.touched">
+          </div>
+          <!-- Mensaje de error -->
+          <div class="text-danger extra-small mt-1" *ngIf="actividadForm.get('titulo')?.invalid && actividadForm.get('titulo')?.touched">
+            El título es obligatorio y debe tener al menos 5 caracteres.
+          </div>
+        </div>
+
+        <!-- CAMPO: Módulo -->
+        <div class="mb-4">
+          <label class="form-label small fw-bold text-uppercase opacity-75">Módulo Asociado</label>
+          <div class="input-group shadow-sm rounded-3 overflow-hidden border">
+            <span class="input-group-text bg-white border-0"><i class="fa-solid fa-book text-muted"></i></span>
+            <input type="text" 
+                   formControlName="modulo" 
+                   class="form-control border-0 px-3" 
+                   placeholder="Ej: Sistemas Informáticos"
+                   [class.is-invalid]="actividadForm.get('modulo')?.invalid && actividadForm.get('modulo')?.touched">
+          </div>
+        </div>
+
+        <!-- CAMPO: Descripción -->
+        <div class="mb-2">
+          <label class="form-label small fw-bold text-uppercase opacity-75">Descripción detallada</label>
+          <textarea formControlName="descripcion" 
+                    class="form-control shadow-sm rounded-3 border px-3" 
+                    rows="5" 
+                    placeholder="Describe los pasos o requisitos de esta actividad..."
+                    [class.is-invalid]="actividadForm.get('descripcion')?.invalid && actividadForm.get('descripcion')?.touched"></textarea>
+        </div>
+        <div class="text-danger extra-small mb-4" *ngIf="actividadForm.get('descripcion')?.invalid && actividadForm.get('descripcion')?.touched">
+          La descripción es obligatoria.
+        </div>
+
+        <!-- ACCIONES -->
+        <div class="d-flex gap-2 mt-5">
+          <button type="button" class="btn btn-light border flex-grow-1 py-2 shadow-sm rounded-3" (click)="cerrar()">
+            Cancelar
+          </button>
+          <button type="submit" class="btn btn-primary flex-grow-1 py-2 shadow-sm rounded-3" [disabled]="actividadForm.invalid">
+            <i class="fa-solid fa-save me-2"></i> {{ actividad ? 'Guardar cambios' : 'Crear Actividad' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

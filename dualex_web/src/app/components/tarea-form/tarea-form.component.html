@@ -1,0 +1,167 @@
+<div class="container-fluid py-4 mt-4 px-md-5 px-3" [formGroup]="tareaForm">
+  <!-- Cabecera de Acción -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold text-dark mb-1">
+        <i class="fa-solid fa-file-pen text-primary me-2"></i>
+        {{ esEdicion ? 'Editar Tarea' : 'Nueva Tarea' }}
+      </h2>
+      <p class="text-muted">Gestiona la información, actividades y evaluaciones de la tarea seleccionada</p>
+    </div>
+    <div class="d-flex gap-2">
+      <button class="btn btn-light border rounded-3 px-4" (click)="volver()">
+        <i class="fa-solid fa-arrow-left me-2"></i> Volver
+      </button>
+      <button class="btn btn-primary rounded-3 px-4 shadow-sm" (click)="guardar()" [disabled]="tareaForm.invalid">
+        <i class="fa-solid fa-save me-2"></i> Guardar Tarea
+      </button>
+    </div>
+  </div>
+
+  <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+    <!-- Primera Fila: Título y Fechas -->
+    <div class="row g-3 mb-4">
+      <div class="col-lg-6">
+        <label class="form-label fw-bold text-muted small text-uppercase">Título de la Tarea</label>
+        <div class="input-group">
+          <span class="input-group-text bg-white text-primary"
+            style="width: 40px; justify-content: center; font-weight: 900; font-family: 'Times New Roman', serif; font-size: 1.2rem; height: 45px;">H</span>
+          <input type="text" class="form-control bg-light-subtle" formControlName="titulo"
+            placeholder="Ej: Implementación de ..." style="height: 45px;">
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6">
+        <label class="form-label fw-bold text-muted small text-uppercase">Fecha Inicio</label>
+        <div class="input-group">
+          <span class="input-group-text bg-white" style="height: 45px;"><i
+              class="fa-solid fa-calendar-day text-primary"></i></span>
+          <input type="date" class="form-control bg-light-subtle" formControlName="fechaIni" style="height: 45px;">
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6">
+        <label class="form-label fw-bold text-muted small text-uppercase">Fecha Fin</label>
+        <div class="input-group">
+          <span class="input-group-text bg-white" style="height: 45px;"><i
+              class="fa-solid fa-calendar-check text-primary"></i></span>
+          <input type="date" class="form-control bg-light-subtle" formControlName="fechaFin" style="height: 45px;">
+        </div>
+      </div>
+    </div>
+
+    <!-- Segunda Fila: Actividades y Descripción -->
+    <div class="row g-4">
+      <!-- Actividades Relacionadas -->
+      <div class="col-lg-4">
+        <label class="form-label fw-bold text-muted small text-uppercase">Actividades Relacionadas</label>
+        <div class="card border-0 rounded-3 p-3"
+          style="min-height: 250px; background-color: #f1f4f8; border: 1px solid #e2e8f0 !important;">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="d-flex align-items-center gap-2">
+              <div class="bg-white p-2 rounded-3 shadow-sm d-flex align-items-center justify-content-center"
+                style="width: 35px; height: 35px;">
+                <i class="fa-solid fa-layer-group text-primary"></i>
+              </div>
+              <span class="fw-bold small text-dark">Seleccionadas</span>
+            </div>
+            <button type="button" class="btn btn-primary btn-sm px-3 rounded-2 shadow-sm" style="height: 35px;"
+              (click)="abrirModalActividades()">
+              <i class="fa-solid fa-plus me-1"></i> Añadir
+            </button>
+          </div>
+
+          <div class="d-flex flex-column gap-2 overflow-auto" style="max-height: 250px;">
+            <div *ngFor="let act of getActividadesSeleccionadas()"
+              class="bg-white p-2 px-3 rounded-3 border d-flex justify-content-between align-items-center shadow-sm animate-fade-in">
+              <span class="small text-truncate me-2">{{ act.titulo }}</span>
+              <i class="fa-solid fa-xmark text-muted pointer hover-danger" (click)="toggleActividad(act.id)"></i>
+            </div>
+            <div *ngIf="getActividadesSeleccionadas().length === 0" class="text-muted small italic py-5 text-center">
+              Ninguna seleccionada
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Descripción Detallada -->
+      <div class="col-lg-8">
+        <label class="form-label fw-bold text-muted small text-uppercase">Descripción Detallada</label>
+        <div class="editor-container border rounded-3 overflow-hidden shadow-sm bg-white">
+          <ckeditor [editor]="Editor" [config]="config" formControlName="descripcion"></ckeditor>
+        </div>
+      </div>
+    </div>
+
+
+    <hr class="my-4 opacity-25">
+
+    <!-- Sección de Evaluación Empresa -->
+    <div class="mb-4">
+      <h5 class="fw-bold mb-3"><i class="fa-solid fa-building text-secondary me-2"></i>Evaluación Empresa</h5>
+      <div class="row g-4">
+        <!-- Calificación (Izquierda) -->
+        <div class="col-lg-4">
+          <label class="form-label fw-bold text-muted small text-uppercase">Calificación</label>
+          <select class="form-select bg-light-subtle rounded-3" formControlName="evaluacionEmpresa"
+            style="height: 45px;">
+            <option *ngFor="let opt of evaluacionEmpresaOptions" [value]="opt">{{ opt }}</option>
+          </select>
+        </div>
+        <!-- Comentario con Rich Text (Derecha) -->
+        <div class="col-lg-8">
+          <label class="form-label fw-bold text-muted small text-uppercase">Comentario Empresa</label>
+          <div class="editor-container border rounded-3 overflow-hidden shadow-sm bg-white">
+            <ckeditor [editor]="Editor" [config]="config" formControlName="comentarioEmpresa"></ckeditor>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <hr class="my-4 opacity-25">
+
+    <!-- Sección de Evaluación Profesor -->
+    <div class="row g-4">
+      <div class="col-12">
+        <h5 class="fw-bold mb-3"><i class="fa-solid fa-chalkboard-user text-secondary me-2"></i>Evaluación Profesor</h5>
+
+        <div class="row">
+          <!-- Revisión por Módulos (Izquierda) -->
+          <div class="col-lg-4">
+            <label class="form-label fw-bold text-muted small text-uppercase mb-2">Modulos</label>
+            <div class="d-flex flex-column gap-2" formArrayName="revisionesModulos"
+              *ngIf="revisionesModulosArray.length > 0; else noModulos">
+              <div *ngFor="let mod of revisionesModulosArray.controls; let i=index" [formGroupName]="i"
+                class="d-flex justify-content-between align-items-center bg-light-subtle px-3 py-2 rounded-3 border shadow-sm">
+                <span class="small fw-bold">{{ mod.value.modulo }}</span>
+                <div class="form-check form-switch mb-0 d-flex align-items-center gap-2">
+                  <input class="form-check-input" type="checkbox" formControlName="revisado" [id]="'mod-check-' + i">
+                  <label class="form-check-label extra-small text-muted" [for]="'mod-check-' + i">
+                    {{ mod.get('revisado')?.value ? 'Revisado' : 'Pendiente' }}
+                  </label>
+                </div>
+              </div>
+            </div>
+            <ng-template #noModulos>
+              <div
+                class="bg-light-subtle p-3 rounded-3 border border-dashed text-center d-flex align-items-center justify-content-center"
+                style="min-height: 50px;">
+                <span class="text-muted small italic">No hay módulos vinculados</span>
+              </div>
+            </ng-template>
+          </div>
+
+          <!-- Comentario Profesor (Derecha) -->
+          <div class="col-lg-8">
+            <label class="form-label fw-bold text-muted small text-uppercase">Comentario profesor</label>
+            <div class="editor-container border rounded-3 overflow-hidden shadow-sm bg-white">
+              <ckeditor [editor]="Editor" [config]="config" formControlName="comentarioProfesor"></ckeditor>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Modal -->
+<app-seleccion-actividades-modal [(visible)]="modalActividadesVisible" [todasLasActividades]="actividades"
+  [seleccionadas]="tareaForm.get('actividadesSeleccionadas')?.value" (seleccionChange)="onSeleccionChange($event)">
+</app-seleccion-actividades-modal>

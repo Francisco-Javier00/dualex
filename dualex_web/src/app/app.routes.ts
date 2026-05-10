@@ -8,6 +8,7 @@ import { ActividadesComponent } from './components/actividades/actividades.compo
 import { CiclosComponent } from './components/ciclos/ciclos.component';
 import { CursosComponent } from './components/cursos/cursos.component';
 import { TareasComponent } from './components/tareas/tareas.component';
+import { TareaFormComponent } from './components/tarea-form/tarea-form.component';
 import { PerfilComponent } from './components/perfil/perfil.component';
 
 import { authGuard } from './auth/guards/auth.guard';
@@ -21,9 +22,12 @@ export const routes: Routes = [
   { path: 'modulos', component: ModulosComponent, canActivate: [authGuard], data: { roles: ['COORDINADOR', 'PROFESOR'] } },
   { path: 'actividades', component: ActividadesComponent, canActivate: [authGuard], data: { roles: ['COORDINADOR', 'PROFESOR'] } },
   { path: 'ciclos', component: CiclosComponent, canActivate: [authGuard], data: { roles: ['COORDINADOR'] } },
+  { path: 'tareas', component: TareasComponent, canActivate: [authGuard], data: { roles: ['COORDINADOR', 'PROFESOR', 'ALUMNO'] } },
+  { path: 'tareas/:alumnoId', component: TareasComponent, canActivate: [authGuard], data: { roles: ['COORDINADOR', 'PROFESOR', 'ALUMNO'] } },
+  { path: 'tarea/nueva', component: TareaFormComponent, canActivate: [authGuard], data: { roles: ['COORDINADOR', 'PROFESOR', 'ALUMNO'] } },
+  { path: 'tarea/:id', component: TareaFormComponent, canActivate: [authGuard], data: { roles: ['COORDINADOR', 'PROFESOR', 'ALUMNO'] } },
   { path: 'perfil', component: PerfilComponent, canActivate: [authGuard], data: { roles: ['COORDINADOR', 'PROFESOR', 'ALUMNO'] } },
   { path: 'cursos', component: CursosComponent, canActivate: [authGuard], data: { roles: ['COORDINADOR'] } },
-  { path: 'tareas', component: TareasComponent, canActivate: [authGuard], data: { roles: ['PROFESOR', 'ALUMNO'] } },
   { path: '**', redirectTo: '' }
 ];
 
