@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { DatatableComponent } from '../shared/datatable/datatable.component';
+import { ConfirmarBorradoModalComponent } from '../shared/modals/confirmar-borrado-modal/confirmar-borrado-modal.component';
 import { Config } from 'datatables.net';
 import { AlertService } from '../../services/alert.service';
 import { CursosService } from '../../services/cursos.service';
@@ -12,7 +13,7 @@ import { Curso } from '../../dto/curso.dto';
 @Component({
   selector: 'app-cursos',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, DatatableComponent],
+  imports: [CommonModule, RouterModule, FormsModule, DatatableComponent, ConfirmarBorradoModalComponent],
   templateUrl: './cursos.component.html',
   styleUrl: './cursos.component.css'
 })
@@ -56,9 +57,13 @@ export class CursosComponent implements OnInit {
           orderable: false,
           className: 'text-center',
           render: () => `
-            <div style="display: flex; gap: 15px; justify-content: center; align-items: center;">
-              <button class="btn-icon edit-icon" data-action="edit" title="Editar" style="background:none;border:none;color:#d4a017;font-size:18px;cursor:pointer;transition:transform 0.1s;"><i class="fa-solid fa-pencil"></i></button>
-              <button class="btn-icon delete-icon" data-action="delete" title="Eliminar" style="background:none;border:none;color:#4da6ff;font-size:18px;cursor:pointer;transition:transform 0.1s;"><i class="fa-solid fa-trash-can"></i></button>
+            <div class="d-flex gap-2 justify-content-center align-items-center action-buttons w-100">
+              <button class="btn btn-sm btn-outline-primary shadow-sm action-edit" data-action="edit" title="Editar">
+                <i class="fa-solid fa-pen"></i>
+              </button>
+              <button class="btn btn-sm btn-outline-danger shadow-sm action-delete" data-action="delete" title="Eliminar">
+                <i class="fa-solid fa-trash"></i>
+              </button>
             </div>
           `
         }

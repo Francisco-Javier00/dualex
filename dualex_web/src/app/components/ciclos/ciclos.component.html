@@ -1,21 +1,38 @@
-<div class="ciclos-container">
-  <h1 class="page-title">Listado de Ciclos</h1>
-
-  <div class="card-container">
-    <div class="card-header" style="justify-content: flex-end;">
-      <!-- Search is handled automatically by the Datatable component -->
-      <button class="btn-create" (click)="abrirEditModal()">Crear nueva entrada</button>
+<div class="container-fluid py-4 animate-fade-in mt-4">
+  <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+    <div class="d-flex align-items-start gap-3">
+      <a routerLink="/dashboard" class="btn btn-outline-secondary btn-sm ciclos-back-btn mt-1" title="Volver">
+        <i class="fa-solid fa-arrow-left"></i>
+      </a>
+      <div>
+        <h2 class="fw-bold text-dark mb-1 ciclos-title">
+          <i class="fa-solid fa-layer-group text-primary me-2"></i>Registro de Ciclos
+        </h2>
+        <p class="text-muted mb-0 ciclos-subtitle">Consulta y gestiona los ciclos formativos disponibles</p>
+      </div>
     </div>
 
-    <div class="table-container">
-      <app-shared-datatable
-        [dtOptions]="dtOptions"
-        [columnTitles]="columnTitles"
-        (actionClick)="handleAction($event)">
-      </app-shared-datatable>
-    </div>
+    <button class="btn btn-primary btn-lg ciclos-action-primary" (click)="abrirEditModal()">
+      <i class="fa-solid fa-circle-plus me-2"></i>Crear nueva entrada
+    </button>
   </div>
+
+  <app-shared-datatable
+    tableId="tabla-ciclos"
+    [dtOptions]="dtOptions"
+    [columnTitles]="columnTitles"
+    (actionClick)="handleAction($event)">
+  </app-shared-datatable>
 </div>
+
+<app-confirmar-borrado-modal
+  [visible]="isDeleteModalOpen"
+  [titulo]="'Eliminar Ciclo'"
+  [mensaje]="'¿Estás seguro de que deseas eliminar el ciclo ' + (cicloToDelete?.nombre ?? '') + '? Esta acción no se puede deshacer.'"
+  [palabraClave]="'confirmar'"
+  (confirmarEvent)="confirmarEliminar()"
+  (cancelarEvent)="cerrarDeleteModal()">
+</app-confirmar-borrado-modal>
 
 @if (isModalOpen) {
 <div class="custom-modal-overlay" (click)="cerrarModal()">
@@ -37,34 +54,16 @@
 </div>
 }
 
-@if (isDeleteModalOpen) {
-<div class="custom-modal-overlay" (click)="cerrarDeleteModal()">
-  <div class="custom-modal" (click)="$event.stopPropagation()">
-    <div class="modal-content-blue">
-      <h3 class="modal-title text-center px-3 lh-base">
-        ¿Seguro que quieres eliminar el ciclo<br>
-        <strong>{{cicloToDelete?.nombre}}</strong>?<br>
-        Una vez eliminado, no se podrá volver atrás.
-      </h3>
-      <div class="modal-actions mt-4">
-        <button class="btn-modal btn-aceptar" (click)="confirmarEliminar()">ACEPTAR</button>
-        <button class="btn-modal btn-salir" (click)="cerrarDeleteModal()">SALIR</button>
-      </div>
-    </div>
-  </div>
-</div>
-}
-
 @if (isEditModalOpen) {
 <div class="custom-modal-overlay" (click)="cerrarEditModal()">
   <div class="custom-modal form-modal" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h3 class="modal-title m-0 fw-bold">Añadir / Modificar Ciclo</h3>
+      <h3 class="modal-title m-0 fw-bold">{{ isEditing ? 'Editar ciclo' : 'Añadir ciclo' }}</h3>
       <button class="btn-close-custom" (click)="cerrarEditModal()">
         <i class="fa-solid fa-xmark"></i>
       </button>
     </div>
-    
+
     <div class="modal-body text-start">
       <div class="form-group row mb-3 align-items-center">
         <label class="col-sm-3 col-form-label pb-0">Nombre:</label>
@@ -91,9 +90,9 @@
           <input type="text" class="form-control" [(ngModel)]="cicloForm.anoEscolar">
         </div>
       </div>
-      
+
       <hr style="border-color: #666; margin-bottom: 20px;">
-      
+
       <div class="form-group row mb-3 align-items-center">
         <label class="col-sm-3 col-form-label pb-0">Siglas primero:</label>
         <div class="col-sm-7">
@@ -136,7 +135,7 @@
         </div>
       </div>
     </div>
-    
+
     <div class="modal-actions mt-4 d-flex justify-content-center gap-4">
       <button class="btn-modal btn-salir px-4" (click)="cerrarEditModal()">CANCELAR</button>
       <button class="btn-modal btn-aceptar px-4" (click)="guardarCiclo()">ACEPTAR</button>

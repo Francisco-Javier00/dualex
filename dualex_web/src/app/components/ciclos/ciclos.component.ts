@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { DatatableComponent } from '../shared/datatable/datatable.component';
+import { ConfirmarBorradoModalComponent } from '../shared/modals/confirmar-borrado-modal/confirmar-borrado-modal.component';
 import { Config } from 'datatables.net';
 import { Router } from '@angular/router';
 import { CiclosService } from '../../services/ciclos.service';
@@ -11,7 +12,7 @@ import { Ciclo } from '../../dto/ciclo.dto';
 @Component({
   selector: 'app-ciclos',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, DatatableComponent],
+  imports: [CommonModule, RouterModule, FormsModule, DatatableComponent, ConfirmarBorradoModalComponent],
   templateUrl: './ciclos.component.html',
   styleUrl: './ciclos.component.css'
 })
@@ -62,10 +63,16 @@ export class CiclosComponent implements OnInit {
           orderable: false, 
           className: 'text-center',
           render: () => `
-            <div style="display: flex; gap: 15px; justify-content: center; align-items: center;">
-              <button class="btn-icon delete-icon" data-action="delete" title="Eliminar" style="background:none;border:none;color:#4da6ff;font-size:18px;cursor:pointer;transition:transform 0.1s;"><i class="fa-solid fa-trash-can"></i></button>
-              <button class="btn-icon edit-icon" data-action="edit" title="Editar" style="background:none;border:none;color:#d4a017;font-size:18px;cursor:pointer;transition:transform 0.1s;"><i class="fa-solid fa-pencil"></i></button>
-              <button class="btn-icon view-icon" data-action="view" title="Ver Cursos" style="background:none;border:none;color:#555;font-size:18px;cursor:pointer;transition:transform 0.1s;"><i class="fa-solid fa-eye"></i></button>
+            <div class="d-flex gap-2 justify-content-center align-items-center action-buttons w-100">
+              <button class="btn btn-sm btn-outline-primary shadow-sm action-edit" data-action="edit" title="Editar">
+                <i class="fa-solid fa-pen"></i>
+              </button>
+              <button class="btn btn-sm btn-outline-danger shadow-sm action-delete" data-action="delete" title="Eliminar">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+              <button class="btn btn-sm btn-outline-secondary shadow-sm action-view" data-action="view" title="Ver cursos">
+                <i class="fa-solid fa-eye"></i>
+              </button>
             </div>
           `
         }
