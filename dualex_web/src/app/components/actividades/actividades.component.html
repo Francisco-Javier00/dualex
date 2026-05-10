@@ -28,3 +28,10 @@
   (confirmarEvent)="onConfirmarBorrado()"
   (cancelarEvent)="onCancelarBorrado()">
 </app-confirmar-borrado-modal>
+
+<!-- Modal de creación/edición de actividades -->
+<app-actividad-modal
+  [(visible)]="modalActividadVisible"
+  [actividad]="actividadSeleccionada"
+  (guardarEvent)="onGuardarActividad($event)">
+</app-actividad-modal>

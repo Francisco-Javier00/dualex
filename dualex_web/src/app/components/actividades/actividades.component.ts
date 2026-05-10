@@ -3,14 +3,22 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { DatatableComponent } from '../shared/datatable/datatable.component';
 import { ConfirmarBorradoModalComponent } from '../shared/modals/confirmar-borrado-modal/confirmar-borrado-modal.component';
+import { ActividadModalComponent } from '../shared/modals/actividad-modal/actividad-modal.component';
 import { ActividadesService } from '../../services/actividades.service';
 import { AlertService } from '../../services/alert.service';
+import { ActividadDTO } from '../../dto/dualex.dto';
 import { Config } from 'datatables.net';
 
 @Component({
   selector: 'app-actividades',
   standalone: true,
-  imports: [CommonModule, RouterModule, DatatableComponent, ConfirmarBorradoModalComponent],
+  imports: [
+    CommonModule, 
+    RouterModule, 
+    DatatableComponent, 
+    ConfirmarBorradoModalComponent,
+    ActividadModalComponent
+  ],
   templateUrl: './actividades.component.html'
 })
 export class ActividadesComponent implements OnInit {
@@ -19,7 +27,8 @@ export class ActividadesComponent implements OnInit {
 
   dtOptions: Config = {};
   modalBorradoVisible = false;
-  actividadSeleccionada: any = null;
+  modalActividadVisible = false;
+  actividadSeleccionada: ActividadDTO | null = null;
 
   ngOnInit(): void {
     this.dtOptions = {
@@ -77,27 +86,55 @@ export class ActividadesComponent implements OnInit {
   }
 
   crearNueva(): void {
-    this.alertService.informacion('Nueva Actividad', 'Aquí se abrirá el formulario para registrar una nueva actividad.');
+    this.actividadSeleccionada = null;
+    this.modalActividadVisible = true;
   }
 
   onTableAction(event: { action: string, data: any }): void {
     if (event.action === 'edit') {
-      this.alertService.informacion('Editar', `Editando la actividad: "${event.data.titulo}"`);
+      this.actividadSeleccionada = { ...event.data };
+      this.modalActividadVisible = true;
     } else if (event.action === 'delete') {
       this.actividadSeleccionada = event.data;
       this.modalBorradoVisible = true;
     }
   }
 
+  onGuardarActividad(actividad: ActividadDTO): void {
+    if (actividad.id) {
+      this.actividadesService.updateActividad(actividad).subscribe(() => {
+        this.alertService.exito('Actualizada', 'La actividad se ha modificado correctamente.');
+        this.recargarTabla();
+      });
+    } else {
+      this.actividadesService.createActividad(actividad).subscribe(() => {
+        this.alertService.exito('Creada', 'La nueva actividad se ha registrado en el catálogo.');
+        this.recargarTabla();
+      });
+    }
+  }
+
   onConfirmarBorrado(): void {
-    this.alertService.exito('Eliminada', `La actividad "${this.actividadSeleccionada?.titulo}" ha sido eliminada.`);
-    this.modalBorradoVisible = false;
-    this.actividadSeleccionada = null;
-    // TODO: llamar al servicio real de borrado
+    if (this.actividadSeleccionada) {
+      this.actividadesService.deleteActividad(this.actividadSeleccionada.id).subscribe(() => {
+        this.alertService.exito('Eliminada', `La actividad ha sido eliminada del catálogo.`);
+        this.recargarTabla();
+        this.modalBorradoVisible = false;
+        this.actividadSeleccionada = null;
+      });
+    }
   }
 
   onCancelarBorrado(): void {
     this.modalBorradoVisible = false;
     this.actividadSeleccionada = null;
+  }
+
+  private recargarTabla(): void {
+    // Para recargar el DataTable, podemos usar el ID de la tabla si el componente lo soporta
+    // En este caso, al ser serverSide, basta con forzar un cambio de estado si fuera necesario,
+    // pero DatatableComponent ya maneja la suscripción al servicio en su ajax.
+    // Una forma rápida es volver a asignar dtOptions o usar un trigger.
+    this.dtOptions = { ...this.dtOptions };
   }
 }

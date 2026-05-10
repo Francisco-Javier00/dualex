@@ -66,4 +66,39 @@ export class ActividadesService {
       data: filtradas.slice(start, start + length)
     }).pipe(delay(400));
   }
+
+  /**
+   * Registra una nueva actividad en el catálogo.
+   * API: return this.http.post<ActividadDTO>(this.API_URL, actividad);
+   */
+  createActividad(actividad: ActividadDTO): Observable<ActividadDTO> {
+    const nueva = { ...actividad, id: this.actividades.length > 0 ? Math.max(...this.actividades.map(a => a.id)) + 1 : 1 };
+    this.actividades.unshift(nueva); // Añadir al principio para que se vea en el DT
+    return of(nueva).pipe(delay(500));
+  }
+
+  /**
+   * Actualiza los datos de una actividad existente.
+   * API: return this.http.put<ActividadDTO>(this.API_URL, actividad);
+   */
+  updateActividad(actividad: ActividadDTO): Observable<ActividadDTO> {
+    const index = this.actividades.findIndex(a => a.id === actividad.id);
+    if (index !== -1) {
+      this.actividades[index] = { ...actividad };
+    }
+    return of(actividad).pipe(delay(500));
+  }
+
+  /**
+   * Elimina una actividad del catálogo.
+   * API: return this.http.delete<boolean>(`${this.API_URL}?id=${id}`);
+   */
+  deleteActividad(id: number): Observable<boolean> {
+    const index = this.actividades.findIndex(a => a.id === id);
+    if (index !== -1) {
+      this.actividades.splice(index, 1);
+      return of(true).pipe(delay(400));
+    }
+    return of(false);
+  }
 }
