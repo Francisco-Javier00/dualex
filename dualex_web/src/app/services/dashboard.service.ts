@@ -15,7 +15,7 @@ export class DashboardService {
     { titulo: 'Empresas', icono: 'fa-solid fa-building', imagen: '/assets/img/empresas.png', ruta: '/empresas' },
     { titulo: 'Módulos', icono: 'fa-solid fa-book-bookmark', imagen: '/assets/img/modulos.png', ruta: '/modulos' },
     { titulo: 'Actividades', icono: 'fa-solid fa-calendar-days', colorIcono: 'text-primary', imagen: '/assets/img/actividades.png', ruta: '/actividades' },
-    { titulo: 'Ciclos', icono: 'fa-solid fa-rotate', imagen: '/assets/img/ciclos.png', ruta: '/ciclos' }
+    { titulo: 'Ciclos', icono: 'fa-solid fa-rotate', imagen: '/assets/img/ciclos.png', ruta: '/ciclos' },
   ];
 
   private categoriasProfesor: Categoria[] = [

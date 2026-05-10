@@ -115,6 +115,43 @@ body {
 
 .avatar {
   cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+button.avatar {
+  border: 0;
+  background-image: none;
+}
+
+button.avatar:hover,
+button.avatar:focus,
+button.avatar:active {
+  opacity: 1 !important;
+  transform: none !important;
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+button.avatar.badge-coordinador:hover,
+button.avatar.badge-coordinador:focus,
+button.avatar.badge-coordinador:active {
+  background-color: var(--primary) !important;
+  color: #fff !important;
+}
+
+button.avatar.badge-profesor:hover,
+button.avatar.badge-profesor:focus,
+button.avatar.badge-profesor:active {
+  background-color: var(--secondary) !important;
+  color: #fff !important;
+}
+
+button.avatar.badge-alumno:hover,
+button.avatar.badge-alumno:focus,
+button.avatar.badge-alumno:active {
+  background-color: #5bb3eb !important;
+  color: #fff !important;
 }
 
 .btn-link:hover {
@@ -399,3 +436,77 @@ footer a:hover {
 .btn:hover i {
   color: inherit !important;
 }
+
+/* --- BOTONES DE ACCIÓN (DASHBOARD) --- */
+.btn-building {
+  background-color: #ffffff;
+  color: #333333;
+  border: 1px solid #e0e0e0;
+  border-radius: 14px;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  transition: all 0.2s ease;
+}
+
+.btn-building:hover {
+  background-color: #f8f9fa;
+  border-color: #333333;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.1) !important;
+}
+
+/* Tooltip personalizado (Estilo Bocadillo) */
+.btn-building {
+  position: relative;
+}
+
+/* El cuerpo del bocadillo */
+.btn-building::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: 50%;
+  right: 120%; /* Lo mueve a la izquierda del botón */
+  transform: translateY(-50%) translateX(-10px);
+  background: #222;
+  color: white;
+  padding: 8px 15px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1000;
+  pointer-events: none;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+/* La flechita del bocadillo */
+.btn-building::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 105%;
+  transform: translateY(-50%) translateX(-5px);
+  border-width: 6px;
+  border-style: solid;
+  border-color: transparent transparent transparent #222;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.btn-building:hover::after,
+.btn-building:hover::before {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(-50%) translateX(0);
+}
+

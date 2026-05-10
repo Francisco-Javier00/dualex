@@ -31,9 +31,18 @@
 
     <!-- === DASHBOARD PROFESOR === -->
     @if (usuario?.rol === 'PROFESOR') {
-      <header class="mb-5">
-        <h1 class="h3 fw-bold text-dark mb-1">Mis Módulos</h1>
-        <p class="text-muted mb-0">Hola, {{ usuario?.nombre }}. Aquí están los módulos que impartes este curso.</p>
+      <header class="mb-4 d-flex justify-content-between align-items-start">
+        <div>
+          <h1 class="h3 fw-bold text-dark mb-1">Mis Módulos</h1>
+          <p class="text-muted mb-0">Hola, {{ usuario?.nombre }}. Aquí están los módulos que impartes este curso.</p>
+        </div>
+        
+        <!-- Botón Empresa (Blanco) -->
+        <div class="d-flex gap-2">
+          <button class="btn btn-building shadow-sm" data-tooltip="Ver listado de empresas">
+            <i class="fa-solid fa-building"></i>
+          </button>
+        </div>
       </header>
 
       @if (cargandoModulos) {

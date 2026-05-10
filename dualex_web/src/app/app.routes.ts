@@ -6,8 +6,10 @@ import { EmpresasComponent } from './components/empresas/empresas.component';
 import { ModulosComponent } from './components/modulos/modulos.component';
 import { ActividadesComponent } from './components/actividades/actividades.component';
 import { CiclosComponent } from './components/ciclos/ciclos.component';
+import { CursosComponent } from './components/cursos/cursos.component';
 import { TareasComponent } from './components/tareas/tareas.component';
 import { TareaFormComponent } from './components/tarea-form/tarea-form.component';
+import { PerfilComponent } from './components/perfil/perfil.component';
 
 import { authGuard } from './auth/guards/auth.guard';
 
@@ -24,6 +26,8 @@ export const routes: Routes = [
   { path: 'tareas/:alumnoId', component: TareasComponent, canActivate: [authGuard], data: { roles: ['COORDINADOR', 'PROFESOR', 'ALUMNO'] } },
   { path: 'tarea/nueva', component: TareaFormComponent, canActivate: [authGuard], data: { roles: ['COORDINADOR', 'PROFESOR', 'ALUMNO'] } },
   { path: 'tarea/:id', component: TareaFormComponent, canActivate: [authGuard], data: { roles: ['COORDINADOR', 'PROFESOR', 'ALUMNO'] } },
+  { path: 'perfil', component: PerfilComponent, canActivate: [authGuard], data: { roles: ['COORDINADOR', 'PROFESOR', 'ALUMNO'] } },
+  { path: 'cursos', component: CursosComponent, canActivate: [authGuard], data: { roles: ['COORDINADOR'] } },
   { path: '**', redirectTo: '' }
 ];
 

@@ -1,10 +1,123 @@
-<div class="container-fluid py-5 text-center animate-fade-in">
-  <div class="py-5 mt-5">
-    <i class="fa-solid fa-chalkboard-user fs-1 text-primary mb-4"></i>
-    <h2 class="fw-bold text-dark">Gestión de Profesores</h2>
-    <p class="text-muted">Vista en desarrollo. Pronto podrás gestionar aquí a todo el equipo docente.</p>
-    <a routerLink="/" class="btn btn-primary-light mt-4 px-4 py-2">
-      <i class="fa-solid fa-arrow-left me-2"></i> Volver al Inicio
-    </a>
+<div class="container-fluid py-4 animate-fade-in mt-4">
+  <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+    <div class="d-flex align-items-start gap-3">
+      <a routerLink="/dashboard" class="btn btn-outline-secondary btn-sm profesores-back-btn mt-1" title="Volver">
+        <i class="fa-solid fa-arrow-left"></i>
+      </a>
+      <div>
+        <h2 class="fw-bold text-dark mb-1 profesores-title">
+          <i class="fa-solid fa-chalkboard-user text-primary me-2"></i>Registro de Profesores
+        </h2>
+        <p class="text-muted mb-0 profesores-subtitle">Selecciona un profesor para gestionar</p>
+      </div>
+    </div>
+
+    <div class="d-flex flex-wrap gap-3">
+      <input
+        id="profesores-excel-input"
+        type="file"
+        accept=".xls,.xlsx"
+        class="d-none"
+        (change)="onExcelSeleccionado($event)">
+      <button class="btn btn-primary btn-lg profesores-action-primary" (click)="subirExcel()">
+        <i class="fa-solid fa-file-excel me-2"></i>Subir excel
+      </button>
+      <button class="btn btn-outline-primary btn-lg profesores-action-secondary" (click)="crearNuevaEntrada()">
+        <i class="fa-solid fa-circle-plus me-2"></i>Crear nueva entrada
+      </button>
+    </div>
   </div>
+
+  <app-shared-datatable
+    tableId="tabla-profesores"
+    [dtOptions]="dtOptions"
+    [columnTitles]="['Nombre', 'Apd', 'Correo', 'ROL', 'Modulos', 'Ciclos', 'Acciones']"
+    (actionClick)="onTableAction($event)">
+  </app-shared-datatable>
 </div>
+
+<app-confirmar-borrado-modal
+  [visible]="modalBorradoVisible"
+  [titulo]="'Eliminar Profesor'"
+  [mensaje]="'¿Estás seguro de que deseas eliminar al profesor ' + (profesorSeleccionado?.nombre ?? '') + ' ' + (profesorSeleccionado?.apellidos ?? '') + '? Esta acción no se puede deshacer.'"
+  [palabraClave]="'confirmar'"
+  (confirmarEvent)="onConfirmarBorrado()"
+  (cancelarEvent)="onCancelarBorrado()">
+</app-confirmar-borrado-modal>
+
+@if (modalCrearVisible) {
+  <div class="modal d-block profesores-create-modal" tabindex="-1" role="dialog" aria-modal="true">
+    <div class="profesores-create-backdrop" (click)="onCancelarCreacion()"></div>
+
+    <div class="modal-dialog modal-dialog-centered modal-xl profesores-create-dialog" role="document">
+      <div class="modal-content profesores-create-content">
+        <div class="modal-header border-0 pb-0 px-4 pt-4">
+          <div class="d-flex align-items-center gap-2">
+            <div class="profesores-create-icon">
+              <i class="fa-solid fa-user-plus"></i>
+            </div>
+            <h5 class="modal-title fw-bold mb-0 profesores-create-title">
+              {{ modoFormulario === 'editar' ? 'Editar profesor' : 'Crear nueva entrada' }}
+            </h5>
+          </div>
+          <button type="button" class="btn-close" aria-label="Cerrar" (click)="onCancelarCreacion()"></button>
+        </div>
+
+        <div class="modal-body px-4 pb-4 pt-2">
+          <div class="row g-4 align-items-start">
+            <div class="col-lg-7">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label profesores-label">Nombre</label>
+                  <input type="text" class="form-control profesores-input" [(ngModel)]="nuevoProfesor.nombre" placeholder="Nombre">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label profesores-label">Correo</label>
+                  <input type="email" class="form-control profesores-input" [(ngModel)]="nuevoProfesor.correo" placeholder="correo@dualex.com">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label profesores-label">Apellido</label>
+                  <input type="text" class="form-control profesores-input" [(ngModel)]="nuevoProfesor.apellidos" placeholder="Apellido">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label profesores-label">ROL</label>
+                  <select class="form-select profesores-input" [(ngModel)]="nuevoProfesor.rol">
+                    <option value="PROFESOR">Profesor</option>
+                    <option value="COORDINADOR">Coordinador</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-lg-5">
+              <p class="fw-semibold profesores-ciclos-title mb-4">
+                Clica en los ciclo que este profesor impartirá clases
+              </p>
+              <div class="profesores-cycle-panel d-flex flex-column gap-3">
+                @for (ciclo of ciclosDisponibles; track ciclo) {
+                  <label class="d-flex align-items-center gap-3 profesores-check-row">
+                    <input
+                      type="checkbox"
+                      class="form-check-input profesores-check"
+                      [checked]="nuevoProfesor.ciclos.includes(ciclo)"
+                      (change)="onToggleCiclo(ciclo, $any($event.target).checked)">
+                    <span class="profesores-cycle-label">{{ ciclo }}</span>
+                  </label>
+                }
+              </div>
+            </div>
+          </div>
+
+          <div class="d-flex flex-wrap gap-4 mt-5">
+            <button class="btn btn-profesores-save btn-lg px-5" (click)="guardarNuevoProfesor()">
+              {{ modoFormulario === 'editar' ? 'GUARDAR CAMBIOS' : 'CREAR' }}
+            </button>
+            <button class="btn btn-profesores-cancel btn-lg px-5" (click)="onCancelarCreacion()">
+              CANCELAR
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+}
