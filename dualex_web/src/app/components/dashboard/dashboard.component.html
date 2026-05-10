@@ -57,7 +57,7 @@
       @for (modulo of modulosProfesor; track modulo.idModulo) {
       <div class="col-sm-6 col-lg-4 col-xl-3">
         <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden modulo-card" style="cursor: pointer;"
-          [routerLink]="['/modulos', modulo.idModulo]">
+          routerLink="/alumnos">
           <!-- Banda de color del módulo -->
           <div class="modulo-header px-4 py-3 d-flex align-items-center gap-3" [style.background-color]="modulo.color">
             <span class="badge bg-white fw-bold rounded-2" [style.color]="modulo.color"
@@ -77,7 +77,7 @@
           </div>
           <!-- Pie con botón -->
           <div class="card-footer border-0 bg-transparent px-4 pb-3 pt-0">
-            <button class="btn btn-sm w-100 text-white" [style.background-color]="modulo.color">
+            <button class="btn btn-sm w-100 text-white" [style.background-color]="modulo.color" routerLink="/alumnos">
               Ver módulo <i class="fa-solid fa-arrow-right ms-1"></i>
             </button>
           </div>
