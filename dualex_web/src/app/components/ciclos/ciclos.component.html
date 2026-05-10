@@ -12,9 +12,15 @@
       </div>
     </div>
 
-    <button class="btn btn-primary btn-lg ciclos-action-primary" (click)="abrirEditModal()">
-      <i class="fa-solid fa-circle-plus me-2"></i>Crear nueva entrada
-    </button>
+    <div class="d-flex align-items-center gap-2">
+      <button class="btn btn-outline-primary btn-lg ciclos-cursos-btn" (click)="abrirCursos()" title="Ir a cursos">
+        <span class="ciclos-shortcut-letter">C</span>
+      </button>
+
+      <button class="btn btn-primary btn-lg ciclos-action-primary" (click)="abrirEditModal()">
+        <i class="fa-solid fa-circle-plus me-2"></i>Crear nueva entrada
+      </button>
+    </div>
   </div>
 
   <app-shared-datatable
@@ -34,25 +40,7 @@
   (cancelarEvent)="cerrarDeleteModal()">
 </app-confirmar-borrado-modal>
 
-@if (isModalOpen) {
-<div class="custom-modal-overlay" (click)="cerrarModal()">
-  <div class="custom-modal" (click)="$event.stopPropagation()">
-    <div class="modal-content-blue">
-      <h3 class="modal-title">¿A qué curso quieres acceder?</h3>
-      <div class="select-container">
-        <select class="form-select custom-select" [(ngModel)]="cursoSeleccionado">
-          <option value="1">1º {{selectedCiclo?.siglas}}</option>
-          <option value="2">2º {{selectedCiclo?.siglas}}</option>
-        </select>
-      </div>
-      <div class="modal-actions">
-        <button class="btn-modal btn-aceptar" (click)="accederCurso()">ACEPTAR</button>
-        <button class="btn-modal btn-salir" (click)="cerrarModal()">SALIR</button>
-      </div>
-    </div>
-  </div>
-</div>
-}
+
 
 @if (isEditModalOpen) {
 <div class="custom-modal-overlay" (click)="cerrarEditModal()">
@@ -143,3 +131,4 @@
   </div>
 </div>
 }
+

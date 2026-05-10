@@ -16,7 +16,6 @@ export class DashboardService {
     { titulo: 'Módulos', icono: 'fa-solid fa-book-bookmark', imagen: '/assets/img/modulos.png', ruta: '/modulos' },
     { titulo: 'Actividades', icono: 'fa-solid fa-calendar-days', colorIcono: 'text-primary', imagen: '/assets/img/actividades.png', ruta: '/actividades' },
     { titulo: 'Ciclos', icono: 'fa-solid fa-rotate', imagen: '/assets/img/ciclos.png', ruta: '/ciclos' },
-    { titulo: 'Cursos', icono: 'fa-solid fa-graduation-cap', imagen: '/assets/img/clases.png', ruta: '/cursos' }
   ];
 
   private categoriasProfesor: Categoria[] = [

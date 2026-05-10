@@ -1,11 +1,10 @@
 import { Component, OnInit, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { DatatableComponent } from '../shared/datatable/datatable.component';
 import { ConfirmarBorradoModalComponent } from '../shared/modals/confirmar-borrado-modal/confirmar-borrado-modal.component';
 import { Config } from 'datatables.net';
-import { Router } from '@angular/router';
 import { CiclosService } from '../../services/ciclos.service';
 import { Ciclo } from '../../dto/ciclo.dto';
 
@@ -24,10 +23,6 @@ export class CiclosComponent implements OnInit {
 
   dtOptions: Config = {};
   columnTitles: string[] = ['Nombre', 'Siglas', 'Grado', 'Módulos', 'Acciones'];
-
-  isModalOpen = false;
-  selectedCiclo: any = null;
-  cursoSeleccionado: string = '1';
 
   isDeleteModalOpen = false;
   cicloToDelete: any = null;
@@ -94,13 +89,17 @@ export class CiclosComponent implements OnInit {
 
   handleAction(event: { action: string, data: any }) {
     if (event.action === 'view') {
-      this.abrirModal(event.data);
+      this.router.navigate(['/cursos'], { queryParams: { ciclo: event.data.siglas } });
     } else if (event.action === 'delete') {
       this.cicloToDelete = event.data;
       this.isDeleteModalOpen = true;
     } else if (event.action === 'edit') {
       this.abrirEditModal(event.data);
     }
+  }
+
+  abrirCursos() {
+    this.router.navigate(['/cursos']);
   }
 
   abrirEditModal(ciclo?: any) {
@@ -172,26 +171,5 @@ export class CiclosComponent implements OnInit {
   cerrarDeleteModal() {
     this.isDeleteModalOpen = false;
     this.cicloToDelete = null;
-  }
-
-  abrirModal(ciclo: any) {
-    this.selectedCiclo = ciclo;
-    this.cursoSeleccionado = '1';
-    this.isModalOpen = true;
-  }
-
-  cerrarModal() {
-    this.isModalOpen = false;
-    this.selectedCiclo = null;
-  }
-
-  accederCurso() {
-    this.router.navigate(['/alumnos'], { 
-      queryParams: { 
-        ciclo: this.selectedCiclo?.siglas, 
-        curso: this.cursoSeleccionado 
-      } 
-    });
-    this.cerrarModal();
   }
 }
