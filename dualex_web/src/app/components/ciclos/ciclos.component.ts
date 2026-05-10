@@ -27,6 +27,11 @@ export class CiclosComponent implements OnInit {
   isDeleteModalOpen = false;
   cicloToDelete: any = null;
 
+  isCursoModalOpen = false;
+  cicloParaCursos: Ciclo | null = null;
+  cursoSeleccionado: string | null = null;
+  opcionesCurso: string[] = [];
+
   isEditModalOpen = false;
   isEditing = false;
   cicloForm: any = {
@@ -89,7 +94,7 @@ export class CiclosComponent implements OnInit {
 
   handleAction(event: { action: string, data: any }) {
     if (event.action === 'view') {
-      this.router.navigate(['/cursos'], { queryParams: { ciclo: event.data.siglas } });
+      this.abrirSelectorCursos(event.data);
     } else if (event.action === 'delete') {
       this.cicloToDelete = event.data;
       this.isDeleteModalOpen = true;
@@ -100,6 +105,33 @@ export class CiclosComponent implements OnInit {
 
   abrirCursos() {
     this.router.navigate(['/cursos']);
+  }
+
+  abrirSelectorCursos(ciclo: Ciclo) {
+    this.cicloParaCursos = ciclo;
+    this.cursoSeleccionado = null;
+    this.opcionesCurso = ciclo.siglas === 'SMR'
+      ? ['1SMR', '2SMR']
+      : [`1${ciclo.siglas}`, `2${ciclo.siglas}`];
+    this.isCursoModalOpen = true;
+  }
+
+  cerrarSelectorCursos() {
+    this.isCursoModalOpen = false;
+    this.cicloParaCursos = null;
+    this.cursoSeleccionado = null;
+    this.opcionesCurso = [];
+  }
+
+  seleccionarCurso(curso: string) {
+    this.cursoSeleccionado = curso;
+  }
+
+  aceptarSelectorCursos() {
+    if (!this.cursoSeleccionado) {
+      return;
+    }
+    this.cerrarSelectorCursos();
   }
 
   abrirEditModal(ciclo?: any) {

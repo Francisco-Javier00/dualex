@@ -40,7 +40,47 @@
   (cancelarEvent)="cerrarDeleteModal()">
 </app-confirmar-borrado-modal>
 
+@if (isCursoModalOpen) {
+<div class="custom-modal-overlay" (click)="cerrarSelectorCursos()">
+  <div class="custom-modal form-modal curso-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3 class="modal-title m-0 fw-bold">Selecciona un curso</h3>
+      <button class="btn-close-custom" (click)="cerrarSelectorCursos()">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
 
+    <p class="text-muted text-start mb-4">
+      ¿Qué curso quieres ver dentro de {{ cicloParaCursos?.nombre ?? 'este ciclo' }}?
+    </p>
+
+    <div class="mb-4 text-start">
+      <label class="form-label fw-semibold mb-2">Curso</label>
+      <select class="form-select curso-select" [(ngModel)]="cursoSeleccionado">
+        <option [ngValue]="null" disabled>Selecciona un curso</option>
+        @for (curso of opcionesCurso; track curso) {
+          <option [ngValue]="curso">{{ curso }}</option>
+        }
+      </select>
+    </div>
+
+    @if (cursoSeleccionado) {
+      <div class="alert alert-info mt-3 mb-0 text-start curso-info">
+        Selección registrada: <strong>{{ cursoSeleccionado }}</strong>. La vista de alumnos aún no está conectada.
+      </div>
+    }
+
+    <div class="d-flex justify-content-end gap-3 mt-4">
+      <button type="button" class="btn btn-modal btn-success" (click)="aceptarSelectorCursos()" [disabled]="!cursoSeleccionado">
+        Aceptar
+      </button>
+      <button type="button" class="btn btn-modal btn-danger" (click)="cerrarSelectorCursos()">
+        Cancelar
+      </button>
+    </div>
+  </div>
+</div>
+}
 
 @if (isEditModalOpen) {
 <div class="custom-modal-overlay" (click)="cerrarEditModal()">
@@ -131,4 +171,3 @@
   </div>
 </div>
 }
-
