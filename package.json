@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@angular/router": "^21.2.12",
+    "tslib": "^2.8.1"
+  }
+}
