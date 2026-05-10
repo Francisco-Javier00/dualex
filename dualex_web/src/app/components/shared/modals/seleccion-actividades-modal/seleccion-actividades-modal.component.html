@@ -1,0 +1,72 @@
+<!-- CONTENEDOR DEL MODAL: Se muestra u oculta según la propiedad 'visible' -->
+<div class="modal-overlay" *ngIf="visible" (click)="cerrar()">
+  
+  <!-- CUERPO DEL MODAL: Detiene la propagación del click para no cerrarse al tocar dentro -->
+  <div class="modal-content animate-slide-up" (click)="$event.stopPropagation()">
+    
+    <!-- CABECERA: Título y Buscador Dinámico -->
+    <div class="modal-header d-flex flex-column gap-3">
+      <div class="d-flex justify-content-between align-items-center w-100">
+        <h5 class="mb-0 fw-bold text-dark">
+          <i class="fa-solid fa-layer-group text-primary me-2"></i> Seleccionar Actividades
+        </h5>
+        <button class="btn-close" (click)="cerrar()"></button>
+      </div>
+
+      <!-- BUSCADOR: Filtra las actividades en tiempo real mientras el usuario escribe -->
+      <div class="search-box position-relative w-100">
+        <i class="fa-solid fa-magnifying-glass position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+        <input type="text" 
+               class="form-control ps-5 rounded-pill border-light-subtle shadow-sm" 
+               placeholder="Buscar por título o módulo..."
+               [(ngModel)]="busqueda"
+               (ngModelChange)="filtrar()">
+      </div>
+    </div>
+
+    <!-- LISTADO DE ACTIVIDADES: Scrollable para manejar catálogos grandes -->
+    <div class="modal-body py-0">
+      <div class="actividades-list">
+        
+        <!-- CARD DE ACTIVIDAD: Estilo interactivo que cambia al estar seleccionada -->
+        <div *ngFor="let actividad of actividadesFiltradas" 
+             class="actividad-item d-flex align-items-center gap-3 p-3 mb-2 rounded-3 border transition-all"
+             [class.selected]="estaSeleccionada(actividad.id)"
+             (click)="toggle(actividad.id)">
+          
+          <!-- ICONO DE ESTADO: Checkbox visual personalizado -->
+          <div class="status-icon shadow-sm d-flex align-items-center justify-content-center"
+               [class.active]="estaSeleccionada(actividad.id)">
+            <i class="fa-solid fa-check scale-in" *ngIf="estaSeleccionada(actividad.id)"></i>
+          </div>
+
+          <!-- INFORMACIÓN DE LA ACTIVIDAD -->
+          <div class="flex-grow-1">
+            <h6 class="mb-0 fw-bold small text-dark">{{ actividad.titulo }}</h6>
+            <div class="d-flex align-items-center gap-2 mt-1">
+              <span class="badge bg-light text-primary border border-primary-subtle extra-small rounded-pill">
+                {{ actividad.modulo }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ESTADO VACÍO: Si el filtro no devuelve resultados -->
+        <div *ngIf="actividadesFiltradas.length === 0" class="text-center py-5">
+          <i class="fa-solid fa-triangle-exclamation text-muted opacity-25 fs-1 mb-2"></i>
+          <p class="text-muted small">No se encontraron actividades que coincidan con la búsqueda.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- PIE DEL MODAL: Resumen de selección y botón de cierre -->
+    <div class="modal-footer bg-light-subtle d-flex justify-content-between align-items-center">
+      <div class="text-muted small">
+        <span class="fw-bold text-primary">{{ seleccionadas.length }}</span> actividades seleccionadas
+      </div>
+      <button class="btn btn-primary px-4 rounded-pill shadow-sm" (click)="cerrar()">
+        Aceptar
+      </button>
+    </div>
+  </div>
+</div>

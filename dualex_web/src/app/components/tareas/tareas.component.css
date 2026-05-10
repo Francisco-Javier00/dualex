@@ -1,0 +1,60 @@
+.task-card {
+  min-height: 130px;
+  background-color: #ffffff;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.task-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+}
+
+.modules-col {
+  width: 160px;
+}
+
+.task-title {
+  font-size: 1.4rem;
+  margin-top: -0.5rem;
+}
+
+.task-details {
+  margin-bottom: -0.5rem;
+}
+
+/* Fixes for badges */
+.badge {
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+}
+
+.calificacion-badge {
+  font-size: 0.9rem;
+  min-width: 110px;
+}
+
+/* Make icons look crisp */
+.action-btn {
+  transition: transform 0.2s ease-in-out, opacity 0.2s ease-in-out;
+  opacity: 0.8;
+}
+
+.action-btn:hover {
+  transform: scale(1.15);
+  opacity: 1;
+}
+
+/* Estilos de badges específicos para que el borde se vea sólido */
+.bg-success-subtle.border-success {
+  background-color: #d1e7dd !important;
+  border-color: #8ac9a3 !important;
+}
+
+.bg-danger-subtle.border-danger {
+  background-color: #f8d7da !important;
+  border-color: #e5939a !important;
+}
+
+.bg-white.border-secondary {
+  border-color: #adb5bd !important;
+}

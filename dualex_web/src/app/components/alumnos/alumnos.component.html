@@ -1,10 +1,39 @@
-<div class="container-fluid py-5 text-center animate-fade-in">
-  <div class="py-5 mt-5">
-    <i class="fa-solid fa-user-graduate fs-1 text-primary mb-4"></i>
-    <h2 class="fw-bold text-dark">Gestión de Alumnos</h2>
-    <p class="text-muted">Vista en desarrollo. Aquí aparecerá el listado y seguimiento de todos los estudiantes.</p>
-    <a routerLink="/" class="btn btn-primary-light mt-4 px-4 py-2">
-      <i class="fa-solid fa-arrow-left me-2"></i> Volver al Inicio
-    </a>
+<div class="container-fluid py-4 animate-fade-in mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold text-dark mb-1">
+        <i class="fa-solid fa-user-graduate text-primary me-2"></i> Gestión de Alumnos
+      </h2>
+      <p class="text-muted mb-0">Listado completo de estudiantes matriculados y su estado actual en el programa dual</p>
+    </div>
+    <div class="d-flex gap-2">
+      <button class="btn btn-outline-primary px-4 shadow-sm" (click)="importarCSV()">
+        <i class="fa-solid fa-file-import me-2"></i> Importar CSV
+      </button>
+      <button class="btn btn-primary px-4 shadow-sm" (click)="crearNuevo()">
+        <i class="fa-solid fa-user-plus me-2"></i> Nuevo Alumno
+      </button>
+    </div>
+  </div>
+
+  <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+    <div class="card-body p-0">
+      <app-shared-datatable
+        tableId="tabla-alumnos"
+        [dtOptions]="dtOptions"
+        [columnTitles]="['Nombre', 'Apellidos', 'Correo', 'NIA', 'NUSS', 'DNI', 'Teléfono', 'Acciones']"
+        (actionClick)="onTableAction($event)">
+      </app-shared-datatable>
+    </div>
   </div>
 </div>
+
+<!-- Modal de confirmación de borrado -->
+<app-confirmar-borrado-modal
+  [visible]="modalBorradoVisible"
+  [titulo]="'Eliminar Alumno'"
+  [mensaje]="'¿Estás seguro de que deseas eliminar al alumno &quot;' + (alumnoSeleccionado ? (alumnoSeleccionado.nombre + ' ' + alumnoSeleccionado.apellidos) : '') + '&quot;? Esta acción no se puede deshacer y borrará su historial.'"
+  [palabraClave]="'eliminar'"
+  (confirmarEvent)="onConfirmarBorrado()"
+  (cancelarEvent)="onCancelarBorrado()">
+</app-confirmar-borrado-modal>

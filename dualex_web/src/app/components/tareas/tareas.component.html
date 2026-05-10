@@ -1,10 +1,103 @@
-<div class="container-fluid py-5 text-center animate-fade-in">
-  <div class="py-5 mt-5">
-    <i class="fa-solid fa-tasks fs-1 text-primary mb-4"></i>
-    <h2 class="fw-bold text-dark">Gestión de Tareas</h2>
-    <p class="text-muted">Vista en desarrollo. Pronto podrás asignar y realizar el seguimiento de las tareas del curso.</p>
-    <a routerLink="/" class="btn btn-primary-light mt-4 px-4 py-2">
-      <i class="fa-solid fa-arrow-left me-2"></i> Volver al Inicio
-    </a>
+<!-- CONTENEDOR PRINCIPAL: Listado de Tareas -->
+<div class="container-fluid py-4 animate-fade-in">
+  
+  <!-- CABECERA: Título y botón de nueva tarea -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h3 class="fw-bold text-dark mb-1">
+        <i class="fa-solid fa-book-open text-primary me-2"></i> 
+        {{ alumnoId ? 'Cuaderno del Alumno' : 'Gestión de Tareas' }}
+      </h3>
+      <p class="text-muted small mb-0">Seguimiento de actividades, progresos y calificaciones</p>
+    </div>
+    <button class="btn btn-primary px-4 shadow-sm hover-lift" (click)="crearTarea()">
+      <i class="fa-solid fa-plus me-2"></i> Nueva Tarea
+    </button>
+  </div>
+
+  <!-- GRILLA DE TAREAS: Layout responsivo mediante Cards -->
+  <div class="row g-4">
+    <!-- Renderizado dinámico de tareas mediante directiva estructural -->
+    <div *ngFor="let tarea of tareas" class="col-xl-4 col-md-6">
+      <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden card-tarea transition-all">
+        
+        <div class="card-body p-4 d-flex flex-column">
+          <!-- CABECERA DE CARD: Título y Categorías (Módulos) -->
+          <div class="d-flex justify-content-between align-items-start mb-3">
+            <div class="flex-grow-1">
+              <h5 class="fw-bold text-dark mb-1 lh-sm">{{ tarea.titulo }}</h5>
+              <div class="d-flex flex-wrap gap-1 mt-2">
+                <!-- Etiquetas de módulos asociados -->
+                <span *ngFor="let mod of tarea.modulos" 
+                  class="badge bg-primary-light text-primary border border-primary-subtle extra-small rounded-pill">
+                  {{ mod }}
+                </span>
+              </div>
+            </div>
+            <!-- Calificación: Visualización mediante badges dinámicos según el estado -->
+            <span class="badge border rounded-pill px-3 py-2 small fw-semibold shadow-sm"
+              [ngClass]="getCalificacionClases(tarea.calificacion)">
+              {{ tarea.calificacion }}
+            </span>
+          </div>
+
+          <!-- INDICADOR DE PROGRESO: Barra de porcentaje dinámica -->
+          <div class="mb-4">
+            <div class="d-flex justify-content-between align-items-end mb-1">
+              <span class="text-muted extra-small fw-bold text-uppercase">Progreso de Actividades</span>
+              <span class="text-dark small fw-bold">
+                {{ tarea.progreso.actual }}/{{ tarea.progreso.total }}
+              </span>
+            </div>
+            <div class="progress rounded-pill bg-light" style="height: 6px;">
+              <div class="progress-bar bg-primary rounded-pill shadow-sm" 
+                [style.width.%]="(tarea.progreso.actual / tarea.progreso.total) * 100"></div>
+            </div>
+          </div>
+
+          <!-- FOOTER DE CARD: Información temporal y botones de acción -->
+          <div class="mt-auto pt-3 border-top d-flex justify-content-between align-items-center">
+            <div class="text-muted extra-small">
+              <i class="fa-regular fa-calendar-check me-1"></i>
+              Límite: <span class="fw-bold">{{ tarea.fechaLimite }}</span>
+            </div>
+            <div class="d-flex gap-2">
+              <!-- Botón Ver/Editar: Lleva al formulario detallado -->
+              <button class="btn btn-sm btn-light border shadow-sm hover-primary" 
+                title="Ver detalles" (click)="verTarea(tarea)">
+                <i class="fa-solid fa-eye"></i>
+              </button>
+              <!-- Botón Eliminar: Invoca el flujo de borrado con confirmación -->
+              <button class="btn btn-sm btn-light border shadow-sm hover-danger" 
+                title="Eliminar tarea" (click)="eliminarTarea(tarea)">
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ESTADO VACÍO: Feedback visual si no hay tareas registradas -->
+    <div *ngIf="tareas.length === 0" class="col-12 text-center py-5">
+      <div class="py-5">
+        <i class="fa-solid fa-folder-open text-muted opacity-25 d-block display-1 mb-3"></i>
+        <h4 class="text-muted fw-bold">No hay tareas registradas</h4>
+        <p class="text-muted">Comienza creando una nueva tarea para este cuaderno.</p>
+        <button class="btn btn-outline-primary rounded-pill px-4 mt-2" (click)="crearTarea()">
+          Crear mi primera tarea
+        </button>
+      </div>
+    </div>
   </div>
 </div>
+
+<!-- COMPONENTE REUTILIZABLE: Modal de Confirmación de Borrado -->
+<app-confirmar-borrado-modal
+  [visible]="modalBorradoVisible"
+  titulo="Eliminar Tarea"
+  [mensaje]="'¿Estás seguro de que deseas eliminar la tarea \'' + tareaSeleccionada?.titulo + '\'? Esta acción no se puede deshacer.'"
+  palabraClave="borrar"
+  (confirmarEvent)="onConfirmarBorrado()"
+  (cancelarEvent)="onCancelarBorrado()">
+</app-confirmar-borrado-modal>

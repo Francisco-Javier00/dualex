@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { DatatableComponent } from '../shared/datatable/datatable.component';
 import { ConfirmarBorradoModalComponent } from '../shared/modals/confirmar-borrado-modal/confirmar-borrado-modal.component';
-import { ActividadesMockService } from '../../services/actividades-mock.service';
+import { ActividadesService } from '../../services/actividades.service';
 import { AlertService } from '../../services/alert.service';
 import { Config } from 'datatables.net';
 
@@ -14,7 +14,7 @@ import { Config } from 'datatables.net';
   templateUrl: './actividades.component.html'
 })
 export class ActividadesComponent implements OnInit {
-  private actividadesMockService = inject(ActividadesMockService);
+  private actividadesService = inject(ActividadesService);
   private alertService = inject(AlertService);
 
   dtOptions: Config = {};
@@ -26,7 +26,7 @@ export class ActividadesComponent implements OnInit {
       serverSide: true,
       processing: true,
       ajax: (dataTablesParameters: any, callback: any) => {
-        this.actividadesMockService.obtenerActividadesDataTables(dataTablesParameters).subscribe(resp => {
+        this.actividadesService.obtenerActividadesDataTables(dataTablesParameters).subscribe(resp => {
           callback({
             recordsTotal: resp.recordsTotal,
             recordsFiltered: resp.recordsFiltered,
