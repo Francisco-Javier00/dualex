@@ -6,6 +6,7 @@ import { EmpresasComponent } from './components/empresas/empresas.component';
 import { ModulosComponent } from './components/modulos/modulos.component';
 import { ActividadesComponent } from './components/actividades/actividades.component';
 import { CiclosComponent } from './components/ciclos/ciclos.component';
+import { CursosComponent } from './components/cursos/cursos.component';
 import { TareasComponent } from './components/tareas/tareas.component';
 import { PerfilComponent } from './components/perfil/perfil.component';
 
@@ -21,6 +22,7 @@ export const routes: Routes = [
   { path: 'actividades', component: ActividadesComponent, canActivate: [authGuard], data: { roles: ['COORDINADOR', 'PROFESOR'] } },
   { path: 'ciclos', component: CiclosComponent, canActivate: [authGuard], data: { roles: ['COORDINADOR'] } },
   { path: 'perfil', component: PerfilComponent, canActivate: [authGuard], data: { roles: ['COORDINADOR', 'PROFESOR', 'ALUMNO'] } },
+  { path: 'cursos', component: CursosComponent, canActivate: [authGuard], data: { roles: ['COORDINADOR'] } },
   { path: 'tareas', component: TareasComponent, canActivate: [authGuard], data: { roles: ['PROFESOR', 'ALUMNO'] } },
   { path: '**', redirectTo: '' }
 ];
