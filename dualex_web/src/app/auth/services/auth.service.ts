@@ -8,6 +8,8 @@ import { PerfilUsuario, JwtPayload } from '../../dto/dualex.dto';
 })
 export class AuthService {
   private readonly COOKIE_NAME = 'dualex_jwt'; // Nombre supuesto de la cookie
+  // La sesión se mantiene en memoria para que el header, el perfil y las vistas
+  // compartan el mismo usuario sin depender de llamadas repetidas al backend.
   private sujetoPerfilUsuario = new BehaviorSubject<PerfilUsuario | null>(null);
   
   perfilUsuario$ = this.sujetoPerfilUsuario.asObservable();
@@ -107,7 +109,8 @@ export class AuthService {
   }
 
   /**
-   * Cierra la sesión local eliminando la cookie y limpiando el perfil en memoria.
+   * Cierra la sesión local limpiando la cookie y el estado en memoria.
+   * De momento solo afecta a la sesión del navegador, no a un backend real.
    */
   public cerrarSesion(): void {
     if (isPlatformBrowser(this.platformId)) {

@@ -31,6 +31,7 @@ export class PerfilComponent implements OnInit, OnDestroy {
   };
 
   ngOnInit(): void {
+    // El perfil se escucha como observable para que el header y esta vista se mantengan sincronizados.
     this.suscripcion = this.authService.perfilUsuario$.subscribe(perfil => {
       this.perfil = perfil;
       if (perfil) {
@@ -99,6 +100,7 @@ export class PerfilComponent implements OnInit, OnDestroy {
       return;
     }
 
+    // El guardado es local: actualizamos el estado de sesión sin llamar aún a un backend.
     const actualizado: PerfilUsuario = {
       ...this.perfil,
       nombre,

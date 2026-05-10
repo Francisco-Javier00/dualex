@@ -48,6 +48,7 @@ export class EmpresasComponent implements OnInit {
   };
 
   ngOnInit(): void {
+    // La tabla mantiene el contrato de DataTables, aunque los datos salgan de un mock local.
     this.dtOptions = {
       serverSide: true,
       processing: true,
@@ -234,6 +235,7 @@ export class EmpresasComponent implements OnInit {
   }
 
   explicarConvenioUrl(): void {
+    // Ayuda contextual: la ubicación real del convenio aún está pendiente de definir.
     this.alertService.informacion(
       'Convenio URL',
       'Aquí va la ubicación del convenio. Por ahora estoy a la espera de que me indiquen dónde está exactamente.'
@@ -249,6 +251,7 @@ export class EmpresasComponent implements OnInit {
       return;
     }
 
+    // La configuración todavía se guarda solo en memoria para simular la edición real.
     this.alertService.exito(
       'Configuración guardada',
       'Los valores de aviso y finalización del convenio se han actualizado.'
@@ -329,6 +332,7 @@ export class EmpresasComponent implements OnInit {
     const fecha = new Date(anio, mes - 1, dia);
     if (Number.isNaN(fecha.getTime())) return '';
 
+    // El fin del convenio se calcula automáticamente a partir de la fecha de inicio y la duración configurada.
     fecha.setFullYear(fecha.getFullYear() + Number(this.configuracionEmpresa.tiempoFinalizacionConvenio || 0));
 
     const diaFinal = String(fecha.getDate()).padStart(2, '0');
