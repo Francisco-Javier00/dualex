@@ -7,6 +7,17 @@
   border-radius: 50%;
 }
 
+.empresa-nombre-link {
+  font-weight: 600;
+  color: #1f2937;
+  text-align: left;
+}
+
+.empresa-nombre-link:hover {
+  color: #2563eb;
+  text-decoration: underline !important;
+}
+
 .empresas-create-modal {
   background: transparent;
 }
@@ -120,6 +131,65 @@
 
 .empresas-config-modal {
   background: transparent;
+}
+
+.empresas-contactos-modal {
+  background: transparent;
+}
+
+.empresas-contactos-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.empresas-contactos-dialog {
+  position: relative;
+  z-index: 1056;
+  max-width: 760px;
+  margin: 1.5rem auto;
+}
+
+.empresas-contactos-content {
+  border: 1px solid #e5e7eb;
+  border-radius: 22px;
+  background: #ffffff;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.18);
+}
+
+.empresas-contactos-title {
+  color: #1f2937;
+  font-size: 1.35rem;
+}
+
+.empresas-contactos-subtitle {
+  color: #6b7280;
+  font-size: 0.95rem;
+}
+
+.empresas-contactos-table {
+  border: 1px solid #dbe3ee;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.empresas-contactos-table thead th {
+  background: #2f6fbf;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.95rem;
+  border-color: #2f6fbf;
+  padding-top: 0.65rem;
+  padding-bottom: 0.65rem;
+}
+
+.empresas-contactos-table tbody td {
+  font-size: 0.95rem;
+  vertical-align: middle;
+  background: #ffffff;
+  border-color: #dbe3ee;
+  padding-top: 0.9rem;
+  padding-bottom: 0.9rem;
 }
 
 .empresas-config-backdrop {

@@ -24,6 +24,7 @@ export class EmpresasComponent implements OnInit {
 
   dtOptions: Config = {};
   modalConfiguracionVisible = false;
+  modalContactosVisible = false;
   modalBorradoVisible = false;
   modalCrearVisible = false;
   modoFormulario: 'crear' | 'editar' = 'crear';
@@ -63,7 +64,18 @@ export class EmpresasComponent implements OnInit {
       },
       columns: [
         { data: 'siglas' },
-        { data: 'nombre' },
+        {
+          data: 'nombre',
+          render: (data: string) => `
+            <button
+              type="button"
+              class="btn btn-link p-0 text-decoration-none empresa-nombre-link"
+              data-action="viewContacts"
+              title="Ver contactos">
+              ${data}
+            </button>
+          `
+        },
         {
           data: 'convenioUrl',
           render: (data: string) => {
@@ -76,8 +88,6 @@ export class EmpresasComponent implements OnInit {
         },
         { data: 'inicioConvenio' },
         { data: 'finConvenio' },
-        { data: 'contacto' },
-        { data: 'numeroContacto', className: 'text-start' },
         {
           data: null,
           className: 'text-center',
@@ -155,10 +165,20 @@ export class EmpresasComponent implements OnInit {
       return;
     }
 
+    if (event.action === 'viewContacts') {
+      this.abrirContactosEmpresa(event.data);
+      return;
+    }
+
     if (event.action === 'delete') {
       this.empresaSeleccionada = event.data;
       this.modalBorradoVisible = true;
     }
+  }
+
+  abrirContactosEmpresa(empresa: EmpresaDTO): void {
+    this.empresaSeleccionada = empresa;
+    this.modalContactosVisible = true;
   }
 
   onConfirmarBorrado(): void {
@@ -173,6 +193,11 @@ export class EmpresasComponent implements OnInit {
 
   onCancelarBorrado(): void {
     this.modalBorradoVisible = false;
+    this.empresaSeleccionada = null;
+  }
+
+  cerrarContactosEmpresa(): void {
+    this.modalContactosVisible = false;
     this.empresaSeleccionada = null;
   }
 

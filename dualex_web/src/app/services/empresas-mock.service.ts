@@ -13,7 +13,21 @@ export class EmpresasMockService {
     { id: 3, siglas: 'INF', nombre: 'Informatika Norte', convenioUrl: 'https://inf.example.com/convenio', inicioConvenio: '01/09/2025', finConvenio: '30/06/2026', contacto: 'Laura Ruiz', numeroContacto: '600000003' },
     { id: 4, siglas: 'NXT', nombre: 'Next Services', convenioUrl: 'https://nxt.example.com/convenio', inicioConvenio: '01/09/2025', finConvenio: '30/06/2026', contacto: 'Pedro Sánchez', numeroContacto: '600000004' },
     { id: 5, siglas: 'SYN', nombre: 'Synapse Works', convenioUrl: 'https://syn.example.com/convenio', inicioConvenio: '01/09/2025', finConvenio: '30/06/2026', contacto: 'Ana Torres', numeroContacto: '600000005' },
-    { id: 6, siglas: 'BIZ', nombre: 'BizDev Labs', convenioUrl: 'https://biz.example.com/convenio', inicioConvenio: '01/09/2025', finConvenio: '30/06/2026', contacto: 'Javier León', numeroContacto: '600000006' },
+    {
+      id: 6,
+      siglas: 'BIZ',
+      nombre: 'BizDev Labs',
+      convenioUrl: 'https://biz.example.com/convenio',
+      inicioConvenio: '01/09/2025',
+      finConvenio: '30/06/2026',
+      contacto: 'Javier León',
+      numeroContacto: '600000006',
+      contactosAdicionales: [
+        { contacto: 'Marta Gil', numeroContacto: '600001101' },
+        { contacto: 'Sergio Vidal', numeroContacto: '600001102' },
+        { contacto: 'Lucía Navarro', numeroContacto: '600001103' }
+      ]
+    },
     { id: 7, siglas: 'EDU', nombre: 'EduTech Center', convenioUrl: 'https://edu.example.com/convenio', inicioConvenio: '01/09/2025', finConvenio: '30/06/2026', contacto: 'Carmen Díaz', numeroContacto: '600000007' },
     { id: 8, siglas: 'RND', nombre: 'Ronda Digital', convenioUrl: 'https://rnd.example.com/convenio', inicioConvenio: '01/09/2025', finConvenio: '30/06/2026', contacto: 'Miguel Ortiz', numeroContacto: '600000008' }
   ];

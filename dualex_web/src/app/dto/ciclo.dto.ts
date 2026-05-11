@@ -3,6 +3,7 @@ export interface Ciclo {
   nombre: string;
   siglas: string;
   grado: string;
+  cursos?: string;
   anoEscolar?: string;
   colorFondo1?: string;
   colorTexto1?: string;

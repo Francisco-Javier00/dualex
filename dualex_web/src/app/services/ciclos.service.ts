@@ -7,11 +7,11 @@ import { Observable, of } from 'rxjs';
 })
 export class CiclosService {
   private ciclos: Ciclo[] = [
-    { nombre: 'Desarrollo de Aplicaciones Web', siglas: 'DAW', grado: 'Grado Superior' },
-    { nombre: 'Electromecánica de Vehículos', siglas: 'EMV', grado: 'Grado Medio' },
-    { nombre: 'Sistemas Microinformáticos y Redes', siglas: 'SMR', grado: 'Grado Medio' },
-    { nombre: 'Mecatrónica Industrial', siglas: 'MI', grado: 'Grado Superior' },
-    { nombre: 'Gestión Administrativa', siglas: 'GA', grado: 'Grado Medio' }
+    this.crearCiclo({ nombre: 'Desarrollo de Aplicaciones Web', siglas: 'DAW', grado: 'Grado Superior' }),
+    this.crearCiclo({ nombre: 'ElectromecÃ¡nica de VehÃ­culos', siglas: 'EMV', grado: 'Grado Medio' }),
+    this.crearCiclo({ nombre: 'Sistemas MicroinformÃ¡ticos y Redes', siglas: 'SMR', grado: 'Grado Medio' }),
+    this.crearCiclo({ nombre: 'MecatrÃ³nica Industrial', siglas: 'MI', grado: 'Grado Superior' }),
+    this.crearCiclo({ nombre: 'GestiÃ³n Administrativa', siglas: 'GA', grado: 'Grado Medio' })
   ];
 
   constructor() {}
@@ -21,16 +21,18 @@ export class CiclosService {
   }
 
   addCiclo(ciclo: Ciclo): Observable<Ciclo> {
-    this.ciclos.push(ciclo);
-    return of(ciclo);
+    const nuevoCiclo = this.crearCiclo(ciclo);
+    this.ciclos.push(nuevoCiclo);
+    return of(nuevoCiclo);
   }
 
   updateCiclo(siglasOriginales: string, cicloActualizado: Ciclo): Observable<Ciclo> {
+    const cicloNormalizado = this.crearCiclo(cicloActualizado);
     const index = this.ciclos.findIndex(c => c.siglas === siglasOriginales);
     if (index !== -1) {
-      this.ciclos[index] = cicloActualizado;
+      this.ciclos[index] = cicloNormalizado;
     }
-    return of(cicloActualizado);
+    return of(cicloNormalizado);
   }
 
   deleteCiclo(siglas: string): Observable<boolean> {
@@ -41,5 +43,16 @@ export class CiclosService {
   // Helper para el selector en cursos
   getCiclosExistentes() {
     return this.ciclos.map(c => ({ nombre: c.nombre, siglas: c.siglas }));
+  }
+
+  private crearCiclo(ciclo: Ciclo): Ciclo {
+    return {
+      ...ciclo,
+      cursos: this.formatearCursos(ciclo.siglas)
+    };
+  }
+
+  private formatearCursos(siglas: string): string {
+    return `1${siglas}, 2${siglas}`;
   }
 }

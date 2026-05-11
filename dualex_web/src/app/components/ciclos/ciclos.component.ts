@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { DatatableComponent } from '../shared/datatable/datatable.component';
 import { ConfirmarBorradoModalComponent } from '../shared/modals/confirmar-borrado-modal/confirmar-borrado-modal.component';
@@ -12,10 +12,10 @@ import { Ciclo } from '../../dto/ciclo.dto';
   selector: 'app-ciclos',
   standalone: true,
   imports: [
-    CommonModule, 
-    RouterModule, 
-    FormsModule, 
-    DatatableComponent, 
+    CommonModule,
+    RouterModule,
+    FormsModule,
+    DatatableComponent,
     ConfirmarBorradoModalComponent
   ],
   templateUrl: './ciclos.component.html',
@@ -23,20 +23,14 @@ import { Ciclo } from '../../dto/ciclo.dto';
 })
 export class CiclosComponent implements OnInit {
   private ciclosService = inject(CiclosService);
-  private router = inject(Router);
 
   ciclos: Ciclo[] = [];
 
   dtOptions: Config = {};
-  columnTitles: string[] = ['Nombre', 'Siglas', 'Grado', 'Módulos', 'Acciones'];
+  columnTitles: string[] = ['Nombre', 'Siglas', 'Grado', 'Cursos', 'Módulos', 'Acciones'];
 
   isDeleteModalOpen = false;
   cicloToDelete: any = null;
-
-  isCursoModalOpen = false;
-  cicloParaCursos: Ciclo | null = null;
-  cursoSeleccionado: string | null = null;
-  opcionesCurso: string[] = [];
 
   isEditModalOpen = false;
   isEditing = false;
@@ -44,6 +38,7 @@ export class CiclosComponent implements OnInit {
     nombre: '',
     siglas: '',
     grado: 'Grado Medio',
+    cursos: '',
     anoEscolar: '',
     colorFondo1: '#ffffff',
     colorTexto1: '#000000',
@@ -56,17 +51,18 @@ export class CiclosComponent implements OnInit {
 
   ngOnInit(): void {
     this.cargarCiclos();
-    
+
     this.dtOptions = {
       data: this.ciclos,
       columns: [
         { data: 'nombre' },
         { data: 'siglas' },
         { data: 'grado' },
+        { data: 'cursos' },
         { data: null, defaultContent: 'Gestionar Módulos' },
-        { 
-          data: null, 
-          orderable: false, 
+        {
+          data: null,
+          orderable: false,
           className: 'text-center',
           render: () => `
             <div class="d-flex gap-2 justify-content-center align-items-center action-buttons w-100">
@@ -75,9 +71,6 @@ export class CiclosComponent implements OnInit {
               </button>
               <button class="btn btn-sm btn-outline-danger shadow-sm action-delete" data-action="delete" title="Eliminar">
                 <i class="fa-solid fa-trash"></i>
-              </button>
-              <button class="btn btn-sm btn-outline-secondary shadow-sm action-view" data-action="view" title="Ver cursos">
-                <i class="fa-solid fa-eye"></i>
               </button>
             </div>
           `
@@ -99,9 +92,7 @@ export class CiclosComponent implements OnInit {
   }
 
   handleAction(event: { action: string, data: any }) {
-    if (event.action === 'view') {
-      this.abrirSelectorCursos(event.data);
-    } else if (event.action === 'delete') {
+    if (event.action === 'delete') {
       this.cicloToDelete = event.data;
       this.isDeleteModalOpen = true;
     } else if (event.action === 'edit') {
@@ -109,48 +100,18 @@ export class CiclosComponent implements OnInit {
     }
   }
 
-  abrirCursos() {
-    this.router.navigate(['/cursos']);
-  }
-
-  abrirSelectorCursos(ciclo: Ciclo) {
-    this.cicloParaCursos = ciclo;
-    this.cursoSeleccionado = null;
-    this.opcionesCurso = ciclo.siglas === 'SMR'
-      ? ['1SMR', '2SMR']
-      : [`1${ciclo.siglas}`, `2${ciclo.siglas}`];
-    this.isCursoModalOpen = true;
-  }
-
-  cerrarSelectorCursos() {
-    this.isCursoModalOpen = false;
-    this.cicloParaCursos = null;
-    this.cursoSeleccionado = null;
-    this.opcionesCurso = [];
-  }
-
-  seleccionarCurso(curso: string) {
-    this.cursoSeleccionado = curso;
-  }
-
-  aceptarSelectorCursos() {
-    if (!this.cursoSeleccionado) {
-      return;
-    }
-    this.cerrarSelectorCursos();
-  }
-
   abrirEditModal(ciclo?: any) {
     if (ciclo) {
       this.isEditing = true;
       this.editingOriginalSiglas = ciclo.siglas;
-      this.cicloForm = { 
-        ...ciclo, 
-        anoEscolar: ciclo.anoEscolar || '', 
-        colorFondo1: ciclo.colorFondo1 || '#ffffff', 
-        colorTexto1: ciclo.colorTexto1 || '#000000', 
-        colorFondo2: ciclo.colorFondo2 || '#ffffff', 
-        colorTexto2: ciclo.colorTexto2 || '#000000' 
+      this.cicloForm = {
+        ...ciclo,
+        cursos: ciclo.cursos || this.formatearCursos(ciclo.siglas),
+        anoEscolar: ciclo.anoEscolar || '',
+        colorFondo1: ciclo.colorFondo1 || '#ffffff',
+        colorTexto1: ciclo.colorTexto1 || '#000000',
+        colorFondo2: ciclo.colorFondo2 || '#ffffff',
+        colorTexto2: ciclo.colorTexto2 || '#000000'
       };
     } else {
       this.isEditing = false;
@@ -159,6 +120,7 @@ export class CiclosComponent implements OnInit {
         nombre: '',
         siglas: '',
         grado: 'Grado Medio',
+        cursos: '',
         anoEscolar: '',
         colorFondo1: '#ffffff',
         colorTexto1: '#000000',
@@ -174,13 +136,18 @@ export class CiclosComponent implements OnInit {
   }
 
   guardarCiclo() {
+    const cicloParaGuardar = {
+      ...this.cicloForm,
+      cursos: this.formatearCursos(this.cicloForm.siglas)
+    };
+
     if (this.isEditing && this.editingOriginalSiglas) {
-      this.ciclosService.updateCiclo(this.editingOriginalSiglas, { ...this.cicloForm }).subscribe(() => {
+      this.ciclosService.updateCiclo(this.editingOriginalSiglas, cicloParaGuardar).subscribe(() => {
         this.cargarCiclos();
         this.cerrarEditModal();
       });
     } else {
-      this.ciclosService.addCiclo({ ...this.cicloForm }).subscribe(() => {
+      this.ciclosService.addCiclo(cicloParaGuardar).subscribe(() => {
         this.cargarCiclos();
         this.cerrarEditModal();
       });
@@ -209,5 +176,9 @@ export class CiclosComponent implements OnInit {
   cerrarDeleteModal() {
     this.isDeleteModalOpen = false;
     this.cicloToDelete = null;
+  }
+
+  formatearCursos(siglas: string): string {
+    return siglas ? `1${siglas},2${siglas}` : '';
   }
 }

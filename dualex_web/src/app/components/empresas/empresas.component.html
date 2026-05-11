@@ -25,7 +25,7 @@
   <app-shared-datatable
     tableId="tabla-empresas"
     [dtOptions]="dtOptions"
-    [columnTitles]="['Siglas', 'Nombre', 'Convenio', 'Inicio Convenio', 'Fin Convenio', 'Contacto', 'Numero Contacto', 'Acciones']"
+    [columnTitles]="['Siglas', 'Nombre', 'Convenio', 'Inicio Convenio', 'Fin Convenio', 'Acciones']"
     (actionClick)="onTableAction($event)">
   </app-shared-datatable>
 </div>
@@ -38,6 +38,56 @@
   (confirmarEvent)="onConfirmarBorrado()"
   (cancelarEvent)="onCancelarBorrado()">
 </app-confirmar-borrado-modal>
+
+@if (modalContactosVisible && empresaSeleccionada) {
+  <div class="modal d-block empresas-contactos-modal" tabindex="-1" role="dialog" aria-modal="true">
+    <div class="empresas-contactos-backdrop" (click)="cerrarContactosEmpresa()"></div>
+
+    <div class="modal-dialog modal-dialog-centered empresas-contactos-dialog" role="document">
+      <div class="modal-content empresas-contactos-content">
+        <div class="modal-header border-0 pb-0 px-4 pt-4">
+          <div>
+            <h5 class="modal-title fw-bold mb-1 empresas-contactos-title">{{ empresaSeleccionada.nombre }}</h5>
+            <p class="text-muted mb-0 empresas-contactos-subtitle">Contactos asociados a esta empresa</p>
+          </div>
+          <button type="button" class="btn-close" aria-label="Cerrar" (click)="cerrarContactosEmpresa()"></button>
+        </div>
+
+        <div class="modal-body px-4 pb-4 pt-3">
+          <div class="table-responsive empresas-contactos-table">
+            <table class="table align-middle mb-0">
+              <thead>
+                <tr>
+                  <th>Tipo</th>
+                  <th>Nombre</th>
+                  <th>Número</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="fw-semibold">Principal</td>
+                  <td>{{ empresaSeleccionada.contacto }}</td>
+                  <td>{{ empresaSeleccionada.numeroContacto }}</td>
+                </tr>
+                @for (contactoExtra of empresaSeleccionada.contactosAdicionales ?? []; track $index) {
+                  <tr>
+                    <td class="fw-semibold">Adicional</td>
+                    <td>{{ contactoExtra.contacto }}</td>
+                    <td>{{ contactoExtra.numeroContacto }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <div class="d-flex justify-content-end mt-4">
+            <button class="btn btn-primary px-4" (click)="cerrarContactosEmpresa()">Cerrar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+}
 
 @if (modalConfiguracionVisible) {
   <div class="modal d-block empresas-config-modal" tabindex="-1" role="dialog" aria-modal="true">
