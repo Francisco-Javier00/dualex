@@ -1,0 +1,22 @@
+/* Centrado vertical */
+.about-page-container {
+    min-height: calc(100vh - 80px);
+    /* Altura total menos el header */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 0;
+}
+
+.about-banner {
+    background: linear-gradient(135deg, #006293 0%, #004d73 100%);
+}
+
+.about-logo {
+    height: 100px;
+    filter: brightness(0) invert(1);
+}
+
+.leading-relaxed {
+    line-height: 1.7;
+}

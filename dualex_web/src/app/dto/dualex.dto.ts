@@ -93,15 +93,37 @@ export interface AlumnoDTO {
   nuss: string;
   dni: string;
   telefono: string;
-  ciclo: string;
-  curso: string;
-  estado: 'Activo' | 'Inactivo';
+  repetidor: boolean;
+  idCurso: number;
+  estado?: 'Activo' | 'Inactivo';
+  nombreCurso?: string; // Para mostrar en tablas
 }
 
 export interface ModuloDTO {
   id: number;
   nombre: string;
   siglas: string;
+  ciclo: string;
+}
+
+export interface CicloDTO {
+  id?: number;
+  nombre: string;
+  siglas: string;
+  grado?: string;
+  cursos?: string;
+  anoEscolar?: string;
+  colorFondo1?: string;
+  colorTexto1?: string;
+  colorFondo2?: string;
+  colorTexto2?: string;
+}
+
+export interface CursoDTO {
+  id: number;
+  nombre: string;
+  curso: number;
+  anoEscolar: string;
   ciclo: string;
 }
 

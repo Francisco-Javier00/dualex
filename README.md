@@ -1,6 +1,6 @@
 # 🛡️ Dualex - School Management System
 
-Dualex es una plataforma integral de gestión académica diseñada para optimizar la comunicación y administración entre coordinadores, profesores y alumnos. Con una interfaz moderna, rápida y basada en los últimos estándares de desarrollo.
+Dualex es una plataforma integral de gestión académica diseñada para optimizar la comunicación y administración entre coordinadores, profesores y alumnos en el periodo de Formación DUAL. Con una interfaz moderna, rápida y basada en los últimos estándares de desarrollo.
 
 ## 🚀 Tecnologías
 
@@ -8,7 +8,7 @@ El proyecto está dividido en dos partes principales:
 
 ### 💻 Frontend (dualex_web)
 - **Framework:** Angular 19+
-- **Estilos:** Bootstrap 5 & CSS3 Premium
+- **Estilos:** Bootstrap 5 & CSS3
 - **Componentes:** Angular DataTables, Bootstrap Icons
 - **Animaciones:** Angular Animations
 
@@ -72,8 +72,10 @@ npm start
 
 ## 📄 Licencia
 
-Este proyecto es de uso privado para la plataforma Dualex.
+La plataforma DUALEX es de uso privado, desarrollado para la Escuela Virgen de Guadalupe - Fundación Loyola (Badajoz).
 
 ---
-
-Desarrollado con ❤️ por Francisco Javier, Juan Carlos y Santiago.
+Desarrolladores:
+Francisco Javier Martínez Fernández
+Juan Carlos Díaz del Castillo
+Santiago Pizarro Pizarro

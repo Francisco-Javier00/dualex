@@ -6,7 +6,7 @@ import { DatatableComponent } from '../shared/datatable/datatable.component';
 import { ConfirmarBorradoModalComponent } from '../shared/modals/confirmar-borrado-modal/confirmar-borrado-modal.component';
 import { Config } from 'datatables.net';
 import { CiclosService } from '../../services/ciclos.service';
-import { Ciclo } from '../../dto/ciclo.dto';
+import { CicloDTO } from '../../dto/dualex.dto';
 
 @Component({
   selector: 'app-ciclos',
@@ -24,7 +24,7 @@ import { Ciclo } from '../../dto/ciclo.dto';
 export class CiclosComponent implements OnInit {
   private ciclosService = inject(CiclosService);
 
-  ciclos: Ciclo[] = [];
+  ciclos: CicloDTO[] = [];
 
   dtOptions: Config = {};
   columnTitles: string[] = ['Nombre', 'Siglas', 'Grado', 'Cursos', 'Módulos', 'Acciones'];

@@ -42,3 +42,11 @@
   (confirmarEvent)="onConfirmarBorrado()"
   (cancelarEvent)="onCancelarBorrado()">
 </app-confirmar-borrado-modal>
+
+<!-- Modal de Añadir/Editar Alumno -->
+<app-alumno-modal
+  [visible]="modalAlumnoVisible"
+  [alumno]="alumnoSeleccionado"
+  (cerrar)="onCerrarModal()"
+  (guardar)="onGuardarAlumno($event)">
+</app-alumno-modal>

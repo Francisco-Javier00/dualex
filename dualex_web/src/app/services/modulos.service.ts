@@ -1,74 +1,53 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
-import { delay } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 import { ModuloDTO } from '../dto/dualex.dto';
 
+/**
+ * Servicio encargado de la gestión de Módulos conectando con el router index.php.
+ */
 @Injectable({
   providedIn: 'root'
 })
 export class ModulosService {
   private http = inject(HttpClient);
   
-  private readonly API_URL = 'api/conModulos.php';
+  // URL del router central de la API PHP
+  private readonly API_URL = `${environment.apiUrl}/index.php?c=Modulos`;
 
-  // Datos de prueba (MOCK)
-  private modulos: ModuloDTO[] = [
-    { id: 1, nombre: 'Sistemas Informáticos', siglas: 'SI', ciclo: 'DAW' },
-    { id: 2, nombre: 'Base de Datos', siglas: 'BD', ciclo: 'DAW' },
-    { id: 3, nombre: 'Programación', siglas: 'PRO', ciclo: 'DAW' },
-    { id: 4, nombre: 'Entornos de Desarrollo', siglas: 'ED', ciclo: 'DAW' },
-    { id: 5, nombre: 'Desarrollo Web en Entorno Cliente', siglas: 'DWEC', ciclo: 'DAW' },
-    { id: 6, nombre: 'Sistemas Gestores de Bases de Datos', siglas: 'SGBD', ciclo: 'ASIR' },
-    { id: 7, nombre: 'Seguridad y Alta Disponibilidad', siglas: 'SAD', ciclo: 'ASIR' }
-  ];
-
+  /**
+   * Obtiene la lista completa de módulos.
+   */
   getModulos(): Observable<ModuloDTO[]> {
-    return of([...this.modulos]).pipe(delay(300));
+    return this.http.get<ModuloDTO[]>(`${this.API_URL}&m=listar`);
   }
 
+  /**
+   * Procesa la solicitud de DataTables conectando con el backend.
+   */
   obtenerModulosDataTables(dataTablesParameters: any): Observable<any> {
-    const start = dataTablesParameters.start || 0;
-    const length = dataTablesParameters.length || 10;
-    const search = dataTablesParameters.search?.value?.toLowerCase() || '';
-
-    let filtrados = this.modulos;
-    if (search) {
-      filtrados = filtrados.filter(m =>
-        m.nombre.toLowerCase().includes(search) ||
-        m.siglas.toLowerCase().includes(search) ||
-        m.ciclo.toLowerCase().includes(search)
-      );
-    }
-
-    return of({
-      draw: dataTablesParameters.draw,
-      recordsTotal: this.modulos.length,
-      recordsFiltered: filtrados.length,
-      data: filtrados.slice(start, start + length)
-    }).pipe(delay(400));
+    return this.http.post<any>(`${this.API_URL}&m=obtenerDataTables`, dataTablesParameters);
   }
 
+  /**
+   * Registra un nuevo módulo.
+   */
   createModulo(modulo: ModuloDTO): Observable<ModuloDTO> {
-    const nuevo = { ...modulo, id: this.modulos.length > 0 ? Math.max(...this.modulos.map(m => m.id)) + 1 : 1 };
-    this.modulos.unshift(nuevo);
-    return of(nuevo).pipe(delay(500));
+    return this.http.post<ModuloDTO>(`${this.API_URL}&m=crear`, modulo);
   }
 
+  /**
+   * Actualiza los datos de un módulo existente.
+   */
   updateModulo(modulo: ModuloDTO): Observable<ModuloDTO> {
-    const index = this.modulos.findIndex(m => m.id === modulo.id);
-    if (index !== -1) {
-      this.modulos[index] = { ...modulo };
-    }
-    return of(modulo).pipe(delay(500));
+    return this.http.put<ModuloDTO>(`${this.API_URL}&m=actualizar&id=${modulo.id}`, modulo);
   }
 
+  /**
+   * Elimina un módulo.
+   */
   deleteModulo(id: number): Observable<boolean> {
-    const index = this.modulos.findIndex(m => m.id === id);
-    if (index !== -1) {
-      this.modulos.splice(index, 1);
-      return of(true).pipe(delay(400));
-    }
-    return of(false);
+    return this.http.delete<boolean>(`${this.API_URL}&m=eliminar&id=${id}`);
   }
 }
