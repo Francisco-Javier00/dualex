@@ -1,12 +1,12 @@
 <?php
-require_once MODELO . 'modModulos.php';
+require_once MODELO . 'modCiclos.php';
 
-class ConModulos extends BaseController {
+class ConCiclos extends BaseController {
     private $modelo;
 
     public function __construct($db, $user = null) {
         parent::__construct($db, $user);
-        $this->modelo = new ModModulos($db);
+        $this->modelo = new ModCiclos($db);
     }
 
     public function listar() {
@@ -21,7 +21,7 @@ class ConModulos extends BaseController {
         }
         $data = $this->modelo->obtener($id);
         if (!$data) {
-            $this->sendError("Módulo no encontrado.", 404);
+            $this->sendError("Ciclo no encontrado.", 404);
         }
         $this->sendResponse($data);
     }
@@ -34,26 +34,36 @@ class ConModulos extends BaseController {
     }
 
     public function crear() {
-        $this->checkRole(['PROFESOR', 'COORDINADOR']);
+        // $this->checkRole(['COORDINADOR']);
         $json = file_get_contents('php://input');
         $datos = json_decode($json, true);
         if (!$datos) {
             $this->sendError("Datos no válidos.", 400);
         }
-        $res = $this->modelo->crear($datos);
-        $this->sendResponse($res, 201);
+        
+        try {
+            $res = $this->modelo->crear($datos);
+            $this->sendResponse($res, 201);
+        } catch (Exception $e) {
+            $this->sendError("Error al crear el ciclo: " . $e->getMessage(), 500);
+        }
     }
 
     public function actualizar() {
-        $this->checkRole(['PROFESOR', 'COORDINADOR']);
+        // $this->checkRole(['COORDINADOR']);
         $id = $_GET['id'] ?? null;
         if (!$id) {
             $this->sendError("ID no proporcionado.", 400);
         }
         $json = file_get_contents('php://input');
         $datos = json_decode($json, true);
-        $res = $this->modelo->actualizar($id, $datos);
-        $this->sendResponse($res);
+        
+        try {
+            $res = $this->modelo->actualizar($id, $datos);
+            $this->sendResponse($res);
+        } catch (Exception $e) {
+            $this->sendError("Error al actualizar el ciclo: " . $e->getMessage(), 500);
+        }
     }
 
     public function eliminar() {
@@ -64,11 +74,5 @@ class ConModulos extends BaseController {
         }
         $success = $this->modelo->eliminar($id);
         $this->sendResponse(["success" => $success]);
-    }
-
-    public function listarProfesor() {
-        $emailProfesor = $_GET['emailProfesor'] ?? ($this->user['email'] ?? null);
-        $data = $this->modelo->obtenerModulosProfesor($emailProfesor);
-        $this->sendResponse($data);
     }
 }
