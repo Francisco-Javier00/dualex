@@ -6,7 +6,10 @@ header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
 
 // Si la petición es un "apretón de manos" de seguridad (OPTIONS), respondemos y cortamos la ejecución para ahorrar recursos
-if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') exit;
+if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+    http_response_code(200);
+    exit;
+}
 
 // Cargamos las variables de entorno desde el archivo .env si existe
 if (file_exists(__DIR__ . '/.env')) {

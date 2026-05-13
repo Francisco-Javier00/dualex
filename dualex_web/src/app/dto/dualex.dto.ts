@@ -132,3 +132,8 @@ export interface ProfesorDTO {
   ciclos: string;
 }
 
+
+export interface ConfiguracionDTO {
+  diasAvisoCaducidad: number;
+  tiempoFinalizacionConvenio: number;
+}

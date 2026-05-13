@@ -49,4 +49,12 @@ export class DatatableComponent implements AfterViewInit, OnDestroy {
       });
     });
   }
+
+  public reloadTable(): void {
+    if (this.dtElement && this.dtElement.dtInstance) {
+      this.dtElement.dtInstance.then((dtInstance: any) => {
+        dtInstance.ajax.reload(null, false);
+      });
+    }
+  }
 }

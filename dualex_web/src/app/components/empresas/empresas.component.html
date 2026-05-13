@@ -186,11 +186,11 @@
               <div class="row g-3">
                 <div class="col-md-4">
                   <label class="form-label empresas-label">Siglas</label>
-                  <input type="text" class="form-control empresas-input" [(ngModel)]="nuevaEmpresa.siglas" placeholder="ABC" required>
+                  <input type="text" class="form-control empresas-input" [ngModel]="nuevaEmpresa.siglas" (ngModelChange)="nuevaEmpresa.siglas = $event.toUpperCase()" placeholder="ABC" maxlength="6" required>
                 </div>
                 <div class="col-md-8">
                   <label class="form-label empresas-label">Nombre</label>
-                  <input type="text" class="form-control empresas-input" [(ngModel)]="nuevaEmpresa.nombre" placeholder="Nombre de la empresa" required>
+                  <input type="text" class="form-control empresas-input" [(ngModel)]="nuevaEmpresa.nombre" placeholder="Nombre de la empresa" maxlength="50" required>
                 </div>
                 <div class="col-md-12">
                   <div class="d-flex align-items-center justify-content-between mb-1">
@@ -199,7 +199,7 @@
                       <i class="fa-regular fa-circle-question"></i>
                     </button>
                   </div>
-                  <input type="url" class="form-control empresas-input" [(ngModel)]="nuevaEmpresa.convenioUrl" placeholder="https://..." required>
+                  <input type="url" class="form-control empresas-input" [(ngModel)]="nuevaEmpresa.convenioUrl" placeholder="https://..." maxlength="100" required>
                 </div>
                 <div class="col-md-6">
                   <label class="form-label empresas-label">Inicio Convenio</label>
@@ -216,11 +216,11 @@
                       <i class="fa-solid fa-plus"></i>
                     </button>
                   </div>
-                  <input type="text" class="form-control empresas-input" [(ngModel)]="nuevaEmpresa.contacto" placeholder="Nombre del contacto" required>
+                  <input type="text" class="form-control empresas-input" [(ngModel)]="nuevaEmpresa.contacto" placeholder="Nombre del contacto" maxlength="50" required>
                 </div>
                 <div class="col-md-6">
                   <label class="form-label empresas-label">Numero Contacto</label>
-                  <input type="text" class="form-control empresas-input" [(ngModel)]="nuevaEmpresa.numeroContacto" placeholder="600000000" required>
+                  <input type="tel" class="form-control empresas-input" [(ngModel)]="nuevaEmpresa.numeroContacto" placeholder="600000000" maxlength="15" pattern="[+0-9\s\-]+" required>
                 </div>
 
                 @for (contactoExtra of contactosAdicionales; track $index; let i = $index) {
@@ -233,11 +233,11 @@
                             <i class="fa-solid fa-circle-xmark"></i>
                           </button>
                         </div>
-                        <input type="text" class="form-control empresas-input" [(ngModel)]="contactoExtra.contacto" placeholder="Nombre del contacto" required>
+                        <input type="text" class="form-control empresas-input" [(ngModel)]="contactoExtra.contacto" placeholder="Nombre del contacto" maxlength="50" required>
                       </div>
                       <div class="col-md-6">
                         <label class="form-label empresas-label">Número de contacto adicional</label>
-                        <input type="text" class="form-control empresas-input" [(ngModel)]="contactoExtra.numeroContacto" placeholder="600000000" required>
+                        <input type="tel" class="form-control empresas-input" [(ngModel)]="contactoExtra.numeroContacto" placeholder="600000000" maxlength="15" pattern="[+0-9\s\-]+" required>
                       </div>
                     </div>
                   </div>
