@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { Config } from 'datatables.net';
 import { DatatableComponent } from '../shared/datatable/datatable.component';
 import { ConfirmarBorradoModalComponent } from '../shared/modals/confirmar-borrado-modal/confirmar-borrado-modal.component';
+import { ProfesorModalComponent } from '../modals/profesor-modal/profesor-modal.component';
 import { AlertService } from '../../services/alert.service';
 import { ProfesoresService } from '../../services/profesores.service';
 import { ProfesorDTO } from '../../dto/dualex.dto';
@@ -14,10 +15,11 @@ import { ProfesorDTO } from '../../dto/dualex.dto';
   standalone: true,
   imports: [
     CommonModule, 
-    RouterModule, 
     FormsModule, 
+    RouterModule, 
     DatatableComponent, 
-    ConfirmarBorradoModalComponent
+    ConfirmarBorradoModalComponent,
+    ProfesorModalComponent
   ],
   templateUrl: './profesores.component.html',
   styleUrl: './profesores.component.css'
@@ -70,8 +72,8 @@ export class ProfesoresComponent implements OnInit {
         { data: 'apellidos' },
         { data: 'correo' },
         { data: 'rol' },
-        { data: 'modulos' },
-        { data: 'ciclos' },
+        { data: 'modulos', defaultContent: '' },
+        { data: 'ciclos', defaultContent: '' },
         {
           data: null,
           orderable: false,
@@ -137,14 +139,7 @@ export class ProfesoresComponent implements OnInit {
 
   crearNuevaEntrada(): void {
     this.modoFormulario = 'crear';
-    this.profesorEditandoId = null;
-    this.nuevoProfesor = {
-      nombre: '',
-      apellidos: '',
-      correo: '',
-      rol: 'PROFESOR',
-      ciclos: []
-    };
+    this.profesorSeleccionado = null;
     this.modalCrearVisible = true;
   }
 
@@ -160,18 +155,32 @@ export class ProfesoresComponent implements OnInit {
     }
   }
 
+  onGuardarProfesor(profesorData: any): void {
+    const obs = this.modoFormulario === 'crear'
+      ? this.profesoresService.agregarProfesor(profesorData)
+      : this.profesoresService.actualizarProfesor(profesorData.id, profesorData);
+
+    obs.subscribe({
+      next: () => {
+        const msg = this.modoFormulario === 'crear' ? 'Profesor creado con éxito.' : 'Profesor actualizado con éxito.';
+        this.alertService.exito('Éxito', msg);
+        this.modalCrearVisible = false;
+        this.datatable?.refrescar();
+      },
+      error: (err: any) => {
+        this.alertService.error('Error', err.error?.message || 'Error al procesar el profesor.');
+      }
+    });
+  }
+
   onConfirmarBorrado(): void {
     if (!this.profesorSeleccionado) return;
 
-    this.profesoresService.eliminarProfesor(this.profesorSeleccionado.id).subscribe({
-      next: () => {
-        this.alertService.exito('Profesor eliminado', `${this.profesorSeleccionado!.nombre} ${this.profesorSeleccionado!.apellidos} ha sido eliminado.`);
-        this.modalBorradoVisible = false;
-        this.profesorSeleccionado = null;
-        this.refrescarTabla();
-      },
-      error: () => this.alertService.error('Error', 'No se pudo eliminar el profesor.')
-    });
+    this.profesoresService.eliminarProfesor(this.profesorSeleccionado.id);
+    this.alertService.exito('Profesor eliminado', `${this.profesorSeleccionado.nombre} ${this.profesorSeleccionado.apellidos} ha sido eliminado.`);
+    this.modalBorradoVisible = false;
+    this.profesorSeleccionado = null;
+    this.refrescarTabla();
   }
 
   onCancelarBorrado(): void {
@@ -194,15 +203,10 @@ export class ProfesoresComponent implements OnInit {
     if (
       !this.nuevoProfesor.nombre.trim() ||
       !this.nuevoProfesor.apellidos.trim() ||
-      !this.nuevoProfesor.correo.trim()
+      !this.nuevoProfesor.correo.trim() ||
+      this.nuevoProfesor.ciclos.length === 0
     ) {
-      this.alertService.error('Datos incompletos', 'Rellena el nombre, apellidos y correo antes de guardar.');
-      return;
-    }
-
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    if (!emailRegex.test(this.nuevoProfesor.correo.trim())) {
-      this.alertService.error('Correo inválido', 'Introduce una dirección de correo electrónico válida (ej: nombre@dominio.com).');
+      this.alertService.error('Datos incompletos', 'Rellena todos los campos y selecciona al menos un ciclo antes de guardar.');
       return;
     }
 
@@ -216,25 +220,13 @@ export class ProfesoresComponent implements OnInit {
     };
 
     if (this.modoFormulario === 'editar' && this.profesorEditandoId !== null) {
-      this.profesoresService.actualizarProfesor(this.profesorEditandoId, profesorPayload).subscribe({
-        next: () => {
-          this.alertService.exito('Profesor actualizado', `${this.nuevoProfesor.nombre} ${this.nuevoProfesor.apellidos} se ha actualizado correctamente.`);
-          this.cerrarModalYRefrescar();
-        },
-        error: () => this.alertService.error('Error', 'No se pudo actualizar el profesor.')
-      });
+      this.profesoresService.actualizarProfesor(this.profesorEditandoId, profesorPayload);
+      this.alertService.exito('Profesor actualizado', `${this.nuevoProfesor.nombre} ${this.nuevoProfesor.apellidos} se ha actualizado correctamente.`);
     } else {
-      this.profesoresService.agregarProfesor(profesorPayload).subscribe({
-        next: () => {
-          this.alertService.exito('Profesor creado', `${this.nuevoProfesor.nombre} ${this.nuevoProfesor.apellidos} se ha añadido correctamente.`);
-          this.cerrarModalYRefrescar();
-        },
-        error: () => this.alertService.error('Error', 'No se pudo crear el profesor.')
-      });
+      this.profesoresService.agregarProfesor(profesorPayload);
+      this.alertService.exito('Profesor creado', `${this.nuevoProfesor.nombre} ${this.nuevoProfesor.apellidos} se ha añadido correctamente.`);
     }
-  }
 
-  private cerrarModalYRefrescar(): void {
     this.modalCrearVisible = false;
     this.profesorEditandoId = null;
     this.refrescarTabla();
@@ -248,14 +240,7 @@ export class ProfesoresComponent implements OnInit {
 
   abrirEdicionProfesor(profesor: ProfesorDTO): void {
     this.modoFormulario = 'editar';
-    this.profesorEditandoId = profesor.id;
-    this.nuevoProfesor = {
-      nombre: profesor.nombre,
-      apellidos: profesor.apellidos,
-      correo: profesor.correo,
-      rol: profesor.rol,
-      ciclos: this.convertirAbreviaturasACiclos(profesor.ciclos)
-    };
+    this.profesorSeleccionado = { ...profesor };
     this.modalCrearVisible = true;
   }
 

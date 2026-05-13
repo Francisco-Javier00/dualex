@@ -1,0 +1,132 @@
+<div class="modal-overlay" (click)="cancelar.emit()">
+  
+  <div class="modal-content animate-slide-up" (click)="$event.stopPropagation()" style="max-height: 90vh; overflow-y: auto;">
+    
+    <!-- CABECERA -->
+    <div class="modal-header d-flex justify-content-between align-items-center">
+      <h5 class="mb-0 fw-bold text-dark">
+        <i class="fa-solid" [ngClass]="empresa ? 'fa-pen-to-square text-primary' : 'fa-plus-circle text-success'"></i>
+        {{ modo === 'editar' ? 'Modificar Empresa' : 'Nueva Empresa' }}
+      </h5>
+      <button class="btn-close" (click)="cancelar.emit()"></button>
+    </div>
+
+    <!-- CUERPO -->
+    <div class="modal-body py-4">
+      <form [formGroup]="empresaForm" (ngSubmit)="onSubmit()">
+        
+        <div class="row g-3">
+          <!-- Siglas -->
+          <div class="col-md-4">
+            <label class="form-label small fw-bold text-uppercase opacity-75">Siglas</label>
+            <div class="input-group shadow-sm rounded-3 overflow-hidden border">
+              <span class="input-group-text bg-white border-0"><i class="fa-solid fa-id-badge text-muted"></i></span>
+              <input type="text" formControlName="siglas" class="form-control border-0 px-3" placeholder="Ej: FGL" maxlength="6">
+            </div>
+          </div>
+
+          <!-- Nombre -->
+          <div class="col-md-8">
+            <label class="form-label small fw-bold text-uppercase opacity-75">Nombre Completo</label>
+            <div class="input-group shadow-sm rounded-3 overflow-hidden border">
+              <span class="input-group-text bg-white border-0"><i class="fa-solid fa-building text-muted"></i></span>
+              <input type="text" formControlName="nombre" class="form-control border-0 px-3" placeholder="Ej: Fundación Gloria López" maxlength="50">
+            </div>
+          </div>
+
+          <!-- URL Convenio -->
+          <div class="col-12">
+            <label class="form-label small fw-bold text-uppercase opacity-75">URL del Convenio</label>
+            <div class="input-group shadow-sm rounded-3 overflow-hidden border">
+              <span class="input-group-text bg-white border-0"><i class="fa-solid fa-link text-muted"></i></span>
+              <input type="text" formControlName="convenioUrl" class="form-control border-0 px-3" placeholder="https://...">
+            </div>
+          </div>
+
+          <!-- Inicio Convenio -->
+          <div class="col-md-6">
+            <label class="form-label small fw-bold text-uppercase opacity-75">Inicio Convenio</label>
+            <div class="input-group shadow-sm rounded-3 overflow-hidden border">
+              <span class="input-group-text bg-white border-0"><i class="fa-solid fa-calendar-day text-muted"></i></span>
+              <input type="date" formControlName="inicioConvenio" (change)="onInicioConvenioChange()" class="form-control border-0 px-3">
+            </div>
+          </div>
+
+          <!-- Fin Convenio -->
+          <div class="col-md-6">
+            <label class="form-label small fw-bold text-uppercase opacity-75">Fin Convenio</label>
+            <div class="input-group shadow-sm rounded-3 overflow-hidden border bg-light">
+              <span class="input-group-text bg-transparent border-0"><i class="fa-solid fa-calendar-check text-muted"></i></span>
+              <input type="text" formControlName="finConvenio" class="form-control border-0 px-3 bg-transparent" readonly>
+            </div>
+          </div>
+
+          <!-- SECCIÓN DE CONTACTOS -->
+          <div class="col-12 mt-4 d-flex justify-content-between align-items-center">
+            <div>
+              <hr class="opacity-10 mb-2">
+              <p class="small fw-bold text-uppercase opacity-50 mb-0">Contactos de la Empresa</p>
+            </div>
+            <button type="button" class="btn btn-outline-success btn-sm rounded-circle" (click)="addContacto()" title="Añadir contacto adicional" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
+              <i class="fa-solid fa-plus"></i>
+            </button>
+          </div>
+
+          <!-- Contacto Principal -->
+          <div class="col-md-6">
+            <label class="form-label small fw-bold text-uppercase opacity-75">Nombre Contacto Ppal.</label>
+            <div class="input-group shadow-sm rounded-3 overflow-hidden border">
+              <span class="input-group-text bg-white border-0"><i class="fa-solid fa-user-tie text-muted"></i></span>
+              <input type="text" formControlName="contacto" class="form-control border-0 px-3" placeholder="Ej: María Pérez">
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label small fw-bold text-uppercase opacity-75">Teléfono Ppal.</label>
+            <div class="input-group shadow-sm rounded-3 overflow-hidden border">
+              <span class="input-group-text bg-white border-0"><i class="fa-solid fa-phone text-muted"></i></span>
+              <input type="text" formControlName="numeroContacto" class="form-control border-0 px-3" placeholder="Ej: 600000000">
+            </div>
+          </div>
+
+          <!-- Contactos Adicionales (Bucle) -->
+          <div formArrayName="contactosAdicionales" class="col-12">
+            @for (item of contactosAdicionales.controls; track $index) {
+              <div [formGroupName]="$index" class="row g-3 mt-1 pb-3 border-bottom animate-fade-in">
+                <div class="col-md-6">
+                  <label class="form-label small fw-bold text-uppercase opacity-75">Nombre Contacto {{$index + 1}}</label>
+                  <div class="input-group shadow-sm rounded-3 overflow-hidden border">
+                    <span class="input-group-text bg-white border-0"><i class="fa-solid fa-user text-muted"></i></span>
+                    <input type="text" formControlName="contacto" class="form-control border-0 px-3" placeholder="Ej: Pedro Gómez">
+                  </div>
+                </div>
+                <div class="col-md-5">
+                  <label class="form-label small fw-bold text-uppercase opacity-75">Teléfono {{$index + 1}}</label>
+                  <div class="input-group shadow-sm rounded-3 overflow-hidden border">
+                    <span class="input-group-text bg-white border-0"><i class="fa-solid fa-phone text-muted"></i></span>
+                    <input type="text" formControlName="numeroContacto" class="form-control border-0 px-3" placeholder="Ej: 600111222">
+                  </div>
+                </div>
+                <div class="col-md-1 d-flex align-items-end pb-1">
+                  <button type="button" class="btn btn-outline-danger btn-sm border-0" (click)="removeContacto($index)" title="Eliminar contacto">
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- ACCIONES -->
+        <div class="d-flex gap-2 mt-5">
+          <button type="button" class="btn btn-light border flex-grow-1 py-2 shadow-sm rounded-3" (click)="cancelar.emit()">
+            Cancelar
+          </button>
+          <button type="submit" class="btn btn-primary flex-grow-1 py-2 shadow-sm rounded-3" [disabled]="empresaForm.invalid">
+            <i class="fa-solid fa-save me-2"></i> {{ modo === 'editar' ? 'Guardar Cambios' : 'Guardar Empresa' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

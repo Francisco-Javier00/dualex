@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { Config } from 'datatables.net';
 import { DatatableComponent } from '../shared/datatable/datatable.component';
 import { ConfirmarBorradoModalComponent } from '../shared/modals/confirmar-borrado-modal/confirmar-borrado-modal.component';
+import { EmpresaModalComponent } from '../modals/empresa-modal/empresa-modal.component';
 import { AlertService } from '../../services/alert.service';
 import { EmpresasService } from '../../services/empresas.service';
 import { ContactoEmpresaDTO, EmpresaDTO, ConfiguracionDTO } from '../../dto/dualex.dto';
@@ -14,7 +15,14 @@ import { AuthService } from '../../auth/services/auth.service';
 @Component({
   selector: 'app-empresas',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, DatatableComponent, ConfirmarBorradoModalComponent],
+  imports: [
+    CommonModule, 
+    RouterModule, 
+    FormsModule, 
+    DatatableComponent, 
+    ConfirmarBorradoModalComponent,
+    EmpresaModalComponent
+  ],
   templateUrl: './empresas.component.html',
   styleUrl: './empresas.component.css'
 })
@@ -146,33 +154,13 @@ export class EmpresasComponent implements OnInit {
 
   crearNuevaEntrada(): void {
     this.modoFormulario = 'crear';
-    this.empresaEditandoId = null;
-    this.contactosAdicionales = [];
-    this.nuevaEmpresa = {
-      siglas: '',
-      nombre: '',
-      convenioUrl: '',
-      inicioConvenio: '',
-      finConvenio: '',
-      contacto: '',
-      numeroContacto: ''
-    };
+    this.empresaSeleccionada = null;
     this.modalCrearVisible = true;
   }
 
   abrirEdicionEmpresa(empresa: EmpresaDTO): void {
     this.modoFormulario = 'editar';
-    this.empresaEditandoId = empresa.id;
-    this.contactosAdicionales = (empresa.contactosAdicionales ?? []).map((contacto: ContactoEmpresaDTO) => ({ ...contacto }));
-    this.nuevaEmpresa = {
-      siglas: empresa.siglas,
-      nombre: empresa.nombre,
-      convenioUrl: empresa.convenioUrl,
-      inicioConvenio: this.formatearFechaParaInput(empresa.inicioConvenio),
-      finConvenio: this.formatearFechaParaInput(empresa.finConvenio),
-      contacto: empresa.contacto,
-      numeroContacto: empresa.numeroContacto
-    };
+    this.empresaSeleccionada = { ...empresa };
     this.modalCrearVisible = true;
   }
 
@@ -198,9 +186,26 @@ export class EmpresasComponent implements OnInit {
     this.modalContactosVisible = true;
   }
 
+  onGuardarEmpresa(empresaData: any): void {
+    const obs = this.modoFormulario === 'crear'
+      ? this.empresasService.agregarEmpresa(empresaData)
+      : this.empresasService.actualizarEmpresa(empresaData.id, empresaData);
+
+    obs.subscribe({
+      next: () => {
+        const msg = this.modoFormulario === 'crear' ? 'Empresa creada con éxito.' : 'Empresa actualizada con éxito.';
+        this.alertService.exito('Éxito', msg);
+        this.modalCrearVisible = false;
+        this.refrescarTabla();
+      },
+      error: (err: any) => {
+        this.alertService.error('Error', err.error?.message || 'Error al procesar la empresa.');
+      }
+    });
+  }
+
   /**
    * Ejecuta el borrado definitivo de una empresa a través del servicio llamando a la API.
-   * Si es exitoso, oculta el modal de confirmación, limpia la selección y recarga la tabla.
    */
   onConfirmarBorrado(): void {
     if (!this.empresaSeleccionada) return;

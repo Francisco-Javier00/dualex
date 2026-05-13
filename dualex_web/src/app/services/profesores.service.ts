@@ -9,7 +9,7 @@ import { ProfesorDTO } from '../dto/dualex.dto';
 })
 export class ProfesoresService {
   private http = inject(HttpClient);
-  private readonly API_URL = `${environment.apiUrl}/dualex/dualex_back/index.php?c=Profesores`;
+  private readonly API_URL = `${environment.apiUrl}/index.php?c=Profesores`;
 
   readonly ciclosDisponibles = [
     'Sistemas Microinformáticos y Redes',
@@ -17,32 +17,19 @@ export class ProfesoresService {
     'Gestión Administrativa'
   ];
 
-  /**
-   * Obtiene la lista de profesores procesada para DataTables.
-   */
   obtenerProfesoresDataTables(dataTablesParameters: any): Observable<any> {
-    return this.http.post(`${this.API_URL}&m=obtenerDataTables`, dataTablesParameters);
+    return this.http.post<any>(`${this.API_URL}&m=obtenerDataTables`, dataTablesParameters);
   }
 
-  /**
-   * Registra un nuevo profesor.
-   */
-  agregarProfesor(profesor: Omit<ProfesorDTO, 'id'>): Observable<any> {
-    return this.http.post(`${this.API_URL}&m=crear`, profesor);
+  agregarProfesor(profesor: any): Observable<any> {
+    return this.http.post<any>(`${this.API_URL}&m=crear`, profesor);
   }
 
-  /**
-   * Actualiza los datos de un profesor existente.
-   */
-  actualizarProfesor(id: number, profesor: Omit<ProfesorDTO, 'id'>): Observable<any> {
-    return this.http.post(`${this.API_URL}&m=actualizar&id=${id}`, profesor);
+  actualizarProfesor(id: number, profesor: any): Observable<any> {
+    return this.http.put<any>(`${this.API_URL}&m=actualizar&id=${id}`, profesor);
   }
 
-  /**
-   * Elimina un profesor del sistema.
-   */
   eliminarProfesor(id: number): Observable<any> {
-    return this.http.post(`${this.API_URL}&m=eliminar&id=${id}`, {});
+    return this.http.get<any>(`${this.API_URL}&m=eliminar&id=${id}`);
   }
 }
-

@@ -313,3 +313,14 @@ CREATE TABLE Configuracion (
     CONSTRAINT chk_configuracion_dias_aviso CHECK (dias_aviso_caducidad > 0),
     CONSTRAINT chk_configuracion_tiempo_convenio CHECK (tiempo_finalizacion_convenio > 0)
 );
+ALTER TABLE Ciclos
+ADD grado CHAR(8) NOT NULL DEFAULT 'medio',
+ADD CONSTRAINT chk_ciclos_grado
+CHECK (grado IN ('superior', 'medio'));
+UPDATE Ciclos
+SET grado = 'superior'
+WHERE siglas IN ('DAW', 'DAM', 'ASIR');
+
+UPDATE Ciclos
+SET grado = 'medio'
+WHERE siglas IN ('SMR', 'MKP');

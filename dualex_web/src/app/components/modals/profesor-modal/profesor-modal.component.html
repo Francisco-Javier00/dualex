@@ -1,0 +1,92 @@
+<div class="modal-overlay" (click)="cancelar.emit()">
+  
+  <div class="modal-content animate-slide-up" (click)="$event.stopPropagation()">
+    
+    <!-- CABECERA -->
+    <div class="modal-header d-flex justify-content-between align-items-center">
+      <h5 class="mb-0 fw-bold text-dark">
+        <i class="fa-solid" [ngClass]="profesor ? 'fa-user-pen text-primary' : 'fa-user-plus text-success'"></i>
+        {{ modo === 'editar' ? 'Modificar Profesor' : 'Nuevo Profesor' }}
+      </h5>
+      <button class="btn-close" (click)="cancelar.emit()"></button>
+    </div>
+
+    <!-- CUERPO -->
+    <div class="modal-body py-4">
+      <div class="row g-4">
+        
+        <!-- Columna Izquierda: Datos Personales -->
+        <div class="col-lg-7">
+          <div class="row g-3">
+            <!-- Nombre -->
+            <div class="col-md-6">
+              <label class="form-label small fw-bold text-uppercase opacity-75">Nombre</label>
+              <div class="input-group shadow-sm rounded-3 overflow-hidden border">
+                <span class="input-group-text bg-white border-0"><i class="fa-solid fa-user text-muted"></i></span>
+                <input type="text" [(ngModel)]="nuevoProfesor.nombre" class="form-control border-0 px-3" placeholder="Ej: Juan Carlos">
+              </div>
+            </div>
+
+            <!-- Apellidos -->
+            <div class="col-md-6">
+              <label class="form-label small fw-bold text-uppercase opacity-75">Apellidos</label>
+              <div class="input-group shadow-sm rounded-3 overflow-hidden border">
+                <span class="input-group-text bg-white border-0"><i class="fa-solid fa-users text-muted"></i></span>
+                <input type="text" [(ngModel)]="nuevoProfesor.apellidos" class="form-control border-0 px-3" placeholder="Ej: García López">
+              </div>
+            </div>
+
+            <!-- Correo -->
+            <div class="col-12">
+              <label class="form-label small fw-bold text-uppercase opacity-75">Correo Electrónico</label>
+              <div class="input-group shadow-sm rounded-3 overflow-hidden border">
+                <span class="input-group-text bg-white border-0"><i class="fa-solid fa-envelope text-muted"></i></span>
+                <input type="email" [(ngModel)]="nuevoProfesor.correo" class="form-control border-0 px-3" placeholder="correo@dualex.es">
+              </div>
+            </div>
+
+            <!-- ROL -->
+            <div class="col-12">
+              <label class="form-label small fw-bold text-uppercase opacity-75">Rol en el sistema</label>
+              <div class="input-group shadow-sm rounded-3 overflow-hidden border">
+                <span class="input-group-text bg-white border-0"><i class="fa-solid fa-id-card-clip text-muted"></i></span>
+                <select class="form-select border-0 px-3" [(ngModel)]="nuevoProfesor.rol">
+                  <option value="PROFESOR">Profesor</option>
+                  <option value="COORDINADOR">Coordinador</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Columna Derecha: Ciclos -->
+        <div class="col-lg-5">
+          <label class="form-label small fw-bold text-uppercase opacity-75 mb-3">Ciclos que imparte</label>
+          <div class="bg-light rounded-3 p-3 border shadow-sm" style="max-height: 250px; overflow-y: auto;">
+            @for (ciclo of ciclosDisponibles; track ciclo) {
+              <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" 
+                       [id]="'ciclo-' + $index"
+                       [checked]="nuevoProfesor.ciclos.includes(ciclo)"
+                       (change)="onToggleCiclo(ciclo, $any($event.target).checked)">
+                <label class="form-check-label small" [for]="'ciclo-' + $index">
+                  {{ ciclo }}
+                </label>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- ACCIONES -->
+      <div class="d-flex gap-2 mt-5">
+        <button type="button" class="btn btn-light border flex-grow-1 py-2 shadow-sm rounded-3" (click)="cancelar.emit()">
+          Cancelar
+        </button>
+        <button type="button" class="btn btn-primary flex-grow-1 py-2 shadow-sm rounded-3" (click)="onGuardar()">
+          <i class="fa-solid fa-save me-2"></i> {{ modo === 'editar' ? 'Guardar Cambios' : 'Registrar Profesor' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
