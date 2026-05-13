@@ -50,4 +50,11 @@ export class ModulosService {
   deleteModulo(id: number): Observable<boolean> {
     return this.http.delete<boolean>(`${this.API_URL}&m=eliminar&id=${id}`);
   }
+
+  /**
+   * Obtiene un módulo por su ID.
+   */
+  getModuloById(id: number): Observable<ModuloDTO> {
+    return this.http.get<ModuloDTO>(`${this.API_URL}&m=obtener&id=${id}`);
+  }
 }
