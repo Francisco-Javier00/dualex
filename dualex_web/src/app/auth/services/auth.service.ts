@@ -9,7 +9,7 @@ import { environment } from '../../../environments/environment';
 })
 export class AuthService {
   private readonly COOKIE_NAME = 'dualex_jwt';
-  
+
   // La sesión se mantiene en memoria para que el header, el perfil y las vistas
   // compartan el mismo usuario sin depender de llamadas repetidas al backend.
   private sujetoPerfilUsuario = new BehaviorSubject<PerfilUsuario | null>(null);
@@ -134,13 +134,12 @@ export class AuthService {
 
   /**
    * Cierra la sesión local limpiando la cookie y el estado en memoria.
-   * Redirige temporalmente a Google para simular la salida del sistema.
    */
   public cerrarSesion(): void {
     if (isPlatformBrowser(this.platformId)) {
       // Borrar cookie estableciendo fecha de expiración pasada
       document.cookie = `${this.COOKIE_NAME}=; Max-Age=0; path=/; SameSite=Lax`;
-      
+
       // Limpiar estado en memoria
       this.sujetoPerfilUsuario.next(null);
 
