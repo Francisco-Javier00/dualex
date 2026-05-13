@@ -7,7 +7,9 @@ import { DatatableComponent } from '../shared/datatable/datatable.component';
 import { ConfirmarBorradoModalComponent } from '../shared/modals/confirmar-borrado-modal/confirmar-borrado-modal.component';
 import { AlertService } from '../../services/alert.service';
 import { EmpresasService } from '../../services/empresas.service';
-import { ContactoEmpresaDTO, EmpresaDTO } from '../../dto/dualex.dto';
+import { ContactoEmpresaDTO, EmpresaDTO, ConfiguracionDTO } from '../../dto/dualex.dto';
+import { ConfiguracionService } from '../../services/configuracion.service';
+import { AuthService } from '../../auth/services/auth.service';
 
 @Component({
   selector: 'app-empresas',
@@ -18,9 +20,13 @@ import { ContactoEmpresaDTO, EmpresaDTO } from '../../dto/dualex.dto';
 })
 export class EmpresasComponent implements OnInit {
   private empresasService = inject(EmpresasService);
+  private configuracionService = inject(ConfiguracionService);
   private alertService = inject(AlertService);
+  private authService = inject(AuthService);
 
   @ViewChild(DatatableComponent) datatable?: DatatableComponent;
+
+  puedeEditar = false;
 
   dtOptions: Config = {};
   modalConfiguracionVisible = false;
@@ -31,7 +37,7 @@ export class EmpresasComponent implements OnInit {
   empresaEditandoId: number | null = null;
   empresaSeleccionada: EmpresaDTO | null = null;
 
-  configuracionEmpresa = {
+  configuracionEmpresa: ConfiguracionDTO = {
     diasAvisoCaducidad: 30,
     tiempoFinalizacionConvenio: 4
   };
@@ -49,17 +55,25 @@ export class EmpresasComponent implements OnInit {
   };
 
   ngOnInit(): void {
-    // La tabla mantiene el contrato de DataTables, aunque los datos salgan de un mock local.
+    this.puedeEditar = this.authService.currentUserValue?.rol === 'COORDINADOR';
+    this.cargarConfiguracion();
+
     this.dtOptions = {
       serverSide: true,
       processing: true,
       ajax: (dataTablesParameters: any, callback: any) => {
-        this.empresasService.obtenerEmpresasDataTables(dataTablesParameters).subscribe(resp => {
-          callback({
-            recordsTotal: resp.recordsTotal,
-            recordsFiltered: resp.recordsFiltered,
-            data: resp.data
-          });
+        this.empresasService.obtenerEmpresasDataTables(dataTablesParameters).subscribe({
+          next: (resp) => {
+            callback({
+              draw: resp.draw,
+              recordsTotal: resp.recordsTotal,
+              recordsFiltered: resp.recordsFiltered,
+              data: resp.data
+            });
+          },
+          error: () => {
+            callback({ recordsTotal: 0, recordsFiltered: 0, data: [] });
+          }
         });
       },
       columns: [
@@ -80,7 +94,7 @@ export class EmpresasComponent implements OnInit {
           data: 'convenioUrl',
           render: (data: string) => {
             return `
-              <a class="btn btn-sm btn-outline-primary shadow-sm" href="/empresas">
+              <a class="btn btn-sm btn-outline-primary shadow-sm" href="${data}" target="_blank">
                 <i class="fa-solid fa-up-right-from-square me-1"></i> Ver convenio
               </a>
             `;
@@ -88,13 +102,16 @@ export class EmpresasComponent implements OnInit {
         },
         { data: 'inicioConvenio' },
         { data: 'finConvenio' },
-        {
+        ...(this.puedeEditar ? [{
           data: null,
           className: 'text-center',
           orderable: false,
           searchable: false,
           render: () => `
             <div class="d-flex justify-content-center align-items-center gap-2 action-buttons w-100">
+              <button class="btn btn-sm btn-outline-info shadow-sm action-link" data-action="link" title="Enlazar">
+                <i class="fa-solid fa-link"></i>
+              </button>
               <button class="btn btn-sm btn-outline-primary shadow-sm action-edit" data-action="edit" title="Editar">
                 <i class="fa-solid fa-pen"></i>
               </button>
@@ -103,7 +120,7 @@ export class EmpresasComponent implements OnInit {
               </button>
             </div>
           `
-        }
+        }] : [])
       ],
       language: {
         emptyTable: 'No hay empresas disponibles',
@@ -181,14 +198,22 @@ export class EmpresasComponent implements OnInit {
     this.modalContactosVisible = true;
   }
 
+  /**
+   * Ejecuta el borrado definitivo de una empresa a través del servicio llamando a la API.
+   * Si es exitoso, oculta el modal de confirmación, limpia la selección y recarga la tabla.
+   */
   onConfirmarBorrado(): void {
     if (!this.empresaSeleccionada) return;
 
-    this.empresasService.eliminarEmpresa(this.empresaSeleccionada.id);
-    this.alertService.exito('Empresa eliminada', `${this.empresaSeleccionada.nombre} ha sido eliminada.`);
-    this.modalBorradoVisible = false;
-    this.empresaSeleccionada = null;
-    this.refrescarTabla();
+    this.empresasService.eliminarEmpresa(this.empresaSeleccionada.id).subscribe({
+      next: () => {
+        this.alertService.exito('Empresa eliminada', `${this.empresaSeleccionada!.nombre} ha sido eliminada.`);
+        this.modalBorradoVisible = false;
+        this.empresaSeleccionada = null;
+        this.refrescarTabla();
+      },
+      error: () => this.alertService.error('Error', 'No se pudo eliminar la empresa')
+    });
   }
 
   onCancelarBorrado(): void {
@@ -201,6 +226,11 @@ export class EmpresasComponent implements OnInit {
     this.empresaSeleccionada = null;
   }
 
+  /**
+   * Recopila, valida y formatea los datos del formulario (incluyendo contactos).
+   * Llama a los endpoints de creación o actualización de la API a través de EmpresasService.
+   * Valida estrictamente que las longitudes no superen los límites de la base de datos MySQL.
+   */
   guardarEmpresa(): void {
     if (
       !this.nuevaEmpresa.siglas.trim() ||
@@ -215,18 +245,11 @@ export class EmpresasComponent implements OnInit {
       return;
     }
 
-    const finConvenioCalculado = this.calcularFinConvenio(this.nuevaEmpresa.inicioConvenio);
-    if (!finConvenioCalculado) {
-      this.alertService.error('Datos incompletos', 'La fecha de inicio no es válida.');
-      return;
-    }
-
-    const payload = {
-      siglas: this.nuevaEmpresa.siglas.trim(),
+    const payload: any = {
+      siglas: this.nuevaEmpresa.siglas.trim().toUpperCase(),
       nombre: this.nuevaEmpresa.nombre.trim(),
       convenioUrl: this.nuevaEmpresa.convenioUrl.trim(),
       inicioConvenio: this.formatearFechaParaGuardar(this.nuevaEmpresa.inicioConvenio),
-      finConvenio: finConvenioCalculado,
       contacto: this.nuevaEmpresa.contacto.trim(),
       numeroContacto: this.nuevaEmpresa.numeroContacto.trim(),
       contactosAdicionales: this.contactosAdicionales.map(contacto => ({
@@ -235,14 +258,79 @@ export class EmpresasComponent implements OnInit {
       }))
     };
 
-    if (this.modoFormulario === 'editar' && this.empresaEditandoId !== null) {
-      this.empresasService.actualizarEmpresa(this.empresaEditandoId, payload);
-      this.alertService.exito('Empresa actualizada', `${payload.nombre} se ha actualizado correctamente.`);
-    } else {
-      this.empresasService.agregarEmpresa(payload);
-      this.alertService.exito('Empresa creada', `${payload.nombre} se ha añadido correctamente.`);
+    // Validaciones de longitud según base de datos
+    if (payload.siglas.length > 6) {
+      this.alertService.error('Error de validación', 'Las siglas no pueden tener más de 6 caracteres.');
+      return;
+    }
+    if (payload.nombre.length > 50) {
+      this.alertService.error('Error de validación', 'El nombre de la empresa no puede superar los 50 caracteres.');
+      return;
+    }
+    if (payload.convenioUrl.length > 100) {
+      this.alertService.error('Error de validación', 'La URL del convenio no puede superar los 100 caracteres.');
+      return;
+    }
+    if (payload.contacto.length > 50 || payload.numeroContacto.length > 15) {
+      this.alertService.error('Error de validación', 'El nombre del contacto (máx 50) o teléfono (máx 15) superan el límite permitido.');
+      return;
+    }
+    for (const add of payload.contactosAdicionales) {
+      if (add.contacto.length > 50 || add.numeroContacto.length > 15) {
+        this.alertService.error('Error de validación', 'El nombre de un contacto adicional o su teléfono superan el límite permitido.');
+        return;
+      }
     }
 
+    const urlRegex = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/;
+    if (!urlRegex.test(payload.convenioUrl)) {
+      this.alertService.error('URL inválida', 'Introduce una dirección web válida para el convenio (ej: https://www.ejemplo.com).');
+      return;
+    }
+
+    const telefonoRegex = /^[+0-9\s\-]+$/;
+    if (!telefonoRegex.test(payload.numeroContacto)) {
+      this.alertService.error('Teléfono inválido', 'El número de contacto solo puede contener números, espacios, guiones o el signo +.');
+      return;
+    }
+
+    for (const add of payload.contactosAdicionales) {
+      if (!telefonoRegex.test(add.numeroContacto)) {
+        this.alertService.error('Teléfono inválido', `El número del contacto adicional "${add.contacto}" solo puede contener números, espacios, guiones o el signo +.`);
+        return;
+      }
+    }
+
+    const finConvenioCalculado = this.calcularFinConvenio(this.nuevaEmpresa.inicioConvenio);
+    if (!finConvenioCalculado) {
+      this.alertService.error('Datos incompletos', 'La fecha de inicio no es válida.');
+      return;
+    }
+    payload.finConvenio = finConvenioCalculado;
+
+    if (this.modoFormulario === 'editar' && this.empresaEditandoId !== null) {
+      this.empresasService.actualizarEmpresa(this.empresaEditandoId, payload).subscribe({
+        next: () => {
+          this.alertService.exito('Empresa actualizada', `${payload.nombre} se ha actualizado correctamente.`);
+          this.cerrarModalYRefrescar();
+        },
+        error: () => this.alertService.error('Error', 'No se pudo actualizar la empresa')
+      });
+    } else {
+      this.empresasService.agregarEmpresa(payload).subscribe({
+        next: () => {
+          this.alertService.exito('Empresa creada', `${payload.nombre} se ha añadido correctamente.`);
+          this.cerrarModalYRefrescar();
+        },
+        error: () => this.alertService.error('Error', 'No se pudo crear la empresa')
+      });
+    }
+  }
+
+  /**
+   * Método auxiliar que cierra el modal de edición/creación, resetea el estado y recarga DataTables.
+   */
+  private cerrarModalYRefrescar(): void {
     this.modalCrearVisible = false;
     this.empresaEditandoId = null;
     this.refrescarTabla();
@@ -256,7 +344,21 @@ export class EmpresasComponent implements OnInit {
   }
 
   abrirConfiguracion(): void {
+    this.cargarConfiguracion();
     this.modalConfiguracionVisible = true;
+  }
+
+  private cargarConfiguracion(): void {
+    this.configuracionService.getConfiguracion().subscribe({
+      next: (config) => {
+        if (config) {
+          this.configuracionEmpresa = config;
+        }
+      },
+      error: () => {
+        this.alertService.error('Error', 'No se pudo cargar la configuración del servidor.');
+      }
+    });
   }
 
   explicarConvenioUrl(): void {
@@ -271,28 +373,30 @@ export class EmpresasComponent implements OnInit {
     const diasAviso = Number(this.configuracionEmpresa.diasAvisoCaducidad);
     const tiempoFinalizacion = Number(this.configuracionEmpresa.tiempoFinalizacionConvenio);
 
-    if (!Number.isFinite(diasAviso) || diasAviso <= 0 || !Number.isFinite(tiempoFinalizacion) || tiempoFinalizacion <= 0) {
-      this.alertService.error('Datos incompletos', 'No puedes dejar ningún valor vacío en la configuración.');
+    if (!Number.isFinite(diasAviso) || diasAviso <= 0 || diasAviso > 255 || 
+        !Number.isFinite(tiempoFinalizacion) || tiempoFinalizacion <= 0 || tiempoFinalizacion > 255) {
+      this.alertService.error('Datos inválidos', 'Los valores deben ser números positivos entre 1 y 255.');
       return;
     }
 
-    // La configuración todavía se guarda solo en memoria para simular la edición real.
-    this.alertService.exito(
-      'Configuración guardada',
-      'Los valores de aviso y finalización del convenio se han actualizado.'
-    );
-    this.modalConfiguracionVisible = false;
+    // Ahora guardamos en la base de datos a través del servicio
+    this.configuracionService.updateConfiguracion(this.configuracionEmpresa).subscribe({
+      next: () => {
+        this.alertService.exito(
+          'Configuración guardada',
+          'Los valores de aviso y finalización del convenio se han actualizado en el servidor.'
+        );
+        this.modalConfiguracionVisible = false;
+      },
+      error: () => {
+        this.alertService.error('Error', 'No se pudo guardar la configuración en el servidor.');
+      }
+    });
   }
 
   cerrarConfiguracion(): void {
-    const diasAviso = Number(this.configuracionEmpresa.diasAvisoCaducidad);
-    const tiempoFinalizacion = Number(this.configuracionEmpresa.tiempoFinalizacionConvenio);
-
-    if (!Number.isFinite(diasAviso) || diasAviso <= 0 || !Number.isFinite(tiempoFinalizacion) || tiempoFinalizacion <= 0) {
-      this.alertService.error('Datos incompletos', 'No puedes cerrar la configuración dejando valores vacíos.');
-      return;
-    }
-
+    // Si el usuario cancela, recargamos la configuración del servidor para descartar los cambios locales no guardados
+    this.cargarConfiguracion();
     this.modalConfiguracionVisible = false;
   }
 

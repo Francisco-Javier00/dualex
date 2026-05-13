@@ -1,6 +1,4 @@
 <?php
-use PDO;
-use PDOException;
 
 class ConexionDB {
     private $host;

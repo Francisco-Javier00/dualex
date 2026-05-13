@@ -1,94 +1,48 @@
-import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { delay } from 'rxjs/operators';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import { EmpresaDTO } from '../dto/dualex.dto';
+
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class EmpresasService {
-  private empresasMock: EmpresaDTO[] = [
-    { id: 1, siglas: 'FGL', nombre: 'Fundación Gloria López', convenioUrl: 'https://fgl.es/convenio.pdf', inicioConvenio: '01/09/2025', finConvenio: '30/06/2026', contacto: 'María Pérez', numeroContacto: '600000001' },
-    { id: 2, siglas: 'TKS', nombre: 'Tech Skills S.L.', convenioUrl: 'https://tks.example.com/convenio', inicioConvenio: '01/09/2025', finConvenio: '30/06/2026', contacto: 'Carlos Gómez', numeroContacto: '600000002' },
-    { id: 3, siglas: 'INF', nombre: 'Informatika Norte', convenioUrl: 'https://inf.example.com/convenio', inicioConvenio: '01/09/2025', finConvenio: '30/06/2026', contacto: 'Laura Ruiz', numeroContacto: '600000003' },
-    { id: 4, siglas: 'NXT', nombre: 'Next Services', convenioUrl: 'https://nxt.example.com/convenio', inicioConvenio: '01/09/2025', finConvenio: '30/06/2026', contacto: 'Pedro Sánchez', numeroContacto: '600000004' },
-    { id: 5, siglas: 'SYN', nombre: 'Synapse Works', convenioUrl: 'https://syn.example.com/convenio', inicioConvenio: '01/09/2025', finConvenio: '30/06/2026', contacto: 'Ana Torres', numeroContacto: '600000005' },
-    {
-      id: 6,
-      siglas: 'BIZ',
-      nombre: 'BizDev Labs',
-      convenioUrl: 'https://biz.example.com/convenio',
-      inicioConvenio: '01/09/2025',
-      finConvenio: '30/06/2026',
-      contacto: 'Javier León',
-      numeroContacto: '600000006',
-      contactosAdicionales: [
-        { contacto: 'Marta Gil', numeroContacto: '600001101' },
-        { contacto: 'Sergio Vidal', numeroContacto: '600001102' },
-        { contacto: 'Lucía Navarro', numeroContacto: '600001103' }
-      ]
-    },
-    { id: 7, siglas: 'EDU', nombre: 'EduTech Center', convenioUrl: 'https://edu.example.com/convenio', inicioConvenio: '01/09/2025', finConvenio: '30/06/2026', contacto: 'Carmen Díaz', numeroContacto: '600000007' },
-    { id: 8, siglas: 'RND', nombre: 'Ronda Digital', convenioUrl: 'https://rnd.example.com/convenio', inicioConvenio: '01/09/2025', finConvenio: '30/06/2026', contacto: 'Miguel Ortiz', numeroContacto: '600000008' }
-  ];
+  private http = inject(HttpClient);
 
+  // URL de la API PHP sacada del environment
+  private readonly API_URL = `${environment.apiUrl}/dualex/dualex_back/index.php`;
+
+  /**
+   * Envía los parámetros de DataTables al backend para obtener la lista de empresas.
+   * Se utiliza POST para poder enviar estructuras complejas de filtros y ordenación sin problemas de URL.
+   *
+   * @param dataTablesParameters Objeto con la configuración actual de paginación y filtros de la tabla.
+   * @returns Observable con la respuesta del servidor lista para ser procesada por DataTables.
+   */
   obtenerEmpresasDataTables(dataTablesParameters: any): Observable<any> {
-    const start = dataTablesParameters.start || 0;
-    const length = dataTablesParameters.length || 10;
-    const search = dataTablesParameters.search?.value?.toLowerCase() || '';
-
-    let filtradas = this.empresasMock;
-
-    if (search) {
-      filtradas = filtradas.filter(empresa =>
-        empresa.siglas.toLowerCase().includes(search) ||
-        empresa.nombre.toLowerCase().includes(search) ||
-        empresa.convenioUrl.toLowerCase().includes(search) ||
-        empresa.inicioConvenio.toLowerCase().includes(search) ||
-        empresa.finConvenio.toLowerCase().includes(search) ||
-        empresa.contacto.toLowerCase().includes(search) ||
-        empresa.numeroContacto.toLowerCase().includes(search) ||
-        (empresa.contactosAdicionales?.some((contacto: any) =>
-          contacto.contacto.toLowerCase().includes(search) ||
-          contacto.numeroContacto.toLowerCase().includes(search)
-        ) ?? false)
-      );
-    }
-
-    if (dataTablesParameters.order && dataTablesParameters.order.length > 0) {
-      const orderColumnIndex = dataTablesParameters.order[0].column;
-      const orderDir = dataTablesParameters.order[0].dir;
-      const columnName = dataTablesParameters.columns[orderColumnIndex]?.data;
-
-      if (columnName) {
-        filtradas = [...filtradas].sort((a: any, b: any) => {
-          const valA = a[columnName]?.toString().toLowerCase() ?? '';
-          const valB = b[columnName]?.toString().toLowerCase() ?? '';
-          if (valA < valB) return orderDir === 'asc' ? -1 : 1;
-          if (valA > valB) return orderDir === 'asc' ? 1 : -1;
-          return 0;
-        });
-      }
-    }
-
-    return of({
-      draw: dataTablesParameters.draw,
-      recordsTotal: this.empresasMock.length,
-      recordsFiltered: filtradas.length,
-      data: filtradas.slice(start, start + length)
-    }).pipe(delay(400));
+    return this.http.post(`${this.API_URL}?c=Empresas&m=obtenerDataTables`, dataTablesParameters);
   }
 
-  agregarEmpresa(empresa: Omit<EmpresaDTO, 'id'>): void {
-    const nextId = this.empresasMock.length > 0 ? Math.max(...this.empresasMock.map(e => e.id)) + 1 : 1;
-    this.empresasMock = [{ id: nextId, ...empresa }, ...this.empresasMock];
+  /**
+   * Llama al endpoint de creación para guardar una nueva empresa junto a sus contactos.
+   */
+  agregarEmpresa(empresa: Omit<EmpresaDTO, 'id'>): Observable<any> {
+    return this.http.post(`${this.API_URL}?c=Empresas&m=crear`, empresa);
   }
 
-  actualizarEmpresa(id: number, empresa: Omit<EmpresaDTO, 'id'>): void {
-    this.empresasMock = this.empresasMock.map(actual => actual.id === id ? { id, ...empresa } : actual);
+  /**
+   * Envía los datos actualizados de una empresa al backend para su modificación.
+   */
+  actualizarEmpresa(id: number, empresa: Omit<EmpresaDTO, 'id'>): Observable<any> {
+    return this.http.post(`${this.API_URL}?c=Empresas&m=actualizar&id=${id}`, empresa);
   }
 
-  eliminarEmpresa(id: number): void {
-    this.empresasMock = this.empresasMock.filter(empresa => empresa.id !== id);
+  /**
+   * Envía una petición de borrado al backend para eliminar permanentemente una empresa.
+   */
+  eliminarEmpresa(id: number): Observable<any> {
+    return this.http.post(`${this.API_URL}?c=Empresas&m=eliminar&id=${id}`, {});
   }
 }
