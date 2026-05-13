@@ -164,7 +164,11 @@ export class CiclosComponent implements OnInit {
 
     const siglas = this.cicloForm.siglas;
     const cicloParaGuardar = {
-      ...this.cicloForm
+      ...this.cicloForm,
+      cursos_objetos: [
+        { nombre: `1º ${siglas}`, anio_escolar: '25-26' },
+        { nombre: `2º ${siglas}`, anio_escolar: '25-26' }
+      ]
     };
 
     if (this.isEditing && this.editingId) {
