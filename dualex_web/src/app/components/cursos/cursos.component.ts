@@ -69,7 +69,21 @@ export class CursosComponent implements OnInit {
         }
       ],
       language: {
-        url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json'
+        processing: "Procesando...",
+        search: "Buscar:",
+        lengthMenu: "Mostrar _MENU_ elementos",
+        info: "Mostrando del _START_ al _END_ de un total de _TOTAL_ elementos",
+        infoEmpty: "Mostrando 0 de 0 de un total de 0 elementos",
+        infoFiltered: "(filtrado de un total de _MAX_ elementos)",
+        loadingRecords: "Cargando...",
+        zeroRecords: "No se han encontrado resultados",
+        emptyTable: "No hay datos disponibles en la tabla",
+        paginate: {
+          first: "Primero",
+          previous: "Anterior",
+          next: "Siguiente",
+          last: "Último"
+        }
       }
     };
   }
@@ -78,13 +92,15 @@ export class CursosComponent implements OnInit {
    * Recupera la lista de cursos y ciclos desde los servicios correspondientes.
    */
   cargarDatos() {
-    this.cursosService.getCursos().subscribe(cursos => {
+    this.cursosService.getCursos().subscribe(cursos => {//llamada async
       this.cursos = cursos;
       if (this.sharedDatatable) {
         this.actualizarTabla();
       }
     });
-    this.ciclosExistentes = this.ciclosService.getCiclosExistentes();
+    this.ciclosService.getCiclosExistentes().subscribe(ciclos => {
+      this.ciclosExistentes = ciclos;
+    });
   }
 
   /**
@@ -178,7 +194,9 @@ export class CursosComponent implements OnInit {
         grado: this.cursoForm.grado,
         anoEscolar: this.cursoForm.anoEscolar
       }).subscribe(() => {
-        this.ciclosExistentes = this.ciclosService.getCiclosExistentes();
+        this.ciclosService.getCiclosExistentes().subscribe(ciclos => {
+          this.ciclosExistentes = ciclos;
+        });
       });
     }
 

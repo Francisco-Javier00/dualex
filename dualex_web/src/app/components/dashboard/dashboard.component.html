@@ -57,7 +57,7 @@
       @for (modulo of modulosProfesor; track modulo.idModulo) {
       <div class="col-sm-6 col-lg-4 col-xl-3">
         <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden modulo-card" style="cursor: pointer;"
-          routerLink="/alumnos">
+          [routerLink]="['/alumnos']" [queryParams]="{ moduloId: modulo.idModulo }">
           <!-- Banda de color del módulo -->
           <div class="modulo-header px-4 py-3 d-flex align-items-center gap-3" [style.background-color]="modulo.color">
             <span class="badge bg-white fw-bold rounded-2" [style.color]="modulo.color"
@@ -72,12 +72,12 @@
           <div class="card-body px-4 py-3">
             <div class="d-flex justify-content-between text-muted" style="font-size: 0.85rem;">
               <span><i class="fa-solid fa-users me-1"></i>{{ modulo.numAlumnos }} alumnos</span>
-              <span><i class="fa-solid fa-list-check me-1"></i>{{ modulo.numActividades }} actividades</span>
+              <span><i class="fa-solid fa-list-check me-1"></i>{{ modulo.numActividades || 0 }} actividades</span>
             </div>
           </div>
           <!-- Pie con botón -->
           <div class="card-footer border-0 bg-transparent px-4 pb-3 pt-0">
-            <button class="btn btn-sm w-100 text-white" [style.background-color]="modulo.color" routerLink="/alumnos">
+            <button class="btn btn-sm w-100 text-white" [style.background-color]="modulo.color" [routerLink]="['/alumnos']" [queryParams]="{ moduloId: modulo.idModulo }">
               Ver módulo <i class="fa-solid fa-arrow-right ms-1"></i>
             </button>
           </div>

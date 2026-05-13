@@ -1,41 +1,35 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../environments/environment';
 import { CursoDTO } from '../dto/dualex.dto';
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CursosService {
-  private cursos: CursoDTO[] = [
-    { id: 2, nombre: '1º DAW', curso: 1, anoEscolar: '25-26', ciclo: 'Desarrollo de Aplicaciones Web' },
-    { id: 3, nombre: '1º SMR', curso: 1, anoEscolar: '25-26', ciclo: 'Sistemas Microinformáticos y Redes' },
-    { id: 4, nombre: '2º SMR', curso: 2, anoEscolar: '25-26', ciclo: 'Sistemas Microinformáticos y Redes' },
-    { id: 5, nombre: '2º DAW', curso: 2, anoEscolar: '25-26', ciclo: 'Desarrollo de Aplicaciones Web' },
-    { id: 6, nombre: '1º EMV', curso: 1, anoEscolar: '25-26', ciclo: 'Electromecánica de Vehículos' },
-    { id: 7, nombre: '1º MI', curso: 1, anoEscolar: '25-26', ciclo: 'Mecatrónica Industrial' }
-  ];
+  private http = inject(HttpClient);
+  private readonly API_URL = `${environment.apiUrl}/index.php?c=Cursos`;
 
   constructor() { }
 
   getCursos(): Observable<CursoDTO[]> {
-    return of([...this.cursos]);
+    return this.http.get<CursoDTO[]>(`${this.API_URL}&m=listar`);
+  }
+
+  getCursosByCiclo(idCiclo: number): Observable<CursoDTO[]> {
+    return this.http.get<CursoDTO[]>(`${this.API_URL}&m=listar&idCiclo=${idCiclo}`);
   }
 
   addCurso(curso: CursoDTO): Observable<CursoDTO> {
-    this.cursos.push(curso);
-    return of(curso);
+    return this.http.post<CursoDTO>(`${this.API_URL}&m=crear`, curso);
   }
 
-  updateCurso(id: number, cursoActualizado: CursoDTO): Observable<CursoDTO> {
-    const index = this.cursos.findIndex(c => c.id === id);
-    if (index !== -1) {
-      this.cursos[index] = cursoActualizado;
-    }
-    return of(cursoActualizado);
+  updateCurso(id: number, curso: CursoDTO): Observable<CursoDTO> {
+    return this.http.put<CursoDTO>(`${this.API_URL}&m=actualizar&id=${id}`, curso);
   }
 
   deleteCurso(id: number): Observable<boolean> {
-    this.cursos = this.cursos.filter(c => c.id !== id);
-    return of(true);
+    return this.http.delete<boolean>(`${this.API_URL}&m=eliminar&id=${id}`);
   }
 }

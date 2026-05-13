@@ -7,6 +7,7 @@ import { ConfirmarBorradoModalComponent } from '../shared/modals/confirmar-borra
 import { Config } from 'datatables.net';
 import { CiclosService } from '../../services/ciclos.service';
 import { CicloDTO } from '../../dto/dualex.dto';
+import { AlertService } from '../../services/alert.service';
 
 @Component({
   selector: 'app-ciclos',
@@ -23,6 +24,7 @@ import { CicloDTO } from '../../dto/dualex.dto';
 })
 export class CiclosComponent implements OnInit {
   private ciclosService = inject(CiclosService);
+  private alertService = inject(AlertService);
 
   ciclos: CicloDTO[] = [];
 
@@ -45,7 +47,7 @@ export class CiclosComponent implements OnInit {
     colorFondo2: '#ffffff',
     colorTexto2: '#000000'
   };
-  editingOriginalSiglas: string | null = null;
+  editingId: number | null = null;
 
   @ViewChild(DatatableComponent) sharedDatatable!: DatatableComponent;
 
@@ -77,7 +79,21 @@ export class CiclosComponent implements OnInit {
         }
       ],
       language: {
-        url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json'
+        processing: "Procesando...",
+        search: "Buscar:",
+        lengthMenu: "Mostrar _MENU_ elementos",
+        info: "Mostrando del _START_ al _END_ de un total de _TOTAL_ elementos",
+        infoEmpty: "Mostrando 0 de 0 de un total de 0 elementos",
+        infoFiltered: "(filtrado de un total de _MAX_ elementos)",
+        loadingRecords: "Cargando...",
+        zeroRecords: "No se han encontrado resultados",
+        emptyTable: "No hay datos disponibles en la tabla",
+        paginate: {
+          first: "Primero",
+          previous: "Anterior",
+          next: "Siguiente",
+          last: "Último"
+        }
       }
     };
   }
@@ -103,29 +119,19 @@ export class CiclosComponent implements OnInit {
   abrirEditModal(ciclo?: any) {
     if (ciclo) {
       this.isEditing = true;
-      this.editingOriginalSiglas = ciclo.siglas;
+      this.editingId = ciclo.id;
       this.cicloForm = {
         ...ciclo,
         cursos: ciclo.cursos || this.formatearCursos(ciclo.siglas),
-        anoEscolar: ciclo.anoEscolar || '',
-        colorFondo1: ciclo.colorFondo1 || '#ffffff',
-        colorTexto1: ciclo.colorTexto1 || '#000000',
-        colorFondo2: ciclo.colorFondo2 || '#ffffff',
-        colorTexto2: ciclo.colorTexto2 || '#000000'
       };
     } else {
       this.isEditing = false;
-      this.editingOriginalSiglas = null;
+      this.editingId = null;
       this.cicloForm = {
         nombre: '',
         siglas: '',
         grado: 'Grado Medio',
         cursos: '',
-        anoEscolar: '',
-        colorFondo1: '#ffffff',
-        colorTexto1: '#000000',
-        colorFondo2: '#ffffff',
-        colorTexto2: '#000000'
       };
     }
     this.isEditModalOpen = true;
@@ -136,13 +142,33 @@ export class CiclosComponent implements OnInit {
   }
 
   guardarCiclo() {
+    const nombreForm = this.cicloForm.nombre?.trim().toLowerCase() || '';
+    const siglasForm = this.cicloForm.siglas?.trim().toLowerCase() || '';
+
+    if (!nombreForm || !siglasForm) {
+      this.alertService.error('Error', 'El nombre y las siglas son obligatorios.');
+      return;
+    }
+
+    const duplicado = this.ciclos.find(c => {
+      if (this.isEditing && c.id === this.editingId) return false;
+      const nombreExistente = c.nombre?.trim().toLowerCase() || '';
+      const siglasExistente = c.siglas?.trim().toLowerCase() || '';
+      return nombreExistente === nombreForm || siglasExistente === siglasForm;
+    });
+
+    if (duplicado) {
+      this.alertService.error('Duplicado', 'Ya existe un ciclo con ese nombre o con esas siglas.');
+      return;
+    }
+
+    const siglas = this.cicloForm.siglas;
     const cicloParaGuardar = {
-      ...this.cicloForm,
-      cursos: this.formatearCursos(this.cicloForm.siglas)
+      ...this.cicloForm
     };
 
-    if (this.isEditing && this.editingOriginalSiglas) {
-      this.ciclosService.updateCiclo(this.editingOriginalSiglas, cicloParaGuardar).subscribe(() => {
+    if (this.isEditing && this.editingId) {
+      this.ciclosService.updateCiclo(this.editingId, cicloParaGuardar).subscribe(() => {
         this.cargarCiclos();
         this.cerrarEditModal();
       });
@@ -156,7 +182,7 @@ export class CiclosComponent implements OnInit {
 
   confirmarEliminar() {
     if (this.cicloToDelete) {
-      this.ciclosService.deleteCiclo(this.cicloToDelete.siglas).subscribe(() => {
+      this.ciclosService.deleteCiclo(this.cicloToDelete.id).subscribe(() => {
         this.cargarCiclos();
         this.cerrarDeleteModal();
       });

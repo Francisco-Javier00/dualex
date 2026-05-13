@@ -72,56 +72,7 @@
           <label class="d-flex align-items-center m-0 gap-1"><input type="radio" name="grado" value="Grado Superior" [(ngModel)]="cicloForm.grado"> Superior</label>
         </div>
       </div>
-      <div class="form-group row mb-4 align-items-center">
-        <label class="col-sm-3 col-form-label pb-0">Año escolar:</label>
-        <div class="col-sm-9">
-          <input type="text" class="form-control" [(ngModel)]="cicloForm.anoEscolar">
-        </div>
-      </div>
 
-      <hr style="border-color: #666; margin-bottom: 20px;">
-
-      <div class="form-group row mb-3 align-items-center">
-        <label class="col-sm-3 col-form-label pb-0">Siglas primero:</label>
-        <div class="col-sm-7">
-          <input type="text" class="form-control text-center bg-white" [value]="cicloForm.siglas ? '1º ' + cicloForm.siglas : ''" disabled>
-        </div>
-        <div class="col-sm-2 text-dark small px-0" style="font-size: 12px;">Automático</div>
-      </div>
-      <div class="form-group row mb-3 align-items-center">
-        <label class="col-sm-3 col-form-label pb-0">Color fondo:</label>
-        <div class="col-sm-9">
-          <input type="color" class="form-control form-control-color p-0 border-0" [(ngModel)]="cicloForm.colorFondo1">
-        </div>
-      </div>
-      <div class="form-group row mb-4 align-items-center">
-        <label class="col-sm-3 col-form-label pb-0">Color texto:</label>
-        <div class="col-sm-9">
-          <input type="color" class="form-control form-control-color p-0 border-0" [(ngModel)]="cicloForm.colorTexto1">
-        </div>
-      </div>
-
-      <hr style="border-color: #666; margin-bottom: 20px;">
-
-      <div class="form-group row mb-3 align-items-center">
-        <label class="col-sm-3 col-form-label pb-0">Siglas segundo:</label>
-        <div class="col-sm-7">
-          <input type="text" class="form-control text-center bg-white" [value]="cicloForm.siglas ? '2º ' + cicloForm.siglas : ''" disabled>
-        </div>
-        <div class="col-sm-2 text-dark small px-0" style="font-size: 12px;">Automático</div>
-      </div>
-      <div class="form-group row mb-3 align-items-center">
-        <label class="col-sm-3 col-form-label pb-0">Color fondo:</label>
-        <div class="col-sm-9">
-          <input type="color" class="form-control form-control-color p-0 border-0" [(ngModel)]="cicloForm.colorFondo2">
-        </div>
-      </div>
-      <div class="form-group row mb-3 align-items-center">
-        <label class="col-sm-3 col-form-label pb-0">Color texto:</label>
-        <div class="col-sm-9">
-          <input type="color" class="form-control form-control-color p-0 border-0" [(ngModel)]="cicloForm.colorTexto2">
-        </div>
-      </div>
     </div>
 
     <div class="modal-actions mt-4 d-flex justify-content-center gap-4">

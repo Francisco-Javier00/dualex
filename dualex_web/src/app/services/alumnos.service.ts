@@ -34,7 +34,8 @@ export class AlumnosService {
    * Procesa la solicitud de DataTables conectando con el backend.
    */
   obtenerAlumnosDataTables(dataTablesParameters: any): Observable<any> {
-    return this.http.post<any>(`${this.API_URL}&m=obtenerDataTables`, dataTablesParameters);
+    const idModulo = dataTablesParameters.idModulo ? `&idModulo=${dataTablesParameters.idModulo}` : '';
+    return this.http.post<any>(`${this.API_URL}&m=obtenerDataTables${idModulo}`, dataTablesParameters);
   }
 
   /**
@@ -56,5 +57,12 @@ export class AlumnosService {
    */
   deleteAlumno(id: number): Observable<boolean> {
     return this.http.delete<boolean>(`${this.API_URL}&m=eliminar&id=${id}`);
+  }
+
+  /**
+   * Obtiene la lista de alumnos inscritos en un módulo específico.
+   */
+  getAlumnosByModulo(idModulo: number): Observable<AlumnoDTO[]> {
+    return this.http.get<AlumnoDTO[]>(`${this.API_URL}&m=listarPorModulo&idModulo=${idModulo}`);
   }
 }

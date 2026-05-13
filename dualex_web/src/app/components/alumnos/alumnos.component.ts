@@ -1,13 +1,15 @@
 import { Component, OnInit, inject, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router } from '@angular/router';
+import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { DatatableComponent } from '../shared/datatable/datatable.component';
 import { ConfirmarBorradoModalComponent } from '../shared/modals/confirmar-borrado-modal/confirmar-borrado-modal.component';
 import { AlumnoModalComponent } from '../modals/alumno-modal/alumno-modal.component';
 import { AlumnosService } from '../../services/alumnos.service';
+import { ModulosService } from '../../services/modulos.service';
 import { AlumnoDTO } from '../../dto/dualex.dto';
 import { AlertService } from '../../services/alert.service';
 import { Config } from 'datatables.net';
+import { AuthService } from '../../auth/services/auth.service';
 
 @Component({
   selector: 'app-alumnos',
@@ -17,7 +19,10 @@ import { Config } from 'datatables.net';
 })
 export class AlumnosComponent implements OnInit {
   private alumnosService = inject(AlumnosService);
+  private modulosService = inject(ModulosService);
   private alertService = inject(AlertService);
+  private authService = inject(AuthService);
+  private route = inject(ActivatedRoute);
   private router = inject(Router);
 
   @ViewChild(DatatableComponent) datatable!: DatatableComponent;
@@ -26,12 +31,45 @@ export class AlumnosComponent implements OnInit {
   modalBorradoVisible = false;
   modalAlumnoVisible = false;
   alumnoSeleccionado: AlumnoDTO | null = null;
+  moduloId: string | null = null;
+  nombreModulo: string | null = null;
+  moduloObj: any = null;
 
   ngOnInit(): void {
+    this.route.queryParamMap.subscribe(params => {
+      this.moduloId = params.get('moduloId');
+      this.nombreModulo = null; // Reset mientras carga
+      this.moduloObj = null;
+
+      if (this.moduloId) {
+        this.modulosService.getModuloById(Number(this.moduloId)).subscribe((mod: any) => {
+          this.nombreModulo = mod.nombre;
+          this.moduloObj = mod;
+        });
+      }
+
+      // Pequeño delay para asegurar que el ID está en el estado antes de la primera petición ajax
+      setTimeout(() => {
+        this.inicializarTabla();
+      }, 100);
+    });
+  }
+
+  inicializarTabla(): void {
     this.dtOptions = {
       serverSide: true,
       processing: true,
       ajax: (dataTablesParameters: any, callback: any) => {
+        if (this.moduloId) {
+          dataTablesParameters.idModulo = this.moduloId;
+        }
+
+        // Obtener el email del usuario logueado mediante AuthService
+        const usuarioActual = this.authService.currentUserValue;
+        if (usuarioActual && usuarioActual.email) {
+          dataTablesParameters.emailProfesor = usuarioActual.email;
+        }
+
         this.alumnosService.obtenerAlumnosDataTables(dataTablesParameters).subscribe(resp => {
           callback({
             recordsTotal: resp.recordsTotal,
@@ -44,6 +82,7 @@ export class AlumnosComponent implements OnInit {
         { data: 'nombre' },
         { data: 'apellidos' },
         { data: 'email' },
+        { data: 'nombreCurso', defaultContent: '<span class="text-muted">Sin curso</span>' },
         { data: 'nia' },
         { data: 'nuss' },
         { data: 'dni' },
