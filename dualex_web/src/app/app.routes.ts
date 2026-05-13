@@ -20,7 +20,7 @@ export const routes: Routes = [
   { path: 'acerca-de', component: AboutComponent },
   { path: 'profesores', component: ProfesoresComponent, canActivate: [authGuard], data: { roles: ['COORDINADOR'] } },
   { path: 'alumnos', component: AlumnosComponent, canActivate: [authGuard], data: { roles: ['COORDINADOR', 'PROFESOR'] } },
-  { path: 'empresas', component: EmpresasComponent, canActivate: [authGuard], data: { roles: ['COORDINADOR'] } },
+  { path: 'empresas', component: EmpresasComponent, canActivate: [authGuard], data: { roles: ['COORDINADOR', 'PROFESOR'] } },
   { path: 'modulos', component: ModulosComponent, canActivate: [authGuard], data: { roles: ['COORDINADOR', 'PROFESOR'] } },
   { path: 'actividades', component: ActividadesComponent, canActivate: [authGuard], data: { roles: ['COORDINADOR', 'PROFESOR'] } },
   { path: 'ciclos', component: CiclosComponent, canActivate: [authGuard], data: { roles: ['COORDINADOR'] } },

@@ -163,11 +163,15 @@ export class ProfesoresComponent implements OnInit {
   onConfirmarBorrado(): void {
     if (!this.profesorSeleccionado) return;
 
-    this.profesoresService.eliminarProfesor(this.profesorSeleccionado.id);
-    this.alertService.exito('Profesor eliminado', `${this.profesorSeleccionado.nombre} ${this.profesorSeleccionado.apellidos} ha sido eliminado.`);
-    this.modalBorradoVisible = false;
-    this.profesorSeleccionado = null;
-    this.refrescarTabla();
+    this.profesoresService.eliminarProfesor(this.profesorSeleccionado.id).subscribe({
+      next: () => {
+        this.alertService.exito('Profesor eliminado', `${this.profesorSeleccionado!.nombre} ${this.profesorSeleccionado!.apellidos} ha sido eliminado.`);
+        this.modalBorradoVisible = false;
+        this.profesorSeleccionado = null;
+        this.refrescarTabla();
+      },
+      error: () => this.alertService.error('Error', 'No se pudo eliminar el profesor.')
+    });
   }
 
   onCancelarBorrado(): void {
@@ -190,10 +194,15 @@ export class ProfesoresComponent implements OnInit {
     if (
       !this.nuevoProfesor.nombre.trim() ||
       !this.nuevoProfesor.apellidos.trim() ||
-      !this.nuevoProfesor.correo.trim() ||
-      this.nuevoProfesor.ciclos.length === 0
+      !this.nuevoProfesor.correo.trim()
     ) {
-      this.alertService.error('Datos incompletos', 'Rellena todos los campos y selecciona al menos un ciclo antes de guardar.');
+      this.alertService.error('Datos incompletos', 'Rellena el nombre, apellidos y correo antes de guardar.');
+      return;
+    }
+
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(this.nuevoProfesor.correo.trim())) {
+      this.alertService.error('Correo inválido', 'Introduce una dirección de correo electrónico válida (ej: nombre@dominio.com).');
       return;
     }
 
@@ -207,13 +216,25 @@ export class ProfesoresComponent implements OnInit {
     };
 
     if (this.modoFormulario === 'editar' && this.profesorEditandoId !== null) {
-      this.profesoresService.actualizarProfesor(this.profesorEditandoId, profesorPayload);
-      this.alertService.exito('Profesor actualizado', `${this.nuevoProfesor.nombre} ${this.nuevoProfesor.apellidos} se ha actualizado correctamente.`);
+      this.profesoresService.actualizarProfesor(this.profesorEditandoId, profesorPayload).subscribe({
+        next: () => {
+          this.alertService.exito('Profesor actualizado', `${this.nuevoProfesor.nombre} ${this.nuevoProfesor.apellidos} se ha actualizado correctamente.`);
+          this.cerrarModalYRefrescar();
+        },
+        error: () => this.alertService.error('Error', 'No se pudo actualizar el profesor.')
+      });
     } else {
-      this.profesoresService.agregarProfesor(profesorPayload);
-      this.alertService.exito('Profesor creado', `${this.nuevoProfesor.nombre} ${this.nuevoProfesor.apellidos} se ha añadido correctamente.`);
+      this.profesoresService.agregarProfesor(profesorPayload).subscribe({
+        next: () => {
+          this.alertService.exito('Profesor creado', `${this.nuevoProfesor.nombre} ${this.nuevoProfesor.apellidos} se ha añadido correctamente.`);
+          this.cerrarModalYRefrescar();
+        },
+        error: () => this.alertService.error('Error', 'No se pudo crear el profesor.')
+      });
     }
+  }
 
+  private cerrarModalYRefrescar(): void {
     this.modalCrearVisible = false;
     this.profesorEditandoId = null;
     this.refrescarTabla();

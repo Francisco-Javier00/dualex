@@ -9,6 +9,7 @@ import { AlertService } from '../../services/alert.service';
 import { EmpresasService } from '../../services/empresas.service';
 import { ContactoEmpresaDTO, EmpresaDTO, ConfiguracionDTO } from '../../dto/dualex.dto';
 import { ConfiguracionService } from '../../services/configuracion.service';
+import { AuthService } from '../../auth/services/auth.service';
 
 @Component({
   selector: 'app-empresas',
@@ -21,8 +22,11 @@ export class EmpresasComponent implements OnInit {
   private empresasService = inject(EmpresasService);
   private configuracionService = inject(ConfiguracionService);
   private alertService = inject(AlertService);
+  private authService = inject(AuthService);
 
   @ViewChild(DatatableComponent) datatable?: DatatableComponent;
+
+  puedeEditar = false;
 
   dtOptions: Config = {};
   modalConfiguracionVisible = false;
@@ -51,9 +55,9 @@ export class EmpresasComponent implements OnInit {
   };
 
   ngOnInit(): void {
+    this.puedeEditar = this.authService.currentUserValue?.rol === 'COORDINADOR';
     this.cargarConfiguracion();
 
-    // La tabla mantiene el contrato de DataTables, aunque los datos salgan de un mock local.
     this.dtOptions = {
       serverSide: true,
       processing: true,
@@ -90,7 +94,7 @@ export class EmpresasComponent implements OnInit {
           data: 'convenioUrl',
           render: (data: string) => {
             return `
-              <a class="btn btn-sm btn-outline-primary shadow-sm" href="/empresas">
+              <a class="btn btn-sm btn-outline-primary shadow-sm" href="${data}" target="_blank">
                 <i class="fa-solid fa-up-right-from-square me-1"></i> Ver convenio
               </a>
             `;
@@ -98,13 +102,16 @@ export class EmpresasComponent implements OnInit {
         },
         { data: 'inicioConvenio' },
         { data: 'finConvenio' },
-        {
+        ...(this.puedeEditar ? [{
           data: null,
           className: 'text-center',
           orderable: false,
           searchable: false,
           render: () => `
             <div class="d-flex justify-content-center align-items-center gap-2 action-buttons w-100">
+              <button class="btn btn-sm btn-outline-info shadow-sm action-link" data-action="link" title="Enlazar">
+                <i class="fa-solid fa-link"></i>
+              </button>
               <button class="btn btn-sm btn-outline-primary shadow-sm action-edit" data-action="edit" title="Editar">
                 <i class="fa-solid fa-pen"></i>
               </button>
@@ -113,7 +120,7 @@ export class EmpresasComponent implements OnInit {
               </button>
             </div>
           `
-        }
+        }] : [])
       ],
       language: {
         emptyTable: 'No hay empresas disponibles',
@@ -275,6 +282,12 @@ export class EmpresasComponent implements OnInit {
       }
     }
 
+    const urlRegex = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/;
+    if (!urlRegex.test(payload.convenioUrl)) {
+      this.alertService.error('URL inválida', 'Introduce una dirección web válida para el convenio (ej: https://www.ejemplo.com).');
+      return;
+    }
+
     const telefonoRegex = /^[+0-9\s\-]+$/;
     if (!telefonoRegex.test(payload.numeroContacto)) {
       this.alertService.error('Teléfono inválido', 'El número de contacto solo puede contener números, espacios, guiones o el signo +.');
@@ -403,9 +416,7 @@ export class EmpresasComponent implements OnInit {
   }
 
   private refrescarTabla(): void {
-    if (this.datatable) {
-      this.datatable.reloadTable();
-    }
+    this.datatable?.refrescar();
   }
 
   private formatearFechaParaInput(valor: string): string {

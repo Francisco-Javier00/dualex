@@ -24,9 +24,33 @@ if (file_exists(__DIR__ . '/.env')) {
 // Requerimos configuración de rutas y el núcleo de conexión a base de datos
 require_once 'src/config/rutas.php';
 require_once 'src/core/conexionDB.php';
+require_once 'src/core/JWTHelper.php';
+require_once 'src/core/BaseController.php';
 
 // Inicializamos la base de datos
 $db = (new ConexionDB())->getConnection();
+
+// --- VALIDACIÓN DE JWT ---
+// Obtenemos el secreto del entorno
+$secret = $_ENV['JWT_SECRET'] ?? 'default_secret_cambiame';
+
+// Obtenemos las cabeceras para buscar el token
+$headers = getallheaders();
+$authHeader = $headers['Authorization'] ?? $headers['authorization'] ?? '';
+
+$userData = null;
+
+if (preg_match('/Bearer\s(\S+)/', $authHeader, $matches)) {
+    $token = $matches[1];
+    $userData = JWTHelper::validar($token, $secret);
+}
+
+// Activarlo en producción, para obligar a tener token válido
+// if ($c !== 'Auth' && !$userData) {
+//     http_response_code(401);
+//     echo json_encode(["error" => "No autorizado o sesión expirada"]);
+//     exit;
+// }
 
 // Capturamos el Controlador (c) y el Método (m) de la URL
 $c = $_GET["c"] ?? null;
@@ -46,7 +70,8 @@ $ruta = CONTROLADOR . "con$c.php";
 if (file_exists($ruta)) {
     require_once $ruta;
     $clase = "Con$c";
-    $obj = new $clase($db);
+    // Pasamos la base de datos y los datos del usuario (si está autenticado)
+    $obj = new $clase($db, $userData);
 
     // Verificamos si el método solicitado existe en la clase del controlador
     if (method_exists($obj, $m)) {

@@ -50,10 +50,16 @@ export class DatatableComponent implements AfterViewInit, OnDestroy {
     });
   }
 
-  public reloadTable(): void {
+  /**
+   * Fuerza el repintado de la tabla y la recarga de datos desde el servidor.
+   * @param mantenerPagina Si es true, se mantiene la página actual de la tabla.
+   */
+  public refrescar(mantenerPagina: boolean = true): void {
     if (this.dtElement && this.dtElement.dtInstance) {
       this.dtElement.dtInstance.then((dtInstance: any) => {
-        dtInstance.ajax.reload(null, false);
+        // null como primer argumento para usar la misma URL/datos de ajax
+        // !mantenerPagina como segundo argumento: false significa que mantiene la página, true que la resetea a 0
+        dtInstance.ajax.reload(null, !mantenerPagina);
       });
     }
   }
