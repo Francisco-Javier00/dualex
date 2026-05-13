@@ -8,45 +8,60 @@ class ModModulos {
     }
 
     public function listar() {
-        $sql = "SELECT * FROM modulos ORDER BY nombre";
+        $sql = "SELECT idModulo as id, nombre, sigla, color FROM Modulos ORDER BY nombre";
         $stmt = $this->db->prepare($sql);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function obtener($id) {
-        $sql = "SELECT * FROM modulos WHERE id = :id";
+        $sql = "SELECT idModulo as id, nombre, sigla, color FROM Modulos WHERE idModulo = :id";
         $stmt = $this->db->prepare($sql);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    public function obtenerModulosProfesor($emailProfesor) {
+        $sql = "SELECT m.idModulo, m.nombre, m.sigla, m.color,
+                       (SELECT COUNT(*) FROM Modulo_Alumno_Cursa mac WHERE mac.idModulo = m.idModulo) as numAlumnos
+                FROM Modulos m
+                JOIN Modulo_Profesor mp ON m.idModulo = mp.idModulo
+                JOIN Profesor p ON mp.idProfesor = p.idProfesor
+                JOIN Usuarios u ON p.idProfesor = u.idUsuario
+                WHERE u.correo = :emailProfesor
+                ORDER BY m.nombre";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(':emailProfesor', $emailProfesor, PDO::PARAM_STR);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function crear($datos) {
-        $sql = "INSERT INTO modulos (nombre, siglas, ciclo) VALUES (:nombre, :siglas, :ciclo)";
+        $sql = "INSERT INTO Modulos (nombre, sigla, color) VALUES (:nombre, :sigla, :color)";
         $stmt = $this->db->prepare($sql);
         $stmt->execute([
             ':nombre' => $datos['nombre'],
-            ':siglas' => $datos['siglas'],
-            ':ciclo'  => $datos['ciclo']
+            ':sigla' => $datos['sigla'],
+            ':color'  => $datos['color']
         ]);
         return $this->obtener($this->db->lastInsertId());
     }
 
     public function actualizar($id, $datos) {
-        $sql = "UPDATE modulos SET nombre = :nombre, siglas = :siglas, ciclo = :ciclo WHERE id = :id";
+        $sql = "UPDATE Modulos SET nombre = :nombre, sigla = :sigla, color = :color WHERE idModulo = :id";
         $stmt = $this->db->prepare($sql);
         $stmt->execute([
             ':id'     => $id,
             ':nombre' => $datos['nombre'],
-            ':siglas' => $datos['siglas'],
-            ':ciclo'  => $datos['ciclo']
+            ':sigla' => $datos['sigla'],
+            ':color'  => $datos['color']
         ]);
         return $this->obtener($id);
     }
 
     public function eliminar($id) {
-        $sql = "DELETE FROM modulos WHERE id = :id";
+        $sql = "DELETE FROM Modulos WHERE idModulo = :id";
         $stmt = $this->db->prepare($sql);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         return $stmt->execute();
@@ -59,17 +74,17 @@ class ModModulos {
 
         $where = "";
         if ($search) {
-            $where = "WHERE nombre LIKE :search OR siglas LIKE :search OR ciclo LIKE :search";
+            $where = "WHERE nombre LIKE :search OR sigla LIKE :search";
         }
 
-        $total = $this->db->query("SELECT COUNT(*) FROM modulos")->fetchColumn();
+        $total = $this->db->query("SELECT COUNT(*) FROM Modulos")->fetchColumn();
 
-        $stmtF = $this->db->prepare("SELECT COUNT(*) FROM modulos $where");
+        $stmtF = $this->db->prepare("SELECT COUNT(*) FROM Modulos $where");
         if ($search) $stmtF->execute([':search' => "%$search%"]);
         else $stmtF->execute();
         $totalFiltrados = $stmtF->fetchColumn();
 
-        $sql = "SELECT * FROM modulos $where LIMIT :start, :length";
+        $sql = "SELECT idModulo as id, nombre, sigla, color FROM Modulos $where LIMIT :start, :length";
         $stmt = $this->db->prepare($sql);
         if ($search) $stmt->bindValue(':search', "%$search%");
         $stmt->bindValue(':start', (int)$start, PDO::PARAM_INT);

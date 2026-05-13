@@ -1,16 +1,21 @@
 <?php
-require_once MODELO . 'modModulos.php';
+require_once MODELO . 'modCursos.php';
 
-class ConModulos extends BaseController {
+class ConCursos extends BaseController {
     private $modelo;
 
     public function __construct($db, $user = null) {
         parent::__construct($db, $user);
-        $this->modelo = new ModModulos($db);
+        $this->modelo = new ModCursos($db);
     }
 
     public function listar() {
-        $data = $this->modelo->listar();
+        $idCiclo = $_GET['idCiclo'] ?? null;
+        if ($idCiclo) {
+            $data = $this->modelo->listarPorCiclo($idCiclo);
+        } else {
+            $data = $this->modelo->listar();
+        }
         $this->sendResponse($data);
     }
 
@@ -21,20 +26,13 @@ class ConModulos extends BaseController {
         }
         $data = $this->modelo->obtener($id);
         if (!$data) {
-            $this->sendError("Módulo no encontrado.", 404);
+            $this->sendError("Curso no encontrado.", 404);
         }
         $this->sendResponse($data);
     }
 
-    public function obtenerDataTables() {
-        $json = file_get_contents('php://input');
-        $params = json_decode($json, true);
-        $data = $this->modelo->obtenerDataTables($params);
-        $this->sendResponse($data);
-    }
-
     public function crear() {
-        $this->checkRole(['PROFESOR', 'COORDINADOR']);
+        // $this->checkRole(['COORDINADOR']);
         $json = file_get_contents('php://input');
         $datos = json_decode($json, true);
         if (!$datos) {
@@ -45,7 +43,7 @@ class ConModulos extends BaseController {
     }
 
     public function actualizar() {
-        $this->checkRole(['PROFESOR', 'COORDINADOR']);
+        // $this->checkRole(['COORDINADOR']);
         $id = $_GET['id'] ?? null;
         if (!$id) {
             $this->sendError("ID no proporcionado.", 400);
@@ -64,11 +62,5 @@ class ConModulos extends BaseController {
         }
         $success = $this->modelo->eliminar($id);
         $this->sendResponse(["success" => $success]);
-    }
-
-    public function listarProfesor() {
-        $emailProfesor = $_GET['emailProfesor'] ?? ($this->user['email'] ?? null);
-        $data = $this->modelo->obtenerModulosProfesor($emailProfesor);
-        $this->sendResponse($data);
     }
 }
