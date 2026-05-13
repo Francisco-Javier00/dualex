@@ -1,35 +1,45 @@
-<header class="navbar navbar-expand-lg bg-white border-bottom fixed-top py-3 px-4" style="height: 80px;">
-  <div class="container-fluid d-flex justify-content-between align-items-center h-100">
+<header class="navbar navbar-expand bg-white border-bottom fixed-top py-2 py-md-3 px-3 px-md-4" style="height: 80px;">
+  <div class="container-fluid d-flex justify-content-between align-items-center h-100 px-0">
+    
+    <!-- Logo: Texto oculto en móviles extra pequeños -->
     <a class="navbar-brand d-flex align-items-center gap-0" routerLink="/" title="Inicio" style="line-height: 1;">
-      <img src="/dualex-logo.svg" alt="Logo Dualex" style="height: 50px; margin-right: -2px; margin-bottom: 17px;">
-      <span class="fw-bold fst-italic fs-3" style="color: #006293; margin-top: 5px;">UALEX</span>
+      <img src="/dualex-logo.svg" alt="Logo Dualex" class="header-logo" style="height: 45px; margin-right: -2px; margin-bottom: 12px;">
+      <span class="fw-bold fst-italic fs-3 d-none d-sm-inline" style="color: #006293; margin-top: 5px;">UALEX</span>
     </a>
 
     @if (usuario$ | async; as usuario) {
-    <div class="d-flex align-items-center gap-3">
-      <div class="text-end lh-1">
+    <div class="d-flex align-items-center gap-2 gap-md-3">
+      
+      <!-- Info Usuario: Oculta en móviles -->
+      <div class="text-end lh-1 d-none d-md-block">
         <div class="small fw-bold text-dark mb-1">{{ usuario.nombre }} {{ usuario.apellidos }}</div>
         <span class="badge rounded-1 text-white" [ngClass]="'badge-' + usuario.rol.toLowerCase()"
-          style="font-size: 0.7rem;">
+          style="font-size: 0.65rem;">
           {{ usuario.rol }}
         </span>
       </div>
 
-      <button type="button" (click)="irAPerfil()" class="avatar text-white d-flex align-items-center justify-content-center rounded-circle fw-bold text-decoration-none border-0"
+      <!-- Avatar: Siempre visible, un poco más pequeño en móvil -->
+      <button type="button" (click)="irAPerfil()" 
+        class="avatar text-white d-flex align-items-center justify-content-center rounded-circle fw-bold text-decoration-none border-0 shadow-sm"
         [ngClass]="'badge-' + usuario.rol.toLowerCase()"
-        style="width: 38px; height: 38px; font-size: 1.1rem; cursor: pointer;" title="Perfil">
+        style="width: 34px; height: 34px; min-width: 34px; font-size: 1rem; cursor: pointer;" 
+        [title]="'Perfil de ' + usuario.nombre">
         {{ usuario.nombre.substring(0, 1).toUpperCase() }}
       </button>
 
-      <div class="vr mx-2" style="height: 32px;"></div>
+      <div class="vr mx-1 mx-md-2 d-none d-sm-block" style="height: 28px;"></div>
 
-      <button class="btn btn-link text-secondary p-1 fs-4 Sharp lh-1" title="Ayuda">
-        <i class="fa-solid fa-question"></i>
-      </button>
-
-      <button class="btn btn-link text-secondary p-1 fs-4 lh-1" title="Cerrar Sesion" type="button" (click)="cerrarSesion()">
-        <i class="fa-solid fa-sign-out-alt"></i>
-      </button>
+      <!-- Botones de Acción -->
+      <div class="d-flex align-items-center gap-1">
+        <button class="btn btn-link text-secondary p-1 fs-5 fs-md-4 lh-1" title="Acerca de Dualex" (click)="abrirAbout()">
+          <i class="fa-solid fa-question"></i>
+        </button>
+  
+        <button class="btn btn-link text-secondary p-1 fs-5 fs-md-4 lh-1" title="Cerrar Sesion" type="button" (click)="cerrarSesion()">
+          <i class="fa-solid fa-sign-out-alt"></i>
+        </button>
+      </div>
     </div>
     }
   </div>
