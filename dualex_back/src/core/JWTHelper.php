@@ -22,7 +22,9 @@ class JWTHelper {
         // Validar firma
         $firmaValida = self::base64UrlEncode(hash_hmac('sha256', "$header.$payload", $secret, true));
 
-        if ($signature !== $firmaValida) return false;
+        if ($signature !== $firmaValida) {
+            return false;
+        }
 
         $datos = json_decode(self::base64UrlDecode($payload), true);
 

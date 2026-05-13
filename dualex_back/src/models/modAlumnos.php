@@ -8,14 +8,26 @@ class ModAlumnos {
     }
 
     public function listar() {
-        $sql = "SELECT * FROM alumnos ORDER BY apellidos, nombre";
+        $sql = "SELECT u.idUsuario as id, u.nombre, u.apellidos, u.correo as email, 
+                       a.DNI as dni, a.NUSS as nuss, a.NIA as nia, a.telefono, 
+                       a.repetidor, a.idCurso, c.nombre as nombreCurso
+                FROM Usuarios u
+                JOIN Alumnos a ON u.idUsuario = a.idAlumnos
+                JOIN Cursos c ON a.idCurso = c.idCurso
+                WHERE u.tipo = 'A'
+                ORDER BY u.apellidos, u.nombre";
         $stmt = $this->db->prepare($sql);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function obtener($id) {
-        $sql = "SELECT * FROM alumnos WHERE id = :id";
+        $sql = "SELECT u.idUsuario as id, u.nombre, u.apellidos, u.correo as email, 
+                       a.DNI as dni, a.NUSS as nuss, a.NIA as nia, a.telefono, 
+                       a.repetidor, a.idCurso
+                FROM Usuarios u
+                JOIN Alumnos a ON u.idUsuario = a.idAlumnos
+                WHERE u.idUsuario = :id";
         $stmt = $this->db->prepare($sql);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         $stmt->execute();
@@ -23,38 +35,83 @@ class ModAlumnos {
     }
 
     public function crear($datos) {
-        $sql = "INSERT INTO alumnos (nombre, apellidos, email, nia, nuss, dni, telefono, ciclo, curso, estado) 
-                VALUES (:nombre, :apellidos, :email, :nia, :nuss, :dni, :telefono, :ciclo, :curso, :estado)";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([
-            ':nombre'    => $datos['nombre'],
-            ':apellidos' => $datos['apellidos'],
-            ':email'     => $datos['email'],
-            ':nia'       => $datos['nia'] ?? null,
-            ':nuss'      => $datos['nuss'] ?? null,
-            ':dni'       => $datos['dni'],
-            ':telefono'  => $datos['telefono'] ?? null,
-            ':ciclo'     => $datos['ciclo'],
-            ':curso'     => $datos['curso'] ?? '1º',
-            ':estado'    => $datos['estado'] ?? 'Activo'
-        ]);
-        return $this->obtener($this->db->lastInsertId());
+        try {
+            $this->db->beginTransaction();
+
+            // 1. Insertar en Usuarios
+            $sqlU = "INSERT INTO Usuarios (nombre, apellidos, correo, tipo) VALUES (:nombre, :apellidos, :correo, 'A')";
+            $stmtU = $this->db->prepare($sqlU);
+            $stmtU->execute([
+                ':nombre'    => $datos['nombre'],
+                ':apellidos' => $datos['apellidos'],
+                ':correo'    => $datos['email']
+            ]);
+            $idUsuario = $this->db->lastInsertId();
+
+            // 2. Insertar en Alumnos
+            $sqlA = "INSERT INTO Alumnos (idAlumnos, DNI, NUSS, NIA, telefono, repetidor, idCurso) 
+                     VALUES (:id, :dni, :nuss, :nia, :telefono, :repetidor, :idCurso)";
+            $stmtA = $this->db->prepare($sqlA);
+            $stmtA->execute([
+                ':id'        => $idUsuario,
+                ':dni'       => $datos['dni'],
+                ':nuss'      => $datos['nuss'],
+                ':nia'       => $datos['nia'],
+                ':telefono'  => $datos['telefono'],
+                ':repetidor' => isset($datos['repetidor']) ? ($datos['repetidor'] ? 1 : 0) : 0,
+                ':idCurso'   => $datos['idCurso']
+            ]);
+
+            $this->db->commit();
+            return $this->obtener($idUsuario);
+        } catch (Exception $e) {
+            $this->db->rollBack();
+            throw $e;
+        }
     }
 
     public function actualizar($id, $datos) {
-        $sql = "UPDATE alumnos SET 
-                nombre = :nombre, apellidos = :apellidos, email = :email, 
-                nia = :nia, nuss = :nuss, dni = :dni, telefono = :telefono, 
-                ciclo = :ciclo, curso = :curso, estado = :estado 
-                WHERE id = :id";
-        $stmt = $this->db->prepare($sql);
-        $datos['id'] = $id;
-        $stmt->execute($datos);
-        return $this->obtener($id);
+        try {
+            $this->db->beginTransaction();
+
+            // 1. Actualizar Usuarios
+            $sqlU = "UPDATE Usuarios SET nombre = :nombre, apellidos = :apellidos, correo = :correo WHERE idUsuario = :id";
+            $stmtU = $this->db->prepare($sqlU);
+            $stmtU->execute([
+                ':id'        => $id,
+                ':nombre'    => $datos['nombre'],
+                ':apellidos' => $datos['apellidos'],
+                ':correo'    => $datos['email']
+            ]);
+
+            // 2. Actualizar Alumnos
+            $sqlA = "UPDATE Alumnos SET 
+                     DNI = :dni, NUSS = :nuss, NIA = :nia, telefono = :telefono, 
+                     repetidor = :repetidor, idCurso = :idCurso 
+                     WHERE idAlumnos = :id";
+            $stmtA = $this->db->prepare($sqlA);
+            $stmtA->execute([
+                ':id'        => $id,
+                ':dni'       => $datos['dni'],
+                ':nuss'      => $datos['nuss'],
+                ':nia'       => $datos['nia'],
+                ':telefono'  => $datos['telefono'],
+                ':repetidor' => isset($datos['repetidor']) ? ($datos['repetidor'] ? 1 : 0) : 0,
+                ':idCurso'   => $datos['idCurso']
+            ]);
+
+            $this->db->commit();
+            return $this->obtener($id);
+        } catch (Exception $e) {
+            $this->db->rollBack();
+            throw $e;
+        }
     }
 
     public function eliminar($id) {
-        $sql = "DELETE FROM alumnos WHERE id = :id";
+        // Al tener ON DELETE CASCADE en la FK de Alumnos -> Usuarios, 
+        // borrar el usuario borrará automáticamente al alumno.
+        $sql = "DELETE FROM Usuarios WHERE idUsuario = :id";
         $stmt = $this->db->prepare($sql);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         return $stmt->execute();
@@ -65,23 +122,31 @@ class ModAlumnos {
         $length = $params['length'] ?? 10;
         $search = $params['search']['value'] ?? '';
 
-        $where = "";
+        $where = "WHERE u.tipo = 'A'";
         if ($search) {
-            $where = "WHERE nombre LIKE :search OR apellidos LIKE :search OR dni LIKE :search OR email LIKE :search";
+            $where .= " AND (u.nombre LIKE :search OR u.apellidos LIKE :search OR a.DNI LIKE :search OR u.correo LIKE :search)";
         }
 
-        // Total registros sin filtrar
-        $total = $this->db->query("SELECT COUNT(*) FROM alumnos")->fetchColumn();
+        // Total registros
+        $total = $this->db->query("SELECT COUNT(*) FROM Alumnos")->fetchColumn();
 
         // Registros filtrados
-        $sqlFiltrados = "SELECT COUNT(*) FROM alumnos $where";
+        $sqlFiltrados = "SELECT COUNT(*) FROM Usuarios u JOIN Alumnos a ON u.idUsuario = a.idAlumnos $where";
         $stmtF = $this->db->prepare($sqlFiltrados);
         if ($search) $stmtF->execute([':search' => "%$search%"]);
         else $stmtF->execute();
         $totalFiltrados = $stmtF->fetchColumn();
 
         // Datos paginados
-        $sql = "SELECT * FROM alumnos $where LIMIT :start, :length";
+        $sql = "SELECT u.idUsuario as id, u.nombre, u.apellidos, u.correo as email, 
+                       a.DNI as dni, a.NUSS as nuss, a.NIA as nia, a.telefono, 
+                       a.repetidor, a.idCurso, c.nombre as nombreCurso
+                FROM Usuarios u
+                JOIN Alumnos a ON u.idUsuario = a.idAlumnos
+                JOIN Cursos c ON a.idCurso = c.idCurso
+                $where 
+                LIMIT :start, :length";
+        
         $stmt = $this->db->prepare($sql);
         if ($search) $stmt->bindValue(':search', "%$search%");
         $stmt->bindValue(':start', (int)$start, PDO::PARAM_INT);

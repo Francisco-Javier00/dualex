@@ -312,9 +312,7 @@ export class EmpresasComponent implements OnInit {
   }
 
   private refrescarTabla(): void {
-    this.datatable?.dtElement?.dtInstance.then((dtInstance: any) => {
-      dtInstance.ajax.reload(null, false);
-    });
+    this.datatable?.refrescar();
   }
 
   private formatearFechaParaInput(valor: string): string {

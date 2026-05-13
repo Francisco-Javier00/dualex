@@ -1,9 +1,9 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { DatatableComponent } from '../shared/datatable/datatable.component';
 import { ConfirmarBorradoModalComponent } from '../shared/modals/confirmar-borrado-modal/confirmar-borrado-modal.component';
-import { ActividadModalComponent } from '../shared/modals/actividad-modal/actividad-modal.component';
+import { ActividadModalComponent } from '../modals/actividad-modal/actividad-modal.component';
 import { ActividadesService } from '../../services/actividades.service';
 import { AlertService } from '../../services/alert.service';
 import { ActividadDTO } from '../../dto/dualex.dto';
@@ -24,6 +24,8 @@ import { Config } from 'datatables.net';
 export class ActividadesComponent implements OnInit {
   private actividadesService = inject(ActividadesService);
   private alertService = inject(AlertService);
+
+  @ViewChild(DatatableComponent) datatable!: DatatableComponent;
 
   dtOptions: Config = {};
   modalBorradoVisible = false;
@@ -131,10 +133,6 @@ export class ActividadesComponent implements OnInit {
   }
 
   private recargarTabla(): void {
-    // Para recargar el DataTable, podemos usar el ID de la tabla si el componente lo soporta
-    // En este caso, al ser serverSide, basta con forzar un cambio de estado si fuera necesario,
-    // pero DatatableComponent ya maneja la suscripción al servicio en su ajax.
-    // Una forma rápida es volver a asignar dtOptions o usar un trigger.
-    this.dtOptions = { ...this.dtOptions };
+    this.datatable.refrescar();
   }
 }

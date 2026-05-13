@@ -1,8 +1,9 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { DatatableComponent } from '../shared/datatable/datatable.component';
 import { ConfirmarBorradoModalComponent } from '../shared/modals/confirmar-borrado-modal/confirmar-borrado-modal.component';
+import { AlumnoModalComponent } from '../modals/alumno-modal/alumno-modal.component';
 import { AlumnosService } from '../../services/alumnos.service';
 import { AlumnoDTO } from '../../dto/dualex.dto';
 import { AlertService } from '../../services/alert.service';
@@ -11,7 +12,7 @@ import { Config } from 'datatables.net';
 @Component({
   selector: 'app-alumnos',
   standalone: true,
-  imports: [CommonModule, RouterModule, DatatableComponent, ConfirmarBorradoModalComponent],
+  imports: [CommonModule, RouterModule, DatatableComponent, ConfirmarBorradoModalComponent, AlumnoModalComponent],
   templateUrl: './alumnos.component.html'
 })
 export class AlumnosComponent implements OnInit {
@@ -19,8 +20,11 @@ export class AlumnosComponent implements OnInit {
   private alertService = inject(AlertService);
   private router = inject(Router);
 
+  @ViewChild(DatatableComponent) datatable!: DatatableComponent;
+
   dtOptions: Config = {};
   modalBorradoVisible = false;
+  modalAlumnoVisible = false;
   alumnoSeleccionado: AlumnoDTO | null = null;
 
   ngOnInit(): void {
@@ -86,7 +90,8 @@ export class AlumnosComponent implements OnInit {
   }
 
   crearNuevo(): void {
-    this.alertService.informacion('Nuevo Alumno', 'Se abrirá el formulario para registrar un nuevo estudiante en el sistema.');
+    this.alumnoSeleccionado = null;
+    this.modalAlumnoVisible = true;
   }
 
   importarExcel(): void {
@@ -95,7 +100,8 @@ export class AlumnosComponent implements OnInit {
 
   onTableAction(event: { action: string, data: any }): void {
     if (event.action === 'edit') {
-      this.alertService.informacion('Editar Alumno', `Editando perfil de: ${event.data.nombre} ${event.data.apellidos}`);
+      this.alumnoSeleccionado = { ...event.data };
+      this.modalAlumnoVisible = true;
     } else if (event.action === 'delete') {
       this.alumnoSeleccionado = event.data;
       this.modalBorradoVisible = true;
@@ -105,13 +111,41 @@ export class AlumnosComponent implements OnInit {
   }
 
   onConfirmarBorrado(): void {
-    this.alertService.exito('Alumno Eliminado', `El estudiante ${this.alumnoSeleccionado?.nombre} ha sido dado de baja correctamente.`);
-    this.modalBorradoVisible = false;
-    this.alumnoSeleccionado = null;
+    if (this.alumnoSeleccionado) {
+      this.alumnosService.deleteAlumno(this.alumnoSeleccionado.id).subscribe(() => {
+        this.alertService.exito('Alumno Eliminado', `El estudiante ${this.alumnoSeleccionado?.nombre} ha sido dado de baja correctamente.`);
+        this.datatable.refrescar();
+        this.modalBorradoVisible = false;
+        this.alumnoSeleccionado = null;
+      });
+    }
   }
 
   onCancelarBorrado(): void {
     this.modalBorradoVisible = false;
+    this.alumnoSeleccionado = null;
+  }
+
+  onGuardarAlumno(alumno: AlumnoDTO): void {
+    if (alumno.id) {
+      this.alumnosService.updateAlumno(alumno).subscribe(() => {
+        this.alertService.exito('Alumno Actualizado', `Los datos de ${alumno.nombre} se han guardado correctamente.`);
+        this.datatable.refrescar();
+        this.modalAlumnoVisible = false;
+        this.alumnoSeleccionado = null;
+      });
+    } else {
+      this.alumnosService.createAlumno(alumno).subscribe(() => {
+        this.alertService.exito('Alumno Registrado', `El estudiante ${alumno.nombre} ha sido dado de alta.`);
+        this.datatable.refrescar();
+        this.modalAlumnoVisible = false;
+        this.alumnoSeleccionado = null;
+      });
+    }
+  }
+
+  onCerrarModal(): void {
+    this.modalAlumnoVisible = false;
     this.alumnoSeleccionado = null;
   }
 }

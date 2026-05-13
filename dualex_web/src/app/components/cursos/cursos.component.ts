@@ -8,7 +8,7 @@ import { Config } from 'datatables.net';
 import { AlertService } from '../../services/alert.service';
 import { CursosService } from '../../services/cursos.service';
 import { CiclosService } from '../../services/ciclos.service';
-import { Curso } from '../../dto/curso.dto';
+import { CursoDTO } from '../../dto/dualex.dto';
 
 @Component({
   selector: 'app-cursos',
@@ -22,7 +22,7 @@ export class CursosComponent implements OnInit {
   private cursosService = inject(CursosService);
   private ciclosService = inject(CiclosService);
 
-  cursos: Curso[] = [];
+  cursos: CursoDTO[] = [];
   ciclosExistentes: any[] = [];
 
   dtOptions: Config = {};
@@ -182,7 +182,7 @@ export class CursosComponent implements OnInit {
       });
     }
 
-    const cursoData: Curso = {
+    const cursoData: CursoDTO = {
       id: this.isEditing ? this.cursoForm.id : Date.now(),
       nombre: siglas,
       curso: this.cursoForm.curso,

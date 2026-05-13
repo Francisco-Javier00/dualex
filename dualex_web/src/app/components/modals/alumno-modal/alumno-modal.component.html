@@ -1,0 +1,108 @@
+<div class="modal fade show" [ngClass]="{'d-block': visible}" tabindex="-1" *ngIf="visible">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg overflow-hidden">
+      <!-- Cabecera con gradiente premium -->
+      <div class="modal-header bg-primary text-white p-4">
+        <h5 class="modal-title d-flex align-items-center">
+          <i class="fa-solid" [ngClass]="alumno ? 'fa-user-pen' : 'fa-user-plus'"></i>
+          <span class="ms-3">{{ alumno ? 'Editar Alumno' : 'Registrar Nuevo Alumno' }}</span>
+        </h5>
+        <button type="button" class="btn-close btn-close-white" (click)="onCerrar()"></button>
+      </div>
+
+      <div class="modal-body p-4 bg-light">
+        <form [formGroup]="alumnoForm">
+          <div class="row g-4">
+            <!-- Información Personal -->
+            <div class="col-12 mt-0">
+              <h6 class="text-primary text-uppercase small fw-bold mb-3">Información Personal</h6>
+            </div>
+            
+            <div class="col-md-6">
+              <label class="form-label small fw-bold">Nombre</label>
+              <input type="text" class="form-control shadow-sm" formControlName="nombre" 
+                     [ngClass]="{'is-invalid': alumnoForm.get('nombre')?.touched && alumnoForm.get('nombre')?.invalid}"
+                     placeholder="Ej: Alejandro">
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label small fw-bold">Apellidos</label>
+              <input type="text" class="form-control shadow-sm" formControlName="apellidos"
+                     [ngClass]="{'is-invalid': alumnoForm.get('apellidos')?.touched && alumnoForm.get('apellidos')?.invalid}"
+                     placeholder="Ej: García Romero">
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label small fw-bold">Correo Electrónico</label>
+              <input type="email" class="form-control shadow-sm" formControlName="email"
+                     [ngClass]="{'is-invalid': alumnoForm.get('email')?.touched && alumnoForm.get('email')?.invalid}"
+                     placeholder="correo@ejemplo.com">
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label small fw-bold">DNI / NIE</label>
+              <input type="text" class="form-control shadow-sm" formControlName="dni"
+                     [ngClass]="{'is-invalid': alumnoForm.get('dni')?.touched && alumnoForm.get('dni')?.invalid}"
+                     placeholder="12345678X">
+            </div>
+
+            <!-- Identificación Académica -->
+            <div class="col-12 mt-4">
+              <h6 class="text-primary text-uppercase small fw-bold mb-3">Identificación Académica</h6>
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label small fw-bold">NIA</label>
+              <input type="text" class="form-control shadow-sm" formControlName="nia"
+                     [ngClass]="{'is-invalid': alumnoForm.get('nia')?.touched && alumnoForm.get('nia')?.invalid}"
+                     placeholder="10 dígitos">
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label small fw-bold">NUSS (Seguridad Social)</label>
+              <input type="text" class="form-control shadow-sm" formControlName="nuss"
+                     [ngClass]="{'is-invalid': alumnoForm.get('nuss')?.touched && alumnoForm.get('nuss')?.invalid}"
+                     placeholder="12 dígitos">
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label small fw-bold">Teléfono</label>
+              <input type="text" class="form-control shadow-sm" formControlName="telefono"
+                     [ngClass]="{'is-invalid': alumnoForm.get('telefono')?.touched && alumnoForm.get('telefono')?.invalid}"
+                     placeholder="600 000 000">
+            </div>
+
+            <div class="col-md-8">
+              <label class="form-label small fw-bold">Curso y Ciclo</label>
+              <select class="form-select shadow-sm" formControlName="idCurso"
+                      [ngClass]="{'is-invalid': alumnoForm.get('idCurso')?.touched && alumnoForm.get('idCurso')?.invalid}">
+                <option [ngValue]="null" disabled>Selecciona un curso...</option>
+                <option *ngFor="let curso of cursos" [value]="curso.id">
+                  {{ curso.nombre }} - {{ curso.ciclo }}
+                </option>
+              </select>
+            </div>
+
+            <div class="col-md-4 d-flex align-items-center pt-4">
+              <div class="form-check form-switch custom-switch">
+                <input class="form-check-input" type="checkbox" id="checkRepetidor" formControlName="repetidor">
+                <label class="form-check-label ms-2 small fw-bold" for="checkRepetidor">¿Es repetidor?</label>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer p-4 bg-white border-top">
+        <button type="button" class="btn btn-light px-4 shadow-sm" (click)="onCerrar()">Cancelar</button>
+        <button type="button" class="btn btn-primary px-4 shadow-sm" (click)="onGuardar()" 
+                [disabled]="alumnoForm.invalid && alumnoForm.touched">
+          <i class="fa-solid fa-save me-2"></i>
+          {{ alumno ? 'Guardar Cambios' : 'Registrar Alumno' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop fade show" *ngIf="visible"></div>

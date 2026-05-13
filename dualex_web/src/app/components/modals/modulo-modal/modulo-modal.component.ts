@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output, OnChanges, SimpleChanges, inject, Renderer2, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ModuloDTO } from '../../../../dto/dualex.dto';
+import { ModuloDTO } from '../../../dto/dualex.dto';
 
 @Component({
   selector: 'app-modulo-modal',

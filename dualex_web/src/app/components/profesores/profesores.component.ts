@@ -259,8 +259,6 @@ export class ProfesoresComponent implements OnInit {
   }
 
   private refrescarTabla(): void {
-    this.datatable?.dtElement?.dtInstance.then((dtInstance: any) => {
-      dtInstance.ajax.reload(null, false);
-    });
+    this.datatable?.refrescar();
   }
 }

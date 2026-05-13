@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
-import { Ciclo } from '../dto/ciclo.dto';
+import { CicloDTO } from '../dto/dualex.dto';
 import { Observable, of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CiclosService {
-  private ciclos: Ciclo[] = [
+  private ciclos: CicloDTO[] = [
     this.crearCiclo({ nombre: 'Desarrollo de Aplicaciones Web', siglas: 'DAW', grado: 'Grado Superior' }),
     this.crearCiclo({ nombre: 'Electromecánica de Vehículos', siglas: 'EMV', grado: 'Grado Medio' }),
     this.crearCiclo({ nombre: 'Sistemas Microinformáticos y Redes', siglas: 'SMR', grado: 'Grado Medio' }),
@@ -16,17 +16,17 @@ export class CiclosService {
 
   constructor() { }
 
-  getCiclos(): Observable<Ciclo[]> {
+  getCiclos(): Observable<CicloDTO[]> {
     return of([...this.ciclos]);
   }
 
-  addCiclo(ciclo: Ciclo): Observable<Ciclo> {
+  addCiclo(ciclo: CicloDTO): Observable<CicloDTO> {
     const nuevoCiclo = this.crearCiclo(ciclo);
     this.ciclos.push(nuevoCiclo);
     return of(nuevoCiclo);
   }
 
-  updateCiclo(siglasOriginales: string, cicloActualizado: Ciclo): Observable<Ciclo> {
+  updateCiclo(siglasOriginales: string, cicloActualizado: CicloDTO): Observable<CicloDTO> {
     const cicloNormalizado = this.crearCiclo(cicloActualizado);
     const index = this.ciclos.findIndex(c => c.siglas === siglasOriginales);
     if (index !== -1) {
@@ -45,7 +45,7 @@ export class CiclosService {
     return this.ciclos.map(c => ({ nombre: c.nombre, siglas: c.siglas }));
   }
 
-  private crearCiclo(ciclo: Ciclo): Ciclo {
+  private crearCiclo(ciclo: CicloDTO): CicloDTO {
     return {
       ...ciclo,
       cursos: this.formatearCursos(ciclo.siglas)
