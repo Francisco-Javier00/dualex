@@ -19,37 +19,49 @@
           <!-- Siglas -->
           <div class="col-md-4">
             <label class="form-label small fw-bold text-uppercase opacity-75">Siglas</label>
-            <div class="input-group shadow-sm rounded-3 overflow-hidden border">
+            <div class="input-group shadow-sm rounded-3 overflow-hidden border" [ngClass]="{'border-danger': isInvalid('siglas')}">
               <span class="input-group-text bg-white border-0"><i class="fa-solid fa-id-badge text-muted"></i></span>
-              <input type="text" formControlName="siglas" class="form-control border-0 px-3" placeholder="Ej: FGL" maxlength="6">
+              <input type="text" formControlName="siglas" class="form-control border-0 px-3" placeholder="Ej: FGL" maxlength="6" style="text-transform: uppercase;" (input)="empresaForm.get('siglas')?.setValue(empresaForm.get('siglas')?.value.toUpperCase())">
             </div>
+            @if (isInvalid('siglas')) {
+              <div class="text-danger small mt-1 animate-fade-in">{{ getErrorMessage('siglas') }}</div>
+            }
           </div>
 
           <!-- Nombre -->
           <div class="col-md-8">
             <label class="form-label small fw-bold text-uppercase opacity-75">Nombre Completo</label>
-            <div class="input-group shadow-sm rounded-3 overflow-hidden border">
+            <div class="input-group shadow-sm rounded-3 overflow-hidden border" [ngClass]="{'border-danger': isInvalid('nombre')}">
               <span class="input-group-text bg-white border-0"><i class="fa-solid fa-building text-muted"></i></span>
               <input type="text" formControlName="nombre" class="form-control border-0 px-3" placeholder="Ej: Fundación Gloria López" maxlength="50">
             </div>
+            @if (isInvalid('nombre')) {
+              <div class="text-danger small mt-1 animate-fade-in">{{ getErrorMessage('nombre') }}</div>
+            }
           </div>
 
           <!-- URL Convenio -->
           <div class="col-12">
             <label class="form-label small fw-bold text-uppercase opacity-75">URL del Convenio</label>
-            <div class="input-group shadow-sm rounded-3 overflow-hidden border">
+            <div class="input-group shadow-sm rounded-3 overflow-hidden border" [ngClass]="{'border-danger': isInvalid('convenioUrl')}">
               <span class="input-group-text bg-white border-0"><i class="fa-solid fa-link text-muted"></i></span>
               <input type="text" formControlName="convenioUrl" class="form-control border-0 px-3" placeholder="https://...">
             </div>
+            @if (isInvalid('convenioUrl')) {
+              <div class="text-danger small mt-1 animate-fade-in">{{ getErrorMessage('convenioUrl') }}</div>
+            }
           </div>
 
           <!-- Inicio Convenio -->
           <div class="col-md-6">
             <label class="form-label small fw-bold text-uppercase opacity-75">Inicio Convenio</label>
-            <div class="input-group shadow-sm rounded-3 overflow-hidden border">
+            <div class="input-group shadow-sm rounded-3 overflow-hidden border" [ngClass]="{'border-danger': isInvalid('inicioConvenio')}">
               <span class="input-group-text bg-white border-0"><i class="fa-solid fa-calendar-day text-muted"></i></span>
               <input type="date" formControlName="inicioConvenio" (change)="onInicioConvenioChange()" class="form-control border-0 px-3">
             </div>
+            @if (isInvalid('inicioConvenio')) {
+              <div class="text-danger small mt-1 animate-fade-in">{{ getErrorMessage('inicioConvenio') }}</div>
+            }
           </div>
 
           <!-- Fin Convenio -->
@@ -75,34 +87,40 @@
           <!-- Contacto Principal -->
           <div class="col-md-6">
             <label class="form-label small fw-bold text-uppercase opacity-75">Nombre Contacto Ppal.</label>
-            <div class="input-group shadow-sm rounded-3 overflow-hidden border">
+            <div class="input-group shadow-sm rounded-3 overflow-hidden border" [ngClass]="{'border-danger': isInvalid('contacto')}">
               <span class="input-group-text bg-white border-0"><i class="fa-solid fa-user-tie text-muted"></i></span>
               <input type="text" formControlName="contacto" class="form-control border-0 px-3" placeholder="Ej: María Pérez">
             </div>
+            @if (isInvalid('contacto')) {
+              <div class="text-danger small mt-1 animate-fade-in">{{ getErrorMessage('contacto') }}</div>
+            }
           </div>
 
           <div class="col-md-6">
             <label class="form-label small fw-bold text-uppercase opacity-75">Teléfono Ppal.</label>
-            <div class="input-group shadow-sm rounded-3 overflow-hidden border">
+            <div class="input-group shadow-sm rounded-3 overflow-hidden border" [ngClass]="{'border-danger': isInvalid('numeroContacto')}">
               <span class="input-group-text bg-white border-0"><i class="fa-solid fa-phone text-muted"></i></span>
               <input type="text" formControlName="numeroContacto" class="form-control border-0 px-3" placeholder="Ej: 600000000">
             </div>
+            @if (isInvalid('numeroContacto')) {
+              <div class="text-danger small mt-1 animate-fade-in">{{ getErrorMessage('numeroContacto') }}</div>
+            }
           </div>
 
           <!-- Contactos Adicionales (Bucle) -->
           <div formArrayName="contactosAdicionales" class="col-12">
-            @for (item of contactosAdicionales.controls; track $index) {
+            @for (group of contactosAdicionales.controls; track $index) {
               <div [formGroupName]="$index" class="row g-3 mt-1 pb-3 border-bottom animate-fade-in">
                 <div class="col-md-6">
                   <label class="form-label small fw-bold text-uppercase opacity-75">Nombre Contacto {{$index + 1}}</label>
-                  <div class="input-group shadow-sm rounded-3 overflow-hidden border">
+                  <div class="input-group shadow-sm rounded-3 overflow-hidden border" [ngClass]="{'border-danger': group.get('contacto')?.invalid && (group.get('contacto')?.dirty || group.get('contacto')?.touched)}">
                     <span class="input-group-text bg-white border-0"><i class="fa-solid fa-user text-muted"></i></span>
                     <input type="text" formControlName="contacto" class="form-control border-0 px-3" placeholder="Ej: Pedro Gómez">
                   </div>
                 </div>
                 <div class="col-md-5">
                   <label class="form-label small fw-bold text-uppercase opacity-75">Teléfono {{$index + 1}}</label>
-                  <div class="input-group shadow-sm rounded-3 overflow-hidden border">
+                  <div class="input-group shadow-sm rounded-3 overflow-hidden border" [ngClass]="{'border-danger': group.get('numeroContacto')?.invalid && (group.get('numeroContacto')?.dirty || group.get('numeroContacto')?.touched)}">
                     <span class="input-group-text bg-white border-0"><i class="fa-solid fa-phone text-muted"></i></span>
                     <input type="text" formControlName="numeroContacto" class="form-control border-0 px-3" placeholder="Ej: 600111222">
                   </div>

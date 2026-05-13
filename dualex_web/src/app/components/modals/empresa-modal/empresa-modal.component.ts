@@ -31,16 +31,20 @@ export class EmpresaModalComponent implements OnInit {
   @Output() cancelar = new EventEmitter<void>();
 
   empresaForm: FormGroup;
+  
+  // Patrones de validación
+  urlPattern = /^https?:\/\/.*$/;
+  telefonoPattern = /^[0-9+ \-]+$/;
 
   constructor(private fb: FormBuilder) {
     this.empresaForm = this.fb.group({
-      siglas: ['', [Validators.required, Validators.maxLength(6)]],
-      nombre: ['', [Validators.required, Validators.maxLength(50)]],
-      convenioUrl: ['', [Validators.required, Validators.maxLength(100)]],
+      siglas: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(6)]],
+      nombre: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
+      convenioUrl: ['', [Validators.required, Validators.pattern(this.urlPattern)]],
       inicioConvenio: ['', Validators.required],
       finConvenio: [{value: '', disabled: true}],
-      contacto: ['', [Validators.required, Validators.maxLength(50)]],
-      numeroContacto: ['', [Validators.required, Validators.maxLength(15)]],
+      contacto: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
+      numeroContacto: ['', [Validators.required, Validators.pattern(this.telefonoPattern), Validators.minLength(9), Validators.maxLength(15)]],
       contactosAdicionales: this.fb.array([])
     });
   }
@@ -55,7 +59,7 @@ export class EmpresaModalComponent implements OnInit {
 
   private resetForm(): void {
     if (this.empresaForm) {
-      this.empresaForm.reset();
+      this.empresaForm.reset({rol: 'PROFESOR'});
       this.contactosAdicionales.clear();
     }
   }
@@ -82,8 +86,8 @@ export class EmpresaModalComponent implements OnInit {
 
   addContacto(nombre = '', telefono = ''): void {
     this.contactosAdicionales.push(this.fb.group({
-      contacto: [nombre, [Validators.required, Validators.maxLength(50)]],
-      numeroContacto: [telefono, [Validators.required, Validators.maxLength(15)]]
+      contacto: [nombre, [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
+      numeroContacto: [telefono, [Validators.required, Validators.pattern(this.telefonoPattern), Validators.minLength(9), Validators.maxLength(15)]]
     }));
   }
 
@@ -109,14 +113,12 @@ export class EmpresaModalComponent implements OnInit {
 
   private formatearFechaParaInput(valor: string): string {
     if (!valor) return '';
-    // Si viene en formato DD/MM/YYYY
     if (valor.includes('/')) {
       const partes = valor.split('/');
       if (partes.length === 3) {
         return `${partes[2]}-${partes[1].padStart(2, '0')}-${partes[0].padStart(2, '0')}`;
       }
     }
-    // Si ya viene en formato YYYY-MM-DD (de la base de datos a veces)
     return valor.substring(0, 10);
   }
 
@@ -139,6 +141,29 @@ export class EmpresaModalComponent implements OnInit {
         finConvenio: formValue.finConvenio
       };
       this.guardar.emit(payload);
+    } else {
+      this.empresaForm.markAllAsTouched();
     }
+  }
+
+  // Helpers para el HTML
+  isInvalid(field: string): boolean {
+    const control = this.empresaForm.get(field);
+    return !!(control && control.invalid && (control.dirty || control.touched));
+  }
+
+  getErrorMessage(field: string): string {
+    const control = this.empresaForm.get(field);
+    if (!control || !control.errors) return '';
+    
+    if (control.errors['required']) return 'Este campo es obligatorio';
+    if (control.errors['pattern']) {
+      if (field === 'convenioUrl') return 'Introduce una URL válida (ej: https://google.com)';
+      if (field.includes('numeroContacto')) return 'Solo números, espacios, - o +';
+    }
+    if (control.errors['minlength']) return `Mínimo ${control.errors['minlength'].requiredLength} caracteres`;
+    if (control.errors['maxlength']) return `Máximo ${control.errors['maxlength'].requiredLength} caracteres`;
+    
+    return 'Campo no válido';
   }
 }
