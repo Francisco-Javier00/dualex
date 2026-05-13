@@ -39,4 +39,8 @@ export class HeaderComponent {
     this.router.navigate(['/perfil']);
   }
 
+  abrirAbout(): void {
+    this.router.navigate(['/acerca-de']);
+  }
+
 }

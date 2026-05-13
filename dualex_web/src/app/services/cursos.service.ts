@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
-import { Curso } from '../dto/curso.dto';
+import { CursoDTO } from '../dto/dualex.dto';
 import { Observable, of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CursosService {
-  private cursos: Curso[] = [
+  private cursos: CursoDTO[] = [
     { id: 2, nombre: '1º DAW', curso: 1, anoEscolar: '25-26', ciclo: 'Desarrollo de Aplicaciones Web' },
     { id: 3, nombre: '1º SMR', curso: 1, anoEscolar: '25-26', ciclo: 'Sistemas Microinformáticos y Redes' },
     { id: 4, nombre: '2º SMR', curso: 2, anoEscolar: '25-26', ciclo: 'Sistemas Microinformáticos y Redes' },
@@ -15,18 +15,18 @@ export class CursosService {
     { id: 7, nombre: '1º MI', curso: 1, anoEscolar: '25-26', ciclo: 'Mecatrónica Industrial' }
   ];
 
-  constructor() {}
+  constructor() { }
 
-  getCursos(): Observable<Curso[]> {
+  getCursos(): Observable<CursoDTO[]> {
     return of([...this.cursos]);
   }
 
-  addCurso(curso: Curso): Observable<Curso> {
+  addCurso(curso: CursoDTO): Observable<CursoDTO> {
     this.cursos.push(curso);
     return of(curso);
   }
 
-  updateCurso(id: number, cursoActualizado: Curso): Observable<Curso> {
+  updateCurso(id: number, cursoActualizado: CursoDTO): Observable<CursoDTO> {
     const index = this.cursos.findIndex(c => c.id === id);
     if (index !== -1) {
       this.cursos[index] = cursoActualizado;

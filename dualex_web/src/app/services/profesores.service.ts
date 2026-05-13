@@ -6,7 +6,7 @@ import { ProfesorDTO } from '../dto/dualex.dto';
 @Injectable({
   providedIn: 'root'
 })
-export class ProfesoresMockService {
+export class ProfesoresService {
   readonly ciclosDisponibles = [
     'Sistemas Microinformáticos y Redes',
     'Desarrollo de Aplicaciones Web',

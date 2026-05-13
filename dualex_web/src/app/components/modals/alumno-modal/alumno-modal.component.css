@@ -1,0 +1,61 @@
+.modal {
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(5px);
+  transition: all 0.3s ease-in-out;
+}
+
+.modal-header {
+  background: linear-gradient(135deg, #1565C0 0%, #0D47A1 100%);
+  border-bottom: none;
+}
+
+.form-control, .form-select {
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 0.6rem 1rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: #1565C0;
+  box-shadow: 0 0 0 0.25rem rgba(21, 101, 192, 0.15);
+}
+
+.form-label {
+  color: #495057;
+  margin-bottom: 0.4rem;
+}
+
+.btn-primary {
+  background: #1565C0;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: transform 0.2s;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #0D47A1;
+  transform: translateY(-2px);
+}
+
+.btn-light {
+  border-radius: 8px;
+}
+
+.custom-switch .form-check-input {
+  width: 3rem;
+  height: 1.5rem;
+  cursor: pointer;
+}
+
+.custom-switch .form-check-input:checked {
+  background-color: #1565C0;
+  border-color: #1565C0;
+}
+
+h6 {
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid rgba(21, 101, 192, 0.1);
+  padding-bottom: 5px;
+}

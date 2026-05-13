@@ -6,7 +6,7 @@ import { Config } from 'datatables.net';
 import { DatatableComponent } from '../shared/datatable/datatable.component';
 import { ConfirmarBorradoModalComponent } from '../shared/modals/confirmar-borrado-modal/confirmar-borrado-modal.component';
 import { AlertService } from '../../services/alert.service';
-import { EmpresasMockService } from '../../services/empresas-mock.service';
+import { EmpresasService } from '../../services/empresas.service';
 import { ContactoEmpresaDTO, EmpresaDTO } from '../../dto/dualex.dto';
 
 @Component({
@@ -17,7 +17,7 @@ import { ContactoEmpresaDTO, EmpresaDTO } from '../../dto/dualex.dto';
   styleUrl: './empresas.component.css'
 })
 export class EmpresasComponent implements OnInit {
-  private empresasMockService = inject(EmpresasMockService);
+  private empresasService = inject(EmpresasService);
   private alertService = inject(AlertService);
 
   @ViewChild(DatatableComponent) datatable?: DatatableComponent;
@@ -54,7 +54,7 @@ export class EmpresasComponent implements OnInit {
       serverSide: true,
       processing: true,
       ajax: (dataTablesParameters: any, callback: any) => {
-        this.empresasMockService.obtenerEmpresasDataTables(dataTablesParameters).subscribe(resp => {
+        this.empresasService.obtenerEmpresasDataTables(dataTablesParameters).subscribe(resp => {
           callback({
             recordsTotal: resp.recordsTotal,
             recordsFiltered: resp.recordsFiltered,
@@ -184,7 +184,7 @@ export class EmpresasComponent implements OnInit {
   onConfirmarBorrado(): void {
     if (!this.empresaSeleccionada) return;
 
-    this.empresasMockService.eliminarEmpresa(this.empresaSeleccionada.id);
+    this.empresasService.eliminarEmpresa(this.empresaSeleccionada.id);
     this.alertService.exito('Empresa eliminada', `${this.empresaSeleccionada.nombre} ha sido eliminada.`);
     this.modalBorradoVisible = false;
     this.empresaSeleccionada = null;
@@ -236,10 +236,10 @@ export class EmpresasComponent implements OnInit {
     };
 
     if (this.modoFormulario === 'editar' && this.empresaEditandoId !== null) {
-      this.empresasMockService.actualizarEmpresa(this.empresaEditandoId, payload);
+      this.empresasService.actualizarEmpresa(this.empresaEditandoId, payload);
       this.alertService.exito('Empresa actualizada', `${payload.nombre} se ha actualizado correctamente.`);
     } else {
-      this.empresasMockService.agregarEmpresa(payload);
+      this.empresasService.agregarEmpresa(payload);
       this.alertService.exito('Empresa creada', `${payload.nombre} se ha añadido correctamente.`);
     }
 
@@ -312,9 +312,7 @@ export class EmpresasComponent implements OnInit {
   }
 
   private refrescarTabla(): void {
-    this.datatable?.dtElement?.dtInstance.then((dtInstance: any) => {
-      dtInstance.ajax.reload(null, false);
-    });
+    this.datatable?.refrescar();
   }
 
   private formatearFechaParaInput(valor: string): string {

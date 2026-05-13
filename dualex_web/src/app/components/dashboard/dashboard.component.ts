@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { AuthService } from '../../auth/services/auth.service';
 import { DashboardService } from '../../services/dashboard.service';
-import { ProfesorDashboardMockService } from '../../services/profesor-dashboard-mock.service';
+import { ProfesorDashboardService } from '../../services/profesor-dashboard.service';
 import { Categoria, ModuloProfesor, PerfilUsuario } from '../../dto/dualex.dto';
 import { Observable, Subscription } from 'rxjs';
 
@@ -16,7 +16,7 @@ import { Observable, Subscription } from 'rxjs';
 export class DashboardComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
   private servicioDashboard = inject(DashboardService);
-  private profesorDashboardService = inject(ProfesorDashboardMockService);
+  private profesorDashboardService = inject(ProfesorDashboardService);
   private router = inject(Router);
 
   usuario: PerfilUsuario | null = null;

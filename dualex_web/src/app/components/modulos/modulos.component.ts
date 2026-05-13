@@ -1,9 +1,9 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { DatatableComponent } from '../shared/datatable/datatable.component';
 import { ConfirmarBorradoModalComponent } from '../shared/modals/confirmar-borrado-modal/confirmar-borrado-modal.component';
-import { ModuloModalComponent } from '../shared/modals/modulo-modal/modulo-modal.component';
+import { ModuloModalComponent } from '../modals/modulo-modal/modulo-modal.component';
 import { ModulosService } from '../../services/modulos.service';
 import { AlertService } from '../../services/alert.service';
 import { ModuloDTO } from '../../dto/dualex.dto';
@@ -13,9 +13,9 @@ import { Config } from 'datatables.net';
   selector: 'app-modulos',
   standalone: true,
   imports: [
-    CommonModule, 
-    RouterModule, 
-    DatatableComponent, 
+    CommonModule,
+    RouterModule,
+    DatatableComponent,
     ConfirmarBorradoModalComponent,
     ModuloModalComponent
   ],
@@ -24,6 +24,8 @@ import { Config } from 'datatables.net';
 export class ModulosComponent implements OnInit {
   private modulosService = inject(ModulosService);
   private alertService = inject(AlertService);
+
+  @ViewChild(DatatableComponent) datatable!: DatatableComponent;
 
   dtOptions: Config = {};
   modalBorradoVisible = false;
@@ -131,6 +133,6 @@ export class ModulosComponent implements OnInit {
   }
 
   private recargarTabla(): void {
-    this.dtOptions = { ...this.dtOptions };
+    this.datatable.refrescar();
   }
 }
