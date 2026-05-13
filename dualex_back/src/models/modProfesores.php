@@ -87,6 +87,11 @@ class ModProfesores {
                 $sqlC = "INSERT INTO Coordinador (idCoordinador) VALUES (:id)";
                 $stmtC = $this->db->prepare($sqlC);
                 $stmtC->execute([':id' => $idUsuario]);
+
+                // Asignar ciclos si es coordinador
+                if (!empty($datos['ciclos']) && is_array($datos['ciclos'])) {
+                    $this->asignarCiclos($idUsuario, $datos['ciclos']);
+                }
             }
 
             $this->db->commit();
@@ -120,8 +125,15 @@ class ModProfesores {
                 $sqlC = "INSERT INTO Coordinador (idCoordinador) VALUES (:id)";
                 $this->db->prepare($sqlC)->execute([':id' => $id]);
             } elseif (!$quiereSerCoordinador && $esCoordinadorActual) {
+                // Si deja de ser coordinador, quitarlo de los ciclos que coordinaba
+                $this->quitarCoordinacionDeTodo($id);
                 $sqlC = "DELETE FROM Coordinador WHERE idCoordinador = :id";
                 $this->db->prepare($sqlC)->execute([':id' => $id]);
+            }
+
+            // Actualizar ciclos (solo si es o sigue siendo coordinador)
+            if ($quiereSerCoordinador) {
+                $this->asignarCiclos($id, $datos['ciclos'] ?? []);
             }
 
             $this->db->commit();
@@ -136,10 +148,19 @@ class ModProfesores {
      * Elimina un profesor.
      */
     public function eliminar($id) {
-        $sql = "DELETE FROM Usuarios WHERE idUsuario = :id AND tipo = 'P'";
-        $stmt = $this->db->prepare($sql);
-        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
-        return $stmt->execute();
+        try {
+            $this->db->beginTransaction();
+            $this->quitarCoordinacionDeTodo($id);
+            $sql = "DELETE FROM Usuarios WHERE idUsuario = :id AND tipo = 'P'";
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+            $stmt->execute();
+            $this->db->commit();
+            return true;
+        } catch (Exception $e) {
+            $this->db->rollBack();
+            throw $e;
+        }
     }
 
     /**
@@ -230,6 +251,29 @@ class ModProfesores {
         $stmtCic->execute([':id' => $id]);
         $ciclos = $stmtCic->fetchAll(PDO::FETCH_COLUMN);
         $prof['ciclos'] = $ciclos ? implode(', ', $ciclos) : '';
+    }
+
+    private function asignarCiclos($idProfesor, $ciclosSiglas) {
+        // 1. Quitar coordinación previa
+        $this->quitarCoordinacionDeTodo($idProfesor);
+
+        // 2. Asignar nuevos ciclos
+        if (!empty($ciclosSiglas)) {
+            foreach ($ciclosSiglas as $sigla) {
+                $sql = "UPDATE Ciclos SET idCoordinador = :id WHERE siglas = :sigla";
+                $stmt = $this->db->prepare($sql);
+                $stmt->execute([
+                    ':id' => $idProfesor,
+                    ':sigla' => $sigla
+                ]);
+            }
+        }
+    }
+
+    private function quitarCoordinacionDeTodo($idProfesor) {
+        $sql = "UPDATE Ciclos SET idCoordinador = NULL WHERE idCoordinador = :id";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':id' => $idProfesor]);
     }
 
     private function esCoordinador($id) {

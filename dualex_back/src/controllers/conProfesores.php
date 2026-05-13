@@ -109,7 +109,11 @@ class ConProfesores extends BaseController {
         $id = $_GET['id'] ?? null;
         if (!$id) $this->sendError("ID no proporcionado", 400);
 
-        $success = $this->modelo->eliminar($id);
-        return ["success" => $success];
+        try {
+            $success = $this->modelo->eliminar($id);
+            return ["success" => $success];
+        } catch (Exception $e) {
+            $this->sendError("Error al eliminar el profesor: " . $e->getMessage(), 500);
+        }
     }
 }
