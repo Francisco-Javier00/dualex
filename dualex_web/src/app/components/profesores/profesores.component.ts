@@ -6,7 +6,7 @@ import { Config } from 'datatables.net';
 import { DatatableComponent } from '../shared/datatable/datatable.component';
 import { ConfirmarBorradoModalComponent } from '../shared/modals/confirmar-borrado-modal/confirmar-borrado-modal.component';
 import { AlertService } from '../../services/alert.service';
-import { ProfesoresMockService } from '../../services/profesores-mock.service';
+import { ProfesoresService } from '../../services/profesores.service';
 import { ProfesorDTO } from '../../dto/dualex.dto';
 
 @Component({
@@ -23,7 +23,7 @@ import { ProfesorDTO } from '../../dto/dualex.dto';
   styleUrl: './profesores.component.css'
 })
 export class ProfesoresComponent implements OnInit {
-  private profesoresMockService = inject(ProfesoresMockService);
+  private profesoresService = inject(ProfesoresService);
   private alertService = inject(AlertService);
 
   @ViewChild(DatatableComponent) datatable?: DatatableComponent;
@@ -43,7 +43,7 @@ export class ProfesoresComponent implements OnInit {
     ciclos: [] as string[]
   };
 
-  ciclosDisponibles = this.profesoresMockService.ciclosDisponibles;
+  ciclosDisponibles = this.profesoresService.ciclosDisponibles;
   private readonly mapeoCiclos: Record<string, string> = {
     'SMR': 'Sistemas Microinformáticos y Redes',
     'DAW': 'Desarrollo de Aplicaciones Web',
@@ -57,7 +57,7 @@ export class ProfesoresComponent implements OnInit {
       lengthChange: true,
       dom: "<'d-flex justify-content-between align-items-center flex-wrap gap-3 mb-3'<'profesores-length'l><'profesores-search'f>>rt<'d-flex justify-content-between align-items-center flex-wrap gap-3 mt-3'ip>",
       ajax: (dataTablesParameters: any, callback: any) => {
-        this.profesoresMockService.obtenerProfesoresDataTables(dataTablesParameters).subscribe(resp => {
+        this.profesoresService.obtenerProfesoresDataTables(dataTablesParameters).subscribe(resp => {
           callback({
             recordsTotal: resp.recordsTotal,
             recordsFiltered: resp.recordsFiltered,
@@ -163,7 +163,7 @@ export class ProfesoresComponent implements OnInit {
   onConfirmarBorrado(): void {
     if (!this.profesorSeleccionado) return;
 
-    this.profesoresMockService.eliminarProfesor(this.profesorSeleccionado.id);
+    this.profesoresService.eliminarProfesor(this.profesorSeleccionado.id);
     this.alertService.exito('Profesor eliminado', `${this.profesorSeleccionado.nombre} ${this.profesorSeleccionado.apellidos} ha sido eliminado.`);
     this.modalBorradoVisible = false;
     this.profesorSeleccionado = null;
@@ -207,10 +207,10 @@ export class ProfesoresComponent implements OnInit {
     };
 
     if (this.modoFormulario === 'editar' && this.profesorEditandoId !== null) {
-      this.profesoresMockService.actualizarProfesor(this.profesorEditandoId, profesorPayload);
+      this.profesoresService.actualizarProfesor(this.profesorEditandoId, profesorPayload);
       this.alertService.exito('Profesor actualizado', `${this.nuevoProfesor.nombre} ${this.nuevoProfesor.apellidos} se ha actualizado correctamente.`);
     } else {
-      this.profesoresMockService.agregarProfesor(profesorPayload);
+      this.profesoresService.agregarProfesor(profesorPayload);
       this.alertService.exito('Profesor creado', `${this.nuevoProfesor.nombre} ${this.nuevoProfesor.apellidos} se ha añadido correctamente.`);
     }
 

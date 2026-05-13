@@ -11,10 +11,19 @@ class ConexionDB {
     public $conn;
 
     public function __construct() {
-        $this->host = $_ENV['DB_HOST'] ?? getenv('DB_HOST') ?: 'localhost';
-        $this->db_name = $_ENV['DB_NAME'] ?? getenv('DB_NAME') ?: 'dualex';
-        $this->username = $_ENV['DB_USER'] ?? getenv('DB_USER') ?: 'root';
-        $this->password = $_ENV['DB_PASS'] ?? getenv('DB_PASS') ?: '';
+        // Obtenemos los datos exclusivamente de $_ENV
+        $this->host = $_ENV['DB_HOST'] ?? null;
+        $this->db_name = $_ENV['DB_NAME'] ?? null;
+        $this->username = $_ENV['DB_USER'] ?? null;
+        $this->password = $_ENV['DB_PASS'] ?? '';
+
+        // Validación de seguridad: no permitimos que falten variables críticas
+        if (!$this->host || !$this->db_name || !$this->username) {
+            http_response_code(500);
+            header('Content-Type: application/json');
+            echo json_encode(["error" => "Faltan variables de entorno críticas (DB_HOST, DB_NAME o DB_USER)"]);
+            exit;
+        }
     }
 
     public function getConnection() {

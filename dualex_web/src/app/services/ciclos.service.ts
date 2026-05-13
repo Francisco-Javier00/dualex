@@ -8,13 +8,13 @@ import { Observable, of } from 'rxjs';
 export class CiclosService {
   private ciclos: Ciclo[] = [
     this.crearCiclo({ nombre: 'Desarrollo de Aplicaciones Web', siglas: 'DAW', grado: 'Grado Superior' }),
-    this.crearCiclo({ nombre: 'ElectromecÃ¡nica de VehÃ­culos', siglas: 'EMV', grado: 'Grado Medio' }),
-    this.crearCiclo({ nombre: 'Sistemas MicroinformÃ¡ticos y Redes', siglas: 'SMR', grado: 'Grado Medio' }),
-    this.crearCiclo({ nombre: 'MecatrÃ³nica Industrial', siglas: 'MI', grado: 'Grado Superior' }),
-    this.crearCiclo({ nombre: 'GestiÃ³n Administrativa', siglas: 'GA', grado: 'Grado Medio' })
+    this.crearCiclo({ nombre: 'Electromecánica de Vehículos', siglas: 'EMV', grado: 'Grado Medio' }),
+    this.crearCiclo({ nombre: 'Sistemas Microinformáticos y Redes', siglas: 'SMR', grado: 'Grado Medio' }),
+    this.crearCiclo({ nombre: 'Mecatrónica Industrial', siglas: 'MI', grado: 'Grado Superior' }),
+    this.crearCiclo({ nombre: 'Gestión Administrativa', siglas: 'GA', grado: 'Grado Medio' })
   ];
 
-  constructor() {}
+  constructor() { }
 
   getCiclos(): Observable<Ciclo[]> {
     return of([...this.ciclos]);

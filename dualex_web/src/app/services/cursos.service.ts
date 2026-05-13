@@ -15,7 +15,7 @@ export class CursosService {
     { id: 7, nombre: '1º MI', curso: 1, anoEscolar: '25-26', ciclo: 'Mecatrónica Industrial' }
   ];
 
-  constructor() {}
+  constructor() { }
 
   getCursos(): Observable<Curso[]> {
     return of([...this.cursos]);

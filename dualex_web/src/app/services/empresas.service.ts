@@ -6,7 +6,7 @@ import { EmpresaDTO } from '../dto/dualex.dto';
 @Injectable({
   providedIn: 'root'
 })
-export class EmpresasMockService {
+export class EmpresasService {
   private empresasMock: EmpresaDTO[] = [
     { id: 1, siglas: 'FGL', nombre: 'Fundación Gloria López', convenioUrl: 'https://fgl.es/convenio.pdf', inicioConvenio: '01/09/2025', finConvenio: '30/06/2026', contacto: 'María Pérez', numeroContacto: '600000001' },
     { id: 2, siglas: 'TKS', nombre: 'Tech Skills S.L.', convenioUrl: 'https://tks.example.com/convenio', inicioConvenio: '01/09/2025', finConvenio: '30/06/2026', contacto: 'Carlos Gómez', numeroContacto: '600000002' },
