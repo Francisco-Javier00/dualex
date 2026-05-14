@@ -67,7 +67,7 @@ class ConModulos extends BaseController {
     }
 
     public function listarProfesor() {
-        $emailProfesor = $_GET['emailProfesor'] ?? ($this->user['email'] ?? null);
+        $emailProfesor = $_GET['emailProfesor'] ?? ($this->user['email'] ?? ($this->user['correo'] ?? null));
         $data = $this->modelo->obtenerModulosProfesor($emailProfesor);
         $this->sendResponse($data);
     }

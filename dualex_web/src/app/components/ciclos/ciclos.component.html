@@ -38,46 +38,77 @@
 
 @if (isEditModalOpen) {
 <div class="custom-modal-overlay" (click)="cerrarEditModal()">
-  <div class="custom-modal form-modal" (click)="$event.stopPropagation()">
+  <div class="custom-modal animate-slide-up" (click)="$event.stopPropagation()">
+    
+    <!-- CABECERA -->
     <div class="modal-header">
-      <h3 class="modal-title m-0 fw-bold">{{ isEditing ? 'Editar ciclo' : 'Añadir ciclo' }}</h3>
+      <h5 class="modal-title">
+        <i class="fa-solid" [ngClass]="isEditing ? 'fa-layer-group text-primary' : 'fa-circle-plus text-success'"></i>
+        {{ isEditing ? 'Modificar Ciclo' : 'Nuevo Ciclo' }}
+      </h5>
       <button class="btn-close-custom" (click)="cerrarEditModal()">
         <i class="fa-solid fa-xmark"></i>
       </button>
     </div>
 
-    <div class="modal-body text-start">
-      <div class="form-group row mb-3 align-items-center">
-        <label class="col-sm-3 col-form-label pb-0">Nombre:</label>
-        <div class="col-sm-9">
-          <input type="text" class="form-control" [(ngModel)]="cicloForm.nombre">
+    <!-- CUERPO -->
+    <div class="modal-body py-4">
+      <div class="row g-3">
+        
+        <!-- Nombre -->
+        <div class="col-12">
+          <label class="form-label small fw-bold text-uppercase opacity-75">Nombre del Ciclo</label>
+          <div class="input-group shadow-sm border">
+            <span class="input-group-text"><i class="fa-solid fa-font text-muted"></i></span>
+            <input type="text" class="form-control border-0 px-3" [(ngModel)]="cicloForm.nombre" maxlength="100" placeholder="Ej: Desarrollo de Aplicaciones Web">
+          </div>
         </div>
-      </div>
-      <div class="form-group row mb-3 align-items-center">
-        <label class="col-sm-3 col-form-label pb-0">Siglas:</label>
-        <div class="col-sm-9">
-          <input type="text" class="form-control" [(ngModel)]="cicloForm.siglas">
+
+        <!-- Siglas -->
+        <div class="col-md-6">
+          <label class="form-label small fw-bold text-uppercase opacity-75">Siglas</label>
+          <div class="input-group shadow-sm border">
+            <span class="input-group-text"><i class="fa-solid fa-tag text-muted"></i></span>
+            <input type="text" class="form-control border-0 px-3 text-uppercase" [(ngModel)]="cicloForm.siglas" 
+                   (input)="cicloForm.siglas = cicloForm.siglas.toUpperCase()" maxlength="5" placeholder="Ej: DAW">
+          </div>
         </div>
-      </div>
-      <div class="form-group row mb-3 align-items-center">
-        <label class="col-sm-3 col-form-label pb-0">Cursos:</label>
-        <div class="col-sm-9">
-          <input type="text" class="form-control text-center bg-white" [value]="formatearCursos(cicloForm.siglas)" disabled>
+
+        <!-- Grado -->
+        <div class="col-md-6">
+          <label class="form-label small fw-bold text-uppercase opacity-75">Grado Formativo</label>
+          <div class="d-flex align-items-center gap-3 mt-2 h-100">
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="grado" id="gradoMedio" value="medio" [(ngModel)]="cicloForm.grado">
+              <label class="form-check-label small" for="gradoMedio">Medio</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="grado" id="gradoSuperior" value="superior" [(ngModel)]="cicloForm.grado">
+              <label class="form-check-label small" for="gradoSuperior">Superior</label>
+            </div>
+          </div>
         </div>
-      </div>
-      <div class="form-group row mb-3 align-items-center">
-        <label class="col-sm-3 col-form-label pb-0">Grado:</label>
-        <div class="col-sm-9 d-flex align-items-center gap-4">
-          <label class="d-flex align-items-center m-0 gap-1"><input type="radio" name="grado" value="Grado Medio" [(ngModel)]="cicloForm.grado"> Medio</label>
-          <label class="d-flex align-items-center m-0 gap-1"><input type="radio" name="grado" value="Grado Superior" [(ngModel)]="cicloForm.grado"> Superior</label>
+
+        <!-- Cursos (Calculado) -->
+        <div class="col-12">
+          <label class="form-label small fw-bold text-uppercase opacity-75">Cursos Generados</label>
+          <div class="input-group shadow-sm border bg-light">
+            <span class="input-group-text bg-light"><i class="fa-solid fa-graduation-cap text-muted"></i></span>
+            <input type="text" class="form-control border-0 px-3 bg-light" [value]="formatearCursos(cicloForm.siglas)" disabled>
+          </div>
         </div>
+
       </div>
 
-    </div>
-
-    <div class="modal-actions mt-4 d-flex justify-content-center gap-4">
-      <button class="btn-modal btn-salir px-4" (click)="cerrarEditModal()">CANCELAR</button>
-      <button class="btn-modal btn-aceptar px-4" (click)="guardarCiclo()">ACEPTAR</button>
+      <!-- ACCIONES -->
+      <div class="d-flex gap-3 mt-5">
+        <button type="button" class="btn-modal-cancelar flex-grow-1" (click)="cerrarEditModal()">
+          Cancelar
+        </button>
+        <button type="button" class="btn-modal-aceptar flex-grow-1" (click)="guardarCiclo()">
+          <i class="fa-solid fa-save me-2"></i> {{ isEditing ? 'Guardar Cambios' : 'Registrar Ciclo' }}
+        </button>
+      </div>
     </div>
   </div>
 </div>

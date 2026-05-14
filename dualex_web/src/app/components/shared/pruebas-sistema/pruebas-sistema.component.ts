@@ -89,8 +89,8 @@ export class PruebasSistemaComponent implements OnInit {
     let apellidos = 'Díaz del Castillo';
 
     if (rol === 'PROFESOR') {
-      nombre = 'Santiago';
-      apellidos = 'Pizarro Pizarro';
+      nombre = 'Juan';
+      apellidos = 'Martínez López';
     } else if (rol === 'ALUMNO') {
       nombre = 'Francisco Javier';
       apellidos = 'Martínez Fernández';
@@ -102,7 +102,7 @@ export class PruebasSistemaComponent implements OnInit {
       id: 1,
       nombre,
       apellidos,
-      email: `dev.${rol.toLowerCase()}@dualex.es`,
+      email: rol === 'PROFESOR' ? 'juan@fp.es' : `dev.${rol.toLowerCase()}@dualex.es`,
       foto: null,
       roles: { dualex: rol.toLowerCase() },
       iat: Math.floor(Date.now() / 1000),

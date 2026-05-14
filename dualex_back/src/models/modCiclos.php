@@ -9,7 +9,7 @@ class ModCiclos {
 
     public function listar() {
         $sql = "SELECT c.idCiclo as id, c.nombre, c.siglas, c.idCoordinador, 
-                       'Grado Superior' AS grado, '1º, 2º' AS cursos,
+                       c.grado, CONCAT('1º ', c.siglas, ', 2º ', c.siglas) AS cursos,
                        u.nombre as nombreCoordinador, u.apellidos as apellidosCoordinador 
                 FROM Ciclos c
                 LEFT JOIN Coordinador co ON c.idCoordinador = co.idCoordinador
@@ -47,12 +47,13 @@ class ModCiclos {
             $this->db->beginTransaction();
 
             // 1. Insertar el Ciclo
-            $sql = "INSERT INTO Ciclos (nombre, siglas, idCoordinador) VALUES (:nombre, :siglas, :idCoordinador)";
+            $sql = "INSERT INTO Ciclos (nombre, siglas, idCoordinador, grado) VALUES (:nombre, :siglas, :idCoordinador, :grado)";
             $stmt = $this->db->prepare($sql);
             $stmt->execute([
                 ':nombre'        => $datos['nombre'],
                 ':siglas'        => $datos['siglas'],
-                ':idCoordinador' => $datos['idCoordinador'] ?? 1 // Valor por defecto si no viene
+                ':idCoordinador' => $datos['idCoordinador'] ?? 1,
+                ':grado'         => $datos['grado'] ?? 'superior'
             ]);
             $idCiclo = $this->db->lastInsertId();
 
@@ -69,13 +70,14 @@ class ModCiclos {
             $this->db->beginTransaction();
 
             // 1. Actualizar el Ciclo
-            $sql = "UPDATE Ciclos SET nombre = :nombre, siglas = :siglas, idCoordinador = :idCoordinador WHERE idCiclo = :id";
+            $sql = "UPDATE Ciclos SET nombre = :nombre, siglas = :siglas, idCoordinador = :idCoordinador, grado = :grado WHERE idCiclo = :id";
             $stmt = $this->db->prepare($sql);
             $stmt->execute([
                 ':id'            => $id,
                 ':nombre'        => $datos['nombre'],
                 ':siglas'        => $datos['siglas'],
-                ':idCoordinador' => $datos['idCoordinador'] ?? 1
+                ':idCoordinador' => $datos['idCoordinador'] ?? 1,
+                ':grado'         => $datos['grado']
             ]);
 
             // 2. Actualizar los nombres de los cursos asociados (1º y 2º)
@@ -143,7 +145,7 @@ class ModCiclos {
         $totalFiltrados = $stmtF->fetchColumn();
 
         $sql = "SELECT c.idCiclo as id, c.nombre, c.siglas, c.idCoordinador, 
-                       'Grado Superior' AS grado, '1º, 2º' AS cursos,
+                       c.grado, CONCAT('1º ', c.siglas, ', 2º ', c.siglas) AS cursos,
                        u.nombre as nombreCoordinador, u.apellidos as apellidosCoordinador 
                 FROM Ciclos c
                 LEFT JOIN Coordinador co ON c.idCoordinador = co.idCoordinador

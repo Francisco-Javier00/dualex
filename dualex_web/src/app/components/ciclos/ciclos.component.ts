@@ -39,7 +39,7 @@ export class CiclosComponent implements OnInit {
   cicloForm: any = {
     nombre: '',
     siglas: '',
-    grado: 'Grado Medio',
+    grado: 'superior',
     cursos: '',
     anoEscolar: '',
     colorFondo1: '#ffffff',
@@ -130,7 +130,7 @@ export class CiclosComponent implements OnInit {
       this.cicloForm = {
         nombre: '',
         siglas: '',
-        grado: 'Grado Medio',
+        grado: 'superior',
         cursos: '',
       };
     }
@@ -209,6 +209,6 @@ export class CiclosComponent implements OnInit {
   }
 
   formatearCursos(siglas: string): string {
-    return siglas ? `1${siglas},2${siglas}` : '';
+    return siglas ? `1º ${siglas.toUpperCase()}, 2º ${siglas.toUpperCase()}` : '';
   }
 }

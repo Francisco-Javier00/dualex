@@ -43,9 +43,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   private cargarModulosProfesor(): void {
     this.cargandoModulos = true;
-    this.profesorDashboardService.obtenerModulosDelProfesor().subscribe(modulos => {
-      this.modulosProfesor = modulos;
-      this.cargandoModulos = false;
+    this.profesorDashboardService.obtenerModulosDelProfesor().subscribe({
+      next: (modulos) => {
+        this.modulosProfesor = modulos;
+        this.cargandoModulos = false;
+      },
+      error: (err) => {
+        console.error('Error al cargar módulos:', err);
+        this.cargandoModulos = false;
+      }
     });
   }
 
