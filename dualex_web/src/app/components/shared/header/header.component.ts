@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../auth/services/auth.service';
 import { PerfilUsuario } from '../../../dto/dualex.dto';
-import { Observable } from 'rxjs';
+import { Observable, take } from 'rxjs';
 
 @Component({
   selector: 'app-header',
@@ -37,6 +37,20 @@ export class HeaderComponent {
 
   irAPerfil(): void {
     this.router.navigate(['/perfil']);
+  }
+
+  irAInicio(): void {
+    this.usuario$.pipe(take(1)).subscribe(usuario => {
+      if (usuario) {
+        if (usuario.rol.toUpperCase() === 'ALUMNO') {
+          this.router.navigate(['/tareas']);
+        } else {
+          this.router.navigate(['/dashboard']);
+        }
+      } else {
+        this.router.navigate(['/']);
+      }
+    });
   }
 
   abrirAbout(): void {

@@ -1,4 +1,4 @@
-﻿import { CommonModule } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -65,6 +65,10 @@ export class PerfilComponent implements OnInit, OnDestroy {
       case 'PROFESOR': return '#0f7a4f';
       default: return '#3b82f6';
     }
+  }
+
+  get rutaInicio(): string {
+    return (this.perfil?.rol === 'ALUMNO') ? '/tareas' : '/dashboard';
   }
 
   activarEdicion(): void {
