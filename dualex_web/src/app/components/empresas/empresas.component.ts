@@ -11,18 +11,12 @@ import { EmpresasService } from '../../services/empresas.service';
 import { ContactoEmpresaDTO, EmpresaDTO, ConfiguracionDTO } from '../../dto/dualex.dto';
 import { ConfiguracionService } from '../../services/configuracion.service';
 import { AuthService } from '../../auth/services/auth.service';
+import { CiclosService } from '../../services/ciclos.service';
 
 @Component({
   selector: 'app-empresas',
   standalone: true,
-  imports: [
-    CommonModule, 
-    RouterModule, 
-    FormsModule, 
-    DatatableComponent, 
-    ConfirmarBorradoModalComponent,
-    EmpresaModalComponent
-  ],
+  imports: [CommonModule, RouterModule, FormsModule, DatatableComponent, ConfirmarBorradoModalComponent, EmpresaModalComponent],
   templateUrl: './empresas.component.html',
   styleUrl: './empresas.component.css'
 })
@@ -31,6 +25,7 @@ export class EmpresasComponent implements OnInit {
   private configuracionService = inject(ConfiguracionService);
   private alertService = inject(AlertService);
   private authService = inject(AuthService);
+  private ciclosService = inject(CiclosService);
 
   @ViewChild(DatatableComponent) datatable?: DatatableComponent;
 
@@ -41,7 +36,7 @@ export class EmpresasComponent implements OnInit {
   modalContactosVisible = false;
   modalBorradoVisible = false;
   modalCrearVisible = false;
-  modoFormulario: 'crear' | 'editar' = 'crear';
+  modoFormulario: 'crear' | 'editar' | 'enlazar' = 'crear';
   empresaEditandoId: number | null = null;
   empresaSeleccionada: EmpresaDTO | null = null;
 
@@ -51,6 +46,7 @@ export class EmpresasComponent implements OnInit {
   };
 
   contactosAdicionales: ContactoEmpresaDTO[] = [];
+  ciclosDisponibles: string[] = [];
 
   nuevaEmpresa = {
     siglas: '',
@@ -65,6 +61,7 @@ export class EmpresasComponent implements OnInit {
   ngOnInit(): void {
     this.puedeEditar = this.authService.currentUserValue?.rol === 'COORDINADOR';
     this.cargarConfiguracion();
+    this.cargarCiclos();
 
     this.dtOptions = {
       serverSide: true,
@@ -97,6 +94,10 @@ export class EmpresasComponent implements OnInit {
               ${data}
             </button>
           `
+        },
+        { 
+          data: 'ciclos',
+          render: (data: string) => data ? data : '<span class="text-muted italic">No asignado</span>'
         },
         {
           data: 'convenioUrl',
@@ -166,7 +167,22 @@ export class EmpresasComponent implements OnInit {
 
   onTableAction(event: { action: string, data: any }): void {
     if (event.action === 'edit') {
-      this.abrirEdicionEmpresa(event.data);
+      this.empresaSeleccionada = null;
+      setTimeout(() => {
+        this.modoFormulario = 'editar';
+        this.empresaSeleccionada = { ...event.data };
+        this.modalCrearVisible = true;
+      }, 0);
+      return;
+    }
+
+    if (event.action === 'link') {
+      this.empresaSeleccionada = null; // Limpiamos para forzar el refresco
+      setTimeout(() => {
+        this.modoFormulario = 'enlazar';
+        this.empresaSeleccionada = { ...event.data };
+        this.modalCrearVisible = true;
+      }, 0);
       return;
     }
 
@@ -362,6 +378,14 @@ export class EmpresasComponent implements OnInit {
       },
       error: () => {
         this.alertService.error('Error', 'No se pudo cargar la configuración del servidor.');
+      }
+    });
+  }
+
+  private cargarCiclos(): void {
+    this.ciclosService.getCiclos().subscribe({
+      next: (ciclos) => {
+        this.ciclosDisponibles = ciclos.map(c => c.siglas);
       }
     });
   }

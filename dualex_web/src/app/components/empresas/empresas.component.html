@@ -27,7 +27,7 @@
   <app-shared-datatable
     tableId="tabla-empresas"
     [dtOptions]="dtOptions"
-    [columnTitles]="puedeEditar ? ['Siglas', 'Nombre', 'Convenio', 'Inicio Convenio', 'Fin Convenio', 'Acciones'] : ['Siglas', 'Nombre', 'Convenio', 'Inicio Convenio', 'Fin Convenio']"
+    [columnTitles]="puedeEditar ? ['Siglas', 'Nombre', 'Ciclos', 'Convenio', 'Inicio Convenio', 'Fin Convenio', 'Acciones'] : ['Siglas', 'Nombre', 'Ciclos', 'Convenio', 'Inicio Convenio', 'Fin Convenio']"
     (actionClick)="onTableAction($event)">
   </app-shared-datatable>
 </div>
@@ -168,6 +168,7 @@
   <app-empresa-modal
     [modo]="modoFormulario"
     [empresa]="empresaSeleccionada"
+    [ciclosDisponibles]="ciclosDisponibles"
     (guardar)="onGuardarEmpresa($event)"
     (cancelar)="onCancelarCreacion()">
   </app-empresa-modal>

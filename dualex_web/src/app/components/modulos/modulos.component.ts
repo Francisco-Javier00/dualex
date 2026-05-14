@@ -12,13 +12,7 @@ import { Config } from 'datatables.net';
 @Component({
   selector: 'app-modulos',
   standalone: true,
-  imports: [
-    CommonModule,
-    RouterModule,
-    DatatableComponent,
-    ConfirmarBorradoModalComponent,
-    ModuloModalComponent
-  ],
+  imports: [CommonModule, RouterModule, DatatableComponent, ConfirmarBorradoModalComponent, ModuloModalComponent],
   templateUrl: './modulos.component.html'
 })
 export class ModulosComponent implements OnInit {

@@ -141,7 +141,9 @@ export interface EmpresaDTO {
   finConvenio: string;
   contacto: string;
   numeroContacto: string;
+  ciclos?: string;
   contactosAdicionales?: ContactoEmpresaDTO[];
+  ciclosInfo?: { siglas: string, tutor: string }[];
 }
 
 export interface ProfesorDTO {

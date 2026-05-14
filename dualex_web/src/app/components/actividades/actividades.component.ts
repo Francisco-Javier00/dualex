@@ -12,13 +12,7 @@ import { Config } from 'datatables.net';
 @Component({
   selector: 'app-actividades',
   standalone: true,
-  imports: [
-    CommonModule,
-    RouterModule,
-    ActividadModalComponent,
-    DatatableComponent,
-    ConfirmarBorradoModalComponent
-  ],
+  imports: [CommonModule, RouterModule, ActividadModalComponent, DatatableComponent, ConfirmarBorradoModalComponent],
   templateUrl: './actividades.component.html'
 })
 export class ActividadesComponent implements OnInit {

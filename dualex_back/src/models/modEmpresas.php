@@ -26,7 +26,7 @@ class ModEmpresas {
      */
     public function listar() {
         $sql = "SELECT idEmpresa as id, siglas, nombre, url_Convenio as convenioUrl, inicioConvenio 
-                FROM Empresa 
+                FROM empresa 
                 ORDER BY nombre";
         $stmt = $this->db->prepare($sql);
         $stmt->execute();
@@ -42,7 +42,7 @@ class ModEmpresas {
      */
     public function obtener($id) {
         $sql = "SELECT idEmpresa as id, siglas, nombre, url_Convenio as convenioUrl, inicioConvenio 
-                FROM Empresa WHERE idEmpresa = :id";
+                FROM empresa WHERE idEmpresa = :id";
         $stmt = $this->db->prepare($sql);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         $stmt->execute();
@@ -73,7 +73,7 @@ class ModEmpresas {
             $fechaMySql = $fechaPartes[2] . '-' . $fechaPartes[1] . '-' . $fechaPartes[0] . ' 00:00:00';
 
             // 1. Inserción de los datos principales de la Empresa
-            $sql = "INSERT INTO Empresa (siglas, nombre, url_Convenio, inicioConvenio) 
+            $sql = "INSERT INTO empresa (siglas, nombre, url_Convenio, inicioConvenio) 
                     VALUES (:siglas, :nombre, :url_Convenio, :inicioConvenio)";
             $stmt = $this->db->prepare($sql);
             $stmt->execute([
@@ -96,6 +96,13 @@ class ModEmpresas {
                 }
             }
 
+            // 4. Inserción iterativa de los ciclos seleccionados en ciclo_empresa
+            if (isset($datos['ciclos']) && is_array($datos['ciclos'])) {
+                foreach ($datos['ciclos'] as $siglaCiclo) {
+                    $this->insertarCicloEmpresa($idEmpresa, trim($siglaCiclo));
+                }
+            }
+
             // Confirmar transacción si todo sale bien
             $this->db->commit();
             return $this->obtener($idEmpresa); // Retornamos los datos recién guardados para Angular
@@ -105,7 +112,7 @@ class ModEmpresas {
             // Parche de seguridad: si el servidor usa el motor MyISAM en MySQL, las transacciones
             // no funcionan. Si es así, forzamos un borrado manual para que no quede la empresa huérfana.
             if (isset($idEmpresa)) {
-                $stmtDel = $this->db->prepare("DELETE FROM Empresa WHERE idEmpresa = :id");
+                $stmtDel = $this->db->prepare("DELETE FROM empresa WHERE idEmpresa = :id");
                 $stmtDel->execute([':id' => $idEmpresa]);
             }
             throw $e;
@@ -126,31 +133,48 @@ class ModEmpresas {
         try {
             $this->db->beginTransaction();
 
-            $fechaPartes = explode('/', $datos['inicioConvenio']);
-            $fechaMySql = $fechaPartes[2] . '-' . $fechaPartes[1] . '-' . $fechaPartes[0] . ' 00:00:00';
+            // 1. Actualización de los campos principales de la tabla Empresa (solo si vienen todos los datos)
+            if (isset($datos['siglas'], $datos['nombre'], $datos['convenioUrl'], $datos['inicioConvenio'])) {
+                $fechaPartes = explode('/', $datos['inicioConvenio']);
+                $fechaMySql = $fechaPartes[2] . '-' . $fechaPartes[1] . '-' . $fechaPartes[0] . ' 00:00:00';
 
-            // 1. Actualización de los campos principales de la tabla Empresa
-            $sql = "UPDATE Empresa SET siglas = :siglas, nombre = :nombre, url_Convenio = :url_Convenio, inicioConvenio = :inicioConvenio 
-                    WHERE idEmpresa = :id";
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute([
-                ':id' => $id,
-                ':siglas' => $datos['siglas'],
-                ':nombre' => $datos['nombre'],
-                ':url_Convenio' => $datos['convenioUrl'],
-                ':inicioConvenio' => $fechaMySql
-            ]);
+                $sql = "UPDATE empresa SET siglas = :siglas, nombre = :nombre, url_Convenio = :url_Convenio, inicioConvenio = :inicioConvenio 
+                        WHERE idEmpresa = :id";
+                $stmt = $this->db->prepare($sql);
+                $stmt->execute([
+                    ':id' => $id,
+                    ':siglas' => $datos['siglas'],
+                    ':nombre' => $datos['nombre'],
+                    ':url_Convenio' => $datos['convenioUrl'],
+                    ':inicioConvenio' => $fechaMySql
+                ]);
 
-            // 2. Destruimos todos los contactos atados a esta empresa
-            $stmtDel = $this->db->prepare("DELETE FROM Contacto WHERE idEmpresa = :id");
-            $stmtDel->execute([':id' => $id]);
+                // 2. Destruimos y volvemos a insertar contactos solo si vienen los datos
+                if (isset($datos['contacto'], $datos['numeroContacto'])) {
+                    $stmtDel = $this->db->prepare("DELETE FROM contacto WHERE idEmpresa = :id");
+                    $stmtDel->execute([':id' => $id]);
 
-            // 3. Volvemos a insertar toda la lista desde cero (principal + adicionales)
-            $this->insertarContacto($id, $datos['contacto'], $datos['numeroContacto'], 'Principal');
+                    $this->insertarContacto($id, $datos['contacto'], $datos['numeroContacto'], 'Principal');
 
-            if (isset($datos['contactosAdicionales']) && is_array($datos['contactosAdicionales'])) {
-                foreach ($datos['contactosAdicionales'] as $add) {
-                    $this->insertarContacto($id, $add['contacto'], $add['numeroContacto'], 'Adicional');
+                    if (isset($datos['contactosAdicionales']) && is_array($datos['contactosAdicionales'])) {
+                        foreach ($datos['contactosAdicionales'] as $add) {
+                            $this->insertarContacto($id, $add['contacto'], $add['numeroContacto'], 'Adicional');
+                        }
+                    }
+                }
+            }
+
+            // 3. Actualización de ciclos (esto siempre se intenta si vienen en el array)
+            if (isset($datos['ciclos']) && is_array($datos['ciclos'])) {
+                $stmtDelCiclos = $this->db->prepare("DELETE FROM ciclo_empresa WHERE idEmpresa = :id");
+                $stmtDelCiclos->execute([':id' => $id]);
+
+                foreach ($datos['ciclos'] as $item) {
+                    // Si viene como objeto {sigla, tutor} o solo como sigla
+                    $sigla = is_array($item) ? $item['sigla'] : $item;
+                    $tutor = is_array($item) && isset($item['tutor']) ? $item['tutor'] : null;
+                    
+                    $this->insertarCicloEmpresa($id, trim($sigla), $tutor);
                 }
             }
 
@@ -173,7 +197,7 @@ class ModEmpresas {
      * @return bool Retorna verdadero si se ejecutó correctamente el comando SQL de borrado.
      */
     public function eliminar($id) {
-        $sql = "DELETE FROM Empresa WHERE idEmpresa = :id";
+        $sql = "DELETE FROM empresa WHERE idEmpresa = :id";
         $stmt = $this->db->prepare($sql);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         return $stmt->execute();
@@ -199,10 +223,10 @@ class ModEmpresas {
         }
 
         // Obtener el recuento total de elementos en la tabla ignorando filtros
-        $total = $this->db->query("SELECT COUNT(*) FROM Empresa")->fetchColumn();
+        $total = $this->db->query("SELECT COUNT(*) FROM empresa")->fetchColumn();
 
         // Obtener el recuento aplicando la cláusula LIKE para que la paginación no se rompa al buscar
-        $sqlFiltrados = "SELECT COUNT(*) FROM Empresa e $where";
+        $sqlFiltrados = "SELECT COUNT(*) FROM empresa e $where";
         $stmtF = $this->db->prepare($sqlFiltrados);
         if ($search) $stmtF->execute([':search' => "%$search%"]);
         else $stmtF->execute();
@@ -236,7 +260,7 @@ class ModEmpresas {
 
         // Query final maestra de extracción de datos
         $sql = "SELECT e.idEmpresa as id, e.siglas, e.nombre, e.url_Convenio as convenioUrl, e.inicioConvenio 
-                FROM Empresa e 
+                FROM empresa e 
                 $where 
                 $orderBy 
                 $limit";
@@ -273,7 +297,7 @@ class ModEmpresas {
         if (empty($empresas)) return [];
 
         // Hacemos una sub-consulta rápida para saber de cuántos años es el convenio en este servidor
-        $stmtConf = $this->db->prepare("SELECT tiempo_finalizacion_convenio FROM Configuracion LIMIT 1");
+        $stmtConf = $this->db->prepare("SELECT tiempo_finalizacion_convenio FROM configuracion LIMIT 1");
         $stmtConf->execute();
         $conf = $stmtConf->fetch(PDO::FETCH_ASSOC);
         $aniosConvenio = $conf ? intval($conf['tiempo_finalizacion_convenio']) : 1;
@@ -288,8 +312,20 @@ class ModEmpresas {
             $finDt->modify("+$aniosConvenio years");
             $empresa['finConvenio'] = $finDt->format('d/m/Y');
 
+            // Obtenemos los ciclos vinculados a esta empresa
+            $sqlCiclos = "SELECT c.siglas, ce.tutor FROM ciclos c 
+                          INNER JOIN ciclo_empresa ce ON c.idCiclo = ce.idCiclo 
+                          WHERE ce.idEmpresa = :id";
+            $stmtCiclos = $this->db->prepare($sqlCiclos);
+            $stmtCiclos->execute([':id' => $empresa['id']]);
+            $ciclosRel = $stmtCiclos->fetchAll(PDO::FETCH_ASSOC);
+
+            // Guardamos la lista de objetos para el modal y un string para la tabla
+            $empresa['ciclosInfo'] = $ciclosRel;
+            $empresa['ciclos'] = count($ciclosRel) > 0 ? implode(', ', array_column($ciclosRel, 'siglas')) : 'No asignado';
+
             // Sacamos absolutamente todos los contactos asociados a esta empresa
-            $stmtC = $this->db->prepare("SELECT tfnoContacto, nombreContacto FROM Contacto WHERE idEmpresa = :id ORDER BY idContacto ASC");
+            $stmtC = $this->db->prepare("SELECT tfnoContacto, nombreContacto FROM contacto WHERE idEmpresa = :id ORDER BY idContacto ASC");
             $stmtC->execute([':id' => $empresa['id']]);
             $contactos = $stmtC->fetchAll(PDO::FETCH_ASSOC);
 
@@ -329,7 +365,7 @@ class ModEmpresas {
      * @return void
      */
     private function insertarContacto($idEmpresa, $nombre, $telefono, $titular) {
-        $sql = "INSERT INTO Contacto (idEmpresa, nombreContacto, tfnoContacto, titular) 
+        $sql = "INSERT INTO contacto (idEmpresa, nombreContacto, tfnoContacto, titular) 
                 VALUES (:idEmpresa, :nombre, :telefono, :titular)";
         $stmt = $this->db->prepare($sql);
         $stmt->execute([
@@ -338,6 +374,26 @@ class ModEmpresas {
             ':telefono' => $telefono,
             ':titular' => $titular
         ]);
+    }
+
+    /**
+     * Vincula una empresa a un ciclo específico mediante sus siglas, incluyendo opcionalmente el tutor.
+     */
+    private function insertarCicloEmpresa($idEmpresa, $siglaCiclo, $tutor = null) {
+        // Primero buscamos el ID del ciclo basándonos en la sigla
+        $stmtBusca = $this->db->prepare("SELECT idCiclo FROM ciclos WHERE siglas = :siglas LIMIT 1");
+        $stmtBusca->execute([':siglas' => $siglaCiclo]);
+        $ciclo = $stmtBusca->fetch(PDO::FETCH_ASSOC);
+
+        if ($ciclo) {
+            $sql = "INSERT INTO ciclo_empresa (idCiclo, idEmpresa, tutor) VALUES (:idC, :idE, :tutor)";
+            $stmtInsert = $this->db->prepare($sql);
+            $stmtInsert->execute([
+                ':idC' => $ciclo['idCiclo'],
+                ':idE' => $idEmpresa,
+                ':tutor' => $tutor
+            ]);
+        }
     }
 }
 ?>

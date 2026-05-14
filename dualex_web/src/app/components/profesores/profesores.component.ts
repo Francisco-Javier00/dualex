@@ -13,14 +13,7 @@ import { ProfesorDTO } from '../../dto/dualex.dto';
 @Component({
   selector: 'app-profesores',
   standalone: true,
-  imports: [
-    CommonModule, 
-    FormsModule, 
-    RouterModule, 
-    DatatableComponent, 
-    ConfirmarBorradoModalComponent,
-    ProfesorModalComponent
-  ],
+  imports: [CommonModule, FormsModule, RouterModule, DatatableComponent, ConfirmarBorradoModalComponent, ProfesorModalComponent],
   templateUrl: './profesores.component.html',
   styleUrl: './profesores.component.css'
 })

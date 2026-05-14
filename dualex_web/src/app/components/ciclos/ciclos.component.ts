@@ -8,17 +8,12 @@ import { Config } from 'datatables.net';
 import { CiclosService } from '../../services/ciclos.service';
 import { CicloDTO } from '../../dto/dualex.dto';
 import { AlertService } from '../../services/alert.service';
+import { CicloModalComponent } from '../modals/ciclo-modal/ciclo-modal.component';
 
 @Component({
   selector: 'app-ciclos',
   standalone: true,
-  imports: [
-    CommonModule,
-    RouterModule,
-    FormsModule,
-    DatatableComponent,
-    ConfirmarBorradoModalComponent
-  ],
+  imports: [CommonModule, RouterModule, FormsModule, DatatableComponent, ConfirmarBorradoModalComponent, CicloModalComponent],
   templateUrl: './ciclos.component.html',
   styleUrl: './ciclos.component.css'
 })
@@ -36,18 +31,7 @@ export class CiclosComponent implements OnInit {
 
   isEditModalOpen = false;
   isEditing = false;
-  cicloForm: any = {
-    nombre: '',
-    siglas: '',
-    grado: 'superior',
-    cursos: '',
-    anoEscolar: '',
-    colorFondo1: '#ffffff',
-    colorTexto1: '#000000',
-    colorFondo2: '#ffffff',
-    colorTexto2: '#000000'
-  };
-  editingId: number | null = null;
+  cicloSeleccionado: any = null;
 
   @ViewChild(DatatableComponent) sharedDatatable!: DatatableComponent;
 
@@ -119,65 +103,48 @@ export class CiclosComponent implements OnInit {
   abrirEditModal(ciclo?: any) {
     if (ciclo) {
       this.isEditing = true;
-      this.editingId = ciclo.id;
-      this.cicloForm = {
-        ...ciclo,
-        cursos: ciclo.cursos || this.formatearCursos(ciclo.siglas),
-      };
+      this.cicloSeleccionado = { ...ciclo };
     } else {
       this.isEditing = false;
-      this.editingId = null;
-      this.cicloForm = {
-        nombre: '',
-        siglas: '',
-        grado: 'superior',
-        cursos: '',
-      };
+      this.cicloSeleccionado = null;
     }
     this.isEditModalOpen = true;
   }
 
   cerrarEditModal() {
     this.isEditModalOpen = false;
+    this.cicloSeleccionado = null;
   }
 
-  guardarCiclo() {
-    const nombreForm = this.cicloForm.nombre?.trim().toLowerCase() || '';
-    const siglasForm = this.cicloForm.siglas?.trim().toLowerCase() || '';
+  guardarCiclo(datos: any) {
+    const nombreForm = datos.nombre?.trim().toLowerCase() || '';
+    const siglasForm = datos.siglas?.trim().toLowerCase() || '';
 
     if (!nombreForm || !siglasForm) {
       this.alertService.error('Error', 'El nombre y las siglas son obligatorios.');
       return;
     }
 
+    // Comprobar duplicados
     const duplicado = this.ciclos.find(c => {
-      if (this.isEditing && c.id === this.editingId) return false;
-      const nombreExistente = c.nombre?.trim().toLowerCase() || '';
-      const siglasExistente = c.siglas?.trim().toLowerCase() || '';
-      return nombreExistente === nombreForm || siglasExistente === siglasForm;
+      if (this.isEditing && this.cicloSeleccionado && c.id === this.cicloSeleccionado.id) return false;
+      return (c.nombre?.trim().toLowerCase() === nombreForm) || (c.siglas?.trim().toLowerCase() === siglasForm);
     });
 
     if (duplicado) {
-      this.alertService.error('Duplicado', 'Ya existe un ciclo con ese nombre o con esas siglas.');
+      this.alertService.error('Duplicado', 'Ya existe un ciclo con ese nombre o siglas.');
       return;
     }
 
-    const siglas = this.cicloForm.siglas;
-    const cicloParaGuardar = {
-      ...this.cicloForm,
-      cursos_objetos: [
-        { nombre: `1º ${siglas}`, anio_escolar: '25-26' },
-        { nombre: `2º ${siglas}`, anio_escolar: '25-26' }
-      ]
-    };
-
-    if (this.isEditing && this.editingId) {
-      this.ciclosService.updateCiclo(this.editingId, cicloParaGuardar).subscribe(() => {
+    if (this.isEditing && this.cicloSeleccionado) {
+      this.ciclosService.updateCiclo(this.cicloSeleccionado.id, datos).subscribe(() => {
+        this.alertService.exito('¡Actualizado!', 'El ciclo se ha actualizado correctamente.');
         this.cargarCiclos();
         this.cerrarEditModal();
       });
     } else {
-      this.ciclosService.addCiclo(cicloParaGuardar).subscribe(() => {
+      this.ciclosService.addCiclo(datos).subscribe(() => {
+        this.alertService.exito('¡Creado!', 'El nuevo ciclo se ha registrado correctamente.');
         this.cargarCiclos();
         this.cerrarEditModal();
       });

@@ -8,17 +8,16 @@ import { EmpresaDTO } from '../../../dto/dualex.dto';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './empresa-modal.component.html',
-  styleUrls: ['./empresa-modal.component.css']
+   styleUrl: './empresa-modal.component.css'
 })
 export class EmpresaModalComponent implements OnInit {
   private _empresa: EmpresaDTO | null = null;
-  @Input() modo: 'crear' | 'editar' = 'crear';
-
+  
   @Input() set empresa(val: EmpresaDTO | null) {
     this._empresa = val;
     if (val) {
       this.patchForm(val);
-    } else if (this.modo === 'crear') {
+    } else {
       this.resetForm();
     }
   }
@@ -27,10 +26,13 @@ export class EmpresaModalComponent implements OnInit {
     return this._empresa;
   }
 
+  @Input() modo: 'crear' | 'editar' | 'enlazar' = 'crear';
+  @Input() ciclosDisponibles: string[] = [];
   @Output() guardar = new EventEmitter<any>();
   @Output() cancelar = new EventEmitter<void>();
 
   empresaForm: FormGroup;
+  ciclosSeleccionados: { sigla: string, tutor: string }[] = [];
   
   // Patrones de validación
   urlPattern = /^https?:\/\/.*$/;
@@ -49,6 +51,19 @@ export class EmpresaModalComponent implements OnInit {
     });
   }
 
+  // Getters dinámicos para la cabecera
+  get tituloModal(): string {
+    if (this.modo === 'crear') return 'Nueva Empresa';
+    if (this.modo === 'editar') return 'Modificar Empresa';
+    return 'Enlazar Ciclos';
+  }
+
+  get iconoModal(): string {
+    if (this.modo === 'crear') return 'fa-plus-circle text-success';
+    if (this.modo === 'editar') return 'fa-pen-to-square text-primary';
+    return 'fa-link text-info';
+  }
+
   get contactosAdicionales(): FormArray {
     return this.empresaForm.get('contactosAdicionales') as FormArray;
   }
@@ -59,8 +74,9 @@ export class EmpresaModalComponent implements OnInit {
 
   private resetForm(): void {
     if (this.empresaForm) {
-      this.empresaForm.reset({rol: 'PROFESOR'});
+      this.empresaForm.reset();
       this.contactosAdicionales.clear();
+      this.ciclosSeleccionados = [];
     }
   }
 
@@ -81,7 +97,38 @@ export class EmpresaModalComponent implements OnInit {
       empresa.contactosAdicionales.forEach(c => this.addContacto(c.contacto, c.numeroContacto));
     }
 
+    // Cargamos la información detallada de los ciclos (sigla + tutor)
+    if (empresa.ciclosInfo && Array.isArray(empresa.ciclosInfo)) {
+      this.ciclosSeleccionados = empresa.ciclosInfo.map(c => ({
+        sigla: c.siglas,
+        tutor: c.tutor || ''
+      }));
+    } else {
+      this.ciclosSeleccionados = [];
+    }
+
     this.actualizarFinConvenio();
+  }
+
+  onToggleCiclo(sigla: string, checked: boolean): void {
+    if (checked) {
+      if (!this.ciclosSeleccionados.find(c => c.sigla === sigla)) {
+        this.ciclosSeleccionados.push({ sigla, tutor: '' });
+      }
+    } else {
+      this.ciclosSeleccionados = this.ciclosSeleccionados.filter(c => c.sigla !== sigla);
+    }
+  }
+
+  actualizarTutor(sigla: string, tutor: string): void {
+    const ciclo = this.ciclosSeleccionados.find(c => c.sigla === sigla);
+    if (ciclo) {
+      ciclo.tutor = tutor;
+    }
+  }
+
+  isCicloSeleccionado(sigla: string): boolean {
+    return !!this.ciclosSeleccionados.find(c => c.sigla === sigla);
   }
 
   addContacto(nombre = '', telefono = ''): void {
@@ -132,13 +179,24 @@ export class EmpresaModalComponent implements OnInit {
   }
 
   onSubmit(): void {
+    // Si estamos en modo enlazar, solo enviamos el ID y los ciclos seleccionados
+    if (this.modo === 'enlazar') {
+      const payload = {
+        id: this.empresa?.id || 0,
+        ciclos: this.ciclosSeleccionados
+      };
+      this.guardar.emit(payload);
+      return;
+    }
+
     if (this.empresaForm.valid) {
       const formValue = this.empresaForm.getRawValue();
       const payload = {
         ...formValue,
         id: this.empresa?.id || 0,
         inicioConvenio: this.formatearFechaParaGuardar(formValue.inicioConvenio),
-        finConvenio: formValue.finConvenio
+        finConvenio: formValue.finConvenio,
+        ciclos: this.ciclosSeleccionados
       };
       this.guardar.emit(payload);
     } else {

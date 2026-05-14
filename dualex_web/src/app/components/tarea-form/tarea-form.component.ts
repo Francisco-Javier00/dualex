@@ -60,12 +60,7 @@ import { SeleccionActividadesModalComponent } from '../shared/modals/seleccion-a
 @Component({
   selector: 'app-tarea-form',
   standalone: true,
-  imports: [
-    CommonModule, 
-    ReactiveFormsModule, 
-    CKEditorModule, 
-    SeleccionActividadesModalComponent
-  ],
+  imports: [CommonModule, ReactiveFormsModule, CKEditorModule, SeleccionActividadesModalComponent],
   templateUrl: './tarea-form.component.html',
   styleUrls: ['./tarea-form.component.css']
 })
