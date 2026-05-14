@@ -1,8 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map, of, tap } from 'rxjs';
-import { delay } from 'rxjs/operators';
-
+import { environment } from '../../environments/environment';
 import { ActividadDTO } from '../dto/dualex.dto';
 
 /**
@@ -16,7 +15,7 @@ export class ActividadesService {
   private http = inject(HttpClient);
 
   // URL de la API PHP (Docker Compose mapea dualex_back directamente al puerto 8080)
-  private readonly API_URL = 'http://localhost:8080/index.php';
+  private readonly API_URL = `${environment.apiUrl}/index.php`;
 
   private cacheActividades: ActividadDTO[] = [];
 
@@ -25,7 +24,7 @@ export class ActividadesService {
    */
   getActividades(): Observable<ActividadDTO[]> {
     return this.http.get<ActividadDTO[]>(`${this.API_URL}?c=Actividades&m=listar`).pipe(
-      tap(data => this.cacheActividades = data)
+      tap((data: ActividadDTO[]) => this.cacheActividades = data)
     );
   }
 
@@ -40,7 +39,7 @@ export class ActividadesService {
     // Si no tenemos cache, cargamos primero
     if (this.cacheActividades.length === 0) {
       return this.getActividades().pipe(
-        map(data => this.filtrarParaDataTables(data, start, length, search, dataTablesParameters.draw))
+        map((data: ActividadDTO[]) => this.filtrarParaDataTables(data, start, length, search, dataTablesParameters.draw))
       );
     }
 
