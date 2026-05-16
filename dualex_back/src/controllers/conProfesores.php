@@ -77,6 +77,8 @@ class ConProfesores extends BaseController {
         try {
             $nuevo = $this->modelo->crear($datos);
             return $nuevo;
+        } catch (InvalidArgumentException $e) {
+            $this->sendError($e->getMessage(), 400);
         } catch (Exception $e) {
             $this->sendError($e);
         }
@@ -104,6 +106,8 @@ class ConProfesores extends BaseController {
         try {
             $actualizado = $this->modelo->actualizar($id, $datos);
             return $actualizado;
+        } catch (InvalidArgumentException $e) {
+            $this->sendError($e->getMessage(), 400);
         } catch (Exception $e) {
             $this->sendError($e);
         }

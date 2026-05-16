@@ -30,20 +30,6 @@ export class ProfesoresComponent implements OnInit {
   profesorEditandoId: number | null = null;
   profesorSeleccionado: ProfesorDTO | null = null;
   archivoExcelSeleccionado: File | null = null;
-  nuevoProfesor = {
-    nombre: '',
-    apellidos: '',
-    correo: '',
-    rol: 'PROFESOR' as 'PROFESOR' | 'COORDINADOR',
-    ciclos: [] as string[]
-  };
-
-  ciclosDisponibles = this.profesoresService.ciclosDisponibles;
-  private readonly mapeoCiclos: Record<string, string> = {
-    'SMR': 'Sistemas Microinformáticos y Redes',
-    'DAW': 'Desarrollo de Aplicaciones Web',
-    'GA': 'Gestión Administrativa'
-  };
 
   ngOnInit(): void {
     this.dtOptions = {
@@ -65,8 +51,24 @@ export class ProfesoresComponent implements OnInit {
         { data: 'apellidos' },
         { data: 'correo' },
         { data: 'rol' },
-        { data: 'modulos', defaultContent: '' },
-        { data: 'ciclos', defaultContent: '' },
+        {
+          data: 'modulos',
+          render: (data: any, type: any, row: any) => {
+            if (data && data.trim() !== '') return data;
+            return row?.rol === 'COORDINADOR'
+              ? '<span class="text-muted opacity-50 italic small">Sin módulos asignados</span>'
+              : '<span class="text-muted opacity-50 italic small">No imparte módulos</span>';
+          }
+        },
+        {
+          data: 'ciclos',
+          render: (data: any, type: any, row: any) => {
+            if (data && data.trim() !== '') return data;
+            return row?.rol === 'COORDINADOR'
+              ? '<span class="text-muted opacity-50 italic small">Sin ciclos coordinados</span>'
+              : '<span class="text-muted opacity-50 italic small">No coordina ciclos</span>';
+          }
+        },
         {
           data: null,
           orderable: false,
@@ -161,7 +163,8 @@ export class ProfesoresComponent implements OnInit {
         this.datatable?.refrescar();
       },
       error: (err: any) => {
-        this.alertService.error('Error', err.error?.message || 'Error al procesar el profesor.');
+        const errorMsg = err.error?.error || err.error?.message || 'Error al procesar el profesor.';
+        this.alertService.error('Error', errorMsg);
       }
     });
   }
@@ -185,56 +188,6 @@ export class ProfesoresComponent implements OnInit {
     this.profesorSeleccionado = null;
   }
 
-  onToggleCiclo(ciclo: string, checked: boolean): void {
-    if (checked) {
-      if (!this.nuevoProfesor.ciclos.includes(ciclo)) {
-        this.nuevoProfesor.ciclos = [...this.nuevoProfesor.ciclos, ciclo];
-      }
-      return;
-    }
-
-    this.nuevoProfesor.ciclos = this.nuevoProfesor.ciclos.filter(item => item !== ciclo);
-  }
-
-  guardarNuevoProfesor(): void {
-    if (
-      !this.nuevoProfesor.nombre.trim() ||
-      !this.nuevoProfesor.apellidos.trim() ||
-      !this.nuevoProfesor.correo.trim() ||
-      this.nuevoProfesor.ciclos.length === 0
-    ) {
-      this.alertService.error('Datos incompletos', 'Rellena todos los campos y selecciona al menos un ciclo antes de guardar.');
-      return;
-    }
-
-    const profesorPayload = {
-      nombre: this.nuevoProfesor.nombre.trim(),
-      apellidos: this.nuevoProfesor.apellidos.trim(),
-      correo: this.nuevoProfesor.correo.trim(),
-      rol: this.nuevoProfesor.rol as 'PROFESOR' | 'COORDINADOR',
-      modulos: 'S.I., SER., B.D.',
-      ciclos: this.convertirCiclosAAbreviaturas(this.nuevoProfesor.ciclos)
-    };
-
-    const obs = (this.modoFormulario === 'editar' && this.profesorEditandoId !== null)
-      ? this.profesoresService.actualizarProfesor(this.profesorEditandoId, profesorPayload)
-      : this.profesoresService.agregarProfesor(profesorPayload);
-
-    obs.subscribe({
-      next: () => {
-        const titulo = this.modoFormulario === 'editar' ? 'Profesor actualizado' : 'Profesor creado';
-        const msg = `${this.nuevoProfesor.nombre} ${this.nuevoProfesor.apellidos} se ha guardado correctamente.`;
-        this.alertService.exito(titulo, msg);
-        this.modalCrearVisible = false;
-        this.profesorEditandoId = null;
-        this.refrescarTabla();
-      },
-      error: (err) => {
-        this.alertService.error('Error', err.error?.message || 'No se pudo procesar la solicitud.');
-      }
-    });
-  }
-
   onCancelarCreacion(): void {
     this.modalCrearVisible = false;
     this.profesorEditandoId = null;
@@ -245,26 +198,6 @@ export class ProfesoresComponent implements OnInit {
     this.modoFormulario = 'editar';
     this.profesorSeleccionado = { ...profesor };
     this.modalCrearVisible = true;
-  }
-
-  private convertirAbreviaturasACiclos(ciclos: string): string[] {
-    if (!ciclos.trim()) return [];
-
-    return ciclos
-      .split(',')
-      .map(ciclo => ciclo.trim())
-      .map(ciclo => this.mapeoCiclos[ciclo] ?? ciclo)
-      .filter(ciclo => this.ciclosDisponibles.includes(ciclo));
-  }
-
-  private convertirCiclosAAbreviaturas(ciclos: string[]): string {
-    const inverso: Record<string, string> = {
-      'Sistemas Microinformáticos y Redes': 'SMR',
-      'Desarrollo de Aplicaciones Web': 'DAW',
-      'Gestión Administrativa': 'GA'
-    };
-
-    return ciclos.map(ciclo => inverso[ciclo] ?? ciclo).join(', ');
   }
 
   private refrescarTabla(): void {

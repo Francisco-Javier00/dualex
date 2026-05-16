@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { DatatableComponent } from '../shared/datatable/datatable.component';
@@ -12,6 +12,7 @@ import { AlumnoDTO, CursoDTO } from '../../dto/dualex.dto';
 import { AlertService } from '../../services/alert.service';
 import { Config } from 'datatables.net';
 import { AuthService } from '../../auth/services/auth.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-alumnos',
@@ -19,7 +20,7 @@ import { AuthService } from '../../auth/services/auth.service';
   imports: [CommonModule, RouterModule, DatatableComponent, ConfirmarBorradoModalComponent, AlumnoModalComponent],
   templateUrl: './alumnos.component.html'
 })
-export class AlumnosComponent implements OnInit {
+export class AlumnosComponent implements OnInit, OnDestroy {
   private alumnosService = inject(AlumnosService);
   private modulosService = inject(ModulosService);
   private profesoresService = inject(ProfesoresService);
@@ -41,8 +42,18 @@ export class AlumnosComponent implements OnInit {
 
   // Lista de cursos que el coordinador gestiona
   cursosGestionados: number[] = [];
+  private suscripcionUsuario?: Subscription;
+  rolUsuarioActual: string | null = null;
+
+  get puedeGestionarAlumnos(): boolean {
+    return this.rolUsuarioActual === 'COORDINADOR';
+  }
 
   ngOnInit(): void {
+    this.suscripcionUsuario = this.authService.perfilUsuario$.subscribe(perfil => {
+      this.rolUsuarioActual = perfil?.rol ?? null;
+    });
+
     const usuarioActual = this.authService.currentUserValue;
 
     // Si es coordinador, obtenemos sus cursos antes de inicializar la tabla
@@ -92,13 +103,11 @@ export class AlumnosComponent implements OnInit {
           dataTablesParameters.idModulo = this.moduloId;
         }
 
-        // Obtener el email del usuario logueado mediante AuthService
         const usuarioActual = this.authService.currentUserValue;
         if (usuarioActual && usuarioActual.email) {
           dataTablesParameters.emailProfesor = usuarioActual.email;
         }
 
-        // Si tenemos cursos filtrados para el coordinador, los enviamos
         if (this.cursosGestionados.length > 0) {
           dataTablesParameters.idsCursos = this.cursosGestionados;
         }
@@ -129,12 +138,14 @@ export class AlumnosComponent implements OnInit {
               <button class="btn btn-sm btn-outline-success shadow-sm" data-action="tasks" title="Ver Tareas">
                 <i class="fa-solid fa-clipboard-list"></i>
               </button>
-              <button class="btn btn-sm btn-outline-primary shadow-sm" data-action="edit" title="Editar">
-                <i class="fa-solid fa-user-pen"></i>
-              </button>
-              <button class="btn btn-sm btn-outline-danger shadow-sm" data-action="delete" title="Eliminar">
-                <i class="fa-solid fa-user-minus"></i>
-              </button>
+              ${this.puedeGestionarAlumnos ? `
+                <button class="btn btn-sm btn-outline-primary shadow-sm" data-action="edit" title="Editar">
+                  <i class="fa-solid fa-user-pen"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-danger shadow-sm" data-action="delete" title="Eliminar">
+                  <i class="fa-solid fa-user-minus"></i>
+                </button>
+              ` : ''}
             </div>
           `
         }
@@ -151,7 +162,7 @@ export class AlumnosComponent implements OnInit {
         zeroRecords: 'No se encontraron coincidencias',
         paginate: {
           first: 'Primero',
-          last: 'Último',
+          last: 'Ãšltimo',
           next: 'Siguiente',
           previous: 'Anterior'
         }
@@ -162,19 +173,31 @@ export class AlumnosComponent implements OnInit {
   }
 
   crearNuevo(): void {
+    if (!this.puedeGestionarAlumnos) {
+      return;
+    }
     this.alumnoSeleccionado = null;
     this.modalAlumnoVisible = true;
   }
 
   importarExcel(): void {
-    this.alertService.informacion('Importar Excel', 'Aquí podrás seleccionar un archivo Excel (.xls o .xlsx) para cargar alumnos de forma masiva.');
+    if (!this.puedeGestionarAlumnos) {
+      return;
+    }
+    this.alertService.informacion('Importar Excel', 'AquÃ­ podrÃ¡s seleccionar un archivo Excel (.xls o .xlsx) para cargar alumnos de forma masiva.');
   }
 
   onTableAction(event: { action: string, data: any }): void {
     if (event.action === 'edit') {
+      if (!this.puedeGestionarAlumnos) {
+        return;
+      }
       this.alumnoSeleccionado = { ...event.data };
       this.modalAlumnoVisible = true;
     } else if (event.action === 'delete') {
+      if (!this.puedeGestionarAlumnos) {
+        return;
+      }
       this.alumnoSeleccionado = event.data;
       this.modalBorradoVisible = true;
     } else if (event.action === 'tasks') {
@@ -183,6 +206,9 @@ export class AlumnosComponent implements OnInit {
   }
 
   onConfirmarBorrado(): void {
+    if (!this.puedeGestionarAlumnos) {
+      return;
+    }
     if (this.alumnoSeleccionado) {
       this.alumnosService.deleteAlumno(this.alumnoSeleccionado.id).subscribe(() => {
         this.alertService.exito('Alumno Eliminado', `El estudiante ${this.alumnoSeleccionado?.nombre} ha sido dado de baja correctamente.`);
@@ -199,6 +225,9 @@ export class AlumnosComponent implements OnInit {
   }
 
   onGuardarAlumno(alumno: AlumnoDTO): void {
+    if (!this.puedeGestionarAlumnos) {
+      return;
+    }
     if (alumno.id) {
       this.alumnosService.updateAlumno(alumno).subscribe({
         next: () => {
@@ -229,5 +258,9 @@ export class AlumnosComponent implements OnInit {
   onCerrarModal(): void {
     this.modalAlumnoVisible = false;
     this.alumnoSeleccionado = null;
+  }
+
+  ngOnDestroy(): void {
+    this.suscripcionUsuario?.unsubscribe();
   }
 }
