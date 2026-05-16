@@ -104,7 +104,7 @@ class ConModulos extends BaseController {
     }
 
     public function eliminar() {
-        // $this->checkRole(['COORDINADOR']);
+        $this->checkRole(['COORDINADOR']);
         $id = $_GET['id'] ?? null;
         if (!$id) {
             $this->sendError("ID no proporcionado.", 400);

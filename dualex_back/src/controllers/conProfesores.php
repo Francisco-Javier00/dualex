@@ -17,9 +17,12 @@ class ConProfesores extends BaseController {
      * Devuelve el listado completo de profesores (para selects o listas simples).
      */
     public function listar() {
-        // En producción se podría restringir por rol
-        // $this->checkRole(['PROFESOR', 'COORDINADOR']);
-        return $this->modelo->listar();
+        try {
+            $data = $this->modelo->listar();
+            $this->sendResponse($data);
+        } catch (Exception $e) {
+            $this->sendError($e);
+        }
     }
 
     /**
@@ -29,28 +32,37 @@ class ConProfesores extends BaseController {
         $id = $_GET['id'] ?? null;
         $correo = $_GET['correo'] ?? null;
 
-        if ($id) {
-            $profesor = $this->modelo->obtener($id);
-        } elseif ($correo) {
-            $profesor = $this->modelo->obtenerPorCorreo($correo);
-        } else {
-            $this->sendError("ID o correo no proporcionado", 400);
-        }
+        try {
+            if ($id) {
+                $profesor = $this->modelo->obtener($id);
+            } elseif ($correo) {
+                $profesor = $this->modelo->obtenerPorCorreo($correo);
+            } else {
+                $this->sendError("ID o correo no proporcionado", 400);
+            }
 
-        if (!$profesor) {
-            $this->sendError("Profesor no encontrado", 404);
-        }
+            if (!$profesor) {
+                $this->sendError("Profesor no encontrado", 404);
+            }
 
-        return $profesor;
+            $this->sendResponse($profesor);
+        } catch (Exception $e) {
+            $this->sendError($e);
+        }
     }
 
     /**
      * Punto de entrada para la carga de datos de DataTables.
      */
     public function obtenerDataTables() {
-        $json = file_get_contents('php://input');
-        $params = json_decode($json, true) ?: [];
-        return $this->modelo->obtenerDataTables($params);
+        try {
+            $json = file_get_contents('php://input');
+            $params = json_decode($json, true) ?: [];
+            $data = $this->modelo->obtenerDataTables($params);
+            $this->sendResponse($data);
+        } catch (Exception $e) {
+            $this->sendError($e);
+        }
     }
 
     /**

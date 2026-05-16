@@ -12,8 +12,24 @@ class ModProfesores {
     }
 
     /**
-     * Obtiene el listado completo de profesores procesados para DataTables.
+     * Devuelve el listado completo de profesores (sin paginación).
      */
+    public function listar() {
+        $sql = "SELECT u.idUsuario as id, u.nombre, u.apellidos, u.correo, c.idCoordinador
+                FROM Usuarios u
+                JOIN Profesor p ON u.idUsuario = p.idProfesor
+                LEFT JOIN Coordinador c ON p.idProfesor = c.idCoordinador
+                WHERE u.tipo = 'P'
+                ORDER BY u.apellidos, u.nombre";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
+        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        foreach ($data as &$row) {
+            $this->cargarInformacionRelacionada($row);
+        }
+        return $data;
+    }
     public function obtenerDataTables($params) {
         $start = (int)($params['start'] ?? 0);
         $length = (int)($params['length'] ?? 10);
@@ -38,7 +54,7 @@ class ModProfesores {
         $recordsFiltered = $stmtFilter->fetch(PDO::FETCH_ASSOC)['total'];
 
         // 3. Obtención de datos con paginación
-        $sqlData = "SELECT 
+        $sqlData = "SELECT u.idUsuario as id, u.nombre, u.apellidos, u.correo, c.idCoordinador
                     FROM Usuarios u
                     JOIN Profesor p ON u.idUsuario = p.idProfesor
                     LEFT JOIN Coordinador c ON p.idProfesor = c.idCoordinador
