@@ -8,9 +8,10 @@ class ModTareas {
     }
 
     public function listar() {
-        $sql = "SELECT t.*, a.nombre as nombre_alumno, a.apellidos as apellidos_alumno 
-                FROM tareas t 
-                JOIN alumnos a ON t.id_alumno = a.id 
+        $sql = "SELECT t.*, u.nombre as nombre_alumno, u.apellidos as apellidos_alumno 
+                FROM Tareas t 
+                JOIN Alumnos a ON t.id_alumno = a.idAlumnos
+                JOIN Usuarios u ON a.idAlumnos = u.idUsuario
                 ORDER BY t.id DESC";
         $stmt = $this->db->prepare($sql);
         $stmt->execute();
@@ -18,7 +19,7 @@ class ModTareas {
     }
 
     public function listarPorAlumno($idAlumno) {
-        $sql = "SELECT * FROM tareas WHERE id_alumno = :id_alumno ORDER BY id DESC";
+        $sql = "SELECT * FROM Tareas WHERE id_alumno = :id_alumno ORDER BY id DESC";
         $stmt = $this->db->prepare($sql);
         $stmt->bindParam(':id_alumno', $idAlumno, PDO::PARAM_INT);
         $stmt->execute();
@@ -26,7 +27,7 @@ class ModTareas {
     }
 
     public function obtener($id) {
-        $sql = "SELECT * FROM tareas WHERE id = :id";
+        $sql = "SELECT * FROM Tareas WHERE id = :id";
         $stmt = $this->db->prepare($sql);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         $stmt->execute();
@@ -34,7 +35,7 @@ class ModTareas {
     }
 
     public function crear($datos) {
-        $sql = "INSERT INTO tareas (id_alumno, titulo, descripcion, modulos, fecha_ini, fecha_fin, calificacion, progreso_actual, progreso_total) 
+        $sql = "INSERT INTO Tareas (id_alumno, titulo, descripcion, modulos, fecha_ini, fecha_fin, calificacion, progreso_actual, progreso_total) 
                 VALUES (:id_alumno, :titulo, :descripcion, :modulos, :fecha_ini, :fecha_fin, :calificacion, :prog_act, :prog_tot)";
         $stmt = $this->db->prepare($sql);
         
@@ -58,7 +59,7 @@ class ModTareas {
     public function actualizar($id, $datos) {
         $modulosStr = is_array($datos['modulos']) ? implode(', ', $datos['modulos']) : $datos['modulos'];
         
-        $sql = "UPDATE tareas SET 
+        $sql = "UPDATE Tareas SET 
                 titulo = :titulo, descripcion = :descripcion, modulos = :modulos, 
                 fecha_ini = :fecha_ini, fecha_fin = :fecha_fin, calificacion = :calificacion, 
                 progreso_actual = :prog_act, progreso_total = :prog_tot 
@@ -79,7 +80,7 @@ class ModTareas {
     }
 
     public function eliminar($id) {
-        $sql = "DELETE FROM tareas WHERE id = :id";
+        $sql = "DELETE FROM Tareas WHERE id = :id";
         $stmt = $this->db->prepare($sql);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         return $stmt->execute();

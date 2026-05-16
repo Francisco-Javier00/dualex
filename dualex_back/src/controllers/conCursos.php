@@ -41,7 +41,7 @@ class ConCursos extends BaseController {
     }
 
     public function crear() {
-        // $this->checkRole(['COORDINADOR']);
+        $this->checkRole(['COORDINADOR']);
         $json = file_get_contents('php://input');
         $datos = json_decode($json, true);
         if (!$datos) {
@@ -56,7 +56,7 @@ class ConCursos extends BaseController {
     }
 
     public function actualizar() {
-        // $this->checkRole(['COORDINADOR']);
+        $this->checkRole(['COORDINADOR']);
         $id = $_GET['id'] ?? null;
         if (!$id) {
             $this->sendError("ID no proporcionado.", 400);
@@ -72,7 +72,7 @@ class ConCursos extends BaseController {
     }
 
     public function eliminar() {
-        // $this->checkRole(['COORDINADOR']);
+        $this->checkRole(['COORDINADOR']);
         $id = $_GET['id'] ?? null;
         if (!$id) {
             $this->sendError("ID no proporcionado.", 400);
