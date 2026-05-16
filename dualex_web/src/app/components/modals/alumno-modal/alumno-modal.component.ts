@@ -21,7 +21,7 @@ export class AlumnoModalComponent implements OnInit, OnChanges {
 
   @Input() alumno: AlumnoDTO | null = null;
   @Input() visible = false;
-  
+
   @Output() cerrar = new EventEmitter<void>();
   @Output() guardar = new EventEmitter<AlumnoDTO>();
 
@@ -92,7 +92,7 @@ export class AlumnoModalComponent implements OnInit, OnChanges {
       const alumnoData = { ...this.alumno };
       if (alumnoData.idCurso) alumnoData.idCurso = Number(alumnoData.idCurso);
       if (alumnoData.idEmpresa) alumnoData.idEmpresa = Number(alumnoData.idEmpresa);
-      
+
       // Mantenemos el pequeño retardo para asegurar que Angular ha renderizado los <option>
       setTimeout(() => {
         this.alumnoForm.patchValue(alumnoData);

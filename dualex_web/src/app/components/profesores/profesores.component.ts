@@ -169,11 +169,15 @@ export class ProfesoresComponent implements OnInit {
   onConfirmarBorrado(): void {
     if (!this.profesorSeleccionado) return;
 
-    this.profesoresService.eliminarProfesor(this.profesorSeleccionado.id);
-    this.alertService.exito('Profesor eliminado', `${this.profesorSeleccionado.nombre} ${this.profesorSeleccionado.apellidos} ha sido eliminado.`);
-    this.modalBorradoVisible = false;
-    this.profesorSeleccionado = null;
-    this.refrescarTabla();
+    this.profesoresService.eliminarProfesor(this.profesorSeleccionado.id).subscribe({
+      next: () => {
+        this.alertService.exito('Profesor eliminado', `${this.profesorSeleccionado!.nombre} ${this.profesorSeleccionado!.apellidos} ha sido eliminado.`);
+        this.modalBorradoVisible = false;
+        this.profesorSeleccionado = null;
+        this.refrescarTabla();
+      },
+      error: (err) => this.alertService.error('Error', err.error?.message || 'No se pudo eliminar al profesor.')
+    });
   }
 
   onCancelarBorrado(): void {
@@ -212,17 +216,23 @@ export class ProfesoresComponent implements OnInit {
       ciclos: this.convertirCiclosAAbreviaturas(this.nuevoProfesor.ciclos)
     };
 
-    if (this.modoFormulario === 'editar' && this.profesorEditandoId !== null) {
-      this.profesoresService.actualizarProfesor(this.profesorEditandoId, profesorPayload);
-      this.alertService.exito('Profesor actualizado', `${this.nuevoProfesor.nombre} ${this.nuevoProfesor.apellidos} se ha actualizado correctamente.`);
-    } else {
-      this.profesoresService.agregarProfesor(profesorPayload);
-      this.alertService.exito('Profesor creado', `${this.nuevoProfesor.nombre} ${this.nuevoProfesor.apellidos} se ha añadido correctamente.`);
-    }
+    const obs = (this.modoFormulario === 'editar' && this.profesorEditandoId !== null)
+      ? this.profesoresService.actualizarProfesor(this.profesorEditandoId, profesorPayload)
+      : this.profesoresService.agregarProfesor(profesorPayload);
 
-    this.modalCrearVisible = false;
-    this.profesorEditandoId = null;
-    this.refrescarTabla();
+    obs.subscribe({
+      next: () => {
+        const titulo = this.modoFormulario === 'editar' ? 'Profesor actualizado' : 'Profesor creado';
+        const msg = `${this.nuevoProfesor.nombre} ${this.nuevoProfesor.apellidos} se ha guardado correctamente.`;
+        this.alertService.exito(titulo, msg);
+        this.modalCrearVisible = false;
+        this.profesorEditandoId = null;
+        this.refrescarTabla();
+      },
+      error: (err) => {
+        this.alertService.error('Error', err.error?.message || 'No se pudo procesar la solicitud.');
+      }
+    });
   }
 
   onCancelarCreacion(): void {

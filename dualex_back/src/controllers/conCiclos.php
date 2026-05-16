@@ -45,7 +45,7 @@ class ConCiclos extends BaseController {
             $res = $this->modelo->crear($datos);
             $this->sendResponse($res, 201);
         } catch (Exception $e) {
-            $this->sendError("Error al crear el ciclo: " . $e->getMessage(), 500);
+            $this->sendError($e);
         }
     }
 
@@ -62,7 +62,7 @@ class ConCiclos extends BaseController {
             $res = $this->modelo->actualizar($id, $datos);
             $this->sendResponse($res);
         } catch (Exception $e) {
-            $this->sendError("Error al actualizar el ciclo: " . $e->getMessage(), 500);
+            $this->sendError($e);
         }
     }
 

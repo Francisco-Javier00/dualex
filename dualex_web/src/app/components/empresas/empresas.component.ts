@@ -233,7 +233,7 @@ export class EmpresasComponent implements OnInit {
         this.empresaSeleccionada = null;
         this.refrescarTabla();
       },
-      error: () => this.alertService.error('Error', 'No se pudo eliminar la empresa')
+      error: (err) => this.alertService.error('Error', err.error?.message || 'No se pudo eliminar la empresa')
     });
   }
 
@@ -335,7 +335,7 @@ export class EmpresasComponent implements OnInit {
           this.alertService.exito('Empresa actualizada', `${payload.nombre} se ha actualizado correctamente.`);
           this.cerrarModalYRefrescar();
         },
-        error: () => this.alertService.error('Error', 'No se pudo actualizar la empresa')
+        error: (err) => this.alertService.error('Error', err.error?.message || 'No se pudo actualizar la empresa')
       });
     } else {
       this.empresasService.agregarEmpresa(payload).subscribe({
@@ -343,7 +343,7 @@ export class EmpresasComponent implements OnInit {
           this.alertService.exito('Empresa creada', `${payload.nombre} se ha añadido correctamente.`);
           this.cerrarModalYRefrescar();
         },
-        error: () => this.alertService.error('Error', 'No se pudo crear la empresa')
+        error: (err) => this.alertService.error('Error', err.error?.message || 'No se pudo crear la empresa')
       });
     }
   }

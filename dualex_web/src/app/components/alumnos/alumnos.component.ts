@@ -38,13 +38,13 @@ export class AlumnosComponent implements OnInit {
   moduloId: string | null = null;
   nombreModulo: string | null = null;
   moduloObj: any = null;
-  
+
   // Lista de cursos que el coordinador gestiona
   cursosGestionados: number[] = [];
 
   ngOnInit(): void {
     const usuarioActual = this.authService.currentUserValue;
-    
+
     // Si es coordinador, obtenemos sus cursos antes de inicializar la tabla
     if (usuarioActual && usuarioActual.rol === 'COORDINADOR' && usuarioActual.email) {
       this.profesoresService.getProfesorByEmail(usuarioActual.email).subscribe({

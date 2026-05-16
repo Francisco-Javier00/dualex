@@ -27,9 +27,6 @@ class ConAlumnos extends BaseController {
     }
 
     public function obtenerDataTables() {
-        // Log temporal para ver qué tiene el usuario
-        file_put_contents('debug_user.txt', "User Session: " . json_encode($this->user) . "\n", FILE_APPEND);
-
         // 1. Capturar parámetros del cuerpo JSON (POST)
         $json = file_get_contents('php://input');
         $params = json_decode($json, true) ?? [];
@@ -68,7 +65,7 @@ class ConAlumnos extends BaseController {
             $res = $this->modelo->crear($datos);
             $this->sendResponse($res, 201);
         } catch (Exception $e) {
-            $this->sendError($e->getMessage(), 500);
+            $this->sendError($e);
         }
     }
 
@@ -91,7 +88,7 @@ class ConAlumnos extends BaseController {
             $res = $this->modelo->actualizar($id, $datos);
             $this->sendResponse($res);
         } catch (Exception $e) {
-            $this->sendError($e->getMessage(), 500);
+            $this->sendError($e);
         }
     }
 

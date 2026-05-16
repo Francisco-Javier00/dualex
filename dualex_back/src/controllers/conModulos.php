@@ -52,7 +52,7 @@ class ConModulos extends BaseController {
             $res = $this->modelo->crear($datos);
             $this->sendResponse($res, 201);
         } catch (Exception $e) {
-            $this->sendError($e->getMessage(), 500);
+            $this->sendError($e);
         }
     }
 
@@ -73,7 +73,7 @@ class ConModulos extends BaseController {
             $res = $this->modelo->actualizar($id, $datos);
             $this->sendResponse($res);
         } catch (Exception $e) {
-            $this->sendError($e->getMessage(), 500);
+            $this->sendError($e);
         }
     }
 
