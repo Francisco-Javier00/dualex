@@ -20,7 +20,7 @@ export class PruebasSistemaComponent implements OnInit {
 
   abierto = false;
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
+  constructor(@Inject(PLATFORM_ID) private platformId: Object) { }
 
   ngOnInit() {
     // Si no estamos en desarrollo, no hacemos nada
@@ -38,7 +38,7 @@ export class PruebasSistemaComponent implements OnInit {
     const token = this.authService.getCookieNativa(COOKIE_NAME);
     const urlParams = new URLSearchParams(window.location.search);
     const devRoleForce = urlParams.get('devRole');
-    
+
     const payload = token ? this.authService.decodificarJwt(token) : null;
     const rolActual = payload ? payload.roles?.dualex : null;
 
@@ -50,7 +50,7 @@ export class PruebasSistemaComponent implements OnInit {
     if (tokenInvalido || cambioRolForzado || esNombreAntiguo) {
       const rol = (devRoleForce || rolActual || 'COORDINADOR').toUpperCase();
       console.warn(`[Modo Dev] Sincronizando sesión para rol: ${rol}`);
-      
+
       const nuevoToken = await this.generarTokenDevReal(rol);
       this.authService.setCookieNativa(COOKIE_NAME, nuevoToken);
 
@@ -71,7 +71,7 @@ export class PruebasSistemaComponent implements OnInit {
   async cambiarRolUsuario(rol: string) {
     const nuevoToken = await this.generarTokenDevReal(rol.toUpperCase());
     this.authService.setCookieNativa('dualex_jwt', nuevoToken);
-    
+
     // Redirigir a la página de inicio del rol correspondiente
     // Usamos window.location.href para forzar la recarga total de la app con el nuevo token
     const targetUrl = (rol.toUpperCase() === 'ALUMNO') ? '/tareas' : '/dashboard';
@@ -89,20 +89,20 @@ export class PruebasSistemaComponent implements OnInit {
     let apellidos = 'Díaz del Castillo';
 
     if (rol === 'PROFESOR') {
-      nombre = 'Juan';
-      apellidos = 'Martínez López';
+      nombre = 'Santiago';
+      apellidos = 'Pizarro Pizarro';
     } else if (rol === 'ALUMNO') {
       nombre = 'Francisco Javier';
       apellidos = 'Martínez Fernández';
     }
 
     const header = toBase64Url(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
-    
+
     const payloadStr = JSON.stringify({
       id: 1,
       nombre,
       apellidos,
-      email: rol === 'PROFESOR' ? 'juan@fp.es' : `dev.${rol.toLowerCase()}@dualex.es`,
+      email: `dev.${rol.toLowerCase()}@dualex.es`,
       foto: null,
       roles: { dualex: rol.toLowerCase() },
       iat: Math.floor(Date.now() / 1000),
@@ -110,10 +110,10 @@ export class PruebasSistemaComponent implements OnInit {
     });
 
     const payload = toBase64Url(toUtf8Binary(payloadStr));
-    
+
     const secret = 'DEFAULT_SECRET_DUALEX_DEV';
     const signature = await this.firmarHmacSha256(`${header}.${payload}`, secret);
-    
+
     return `${header}.${payload}.${signature}`;
   }
 
@@ -131,7 +131,7 @@ export class PruebasSistemaComponent implements OnInit {
   }
 
   probarAlerta(tipo: 'success' | 'danger' | 'info') {
-    switch(tipo) {
+    switch (tipo) {
       case 'success': this.servicioAlertas.exito('Éxito', 'Operación completada correctamente'); break;
       case 'danger': this.servicioAlertas.error('Error', 'Ha ocurrido un error inesperado'); break;
       case 'info': this.servicioAlertas.informacion('Información', 'Este es un mensaje informativo'); break;

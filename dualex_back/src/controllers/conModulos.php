@@ -10,8 +10,12 @@ class ConModulos extends BaseController {
     }
 
     public function listar() {
-        $data = $this->modelo->listar();
-        $this->sendResponse($data);
+        try {
+            $data = $this->modelo->listar();
+            $this->sendResponse($data);
+        } catch (Exception $e) {
+            $this->sendError($e);
+        }
     }
 
     public function listarPorCiclo() {
@@ -20,8 +24,12 @@ class ConModulos extends BaseController {
             $this->sendError("Siglas de ciclo no proporcionadas.", 400);
         }
 
-        $data = $this->modelo->listarPorCiclo($siglasCiclo);
-        $this->sendResponse($data);
+        try {
+            $data = $this->modelo->listarPorCiclo($siglasCiclo);
+            $this->sendResponse($data);
+        } catch (Exception $e) {
+            $this->sendError($e);
+        }
     }
 
     public function obtener() {
@@ -29,11 +37,15 @@ class ConModulos extends BaseController {
         if (!$id) {
             $this->sendError("ID no proporcionado.", 400);
         }
-        $data = $this->modelo->obtener($id);
-        if (!$data) {
-            $this->sendError("Módulo no encontrado.", 404);
+        try {
+            $data = $this->modelo->obtener($id);
+            if (!$data) {
+                $this->sendError("Módulo no encontrado.", 404);
+            }
+            $this->sendResponse($data);
+        } catch (Exception $e) {
+            $this->sendError($e);
         }
-        $this->sendResponse($data);
     }
 
     public function obtenerDataTables() {
@@ -45,8 +57,12 @@ class ConModulos extends BaseController {
             $params['idCoordinador'] = $this->user['id'];
         }
 
-        $data = $this->modelo->obtenerDataTables($params);
-        $this->sendResponse($data);
+        try {
+            $data = $this->modelo->obtenerDataTables($params);
+            $this->sendResponse($data);
+        } catch (Exception $e) {
+            $this->sendError($e);
+        }
     }
 
     public function crear() {
@@ -98,8 +114,23 @@ class ConModulos extends BaseController {
     }
 
     public function listarProfesor() {
-        $emailProfesor = $_GET['emailProfesor'] ?? ($this->user['email'] ?? ($this->user['correo'] ?? null));
-        $data = $this->modelo->obtenerModulosProfesor($emailProfesor);
-        $this->sendResponse($data);
+        try {
+            // Protección contra acceso a offset en null si el usuario no está autenticado
+            $emailToken = null;
+            if ($this->user) {
+                $emailToken = $this->user['email'] ?? ($this->user['correo'] ?? null);
+            }
+            
+            $emailProfesor = $_GET['emailProfesor'] ?? $emailToken;
+            
+            if (!$emailProfesor) {
+                $this->sendError("Identificación de profesor no proporcionada.", 400);
+            }
+
+            $data = $this->modelo->obtenerModulosProfesor($emailProfesor);
+            $this->sendResponse($data);
+        } catch (Exception $e) {
+            $this->sendError($e);
+        }
     }
 }
