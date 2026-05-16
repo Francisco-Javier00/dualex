@@ -1,61 +1,105 @@
-.modal {
-  background-color: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(5px);
-  transition: all 0.3s ease-in-out;
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1055;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.modal-content {
+  background: white;
+  width: 95%;
+  max-width: 900px;
+  border-radius: 1.25rem;
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: none;
+}
+
+.form-select {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .modal-header {
-  background: linear-gradient(135deg, #1565C0 0%, #0D47A1 100%);
-  border-bottom: none;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.input-group-text {
+  border-right: 1px solid #f0f0f0 !important;
+  min-width: 46px;
+  justify-content: center;
+}
+
+.modal-body {
+  padding: 1.5rem;
+  background-color: white;
 }
 
 .form-control, .form-select {
-  border: 1px solid #dee2e6;
-  border-radius: 8px;
-  padding: 0.6rem 1rem;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  font-size: 0.95rem;
+  background-color: #fcfcfc;
+  transition: all 0.2s ease;
 }
 
 .form-control:focus, .form-select:focus {
-  border-color: #1565C0;
-  box-shadow: 0 0 0 0.25rem rgba(21, 101, 192, 0.15);
+  box-shadow: none;
+  background-color: #f8f9fa;
 }
 
-.form-label {
-  color: #495057;
-  margin-bottom: 0.4rem;
-}
-
-.btn-primary {
-  background: #1565C0;
-  border: none;
-  border-radius: 8px;
-  font-weight: 500;
-  transition: transform 0.2s;
-}
-
-.btn-primary:hover:not(:disabled) {
-  background: #0D47A1;
-  transform: translateY(-2px);
-}
-
-.btn-light {
-  border-radius: 8px;
+.input-group:focus-within {
+  border-color: #0d6efd !important;
+  box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.1) !important;
 }
 
 .custom-switch .form-check-input {
-  width: 3rem;
-  height: 1.5rem;
+  width: 2.8rem;
+  height: 1.4rem;
   cursor: pointer;
 }
 
-.custom-switch .form-check-input:checked {
-  background-color: #1565C0;
-  border-color: #1565C0;
+h6 {
+  color: #6c757d;
+  letter-spacing: 0.5px;
+  position: relative;
+  padding-left: 0;
 }
 
-h6 {
-  letter-spacing: 0.5px;
-  border-bottom: 2px solid rgba(21, 101, 192, 0.1);
-  padding-bottom: 5px;
+.btn-primary {
+  padding: 0.75rem 1.5rem;
+  background-color: #0d6efd;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: #0b5ed7;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(13, 110, 253, 0.2);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.animate-slide-up {
+  animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }

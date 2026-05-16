@@ -1,108 +1,208 @@
-<div class="modal fade show" [ngClass]="{'d-block': visible}" tabindex="-1" *ngIf="visible">
-  <div class="modal-dialog modal-lg modal-dialog-centered">
-    <div class="modal-content border-0 shadow-lg overflow-hidden">
-      <!-- Cabecera con gradiente premium -->
-      <div class="modal-header bg-primary text-white p-4">
-        <h5 class="modal-title d-flex align-items-center">
-          <i class="fa-solid" [ngClass]="alumno ? 'fa-user-pen' : 'fa-user-plus'"></i>
-          <span class="ms-3">{{ alumno ? 'Editar Alumno' : 'Registrar Nuevo Alumno' }}</span>
-        </h5>
-        <button type="button" class="btn-close btn-close-white" (click)="onCerrar()"></button>
-      </div>
+<div class="modal-overlay" *ngIf="visible">
 
-      <div class="modal-body p-4 bg-light">
-        <form [formGroup]="alumnoForm">
-          <div class="row g-4">
-            <!-- Información Personal -->
-            <div class="col-12 mt-0">
-              <h6 class="text-primary text-uppercase small fw-bold mb-3">Información Personal</h6>
-            </div>
-            
-            <div class="col-md-6">
-              <label class="form-label small fw-bold">Nombre</label>
-              <input type="text" class="form-control shadow-sm" formControlName="nombre" 
-                     [ngClass]="{'is-invalid': alumnoForm.get('nombre')?.touched && alumnoForm.get('nombre')?.invalid}"
-                     placeholder="Ej: Alejandro">
-            </div>
+  <div class="modal-content animate-slide-up" (click)="$event.stopPropagation()">
 
-            <div class="col-md-6">
-              <label class="form-label small fw-bold">Apellidos</label>
-              <input type="text" class="form-control shadow-sm" formControlName="apellidos"
-                     [ngClass]="{'is-invalid': alumnoForm.get('apellidos')?.touched && alumnoForm.get('apellidos')?.invalid}"
-                     placeholder="Ej: García Romero">
-            </div>
+    <!-- CABECERA -->
+    <div class="modal-header d-flex justify-content-between align-items-center">
+      <h5 class="mb-0 fw-bold text-dark">
+        <i class="fa-solid" [ngClass]="alumno ? 'fa-user-pen text-primary' : 'fa-user-plus text-success'"></i>
+        {{ alumno ? 'Modificar Alumno' : 'Nuevo Alumno' }}
+      </h5>
+      <button class="btn-close" (click)="onCerrar()"></button>
+    </div>
 
-            <div class="col-md-6">
-              <label class="form-label small fw-bold">Correo Electrónico</label>
-              <input type="email" class="form-control shadow-sm" formControlName="email"
-                     [ngClass]="{'is-invalid': alumnoForm.get('email')?.touched && alumnoForm.get('email')?.invalid}"
-                     placeholder="correo@ejemplo.com">
-            </div>
+    <!-- CUERPO -->
+    <div class="modal-body py-4">
+      <form [formGroup]="alumnoForm">
+        <div class="row g-4">
 
-            <div class="col-md-6">
-              <label class="form-label small fw-bold">DNI / NIE</label>
-              <input type="text" class="form-control shadow-sm" formControlName="dni"
-                     [ngClass]="{'is-invalid': alumnoForm.get('dni')?.touched && alumnoForm.get('dni')?.invalid}"
-                     placeholder="12345678X">
-            </div>
+          <!-- SECCIÓN: INFORMACIÓN PERSONAL (COL 6) -->
+          <div class="col-lg-6">
+            <h6 class="text-primary text-uppercase small fw-bold mb-3">Información Personal</h6>
+            <div class="row g-3">
+              <!-- Nombre -->
+              <div class="col-12">
+                <label class="form-label small fw-bold text-uppercase opacity-75">Nombre</label>
+                <div class="input-group shadow-sm rounded-3 overflow-hidden border">
+                  <span class="input-group-text bg-white border-0"><i class="fa-solid fa-user text-muted"></i></span>
+                  <input type="text" formControlName="nombre" class="form-control border-0 px-3"
+                    placeholder="Ej: Alejandro" maxlength="50"
+                    [class.is-invalid]="alumnoForm.get('nombre')?.touched && alumnoForm.get('nombre')?.invalid">
+                </div>
+                <div class="text-danger small mt-1"
+                  *ngIf="alumnoForm.get('nombre')?.touched && alumnoForm.get('nombre')?.errors?.['required']">
+                  El nombre es obligatorio
+                </div>
+              </div>
 
-            <!-- Identificación Académica -->
-            <div class="col-12 mt-4">
-              <h6 class="text-primary text-uppercase small fw-bold mb-3">Identificación Académica</h6>
-            </div>
+              <!-- Apellidos -->
+              <div class="col-12">
+                <label class="form-label small fw-bold text-uppercase opacity-75">Apellidos</label>
+                <div class="input-group shadow-sm rounded-3 overflow-hidden border">
+                  <span class="input-group-text bg-white border-0"><i class="fa-solid fa-users text-muted"></i></span>
+                  <input type="text" formControlName="apellidos" class="form-control border-0 px-3"
+                    placeholder="Ej: García Romero" maxlength="100"
+                    [class.is-invalid]="alumnoForm.get('apellidos')?.touched && alumnoForm.get('apellidos')?.invalid">
+                </div>
+                <div class="text-danger small mt-1"
+                  *ngIf="alumnoForm.get('apellidos')?.touched && alumnoForm.get('apellidos')?.errors?.['required']">
+                  Los apellidos son obligatorios
+                </div>
+              </div>
 
-            <div class="col-md-4">
-              <label class="form-label small fw-bold">NIA</label>
-              <input type="text" class="form-control shadow-sm" formControlName="nia"
-                     [ngClass]="{'is-invalid': alumnoForm.get('nia')?.touched && alumnoForm.get('nia')?.invalid}"
-                     placeholder="10 dígitos">
-            </div>
+              <!-- Correo -->
+              <div class="col-12">
+                <label class="form-label small fw-bold text-uppercase opacity-75">Correo Electrónico</label>
+                <div class="input-group shadow-sm rounded-3 overflow-hidden border">
+                  <span class="input-group-text bg-white border-0"><i
+                      class="fa-solid fa-envelope text-muted"></i></span>
+                  <input type="email" formControlName="email" class="form-control border-0 px-3"
+                    placeholder="correo@ejemplo.com" maxlength="100"
+                    [class.is-invalid]="alumnoForm.get('email')?.touched && alumnoForm.get('email')?.invalid">
+                </div>
+                <div class="text-danger small mt-1"
+                  *ngIf="alumnoForm.get('email')?.touched && alumnoForm.get('email')?.errors">
+                  <span *ngIf="alumnoForm.get('email')?.errors?.['required']">El correo es obligatorio</span>
+                  <span *ngIf="alumnoForm.get('email')?.errors?.['pattern']">Formato no válido (ej:
+                    usuario&#64;dominio.com)</span>
+                </div>
+              </div>
 
-            <div class="col-md-4">
-              <label class="form-label small fw-bold">NUSS (Seguridad Social)</label>
-              <input type="text" class="form-control shadow-sm" formControlName="nuss"
-                     [ngClass]="{'is-invalid': alumnoForm.get('nuss')?.touched && alumnoForm.get('nuss')?.invalid}"
-                     placeholder="12 dígitos">
-            </div>
+              <!-- Teléfono -->
+              <div class="col-md-6">
+                <label class="form-label small fw-bold text-uppercase opacity-75">Teléfono</label>
+                <div class="input-group shadow-sm rounded-3 overflow-hidden border">
+                  <span class="input-group-text bg-white border-0"><i class="fa-solid fa-phone text-muted"></i></span>
+                  <input type="text" formControlName="telefono" class="form-control border-0 px-3"
+                    placeholder="600 000 000" maxlength="15"
+                    [class.is-invalid]="alumnoForm.get('telefono')?.touched && alumnoForm.get('telefono')?.invalid">
+                </div>
+                <div class="text-danger small mt-1"
+                  *ngIf="alumnoForm.get('telefono')?.touched && alumnoForm.get('telefono')?.errors?.['required']">
+                  El teléfono es obligatorio
+                </div>
+              </div>
 
-            <div class="col-md-4">
-              <label class="form-label small fw-bold">Teléfono</label>
-              <input type="text" class="form-control shadow-sm" formControlName="telefono"
-                     [ngClass]="{'is-invalid': alumnoForm.get('telefono')?.touched && alumnoForm.get('telefono')?.invalid}"
-                     placeholder="600 000 000">
-            </div>
-
-            <div class="col-md-8">
-              <label class="form-label small fw-bold">Curso y Ciclo</label>
-              <select class="form-select shadow-sm" formControlName="idCurso"
-                      [ngClass]="{'is-invalid': alumnoForm.get('idCurso')?.touched && alumnoForm.get('idCurso')?.invalid}">
-                <option [ngValue]="null" disabled>Selecciona un curso...</option>
-                <option *ngFor="let curso of cursos" [value]="curso.id">
-                  {{ curso.nombre }} - {{ curso.ciclo }}
-                </option>
-              </select>
-            </div>
-
-            <div class="col-md-4 d-flex align-items-center pt-4">
-              <div class="form-check form-switch custom-switch">
-                <input class="form-check-input" type="checkbox" id="checkRepetidor" formControlName="repetidor">
-                <label class="form-check-label ms-2 small fw-bold" for="checkRepetidor">¿Es repetidor?</label>
+              <!-- NUSS -->
+              <div class="col-md-6">
+                <label class="form-label small fw-bold text-uppercase opacity-75">NUSS</label>
+                <div class="input-group shadow-sm rounded-3 overflow-hidden border">
+                  <span class="input-group-text bg-white border-0"><i
+                      class="fa-solid fa-shield-heart text-muted"></i></span>
+                  <input type="text" formControlName="nuss" class="form-control border-0 px-3" placeholder="12 dígitos"
+                    maxlength="12"
+                    [class.is-invalid]="alumnoForm.get('nuss')?.touched && alumnoForm.get('nuss')?.invalid">
+                </div>
+                <div class="text-danger small mt-1"
+                  *ngIf="alumnoForm.get('nuss')?.touched && alumnoForm.get('nuss')?.errors?.['required']">
+                  El NUSS es obligatorio
+                </div>
+                <div class="text-danger small mt-1"
+                  *ngIf="alumnoForm.get('nuss')?.touched && alumnoForm.get('nuss')?.errors?.['maxlength']">
+                  Máximo 12 dígitos
+                </div>
               </div>
             </div>
           </div>
-        </form>
-      </div>
 
-      <div class="modal-footer p-4 bg-white border-top">
-        <button type="button" class="btn btn-light px-4 shadow-sm" (click)="onCerrar()">Cancelar</button>
-        <button type="button" class="btn btn-primary px-4 shadow-sm" (click)="onGuardar()" 
-                [disabled]="alumnoForm.invalid && alumnoForm.touched">
-          <i class="fa-solid fa-save me-2"></i>
-          {{ alumno ? 'Guardar Cambios' : 'Registrar Alumno' }}
-        </button>
-      </div>
+          <!-- SECCIÓN: IDENTIFICACIÓN Y ACADÉMICO (COL 6) -->
+          <div class="col-lg-6">
+            <h6 class="text-primary text-uppercase small fw-bold mb-3">Identificación y Académico</h6>
+            <div class="row g-3">
+              <!-- DNI -->
+              <div class="col-md-6">
+                <label class="form-label small fw-bold text-uppercase opacity-75">DNI / NIE</label>
+                <div class="input-group shadow-sm rounded-3 overflow-hidden border">
+                  <span class="input-group-text bg-white border-0"><i class="fa-solid fa-id-card text-muted"></i></span>
+                  <input type="text" formControlName="dni" class="form-control border-0 px-3" placeholder="12345678X"
+                    maxlength="15"
+                    [class.is-invalid]="alumnoForm.get('dni')?.touched && alumnoForm.get('dni')?.invalid">
+                </div>
+                <div class="text-danger small mt-1"
+                  *ngIf="alumnoForm.get('dni')?.touched && alumnoForm.get('dni')?.errors">
+                  <span *ngIf="alumnoForm.get('dni')?.errors?.['required']">El DNI es obligatorio</span>
+                  <span *ngIf="alumnoForm.get('dni')?.errors?.['dniFormato']">Formato no válido (8 números +
+                    letra)</span>
+                  <span *ngIf="alumnoForm.get('dni')?.errors?.['letraInvalida']">Letra no válida</span>
+                </div>
+              </div>
+
+              <!-- NIA -->
+              <div class="col-md-6">
+                <label class="form-label small fw-bold text-uppercase opacity-75">NIA</label>
+                <div class="input-group shadow-sm rounded-3 overflow-hidden border">
+                  <span class="input-group-text bg-white border-0"><i class="fa-solid fa-hashtag text-muted"></i></span>
+                  <input type="text" formControlName="nia" class="form-control border-0 px-3" placeholder="10 dígitos"
+                    maxlength="10"
+                    [class.is-invalid]="alumnoForm.get('nia')?.touched && alumnoForm.get('nia')?.invalid">
+                </div>
+                <div class="text-danger small mt-1"
+                  *ngIf="alumnoForm.get('nia')?.touched && alumnoForm.get('nia')?.errors">
+                  <span *ngIf="alumnoForm.get('nia')?.errors?.['required']">El NIA es obligatorio</span>
+                  <span *ngIf="alumnoForm.get('nia')?.errors?.['maxlength']">Máximo 10 caracteres</span>
+                </div>
+              </div>
+
+              <!-- Curso -->
+              <div class="col-12">
+                <label class="form-label small fw-bold text-uppercase opacity-75">Curso y Ciclo</label>
+                <div class="input-group shadow-sm rounded-3 overflow-hidden border">
+                  <span class="input-group-text bg-white border-0"><i
+                      class="fa-solid fa-graduation-cap text-muted"></i></span>
+                  <select class="form-select border-0 px-3" formControlName="idCurso"
+                    [class.is-invalid]="alumnoForm.get('idCurso')?.touched && alumnoForm.get('idCurso')?.invalid">
+                    <option [ngValue]="null" disabled>Selecciona un curso...</option>
+                    <option *ngFor="let curso of cursos" [ngValue]="curso.id">
+                      {{ curso.nombre }} - {{ curso.ciclo }} ({{ curso.grado | titlecase }})
+                    </option>
+                  </select>
+                </div>
+                <div class="text-danger small mt-1"
+                  *ngIf="alumnoForm.get('idCurso')?.touched && alumnoForm.get('idCurso')?.errors?.['required']">
+                  Debes seleccionar un curso
+                </div>
+              </div>
+
+              <!-- Empresa de Prácticas -->
+              <div class="col-12">
+                <label class="form-label small fw-bold text-uppercase opacity-75">Empresa de Prácticas</label>
+                <div class="input-group shadow-sm rounded-3 overflow-hidden border">
+                  <span class="input-group-text bg-white border-0"><i
+                      class="fa-solid fa-building text-muted"></i></span>
+                  <select class="form-select border-0 px-3" formControlName="idEmpresa">
+                    <option [ngValue]="null">Sin empresa asignada</option>
+                    <option *ngFor="let empresa of empresas" [ngValue]="empresa.id">
+                      {{ empresa.nombre }} ({{ empresa.siglas }})
+                    </option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Repetidor -->
+              <div class="col-12 mt-2">
+                <div class="form-check form-switch custom-switch">
+                  <input class="form-check-input" type="checkbox" id="checkRepetidor" formControlName="repetidor">
+                  <label class="form-check-label ms-2 small fw-bold text-uppercase opacity-75" for="checkRepetidor">¿Es
+                    repetidor?</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ACCIONES -->
+        <div class="d-flex gap-2 mt-5">
+          <button type="button" class="btn btn-light border flex-grow-1 py-2 shadow-sm rounded-3 fw-bold text-secondary"
+            (click)="onCerrar()">
+            Cancelar
+          </button>
+          <button type="button" class="btn btn-primary flex-grow-1 py-2 shadow-sm rounded-3 fw-bold"
+            (click)="onGuardar()">
+            <i class="fa-solid fa-save me-2"></i>
+            {{ alumno ? 'Guardar Cambios' : 'Registrar Alumno' }}
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
-
-<div class="modal-backdrop fade show" *ngIf="visible"></div>

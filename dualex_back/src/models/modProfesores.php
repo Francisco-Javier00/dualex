@@ -30,7 +30,7 @@ class ModProfesores {
         $profesores = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         foreach ($profesores as &$prof) {
-            $this->hidratarRelaciones($prof);
+            $this->cargarInformacionRelacionada($prof);
         }
 
         return $profesores;
@@ -57,7 +57,34 @@ class ModProfesores {
         $profesor = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($profesor) {
-            $this->hidratarRelaciones($profesor);
+            $this->cargarInformacionRelacionada($profesor);
+        }
+
+        return $profesor;
+    }
+
+    /**
+     * Obtiene los datos detallados de un profesor por su correo.
+     */
+    public function obtenerPorCorreo($correo) {
+        $sql = "SELECT 
+                    u.idUsuario as id, 
+                    u.nombre, 
+                    u.apellidos, 
+                    u.correo,
+                    c.idCoordinador
+                FROM Usuarios u
+                JOIN Profesor p ON u.idUsuario = p.idProfesor
+                LEFT JOIN Coordinador c ON p.idProfesor = c.idCoordinador
+                WHERE u.correo = :correo AND u.tipo = 'P'";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(':correo', $correo, PDO::PARAM_STR);
+        $stmt->execute();
+        $profesor = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($profesor) {
+            $this->cargarInformacionRelacionada($profesor);
         }
 
         return $profesor;
@@ -212,9 +239,9 @@ class ModProfesores {
         $stmtData->execute();
         $data = $stmtData->fetchAll(PDO::FETCH_ASSOC);
 
-        // Hidratar relaciones en PHP para evitar GROUP_CONCAT y CASE
+        // Completar relaciones en PHP para evitar consultas SQL excesivamente complejas
         foreach ($data as &$row) {
-            $this->hidratarRelaciones($row);
+            $this->cargarInformacionRelacionada($row);
         }
 
         return [
@@ -226,9 +253,9 @@ class ModProfesores {
     }
 
     /**
-     * Procesa las relaciones de módulos, ciclos y rol.
+     * Procesa las relaciones de módulos, ciclos y rol para completar el objeto profesor.
      */
-    private function hidratarRelaciones(&$prof) {
+    private function cargarInformacionRelacionada(&$prof) {
         $id = $prof['id'];
 
         // 1. Determinar ROL (en lugar de CASE SQL)

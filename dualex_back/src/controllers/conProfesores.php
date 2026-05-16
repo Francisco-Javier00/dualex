@@ -27,10 +27,19 @@ class ConProfesores extends BaseController {
      */
     public function obtener() {
         $id = $_GET['id'] ?? null;
-        if (!$id) $this->sendError("ID no proporcionado", 400);
+        $correo = $_GET['correo'] ?? null;
 
-        $profesor = $this->modelo->obtener($id);
-        if (!$profesor) $this->sendError("Profesor no encontrado", 404);
+        if ($id) {
+            $profesor = $this->modelo->obtener($id);
+        } elseif ($correo) {
+            $profesor = $this->modelo->obtenerPorCorreo($correo);
+        } else {
+            $this->sendError("ID o correo no proporcionado", 400);
+        }
+
+        if (!$profesor) {
+            $this->sendError("Profesor no encontrado", 404);
+        }
 
         return $profesor;
     }

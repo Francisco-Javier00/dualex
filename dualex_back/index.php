@@ -46,12 +46,30 @@ if (!$c || !$m) {
     exit;
 }
 
+// --- Manejo de Autenticación (JWT) ---
+$user = null;
+$authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? null;
+
+// En algunos servidores Apache, getallheaders() es necesario
+if (!$authHeader && function_exists('getallheaders')) {
+    $headers = getallheaders();
+    $authHeader = $headers['Authorization'] ?? $headers['authorization'] ?? null;
+}
+
+if ($authHeader && preg_match('/Bearer\s+(.*)$/i', $authHeader, $matches)) {
+    $token = $matches[1];
+    $secret = $_ENV['JWT_SECRET'] ?? '';
+    if ($secret) {
+        $user = JWTHelper::validar($token, $secret);
+    }
+}
+
 $ruta = CONTROLADOR . "con$c.php";
 
 if (file_exists($ruta)) {
     require_once $ruta;
     $clase = "Con$c";
-    $obj = new $clase($db, null); // Pasamos null al user por ahora para simplificar
+    $obj = new $clase($db, $user); 
 
     if (method_exists($obj, $m)) {
         $resultado = $obj->$m();

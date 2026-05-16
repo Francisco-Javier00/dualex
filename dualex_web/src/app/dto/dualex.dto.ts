@@ -95,6 +95,7 @@ export interface AlumnoDTO {
   telefono: string;
   repetidor: boolean;
   idCurso: number;
+  idEmpresa?: number;
   estado?: 'Activo' | 'Inactivo';
   nombreCurso?: string; // Para mostrar en tablas
 }
@@ -125,6 +126,7 @@ export interface CursoDTO {
   curso: number;
   anoEscolar: string;
   ciclo: string;
+  grado?: string;
 }
 
 export interface ContactoEmpresaDTO {

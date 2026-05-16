@@ -6,7 +6,9 @@ import { ConfirmarBorradoModalComponent } from '../shared/modals/confirmar-borra
 import { AlumnoModalComponent } from '../modals/alumno-modal/alumno-modal.component';
 import { AlumnosService } from '../../services/alumnos.service';
 import { ModulosService } from '../../services/modulos.service';
-import { AlumnoDTO } from '../../dto/dualex.dto';
+import { ProfesoresService } from '../../services/profesores.service';
+import { CursosService } from '../../services/cursos.service';
+import { AlumnoDTO, CursoDTO } from '../../dto/dualex.dto';
 import { AlertService } from '../../services/alert.service';
 import { Config } from 'datatables.net';
 import { AuthService } from '../../auth/services/auth.service';
@@ -20,6 +22,8 @@ import { AuthService } from '../../auth/services/auth.service';
 export class AlumnosComponent implements OnInit {
   private alumnosService = inject(AlumnosService);
   private modulosService = inject(ModulosService);
+  private profesoresService = inject(ProfesoresService);
+  private cursosService = inject(CursosService);
   private alertService = inject(AlertService);
   private authService = inject(AuthService);
   private route = inject(ActivatedRoute);
@@ -34,11 +38,36 @@ export class AlumnosComponent implements OnInit {
   moduloId: string | null = null;
   nombreModulo: string | null = null;
   moduloObj: any = null;
+  
+  // Lista de cursos que el coordinador gestiona
+  cursosGestionados: number[] = [];
 
   ngOnInit(): void {
+    const usuarioActual = this.authService.currentUserValue;
+    
+    // Si es coordinador, obtenemos sus cursos antes de inicializar la tabla
+    if (usuarioActual && usuarioActual.rol === 'COORDINADOR' && usuarioActual.email) {
+      this.profesoresService.getProfesorByEmail(usuarioActual.email).subscribe({
+        next: (profesor) => {
+          this.cursosService.getCursosByProfesor(profesor.id).subscribe({
+            next: (cursos: CursoDTO[]) => {
+              this.cursosGestionados = cursos.map(c => c.id);
+              this.procesarParametrosRuta();
+            },
+            error: () => this.procesarParametrosRuta() // Continuar aunque falle
+          });
+        },
+        error: () => this.procesarParametrosRuta()
+      });
+    } else {
+      this.procesarParametrosRuta();
+    }
+  }
+
+  private procesarParametrosRuta(): void {
     this.route.queryParamMap.subscribe(params => {
       this.moduloId = params.get('moduloId');
-      this.nombreModulo = null; // Reset mientras carga
+      this.nombreModulo = null;
       this.moduloObj = null;
 
       if (this.moduloId) {
@@ -48,7 +77,6 @@ export class AlumnosComponent implements OnInit {
         });
       }
 
-      // Pequeño delay para asegurar que el ID está en el estado antes de la primera petición ajax
       setTimeout(() => {
         this.inicializarTabla();
       }, 100);
@@ -70,7 +98,12 @@ export class AlumnosComponent implements OnInit {
           dataTablesParameters.emailProfesor = usuarioActual.email;
         }
 
-        this.alumnosService.obtenerAlumnosDataTables(dataTablesParameters).subscribe(resp => {
+        // Si tenemos cursos filtrados para el coordinador, los enviamos
+        if (this.cursosGestionados.length > 0) {
+          dataTablesParameters.idsCursos = this.cursosGestionados;
+        }
+
+        this.alumnosService.obtenerAlumnosDataTables(dataTablesParameters).subscribe((resp: any) => {
           callback({
             recordsTotal: resp.recordsTotal,
             recordsFiltered: resp.recordsFiltered,

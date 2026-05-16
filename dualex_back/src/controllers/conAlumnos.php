@@ -42,8 +42,8 @@ class ConAlumnos extends BaseController {
         }
         
         // 4. Inyectamos los datos del token de sesión para que el modelo pueda filtrar por profesor
-        // Extraemos el email directamente del JWT en el backend por seguridad, en vez del frontend
         $params['emailProfesor'] = $this->user['email'] ?? null;
+        $params['idUsuario'] = $this->user['id'] ?? null;
         $params['rol_token'] = $this->user['roles']['dualex'] ?? null;
         
         $data = $this->modelo->obtenerDataTables($params);
@@ -54,11 +54,24 @@ class ConAlumnos extends BaseController {
         $this->checkRole(['PROFESOR', 'COORDINADOR']);
         $json = file_get_contents('php://input');
         $datos = json_decode($json, true);
-        if (!$datos) {
-            $this->sendError("Datos no válidos.", 400);
+        
+        // LOG TEMPORAL
+        file_put_contents('debug_save.txt', "Creando Paula - Datos: " . print_r($datos, true) . "\n", FILE_APPEND);
+
+        // Validación del lado del servidor
+        $errores = $this->modelo->validar($datos);
+        if (!empty($errores)) {
+            file_put_contents('debug_save.txt', "Paula Errores Val: " . print_r($errores, true) . "\n", FILE_APPEND);
+            $this->sendError(implode(" ", $errores), 400);
         }
-        $res = $this->modelo->crear($datos);
-        $this->sendResponse($res, 201);
+
+        try {
+            $res = $this->modelo->crear($datos);
+            $this->sendResponse($res, 201);
+        } catch (Exception $e) {
+            file_put_contents('debug_save.txt', "Paula EXCEPCION: " . $e->getMessage() . "\n", FILE_APPEND);
+            $this->sendError($e->getMessage(), 500);
+        }
     }
 
     public function actualizar() {
@@ -69,8 +82,24 @@ class ConAlumnos extends BaseController {
         }
         $json = file_get_contents('php://input');
         $datos = json_decode($json, true);
-        $res = $this->modelo->actualizar($id, $datos);
-        $this->sendResponse($res);
+
+        // LOG TEMPORAL
+        file_put_contents('debug_save.txt', "Actualizando Alumno $id - Datos: " . print_r($datos, true) . "\n", FILE_APPEND);
+
+        // Validación del lado del servidor
+        $errores = $this->modelo->validar($datos);
+        if (!empty($errores)) {
+            file_put_contents('debug_save.txt', "Errores Val $id: " . print_r($errores, true) . "\n", FILE_APPEND);
+            $this->sendError(implode(" ", $errores), 400);
+        }
+
+        try {
+            $res = $this->modelo->actualizar($id, $datos);
+            $this->sendResponse($res);
+        } catch (Exception $e) {
+            file_put_contents('debug_save.txt', "EXCEPCION Actualizar $id: " . $e->getMessage() . "\n", FILE_APPEND);
+            $this->sendError($e->getMessage(), 500);
+        }
     }
 
     public function eliminar() {
