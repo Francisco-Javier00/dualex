@@ -9,9 +9,12 @@
   align-items: center;
   justify-content: center;
   z-index: 1055;
-  cursor: not-allowed;
+  cursor: default;
   animation: fadeIn 0.2s ease-out;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
+
 
 .modal-content {
   background: white;

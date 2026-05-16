@@ -47,8 +47,12 @@ class ConCursos extends BaseController {
         if (!$datos) {
             $this->sendError("Datos no válidos.", 400);
         }
-        $res = $this->modelo->crear($datos);
-        $this->sendResponse($res, 201);
+        try {
+            $res = $this->modelo->crear($datos);
+            $this->sendResponse($res, 201);
+        } catch (Exception $e) {
+            $this->sendError($e);
+        }
     }
 
     public function actualizar() {
@@ -59,8 +63,12 @@ class ConCursos extends BaseController {
         }
         $json = file_get_contents('php://input');
         $datos = json_decode($json, true);
-        $res = $this->modelo->actualizar($id, $datos);
-        $this->sendResponse($res);
+        try {
+            $res = $this->modelo->actualizar($id, $datos);
+            $this->sendResponse($res);
+        } catch (Exception $e) {
+            $this->sendError($e);
+        }
     }
 
     public function eliminar() {

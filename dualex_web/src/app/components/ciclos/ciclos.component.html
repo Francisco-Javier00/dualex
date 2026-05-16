@@ -13,8 +13,8 @@
     </div>
 
     <div class="d-flex align-items-center gap-2">
-      <button class="btn btn-primary btn-lg ciclos-action-primary" (click)="abrirEditModal()">
-        <i class="fa-solid fa-circle-plus me-2"></i>Crear nueva entrada
+      <button class="btn btn-primary px-4 shadow-sm" (click)="abrirEditModal()">
+        <i class="fa-solid fa-plus me-2"></i> Nuevo Ciclo
       </button>
     </div>
   </div>
@@ -30,7 +30,8 @@
 <app-confirmar-borrado-modal
   [visible]="isDeleteModalOpen"
   [titulo]="'Eliminar Ciclo'"
-  [mensaje]="'¿Estás seguro de que deseas eliminar el ciclo ' + (cicloToDelete?.nombre ?? '') + '? Esta acción no se puede deshacer.'"
+  [mensaje]="'¿Estás seguro de que deseas eliminar el ciclo <strong>' + (cicloToDelete?.nombre ?? '') + '</strong>? Esta acción no se puede deshacer.'"
+
   [palabraClave]="'confirmar'"
   (confirmarEvent)="confirmarEliminar()"
   (cancelarEvent)="cerrarDeleteModal()">

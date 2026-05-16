@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, inject, Renderer2 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { EmpresaDTO } from '../../../dto/dualex.dto';
@@ -8,11 +8,12 @@ import { EmpresaDTO } from '../../../dto/dualex.dto';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './empresa-modal.component.html',
-   styleUrl: './empresa-modal.component.css'
+  styleUrl: './empresa-modal.component.css'
 })
-export class EmpresaModalComponent implements OnInit {
+export class EmpresaModalComponent implements OnInit, OnDestroy {
+  private renderer = inject(Renderer2);
   private _empresa: EmpresaDTO | null = null;
-  
+
   @Input() set empresa(val: EmpresaDTO | null) {
     this._empresa = val;
     if (val) {
@@ -33,7 +34,7 @@ export class EmpresaModalComponent implements OnInit {
 
   empresaForm: FormGroup;
   ciclosSeleccionados: { sigla: string, tutor: string }[] = [];
-  
+
   // Patrones de validación
   urlPattern = /^https?:\/\/.*$/;
   telefonoPattern = /^[0-9+ \-]+$/;
@@ -44,7 +45,7 @@ export class EmpresaModalComponent implements OnInit {
       nombre: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
       convenioUrl: ['', [Validators.required, Validators.pattern(this.urlPattern)]],
       inicioConvenio: ['', Validators.required],
-      finConvenio: [{value: '', disabled: true}],
+      finConvenio: [{ value: '', disabled: true }],
       contacto: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
       numeroContacto: ['', [Validators.required, Validators.pattern(this.telefonoPattern), Validators.minLength(9), Validators.maxLength(15)]],
       contactosAdicionales: this.fb.array([])
@@ -69,7 +70,22 @@ export class EmpresaModalComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.toggleBodyScroll(true);
     if (this.empresa) this.patchForm(this.empresa);
+  }
+
+  ngOnDestroy(): void {
+    this.toggleBodyScroll(false);
+  }
+
+  private toggleBodyScroll(isVisible: boolean): void {
+    if (isVisible) {
+      this.renderer.addClass(document.documentElement, 'modal-open');
+      this.renderer.addClass(document.body, 'modal-open');
+    } else {
+      this.renderer.removeClass(document.documentElement, 'modal-open');
+      this.renderer.removeClass(document.body, 'modal-open');
+    }
   }
 
   private resetForm(): void {
@@ -213,7 +229,7 @@ export class EmpresaModalComponent implements OnInit {
   getErrorMessage(field: string): string {
     const control = this.empresaForm.get(field);
     if (!control || !control.errors) return '';
-    
+
     if (control.errors['required']) return 'Este campo es obligatorio';
     if (control.errors['pattern']) {
       if (field === 'convenioUrl') return 'Introduce una URL válida (ej: https://google.com)';
@@ -221,7 +237,7 @@ export class EmpresaModalComponent implements OnInit {
     }
     if (control.errors['minlength']) return `Mínimo ${control.errors['minlength'].requiredLength} caracteres`;
     if (control.errors['maxlength']) return `Máximo ${control.errors['maxlength'].requiredLength} caracteres`;
-    
+
     return 'Campo no válido';
   }
 }

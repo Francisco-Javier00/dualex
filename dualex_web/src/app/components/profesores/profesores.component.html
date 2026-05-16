@@ -20,10 +20,10 @@
         class="d-none"
         (change)="onExcelSeleccionado($event)">
       <button class="btn btn-outline-primary px-4 shadow-sm profesores-action-secondary" (click)="subirExcel()">
-        <i class="fa-solid fa-file-excel me-2"></i>Subir excel
+        <i class="fa-solid fa-file-excel me-2"></i> Importar Excel
       </button>
       <button class="btn btn-primary px-4 shadow-sm profesores-action-primary" (click)="crearNuevaEntrada()">
-        <i class="fa-solid fa-circle-plus me-2"></i>Crear nueva entrada
+        <i class="fa-solid fa-user-plus me-2"></i> Nuevo Profesor
       </button>
     </div>
   </div>
@@ -49,7 +49,8 @@
   <app-confirmar-borrado-modal
     [visible]="modalBorradoVisible"
     [titulo]="'Eliminar Profesor'"
-    [mensaje]="'¿Estás seguro de que deseas eliminar al profesor ' + profesorSeleccionado?.nombre + ' ' + profesorSeleccionado?.apellidos + '?'"
+    [mensaje]="'¿Estás seguro de que deseas eliminar al profesor <strong>' + (profesorSeleccionado?.nombre + ' ' + profesorSeleccionado?.apellidos) + '</strong>?'"
+
     [palabraClave]="'confirmar'"
     (confirmarEvent)="onConfirmarBorrado()"
     (cancelarEvent)="onCancelarBorrado()">

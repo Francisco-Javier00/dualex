@@ -80,7 +80,7 @@ class ConProfesores extends BaseController {
         } catch (InvalidArgumentException $e) {
             $this->sendError($e->getMessage(), 400);
         } catch (Exception $e) {
-            $this->sendError("Error al crear el profesor: " . $e->getMessage(), 500);
+            $this->sendError($e);
         }
     }
 
@@ -109,7 +109,7 @@ class ConProfesores extends BaseController {
         } catch (InvalidArgumentException $e) {
             $this->sendError($e->getMessage(), 400);
         } catch (Exception $e) {
-            $this->sendError("Error al actualizar: " . $e->getMessage(), 500);
+            $this->sendError($e);
         }
     }
 

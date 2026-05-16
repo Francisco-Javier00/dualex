@@ -1,8 +1,8 @@
-import { Component, Input, Output, EventEmitter, OnInit, inject } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, inject, Renderer2 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { forkJoin } from 'rxjs';
-import { ProfesorDTO, CicloDTO, ModuloDTO } from '../../../dto/dualex.dto';
+import { CicloDTO, ModuloDTO } from '../../../dto/dualex.dto';
 import { CiclosService } from '../../../services/ciclos.service';
 import { ModulosService } from '../../../services/modulos.service';
 
@@ -13,18 +13,19 @@ import { ModulosService } from '../../../services/modulos.service';
   templateUrl: './profesor-modal.component.html',
   styleUrls: ['./profesor-modal.component.css']
 })
-export class ProfesorModalComponent implements OnInit {
+export class ProfesorModalComponent implements OnInit, OnDestroy {
+  private renderer = inject(Renderer2);
   private ciclosService = inject(CiclosService);
   private modulosService = inject(ModulosService);
 
   private _profesor: any | null = null;
   @Input() modo: 'crear' | 'editar' = 'crear';
-  
+
   ciclosBD: CicloDTO[] = [];
   modulosBD: ModuloDTO[] = [];
   modulosPorCiclo: Record<string, ModuloDTO[]> = {};
-  filtroCiclos: string = '';
-  ciclosExpandidos: string[] = []; // Control visual de qué ciclo está abierto
+  filtroCiclos = '';
+  ciclosExpandidos: string[] = [];
   modulosSeleccionadosIds: number[] = [];
 
   @Input() set profesor(val: any | null) {
@@ -54,9 +55,23 @@ export class ProfesorModalComponent implements OnInit {
   };
 
   ngOnInit(): void {
+    this.toggleBodyScroll(true);
     this.cargarDatos();
-    // Si ya había datos al inicializar, sincronizamos
     if (this.profesor) this.syncProfesor(this.profesor);
+  }
+
+  ngOnDestroy(): void {
+    this.toggleBodyScroll(false);
+  }
+
+  private toggleBodyScroll(isVisible: boolean): void {
+    if (isVisible) {
+      this.renderer.addClass(document.documentElement, 'modal-open');
+      this.renderer.addClass(document.body, 'modal-open');
+    } else {
+      this.renderer.removeClass(document.documentElement, 'modal-open');
+      this.renderer.removeClass(document.body, 'modal-open');
+    }
   }
 
   private cargarDatos(): void {
@@ -90,7 +105,6 @@ export class ProfesorModalComponent implements OnInit {
       });
     });
   }
-
 
   private normalizarClave(valor: string): string {
     return (valor || '')
@@ -150,6 +164,7 @@ export class ProfesorModalComponent implements OnInit {
       ciclos: rol === 'COORDINADOR' ? listaCiclos : [],
       modulos: listaModulos
     };
+
     this.sincronizarIdsModulosSeleccionados();
     this.refrescarEstadoVisual();
   }
@@ -211,7 +226,6 @@ export class ProfesorModalComponent implements OnInit {
     const esCoordinador = this.nuevoProfesor.rol === 'COORDINADOR';
 
     if (!esCoordinador) {
-      // En rol profesor el ciclo solo se usa para desplegar módulos.
       this.ciclosExpandidos = checked
         ? [...new Set([...this.ciclosExpandidos, cicloSiglas])]
         : this.ciclosExpandidos.filter(c => c !== cicloSiglas);
@@ -224,11 +238,11 @@ export class ProfesorModalComponent implements OnInit {
       }
       this.ciclosExpandidos = [...new Set([...this.ciclosExpandidos, cicloSiglas])];
     } else {
-      // Si desmarcamos, contraemos y quitamos coordinación.
       this.nuevoProfesor.ciclos = this.nuevoProfesor.ciclos.filter((c: string) => c !== cicloSiglas);
       this.ciclosExpandidos = this.ciclosExpandidos.filter(c => c !== cicloSiglas);
+      this.limpiarModulosHuerfanos();
+      this.sincronizarIdsModulosSeleccionados();
     }
-
   }
 
   isCicloExpandido(siglas: string): boolean {
@@ -257,10 +271,6 @@ export class ProfesorModalComponent implements OnInit {
   }
 
   get modulosSeleccionadosCount(): number {
-    if (this.nuevoProfesor.rol === 'COORDINADOR') {
-      return this.modulosSeleccionadosIds.length;
-    }
-
     return this.modulosSeleccionadosIds.length;
   }
 
@@ -306,11 +316,14 @@ export class ProfesorModalComponent implements OnInit {
 
   onRolChange(rol: 'PROFESOR' | 'COORDINADOR'): void {
     this.nuevoProfesor.rol = rol;
+    if (rol !== 'COORDINADOR') {
+      this.nuevoProfesor.ciclos = [];
+    }
     this.sincronizarIdsModulosSeleccionados();
+    this.refrescarEstadoVisual();
   }
 
   onGuardar(): void {
-    // VALIDACIÓN: coordinador implica ciclo y módulos derivados de ese ciclo.
     const ciclosFinales = this.nuevoProfesor.rol === 'COORDINADOR'
       ? Array.from(new Set(this.nuevoProfesor.ciclos as string[]))
       : [];
@@ -333,6 +346,7 @@ export class ProfesorModalComponent implements OnInit {
       )],
       modulosIds: modulosIdsFinales
     };
+
     this.guardar.emit(payload);
   }
 }

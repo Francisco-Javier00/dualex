@@ -24,12 +24,12 @@
 
         <!-- Cuerpo -->
         <div class="modal-body px-4 pb-2 pt-1">
-          <p class="text-secondary mb-3" style="font-size: 0.88rem; line-height: 1.5;">
-            {{ mensaje }}
+          <p class="text-secondary mb-3" style="font-size: 0.88rem; line-height: 1.5;" [innerHTML]="mensaje">
           </p>
           <p class="text-muted mb-2" style="font-size: 0.82rem;">
-            Escribe <strong class="text-danger">"{{ palabraClave }}"</strong> para continuar.
+            Escribe <strong class="text-danger fw-bolder" style="font-size: 0.9rem;">"{{ palabraClave }}"</strong> para continuar.
           </p>
+
           <input
             type="text"
             class="form-control form-control-sm confirm-input"

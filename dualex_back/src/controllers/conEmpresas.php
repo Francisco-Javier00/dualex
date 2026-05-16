@@ -86,9 +86,13 @@ class ConEmpresas extends BaseController {
             $this->sendError($error, 400);
         }
         
-        // El modelo devuelve la empresa recién creada con su ID generado.
-        $res = $this->modelo->crear($datos);
-        $this->sendResponse($res, 201);
+        try {
+            // El modelo devuelve la empresa recién creada con su ID generado.
+            $res = $this->modelo->crear($datos);
+            $this->sendResponse($res, 201);
+        } catch (Exception $e) {
+            $this->sendError($e);
+        }
     }
 
     /**
@@ -117,8 +121,12 @@ class ConEmpresas extends BaseController {
             $this->sendError($error, 400);
         }
         
-        $res = $this->modelo->actualizar($id, $datos);
-        $this->sendResponse($res);
+        try {
+            $res = $this->modelo->actualizar($id, $datos);
+            $this->sendResponse($res);
+        } catch (Exception $e) {
+            $this->sendError($e);
+        }
     }
 
     /**

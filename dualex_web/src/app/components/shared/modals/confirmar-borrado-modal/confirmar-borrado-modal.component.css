@@ -4,8 +4,11 @@
   inset: 0;
   background-color: rgba(0, 0, 0, 0.55);
   z-index: 1055;
-  cursor: not-allowed; /* Indica visualmente que no se puede cerrar aquí */
+  cursor: default;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
+
 
 /* Ajuste para que el icono de cabecera destaque */
 .modal-icon-wrapper {

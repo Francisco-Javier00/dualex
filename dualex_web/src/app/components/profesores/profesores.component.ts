@@ -51,8 +51,8 @@ export class ProfesoresComponent implements OnInit {
         { data: 'apellidos' },
         { data: 'correo' },
         { data: 'rol' },
-        { 
-          data: 'modulos', 
+        {
+          data: 'modulos',
           render: (data: any, type: any, row: any) => {
             if (data && data.trim() !== '') return data;
             return row?.rol === 'COORDINADOR'
@@ -60,8 +60,8 @@ export class ProfesoresComponent implements OnInit {
               : '<span class="text-muted opacity-50 italic small">No imparte módulos</span>';
           }
         },
-        { 
-          data: 'ciclos', 
+        {
+          data: 'ciclos',
           render: (data: any, type: any, row: any) => {
             if (data && data.trim() !== '') return data;
             return row?.rol === 'COORDINADOR'
@@ -163,7 +163,7 @@ export class ProfesoresComponent implements OnInit {
         this.datatable?.refrescar();
       },
       error: (err: any) => {
-        const errorMsg = err.error?.error || 'Error al procesar el profesor.';
+        const errorMsg = err.error?.error || err.error?.message || 'Error al procesar el profesor.';
         this.alertService.error('Error', errorMsg);
       }
     });
@@ -172,11 +172,15 @@ export class ProfesoresComponent implements OnInit {
   onConfirmarBorrado(): void {
     if (!this.profesorSeleccionado) return;
 
-    this.profesoresService.eliminarProfesor(this.profesorSeleccionado.id);
-    this.alertService.exito('Profesor eliminado', `${this.profesorSeleccionado.nombre} ${this.profesorSeleccionado.apellidos} ha sido eliminado.`);
-    this.modalBorradoVisible = false;
-    this.profesorSeleccionado = null;
-    this.refrescarTabla();
+    this.profesoresService.eliminarProfesor(this.profesorSeleccionado.id).subscribe({
+      next: () => {
+        this.alertService.exito('Profesor eliminado', `${this.profesorSeleccionado!.nombre} ${this.profesorSeleccionado!.apellidos} ha sido eliminado.`);
+        this.modalBorradoVisible = false;
+        this.profesorSeleccionado = null;
+        this.refrescarTabla();
+      },
+      error: (err) => this.alertService.error('Error', err.error?.message || 'No se pudo eliminar al profesor.')
+    });
   }
 
   onCancelarBorrado(): void {
