@@ -27,6 +27,9 @@ class ConAlumnos extends BaseController {
     }
 
     public function obtenerDataTables() {
+        // Log temporal para ver qué tiene el usuario
+        file_put_contents('debug_user.txt', "User Session: " . json_encode($this->user) . "\n", FILE_APPEND);
+
         // 1. Capturar parámetros del cuerpo JSON (POST)
         $json = file_get_contents('php://input');
         $params = json_decode($json, true) ?? [];
@@ -41,9 +44,9 @@ class ConAlumnos extends BaseController {
             $params['idModulo'] = $_POST['idModulo'];
         }
         
-        // 4. Inyectamos los datos del token de sesión para que el modelo pueda filtrar por profesor
+        // 4. Inyectamos los datos del token de sesión
         $params['emailProfesor'] = $this->user['email'] ?? null;
-        $params['idUsuario'] = $this->user['id'] ?? null;
+        $params['idUsuario'] = $this->user['id'] ?? $this->user['idUsuario'] ?? $this->user['sub'] ?? null;
         $params['rol_token'] = $this->user['roles']['dualex'] ?? null;
         
         $data = $this->modelo->obtenerDataTables($params);

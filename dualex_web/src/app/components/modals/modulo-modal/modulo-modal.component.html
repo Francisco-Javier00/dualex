@@ -12,36 +12,72 @@
     <div class="modal-body py-4">
       <form [formGroup]="moduloForm" (ngSubmit)="onSubmit()">
         
-        <div class="mb-4">
-          <label class="form-label small fw-bold text-uppercase opacity-75">Nombre del Módulo</label>
-          <div class="input-group shadow-sm rounded-3 overflow-hidden border">
-            <span class="input-group-text bg-white border-0"><i class="fa-solid fa-book text-muted"></i></span>
-            <input type="text" formControlName="nombre" class="form-control border-0 px-3" placeholder="Ej: Desarrollo Web en Entorno Cliente">
-          </div>
-        </div>
-
         <div class="row">
-          <div class="col-md-6 mb-4">
-            <label class="form-label small fw-bold text-uppercase opacity-75">Siglas</label>
-            <div class="input-group shadow-sm rounded-3 overflow-hidden border">
-              <span class="input-group-text bg-white border-0"><i class="fa-solid fa-tag text-muted"></i></span>
-              <input type="text" formControlName="siglas" class="form-control border-0 px-3" placeholder="Ej: DWEC">
+          <!-- Nombre -->
+          <div class="col-md-8 mb-4">
+            <label class="form-label small fw-bold text-uppercase opacity-75">Nombre del Módulo</label>
+            <div class="input-group shadow-sm rounded-3 overflow-hidden border"
+                 [class.is-invalid]="moduloForm.get('nombre')?.touched && moduloForm.get('nombre')?.invalid">
+              <span class="input-group-text bg-white border-0"><i class="fa-solid fa-book text-muted"></i></span>
+              <input type="text" formControlName="nombre" class="form-control border-0 px-3" 
+                     placeholder="Ej: Desarrollo Web en Entorno Cliente"
+                     [class.is-invalid]="moduloForm.get('nombre')?.touched && moduloForm.get('nombre')?.invalid">
+            </div>
+            <div class="text-danger small mt-1" *ngIf="moduloForm.get('nombre')?.touched && moduloForm.get('nombre')?.errors?.['required']">
+              El nombre es obligatorio
             </div>
           </div>
-          <div class="col-md-6 mb-4">
-            <label class="form-label small fw-bold text-uppercase opacity-75">Ciclo</label>
-            <div class="input-group shadow-sm rounded-3 overflow-hidden border">
-              <span class="input-group-text bg-white border-0"><i class="fa-solid fa-graduation-cap text-muted"></i></span>
-              <input type="text" formControlName="ciclo" class="form-control border-0 px-3" placeholder="Ej: DAW">
+
+          <!-- Sigla -->
+          <div class="col-md-4 mb-4">
+            <label class="form-label small fw-bold text-uppercase opacity-75">Sigla</label>
+            <div class="input-group shadow-sm rounded-3 overflow-hidden border"
+                 [class.is-invalid]="moduloForm.get('sigla')?.touched && moduloForm.get('sigla')?.invalid">
+              <span class="input-group-text bg-white border-0"><i class="fa-solid fa-tag text-muted"></i></span>
+              <input type="text" formControlName="sigla" class="form-control border-0 px-3" 
+                     placeholder="Ej: DWEC" maxlength="5"
+                     [class.is-invalid]="moduloForm.get('sigla')?.touched && moduloForm.get('sigla')?.invalid">
+            </div>
+            <div class="text-danger small mt-1" *ngIf="moduloForm.get('sigla')?.touched && moduloForm.get('sigla')?.errors?.['required']">
+              La sigla es obligatoria
             </div>
           </div>
         </div>
 
-        <div class="d-flex gap-2 mt-4">
-          <button type="button" class="btn btn-light border flex-grow-1 py-2 shadow-sm rounded-3" (click)="cerrar()">
+        <!-- Ciclo Formativo (Fila completa) -->
+        <div class="mb-4">
+          <label class="form-label small fw-bold text-uppercase opacity-75">Ciclo Formativo</label>
+          <div class="input-group shadow-sm rounded-3 overflow-hidden border"
+               [class.is-invalid]="moduloForm.get('idCiclo')?.touched && moduloForm.get('idCiclo')?.invalid">
+            <span class="input-group-text bg-white border-0"><i class="fa-solid fa-graduation-cap text-muted"></i></span>
+            <select formControlName="idCiclo" class="form-select border-0 px-3"
+                    [class.is-invalid]="moduloForm.get('idCiclo')?.touched && moduloForm.get('idCiclo')?.invalid">
+              <option [ngValue]="null" disabled>Selecciona un ciclo formativo...</option>
+              <option *ngFor="let ciclo of ciclos" [ngValue]="ciclo.id">
+                {{ ciclo.siglas }} - {{ ciclo.nombre }}
+              </option>
+            </select>
+          </div>
+          <div class="text-danger small mt-1" *ngIf="moduloForm.get('idCiclo')?.touched && moduloForm.get('idCiclo')?.errors?.['required']">
+            Debes seleccionar un ciclo
+          </div>
+        </div>
+
+        <!-- Color Picker -->
+        <div class="mb-4">
+          <label class="form-label small fw-bold text-uppercase opacity-75">Color del Módulo</label>
+          <div class="d-flex align-items-center gap-3">
+            <input type="color" formControlName="color" class="form-control form-control-color border-0 shadow-sm" 
+                   title="Elige un color para el módulo">
+            <span class="text-muted small">Este color se usará en los calendarios y tarjetas</span>
+          </div>
+        </div>
+
+        <div class="d-flex gap-2 mt-5">
+          <button type="button" class="btn btn-light border flex-grow-1 py-2 shadow-sm rounded-3 fw-bold text-secondary" (click)="cerrar()">
             Cancelar
           </button>
-          <button type="submit" class="btn btn-primary flex-grow-1 py-2 shadow-sm rounded-3" [disabled]="moduloForm.invalid">
+          <button type="submit" class="btn btn-primary flex-grow-1 py-2 shadow-sm rounded-3 fw-bold">
             <i class="fa-solid fa-save me-2"></i> {{ modulo ? 'Guardar cambios' : 'Crear Módulo' }}
           </button>
         </div>

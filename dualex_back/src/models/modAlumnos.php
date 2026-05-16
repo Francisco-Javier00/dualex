@@ -144,8 +144,9 @@ class ModAlumnos {
         $idUsuario = $params['idUsuario'] ?? null;
         $idsCursos = $params['idsCursos'] ?? null;
         $rol = strtoupper($params['rol_token'] ?? '');
-        $start = $params['start'] ?? 0;
-        $length = $params['length'] ?? 10;
+        $start = (int)($params['start'] ?? 0);
+        $length = (int)($params['length'] ?? 10);
+        $search = $params['search']['value'] ?? '';
 
         // Base de la consulta con DISTINCT para evitar duplicados
         $sql = "SELECT DISTINCT u.idUsuario as id, u.nombre, u.apellidos, u.correo as email, 
@@ -161,6 +162,14 @@ class ModAlumnos {
         $conditions = [];
         $binds = [];
         $joinClause = "";
+
+        if ($search) {
+            $conditions[] = "(u.nombre LIKE :search1 OR u.apellidos LIKE :search2 OR u.correo LIKE :search3 OR a.DNI LIKE :search4)";
+            $binds[':search1'] = "%$search%";
+            $binds[':search2'] = "%$search%";
+            $binds[':search3'] = "%$search%";
+            $binds[':search4'] = "%$search%";
+        }
         
         // 1. Filtrado por módulo específico
         if (!empty($idModulo) && $idModulo !== 'null') {
