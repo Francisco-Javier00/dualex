@@ -10,8 +10,10 @@
   justify-content: center;
   z-index: 1055;
   animation: fadeIn 0.2s ease-out;
-  backdrop-filter: blur(2px);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
+
 
 .modal-content {
   background: white;

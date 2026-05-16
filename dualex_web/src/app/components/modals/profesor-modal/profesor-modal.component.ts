@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, inject, Renderer2 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ProfesorDTO } from '../../../dto/dualex.dto';
@@ -10,10 +10,11 @@ import { ProfesorDTO } from '../../../dto/dualex.dto';
   templateUrl: './profesor-modal.component.html',
   styleUrls: ['./profesor-modal.component.css']
 })
-export class ProfesorModalComponent implements OnInit {
+export class ProfesorModalComponent implements OnInit, OnDestroy {
+  private renderer = inject(Renderer2);
   private _profesor: any | null = null;
   @Input() modo: 'crear' | 'editar' = 'crear';
-  
+
   @Input() set profesor(val: any | null) {
     this._profesor = val;
     if (val) {
@@ -40,8 +41,23 @@ export class ProfesorModalComponent implements OnInit {
   };
 
   ngOnInit(): void {
+    this.toggleBodyScroll(true);
     // Si ya había datos al inicializar, sincronizamos
     if (this.profesor) this.syncProfesor(this.profesor);
+  }
+
+  ngOnDestroy(): void {
+    this.toggleBodyScroll(false);
+  }
+
+  private toggleBodyScroll(isVisible: boolean): void {
+    if (isVisible) {
+      this.renderer.addClass(document.documentElement, 'modal-open');
+      this.renderer.addClass(document.body, 'modal-open');
+    } else {
+      this.renderer.removeClass(document.documentElement, 'modal-open');
+      this.renderer.removeClass(document.body, 'modal-open');
+    }
   }
 
   private syncProfesor(profesor: any): void {

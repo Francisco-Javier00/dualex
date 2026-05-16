@@ -95,7 +95,7 @@ export class EmpresasComponent implements OnInit {
             </button>
           `
         },
-        { 
+        {
           data: 'ciclos',
           render: (data: string) => data ? data : '<span class="text-muted italic">No asignado</span>'
         },
@@ -402,8 +402,8 @@ export class EmpresasComponent implements OnInit {
     const diasAviso = Number(this.configuracionEmpresa.diasAvisoCaducidad);
     const tiempoFinalizacion = Number(this.configuracionEmpresa.tiempoFinalizacionConvenio);
 
-    if (!Number.isFinite(diasAviso) || diasAviso <= 0 || diasAviso > 255 || 
-        !Number.isFinite(tiempoFinalizacion) || tiempoFinalizacion <= 0 || tiempoFinalizacion > 255) {
+    if (!Number.isFinite(diasAviso) || diasAviso <= 0 || diasAviso > 255 ||
+      !Number.isFinite(tiempoFinalizacion) || tiempoFinalizacion <= 0 || tiempoFinalizacion > 255) {
       this.alertService.error('Datos inválidos', 'Los valores deben ser números positivos entre 1 y 255.');
       return;
     }

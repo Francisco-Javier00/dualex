@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, inject, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, inject, OnChanges, SimpleChanges, OnDestroy, Renderer2 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { AlumnoDTO, CursoDTO, EmpresaDTO } from '../../../dto/dualex.dto';
@@ -13,8 +13,10 @@ import { EmpresasService } from '../../../services/empresas.service';
   templateUrl: './alumno-modal.component.html',
   styleUrls: ['./alumno-modal.component.css']
 })
-export class AlumnoModalComponent implements OnInit, OnChanges {
+export class AlumnoModalComponent implements OnInit, OnChanges, OnDestroy {
+  private renderer = inject(Renderer2);
   private fb = inject(FormBuilder);
+
   private cursosService = inject(CursosService);
   private empresasService = inject(EmpresasService);
   private alertService = inject(AlertService);
@@ -104,13 +106,31 @@ export class AlumnoModalComponent implements OnInit, OnChanges {
     if (changes['alumno'] && this.alumno) {
       this.aplicarDatosAlumno();
     }
-    if (changes['visible'] && !this.visible) {
-      this.alumnoForm.reset({
-        repetidor: false,
-        estado: 'Activo',
-        idCurso: null,
-        idEmpresa: null
-      });
+    
+    if (changes['visible']) {
+      this.toggleBodyScroll(this.visible);
+      if (!this.visible) {
+        this.alumnoForm.reset({
+          repetidor: false,
+          estado: 'Activo',
+          idCurso: null,
+          idEmpresa: null
+        });
+      }
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.toggleBodyScroll(false);
+  }
+
+  private toggleBodyScroll(isVisible: boolean): void {
+    if (isVisible) {
+      this.renderer.addClass(document.documentElement, 'modal-open');
+      this.renderer.addClass(document.body, 'modal-open');
+    } else {
+      this.renderer.removeClass(document.documentElement, 'modal-open');
+      this.renderer.removeClass(document.body, 'modal-open');
     }
   }
 

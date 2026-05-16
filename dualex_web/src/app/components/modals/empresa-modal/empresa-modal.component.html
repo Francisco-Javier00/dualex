@@ -1,6 +1,6 @@
-<div class="modal-overlay" (click)="cancelar.emit()">
+<div class="modal-overlay">
   
-  <div class="modal-content animate-slide-up" (click)="$event.stopPropagation()" style="max-height: 90vh; overflow-y: auto;">
+  <div class="modal-content animate-slide-up" (click)="$event.stopPropagation()">
     
     <!-- CABECERA -->
     <div class="modal-header d-flex justify-content-between align-items-center">
@@ -12,7 +12,10 @@
     </div>
 
     <!-- CUERPO -->
-    <div class="modal-body py-4">
+    <div class="modal-body py-4" style="max-height: 85vh; overflow-y: auto;">
+
+
+
       <form [formGroup]="empresaForm" (ngSubmit)="onSubmit()">
         
         <!-- SECCIÓN DE DATOS DE EMPRESA (Solo en modo crear/editar) -->

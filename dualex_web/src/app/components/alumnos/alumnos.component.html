@@ -51,7 +51,8 @@
 
 <!-- Modal de confirmación de borrado -->
 <app-confirmar-borrado-modal [visible]="modalBorradoVisible" [titulo]="'Eliminar Alumno'"
-  [mensaje]="'¿Estás seguro de que deseas eliminar al alumno &quot;' + (alumnoSeleccionado ? (alumnoSeleccionado.nombre + ' ' + alumnoSeleccionado.apellidos) : '') + '&quot;? Esta acción no se puede deshacer y borrará su historial.'"
+  [mensaje]="'¿Estás seguro de que deseas eliminar al alumno <strong>' + (alumnoSeleccionado ? (alumnoSeleccionado.nombre + ' ' + alumnoSeleccionado.apellidos) : '') + '</strong>? Esta acción no se puede deshacer y borrará su historial.'"
+
   [palabraClave]="'confirmar'" (confirmarEvent)="onConfirmarBorrado()" (cancelarEvent)="onCancelarBorrado()">
 </app-confirmar-borrado-modal>
 
