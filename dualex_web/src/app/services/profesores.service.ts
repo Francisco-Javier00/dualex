@@ -11,11 +11,6 @@ export class ProfesoresService {
   private http = inject(HttpClient);
   private readonly API_URL = `${environment.apiUrl}/index.php?c=Profesores`;
 
-  readonly ciclosDisponibles = [
-    'Sistemas Microinformáticos y Redes',
-    'Desarrollo de Aplicaciones Web',
-    'Gestión Administrativa'
-  ];
 
   obtenerProfesoresDataTables(dataTablesParameters: any): Observable<any> {
     return this.http.post<any>(`${this.API_URL}&m=obtenerDataTables`, dataTablesParameters);

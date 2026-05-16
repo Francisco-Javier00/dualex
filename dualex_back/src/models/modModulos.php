@@ -8,15 +8,52 @@ class ModModulos {
     }
 
     public function listar() {
-        $sql = "SELECT m.idModulo as id, m.nombre, m.sigla, m.color, c.nombre as nombreCiclo
-                FROM Modulos m
-                LEFT JOIN Modulo_Curso mc ON m.idModulo = mc.idModulo
-                LEFT JOIN Cursos cur ON mc.idCurso = cur.idCurso
-                LEFT JOIN Ciclos c ON cur.idCiclo = c.idCiclo
-                GROUP BY m.idModulo
+        // Usamos COALESCE para asegurar que el campo ciclo no sea NULL y no rompa el frontend
+        $sql = "SELECT 
+                    m.idModulo as id, 
+                    m.nombre, 
+                    m.sigla as siglas, 
+                    m.color, 
+                    IFNULL(c.siglas, 'S/C') as ciclo
+                FROM modulos m
+                LEFT JOIN modulo_curso mc ON m.idModulo = mc.idModulo
+                LEFT JOIN cursos cur ON mc.idCurso = cur.idCurso
+                LEFT JOIN ciclos c ON cur.idCiclo = c.idCiclo
                 ORDER BY m.nombre";
+        
         $stmt = $this->db->prepare($sql);
         $stmt->execute();
+        $resultados = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Eliminamos duplicados en PHP para mayor control
+        $modulosUnicos = [];
+        foreach ($resultados as $row) {
+            if (!isset($modulosUnicos[$row['id']])) {
+                $modulosUnicos[$row['id']] = $row;
+            }
+        }
+
+        return array_values($modulosUnicos);
+    }
+
+    public function listarPorCiclo($siglasCiclo) {
+        $siglasCiclo = strtoupper(trim((string)$siglasCiclo));
+
+        $sql = "SELECT DISTINCT
+                    m.idModulo as id,
+                    m.nombre,
+                    m.sigla as siglas,
+                    c.siglas as ciclo
+                FROM modulos m
+                JOIN modulo_curso mc ON m.idModulo = mc.idModulo
+                JOIN cursos cur ON mc.idCurso = cur.idCurso
+                JOIN ciclos c ON cur.idCiclo = c.idCiclo
+                WHERE c.siglas = :siglasCiclo
+                ORDER BY m.nombre";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':siglasCiclo' => $siglasCiclo]);
+
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
@@ -35,11 +72,11 @@ class ModModulos {
 
     public function obtenerModulosProfesor($emailProfesor) {
         $sql = "SELECT m.idModulo, m.nombre, m.sigla, m.color,
-                       (SELECT COUNT(*) FROM Modulo_Alumno_Cursa mac WHERE mac.idModulo = m.idModulo) as numAlumnos
-                FROM Modulos m
-                JOIN Modulo_Profesor mp ON m.idModulo = mp.idModulo
-                JOIN Profesor p ON mp.idProfesor = p.idProfesor
-                JOIN Usuarios u ON p.idProfesor = u.idUsuario
+                       (SELECT COUNT(*) FROM modulo_alumno_cursa mac WHERE mac.idModulo = m.idModulo) as numAlumnos
+                FROM modulos m
+                JOIN modulo_profesor mp ON m.idModulo = mp.idModulo
+                JOIN profesor p ON mp.idProfesor = p.idProfesor
+                JOIN usuarios u ON p.idProfesor = u.idUsuario
                 WHERE u.correo = :emailProfesor
                 ORDER BY m.nombre";
         $stmt = $this->db->prepare($sql);
@@ -123,7 +160,7 @@ class ModModulos {
     }
 
     public function eliminar($id) {
-        $sql = "DELETE FROM Modulos WHERE idModulo = :id";
+        $sql = "DELETE FROM modulos WHERE idModulo = :id";
         $stmt = $this->db->prepare($sql);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         return $stmt->execute();
@@ -173,10 +210,10 @@ class ModModulos {
         $sql = "SELECT m.idModulo as id, m.nombre, m.sigla, m.color, 
                        MIN(c.idCiclo) as idCiclo,
                        GROUP_CONCAT(DISTINCT CONCAT(c.siglas, ' - ', c.nombre) SEPARATOR ', ') as cicloCompleto
-                FROM Modulos m
-                LEFT JOIN Modulo_Curso mc ON m.idModulo = mc.idModulo
-                LEFT JOIN Cursos cur ON mc.idCurso = cur.idCurso
-                LEFT JOIN Ciclos c ON cur.idCiclo = c.idCiclo
+                FROM modulos m
+                LEFT JOIN modulo_curso mc ON m.idModulo = mc.idModulo
+                LEFT JOIN cursos cur ON mc.idCurso = cur.idCurso
+                LEFT JOIN ciclos c ON cur.idCiclo = c.idCiclo
                 $where 
                 GROUP BY m.idModulo, m.nombre, m.sigla, m.color
                 ORDER BY m.nombre

@@ -24,6 +24,14 @@ export class ModulosService {
   }
 
   /**
+   * Obtiene los módulos asociados a un ciclo concreto usando la relación real de la BD.
+   */
+  getModulosPorCiclo(siglasCiclo: string): Observable<ModuloDTO[]> {
+    const ciclo = encodeURIComponent(siglasCiclo);
+    return this.http.get<ModuloDTO[]>(`${this.API_URL}&m=listarPorCiclo&siglasCiclo=${ciclo}`);
+  }
+
+  /**
    * Procesa la solicitud de DataTables conectando con el backend.
    */
   obtenerModulosDataTables(dataTablesParameters: any): Observable<any> {

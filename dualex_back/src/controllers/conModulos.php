@@ -14,6 +14,16 @@ class ConModulos extends BaseController {
         $this->sendResponse($data);
     }
 
+    public function listarPorCiclo() {
+        $siglasCiclo = $_GET['siglasCiclo'] ?? null;
+        if (!$siglasCiclo) {
+            $this->sendError("Siglas de ciclo no proporcionadas.", 400);
+        }
+
+        $data = $this->modelo->listarPorCiclo($siglasCiclo);
+        $this->sendResponse($data);
+    }
+
     public function obtener() {
         $id = $_GET['id'] ?? null;
         if (!$id) {
