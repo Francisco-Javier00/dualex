@@ -40,8 +40,7 @@ import {
   Base64UploadAdapter
 } from 'ckeditor5';
 
-// Estilos base y traducciones al español para CKEditor
-import 'ckeditor5/ckeditor5.css';
+// Traducciones al español para CKEditor
 import translations from 'ckeditor5/translations/es.js';
 
 // Servicios y DTOs

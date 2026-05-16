@@ -16,7 +16,7 @@
 .modal-content {
   background: white;
   width: 90%;
-  max-width: 500px;
+  max-width: 650px;
   border-radius: 1.25rem;
   box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
   display: flex;
@@ -45,8 +45,22 @@
 }
 
 .input-group:focus-within {
-  border-color: var(--bs-primary) !important;
+  border-color: #0d6efd !important;
   box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.1) !important;
+}
+
+/* Estilo para errores en el input-group */
+.input-group.border.is-invalid {
+  border-color: #dc3545 !important;
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1) !important;
+}
+
+.form-control-color {
+  width: 45px;
+  height: 45px;
+  padding: 0;
+  border-radius: 12px !important;
+  cursor: pointer;
 }
 
 @keyframes fadeIn {

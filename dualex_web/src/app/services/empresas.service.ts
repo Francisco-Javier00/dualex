@@ -11,6 +11,10 @@ export class EmpresasService {
   private http = inject(HttpClient);
   private readonly API_URL = `${environment.apiUrl}/index.php?c=Empresas`;
 
+  getEmpresas(): Observable<EmpresaDTO[]> {
+    return this.http.get<EmpresaDTO[]>(`${this.API_URL}&m=listar`);
+  }
+
   obtenerEmpresasDataTables(dataTablesParameters: any): Observable<any> {
     return this.http.post<any>(`${this.API_URL}&m=obtenerDataTables`, dataTablesParameters);
   }

@@ -8,14 +8,25 @@ class ModModulos {
     }
 
     public function listar() {
-        $sql = "SELECT idModulo as id, nombre, sigla, color FROM Modulos ORDER BY nombre";
+        $sql = "SELECT m.idModulo as id, m.nombre, m.sigla, m.color, c.nombre as nombreCiclo
+                FROM Modulos m
+                LEFT JOIN Modulo_Curso mc ON m.idModulo = mc.idModulo
+                LEFT JOIN Cursos cur ON mc.idCurso = cur.idCurso
+                LEFT JOIN Ciclos c ON cur.idCiclo = c.idCiclo
+                GROUP BY m.idModulo
+                ORDER BY m.nombre";
         $stmt = $this->db->prepare($sql);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function obtener($id) {
-        $sql = "SELECT idModulo as id, nombre, sigla, color FROM Modulos WHERE idModulo = :id";
+        $sql = "SELECT m.idModulo as id, m.nombre, m.sigla, m.color, 
+                       (SELECT cur.idCiclo FROM Modulo_Curso mc 
+                        JOIN Cursos cur ON mc.idCurso = cur.idCurso 
+                        WHERE mc.idModulo = m.idModulo LIMIT 1) as idCiclo
+                FROM Modulos m 
+                WHERE m.idModulo = :id";
         $stmt = $this->db->prepare($sql);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         $stmt->execute();
@@ -38,26 +49,77 @@ class ModModulos {
     }
 
     public function crear($datos) {
-        $sql = "INSERT INTO Modulos (nombre, sigla, color) VALUES (:nombre, :sigla, :color)";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([
-            ':nombre' => $datos['nombre'],
-            ':sigla' => $datos['sigla'],
-            ':color'  => $datos['color']
-        ]);
-        return $this->obtener($this->db->lastInsertId());
+        try {
+            $this->db->beginTransaction();
+
+            $sql = "INSERT INTO Modulos (nombre, sigla, color) VALUES (:nombre, :sigla, :color)";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([
+                ':nombre' => $datos['nombre'],
+                ':sigla' => $datos['sigla'],
+                ':color'  => $datos['color']
+            ]);
+            $idModulo = $this->db->lastInsertId();
+
+            // Vincular con los cursos del ciclo seleccionado
+            if (isset($datos['idCiclo'])) {
+                $sqlCursos = "SELECT idCurso FROM Cursos WHERE idCiclo = :idCiclo";
+                $stmtCursos = $this->db->prepare($sqlCursos);
+                $stmtCursos->execute([':idCiclo' => $datos['idCiclo']]);
+                $cursos = $stmtCursos->fetchAll(PDO::FETCH_ASSOC);
+
+                $sqlRel = "INSERT INTO Modulo_Curso (idModulo, idCurso) VALUES (:idModulo, :idCurso)";
+                $stmtRel = $this->db->prepare($sqlRel);
+                foreach ($cursos as $curso) {
+                    $stmtRel->execute([':idModulo' => $idModulo, ':idCurso' => $curso['idCurso']]);
+                }
+            }
+
+            $this->db->commit();
+            return $this->obtener($idModulo);
+        } catch (Exception $e) {
+            $this->db->rollBack();
+            throw $e;
+        }
     }
 
     public function actualizar($id, $datos) {
-        $sql = "UPDATE Modulos SET nombre = :nombre, sigla = :sigla, color = :color WHERE idModulo = :id";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([
-            ':id'     => $id,
-            ':nombre' => $datos['nombre'],
-            ':sigla' => $datos['sigla'],
-            ':color'  => $datos['color']
-        ]);
-        return $this->obtener($id);
+        try {
+            $this->db->beginTransaction();
+
+            $sql = "UPDATE Modulos SET nombre = :nombre, sigla = :sigla, color = :color WHERE idModulo = :id";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([
+                ':id'     => $id,
+                ':nombre' => $datos['nombre'],
+                ':sigla' => $datos['sigla'],
+                ':color'  => $datos['color']
+            ]);
+
+            // Actualizar vínculos con cursos
+            if (isset($datos['idCiclo'])) {
+                // Borrar anteriores
+                $this->db->prepare("DELETE FROM Modulo_Curso WHERE idModulo = :id")->execute([':id' => $id]);
+
+                // Insertar nuevos
+                $sqlCursos = "SELECT idCurso FROM Cursos WHERE idCiclo = :idCiclo";
+                $stmtCursos = $this->db->prepare($sqlCursos);
+                $stmtCursos->execute([':idCiclo' => $datos['idCiclo']]);
+                $cursos = $stmtCursos->fetchAll(PDO::FETCH_ASSOC);
+
+                $sqlRel = "INSERT INTO Modulo_Curso (idModulo, idCurso) VALUES (:idModulo, :idCurso)";
+                $stmtRel = $this->db->prepare($sqlRel);
+                foreach ($cursos as $curso) {
+                    $stmtRel->execute([':idModulo' => $id, ':idCurso' => $curso['idCurso']]);
+                }
+            }
+
+            $this->db->commit();
+            return $this->obtener($id);
+        } catch (Exception $e) {
+            $this->db->rollBack();
+            throw $e;
+        }
     }
 
     public function eliminar($id) {
@@ -68,27 +130,64 @@ class ModModulos {
     }
 
     public function obtenerDataTables($params) {
-        $start = $params['start'] ?? 0;
-        $length = $params['length'] ?? 10;
+        $start = (int)($params['start'] ?? 0);
+        $length = (int)($params['length'] ?? 10);
         $search = $params['search']['value'] ?? '';
+        $idCoordinador = $params['idCoordinador'] ?? null;
 
-        $where = "";
+        $conditions = [];
+        $binds = [];
+
         if ($search) {
-            $where = "WHERE nombre LIKE :search OR sigla LIKE :search";
+            $conditions[] = "(m.nombre LIKE :search1 OR m.sigla LIKE :search2 OR c.nombre LIKE :search3)";
+            $binds[':search1'] = "%$search%";
+            $binds[':search2'] = "%$search%";
+            $binds[':search3'] = "%$search%";
         }
 
+        if ($idCoordinador) {
+            $conditions[] = "c.idCoordinador = :idCoordinador";
+            $binds[':idCoordinador'] = $idCoordinador;
+        }
+
+        $where = !empty($conditions) ? "WHERE " . implode(" AND ", $conditions) : "";
+
+        // Conteo total
         $total = $this->db->query("SELECT COUNT(*) FROM Modulos")->fetchColumn();
 
-        $stmtF = $this->db->prepare("SELECT COUNT(*) FROM Modulos $where");
-        if ($search) $stmtF->execute([':search' => "%$search%"]);
-        else $stmtF->execute();
+        // Conteo filtrado
+        $sqlCount = "SELECT COUNT(DISTINCT m.idModulo) 
+                     FROM Modulos m
+                     LEFT JOIN Modulo_Curso mc ON m.idModulo = mc.idModulo
+                     LEFT JOIN Cursos cur ON mc.idCurso = cur.idCurso
+                     LEFT JOIN Ciclos c ON cur.idCiclo = c.idCiclo
+                     $where";
+        $stmtF = $this->db->prepare($sqlCount);
+        foreach ($binds as $key => $val) {
+            $stmtF->bindValue($key, $val);
+        }
+        $stmtF->execute();
         $totalFiltrados = $stmtF->fetchColumn();
 
-        $sql = "SELECT idModulo as id, nombre, sigla, color FROM Modulos $where LIMIT :start, :length";
+        // Datos
+        $sql = "SELECT m.idModulo as id, m.nombre, m.sigla, m.color, 
+                       MIN(c.idCiclo) as idCiclo,
+                       GROUP_CONCAT(DISTINCT CONCAT(c.siglas, ' - ', c.nombre) SEPARATOR ', ') as cicloCompleto
+                FROM Modulos m
+                LEFT JOIN Modulo_Curso mc ON m.idModulo = mc.idModulo
+                LEFT JOIN Cursos cur ON mc.idCurso = cur.idCurso
+                LEFT JOIN Ciclos c ON cur.idCiclo = c.idCiclo
+                $where 
+                GROUP BY m.idModulo, m.nombre, m.sigla, m.color
+                ORDER BY m.nombre
+                LIMIT :start, :length";
+        
         $stmt = $this->db->prepare($sql);
-        if ($search) $stmt->bindValue(':search', "%$search%");
-        $stmt->bindValue(':start', (int)$start, PDO::PARAM_INT);
-        $stmt->bindValue(':length', (int)$length, PDO::PARAM_INT);
+        foreach ($binds as $key => $val) {
+            $stmt->bindValue($key, $val);
+        }
+        $stmt->bindValue(':start', $start, PDO::PARAM_INT);
+        $stmt->bindValue(':length', $length, PDO::PARAM_INT);
         $stmt->execute();
         
         return [

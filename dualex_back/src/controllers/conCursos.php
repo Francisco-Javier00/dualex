@@ -19,6 +19,15 @@ class ConCursos extends BaseController {
         $this->sendResponse($data);
     }
 
+    public function listarPorProfesor() {
+        $idProfesor = $_GET['idProfesor'] ?? null;
+        if (!$idProfesor) {
+            $this->sendError("ID de profesor no proporcionado.", 400);
+        }
+        $data = $this->modelo->listarPorProfesor($idProfesor);
+        $this->sendResponse($data);
+    }
+
     public function obtener() {
         $id = $_GET['id'] ?? null;
         if (!$id) {

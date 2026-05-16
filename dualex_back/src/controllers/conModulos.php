@@ -29,6 +29,12 @@ class ConModulos extends BaseController {
     public function obtenerDataTables() {
         $json = file_get_contents('php://input');
         $params = json_decode($json, true);
+
+        // Si el usuario es COORDINADOR, filtramos solo por sus ciclos
+        if ($this->user && isset($this->user['roles']['dualex']) && strtoupper($this->user['roles']['dualex']) === 'COORDINADOR') {
+            $params['idCoordinador'] = $this->user['id'];
+        }
+
         $data = $this->modelo->obtenerDataTables($params);
         $this->sendResponse($data);
     }
@@ -37,11 +43,17 @@ class ConModulos extends BaseController {
         $this->checkRole(['PROFESOR', 'COORDINADOR']);
         $json = file_get_contents('php://input');
         $datos = json_decode($json, true);
-        if (!$datos) {
-            $this->sendError("Datos no válidos.", 400);
+        
+        if (empty($datos['nombre']) || empty($datos['sigla']) || empty($datos['idCiclo'])) {
+            $this->sendError("Faltan campos obligatorios (nombre, sigla, ciclo).", 400);
         }
-        $res = $this->modelo->crear($datos);
-        $this->sendResponse($res, 201);
+
+        try {
+            $res = $this->modelo->crear($datos);
+            $this->sendResponse($res, 201);
+        } catch (Exception $e) {
+            $this->sendError($e->getMessage(), 500);
+        }
     }
 
     public function actualizar() {
@@ -52,8 +64,17 @@ class ConModulos extends BaseController {
         }
         $json = file_get_contents('php://input');
         $datos = json_decode($json, true);
-        $res = $this->modelo->actualizar($id, $datos);
-        $this->sendResponse($res);
+
+        if (empty($datos['nombre']) || empty($datos['sigla']) || empty($datos['idCiclo'])) {
+            $this->sendError("Faltan campos obligatorios.", 400);
+        }
+
+        try {
+            $res = $this->modelo->actualizar($id, $datos);
+            $this->sendResponse($res);
+        } catch (Exception $e) {
+            $this->sendError($e->getMessage(), 500);
+        }
     }
 
     public function eliminar() {

@@ -27,6 +27,9 @@ class ConAlumnos extends BaseController {
     }
 
     public function obtenerDataTables() {
+        // Log temporal para ver qué tiene el usuario
+        file_put_contents('debug_user.txt', "User Session: " . json_encode($this->user) . "\n", FILE_APPEND);
+
         // 1. Capturar parámetros del cuerpo JSON (POST)
         $json = file_get_contents('php://input');
         $params = json_decode($json, true) ?? [];
@@ -41,9 +44,9 @@ class ConAlumnos extends BaseController {
             $params['idModulo'] = $_POST['idModulo'];
         }
         
-        // 4. Inyectamos los datos del token de sesión para que el modelo pueda filtrar por profesor
-        // Extraemos el email directamente del JWT en el backend por seguridad, en vez del frontend
+        // 4. Inyectamos los datos del token de sesión
         $params['emailProfesor'] = $this->user['email'] ?? null;
+        $params['idUsuario'] = $this->user['id'] ?? $this->user['idUsuario'] ?? $this->user['sub'] ?? null;
         $params['rol_token'] = $this->user['roles']['dualex'] ?? null;
         
         $data = $this->modelo->obtenerDataTables($params);
@@ -54,11 +57,19 @@ class ConAlumnos extends BaseController {
         $this->checkRole(['PROFESOR', 'COORDINADOR']);
         $json = file_get_contents('php://input');
         $datos = json_decode($json, true);
-        if (!$datos) {
-            $this->sendError("Datos no válidos.", 400);
+
+        // Validación del lado del servidor
+        $errores = $this->modelo->validar($datos);
+        if (!empty($errores)) {
+            $this->sendError(implode(" ", $errores), 400);
         }
-        $res = $this->modelo->crear($datos);
-        $this->sendResponse($res, 201);
+
+        try {
+            $res = $this->modelo->crear($datos);
+            $this->sendResponse($res, 201);
+        } catch (Exception $e) {
+            $this->sendError($e->getMessage(), 500);
+        }
     }
 
     public function actualizar() {
@@ -69,12 +80,23 @@ class ConAlumnos extends BaseController {
         }
         $json = file_get_contents('php://input');
         $datos = json_decode($json, true);
-        $res = $this->modelo->actualizar($id, $datos);
-        $this->sendResponse($res);
+
+        // Validación del lado del servidor
+        $errores = $this->modelo->validar($datos);
+        if (!empty($errores)) {
+            $this->sendError(implode(" ", $errores), 400);
+        }
+
+        try {
+            $res = $this->modelo->actualizar($id, $datos);
+            $this->sendResponse($res);
+        } catch (Exception $e) {
+            $this->sendError($e->getMessage(), 500);
+        }
     }
 
     public function eliminar() {
-        // $this->checkRole(['PROFESOR', 'COORDINADOR']);
+        $this->checkRole(['PROFESOR', 'COORDINADOR']);
         $id = $_GET['id'] ?? null;
         if (!$id) {
             $this->sendError("ID no proporcionado.", 400);

@@ -31,7 +31,7 @@ export class ActividadesComponent implements OnInit {
       serverSide: true,
       processing: true,
       ajax: (dataTablesParameters: any, callback: any) => {
-        this.actividadesService.obtenerActividadesDataTables(dataTablesParameters).subscribe(resp => {
+        this.actividadesService.obtenerActividadesDataTables(dataTablesParameters).subscribe((resp: any) => {
           callback({
             recordsTotal: resp.recordsTotal,
             recordsFiltered: resp.recordsFiltered,

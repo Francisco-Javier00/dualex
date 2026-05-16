@@ -40,19 +40,36 @@ export class ModulosComponent implements OnInit {
         });
       },
       columns: [
-        { data: 'nombre' },
-        { data: 'siglas' },
-        { data: 'ciclo' },
+        { 
+          data: 'color',
+          className: 'text-center',
+          render: (data: any) => `
+            <div class="d-flex justify-content-center">
+              <div class="rounded-circle shadow-sm" style="width: 18px; height: 18px; background-color: ${data || '#4e73df'}"></div>
+            </div>
+          `
+        },
+        { 
+          data: 'nombre',
+          render: (data: any) => `<span class="fw-medium text-dark">${data}</span>`
+        },
+        { data: 'sigla', className: 'text-center text-muted' },
+        { 
+          data: 'cicloCompleto',
+          className: 'text-center text-muted',
+          render: (data: any) => data || 'Sin asignar'
+        },
         {
           data: null,
           orderable: false,
           searchable: false,
+          className: 'text-center',
           render: () => `
             <div class="d-flex gap-2 justify-content-center">
-              <button class="btn btn-sm btn-outline-primary shadow-sm" data-action="edit" title="Editar">
+              <button class="btn btn-sm btn-outline-primary shadow-sm edit-btn" data-action="edit" title="Editar">
                 <i class="fa-solid fa-pen"></i>
               </button>
-              <button class="btn btn-sm btn-outline-danger shadow-sm" data-action="delete" title="Eliminar">
+              <button class="btn btn-sm btn-outline-danger shadow-sm delete-btn" data-action="delete" title="Eliminar">
                 <i class="fa-solid fa-trash"></i>
               </button>
             </div>
@@ -96,16 +113,24 @@ export class ModulosComponent implements OnInit {
     }
   }
 
-  onGuardarModulo(modulo: ModuloDTO): void {
+  onGuardarModulo(modulo: any): void {
     if (modulo.id) {
-      this.modulosService.updateModulo(modulo).subscribe(() => {
-        this.alertService.exito('Actualizado', 'Módulo actualizado correctamente.');
-        this.recargarTabla();
+      this.modulosService.updateModulo(modulo).subscribe({
+        next: () => {
+          this.alertService.exito('Actualizado', 'Módulo actualizado correctamente.');
+          this.modalModuloVisible = false;
+          this.recargarTabla();
+        },
+        error: (err) => this.alertService.error('Error', err.error?.message || 'Fallo al actualizar')
       });
     } else {
-      this.modulosService.createModulo(modulo).subscribe(() => {
-        this.alertService.exito('Creado', 'Nuevo módulo registrado con éxito.');
-        this.recargarTabla();
+      this.modulosService.createModulo(modulo).subscribe({
+        next: () => {
+          this.alertService.exito('Creado', 'Nuevo módulo registrado con éxito.');
+          this.modalModuloVisible = false;
+          this.recargarTabla();
+        },
+        error: (err) => this.alertService.error('Error', err.error?.message || 'Fallo al crear')
       });
     }
   }

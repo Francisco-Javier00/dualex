@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 import { ConfiguracionDTO } from '../dto/dualex.dto';
 
 /**
@@ -12,8 +13,8 @@ import { ConfiguracionDTO } from '../dto/dualex.dto';
 export class ConfiguracionService {
   private http = inject(HttpClient);
 
-  // URL de la API PHP para entorno XAMPP
-  private readonly API_URL = 'http://localhost:8080/dualex/dualex_back/index.php';
+  // URL de la API PHP
+  private readonly API_URL = `${environment.apiUrl}/index.php`;
 
   /**
    * Obtiene la configuración actual desde la base de datos.

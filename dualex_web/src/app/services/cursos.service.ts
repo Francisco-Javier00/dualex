@@ -32,4 +32,8 @@ export class CursosService {
   deleteCurso(id: number): Observable<boolean> {
     return this.http.delete<boolean>(`${this.API_URL}&m=eliminar&id=${id}`);
   }
+
+  getCursosByProfesor(idProfesor: number): Observable<CursoDTO[]> {
+    return this.http.get<CursoDTO[]>(`${this.API_URL}&m=listarPorProfesor&idProfesor=${idProfesor}`);
+  }
 }

@@ -32,4 +32,8 @@ export class ProfesoresService {
   eliminarProfesor(id: number): Observable<any> {
     return this.http.get<any>(`${this.API_URL}&m=eliminar&id=${id}`);
   }
+
+  getProfesorByEmail(email: string): Observable<ProfesorDTO> {
+    return this.http.get<ProfesorDTO>(`${this.API_URL}&m=obtener&correo=${email}`);
+  }
 }

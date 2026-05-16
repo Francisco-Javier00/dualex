@@ -55,7 +55,7 @@
   [visible]="modalBorradoVisible"
   [titulo]="'Eliminar Alumno'"
   [mensaje]="'¿Estás seguro de que deseas eliminar al alumno &quot;' + (alumnoSeleccionado ? (alumnoSeleccionado.nombre + ' ' + alumnoSeleccionado.apellidos) : '') + '&quot;? Esta acción no se puede deshacer y borrará su historial.'"
-  [palabraClave]="'eliminar'"
+  [palabraClave]="'confirmar'"
   (confirmarEvent)="onConfirmarBorrado()"
   (cancelarEvent)="onCancelarBorrado()">
 </app-confirmar-borrado-modal>
