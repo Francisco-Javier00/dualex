@@ -200,18 +200,28 @@ export class AlumnosComponent implements OnInit {
 
   onGuardarAlumno(alumno: AlumnoDTO): void {
     if (alumno.id) {
-      this.alumnosService.updateAlumno(alumno).subscribe(() => {
-        this.alertService.exito('Alumno Actualizado', `Los datos de ${alumno.nombre} se han guardado correctamente.`);
-        this.datatable.refrescar();
-        this.modalAlumnoVisible = false;
-        this.alumnoSeleccionado = null;
+      this.alumnosService.updateAlumno(alumno).subscribe({
+        next: () => {
+          this.alertService.exito('Alumno Actualizado', `Los datos de ${alumno.nombre} se han guardado correctamente.`);
+          this.datatable.refrescar();
+          this.modalAlumnoVisible = false;
+          this.alumnoSeleccionado = null;
+        },
+        error: (err) => {
+          this.alertService.error('Error al Actualizar', err.error?.message || 'No se pudieron guardar los cambios del alumno.');
+        }
       });
     } else {
-      this.alumnosService.createAlumno(alumno).subscribe(() => {
-        this.alertService.exito('Alumno Registrado', `El estudiante ${alumno.nombre} ha sido dado de alta.`);
-        this.datatable.refrescar();
-        this.modalAlumnoVisible = false;
-        this.alumnoSeleccionado = null;
+      this.alumnosService.createAlumno(alumno).subscribe({
+        next: () => {
+          this.alertService.exito('Alumno Registrado', `El estudiante ${alumno.nombre} ha sido dado de alta.`);
+          this.datatable.refrescar();
+          this.modalAlumnoVisible = false;
+          this.alumnoSeleccionado = null;
+        },
+        error: (err) => {
+          this.alertService.error('Error al Registrar', err.error?.message || 'No se pudo dar de alta al alumno.');
+        }
       });
     }
   }

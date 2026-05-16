@@ -54,14 +54,10 @@ class ConAlumnos extends BaseController {
         $this->checkRole(['PROFESOR', 'COORDINADOR']);
         $json = file_get_contents('php://input');
         $datos = json_decode($json, true);
-        
-        // LOG TEMPORAL
-        file_put_contents('debug_save.txt', "Creando Paula - Datos: " . print_r($datos, true) . "\n", FILE_APPEND);
 
         // Validación del lado del servidor
         $errores = $this->modelo->validar($datos);
         if (!empty($errores)) {
-            file_put_contents('debug_save.txt', "Paula Errores Val: " . print_r($errores, true) . "\n", FILE_APPEND);
             $this->sendError(implode(" ", $errores), 400);
         }
 
@@ -69,7 +65,6 @@ class ConAlumnos extends BaseController {
             $res = $this->modelo->crear($datos);
             $this->sendResponse($res, 201);
         } catch (Exception $e) {
-            file_put_contents('debug_save.txt', "Paula EXCEPCION: " . $e->getMessage() . "\n", FILE_APPEND);
             $this->sendError($e->getMessage(), 500);
         }
     }
@@ -83,13 +78,9 @@ class ConAlumnos extends BaseController {
         $json = file_get_contents('php://input');
         $datos = json_decode($json, true);
 
-        // LOG TEMPORAL
-        file_put_contents('debug_save.txt', "Actualizando Alumno $id - Datos: " . print_r($datos, true) . "\n", FILE_APPEND);
-
         // Validación del lado del servidor
         $errores = $this->modelo->validar($datos);
         if (!empty($errores)) {
-            file_put_contents('debug_save.txt', "Errores Val $id: " . print_r($errores, true) . "\n", FILE_APPEND);
             $this->sendError(implode(" ", $errores), 400);
         }
 
@@ -97,13 +88,12 @@ class ConAlumnos extends BaseController {
             $res = $this->modelo->actualizar($id, $datos);
             $this->sendResponse($res);
         } catch (Exception $e) {
-            file_put_contents('debug_save.txt', "EXCEPCION Actualizar $id: " . $e->getMessage() . "\n", FILE_APPEND);
             $this->sendError($e->getMessage(), 500);
         }
     }
 
     public function eliminar() {
-        // $this->checkRole(['PROFESOR', 'COORDINADOR']);
+        $this->checkRole(['PROFESOR', 'COORDINADOR']);
         $id = $_GET['id'] ?? null;
         if (!$id) {
             $this->sendError("ID no proporcionado.", 400);

@@ -82,11 +82,6 @@ class ModAlumnos {
     }
 
     public function actualizar($id, $datos) {
-        // Aseguramos que usamos el ID correcto de los datos si existe
-        if (isset($datos['id'])) {
-            $id = $datos['id'];
-        }
-        
         try {
             $this->db->beginTransaction();
 
@@ -98,8 +93,6 @@ class ModAlumnos {
                 ':apellidos' => $datos['apellidos'],
                 ':correo'    => $datos['email']
             ]);
-            
-            file_put_contents('debug_save.txt', "Rows affected Usuarios: " . $stmtU->rowCount() . "\n", FILE_APPEND);
 
             $sqlA = "UPDATE Alumnos SET 
                      DNI = :dni, NUSS = :nuss, NIA = :nia, telefono = :telefono, 

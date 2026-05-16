@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, OnInit, Output, inject, OnChanges, Simp
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { AlumnoDTO, CursoDTO, EmpresaDTO } from '../../../dto/dualex.dto';
+import { AlertService } from '../../../services/alert.service';
 import { CursosService } from '../../../services/cursos.service';
 import { EmpresasService } from '../../../services/empresas.service';
 
@@ -16,6 +17,7 @@ export class AlumnoModalComponent implements OnInit, OnChanges {
   private fb = inject(FormBuilder);
   private cursosService = inject(CursosService);
   private empresasService = inject(EmpresasService);
+  private alertService = inject(AlertService);
 
   @Input() alumno: AlumnoDTO | null = null;
   @Input() visible = false;
@@ -121,6 +123,7 @@ export class AlumnoModalComponent implements OnInit, OnChanges {
       this.guardar.emit(this.alumnoForm.value);
     } else {
       this.alumnoForm.markAllAsTouched();
+      this.alertService.advertencia('Formulario Incompleto', 'Por favor, revisa los campos marcados en rojo antes de continuar.');
     }
   }
 }
