@@ -324,3 +324,16 @@ WHERE siglas IN ('DAW', 'DAM', 'ASIR');
 UPDATE Ciclos
 SET grado = 'medio'
 WHERE siglas IN ('SMR', 'MKP');
+
+ALTER TABLE Ciclos
+MODIFY idCoordinador SMALLINT UNSIGNED NULL;
+
+ALTER TABLE Ciclos
+DROP FOREIGN KEY fk_ciclos_coordinador;
+
+ALTER TABLE Ciclos
+ADD CONSTRAINT fk_ciclos_coordinador
+FOREIGN KEY (idCoordinador)
+REFERENCES Coordinador(idCoordinador)
+ON UPDATE CASCADE
+ON DELETE SET NULL;
