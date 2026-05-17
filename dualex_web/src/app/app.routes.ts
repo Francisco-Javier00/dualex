@@ -10,6 +10,7 @@ import { TareasComponent } from './components/tareas/tareas.component';
 import { TareaFormComponent } from './components/tarea-form/tarea-form.component';
 import { PerfilComponent } from './components/perfil/perfil.component';
 import { AboutComponent } from './components/about/about.component';
+import { DocsViewerComponent } from './components/docs-viewer/docs-viewer.component';
 
 import { authGuard } from './auth/guards/auth.guard';
 
@@ -17,6 +18,7 @@ export const routes: Routes = [
   { path: '', component: DashboardComponent },
   { path: 'dashboard', component: DashboardComponent },
   { path: 'acerca-de', component: AboutComponent },
+  { path: 'docs/:tipo', component: DocsViewerComponent, canActivate: [authGuard], data: { roles: ['COORDINADOR', 'PROFESOR', 'ALUMNO'] } },
   { path: 'profesores', component: ProfesoresComponent, canActivate: [authGuard], data: { roles: ['COORDINADOR'] } },
   { path: 'alumnos', component: AlumnosComponent, canActivate: [authGuard], data: { roles: ['COORDINADOR', 'PROFESOR'] } },
   { path: 'empresas', component: EmpresasComponent, canActivate: [authGuard], data: { roles: ['COORDINADOR', 'PROFESOR'] } },

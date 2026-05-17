@@ -38,11 +38,22 @@
 
                             <h5 class="fw-bold text-primary text-uppercase mb-3 small" style="letter-spacing: 1px;">
                                 Dirección Técnica</h5>
-                            <div class="list-group list-group-flush mb-5">
+                            <div class="list-group list-group-flush mb-4">
                                 <div class="list-group-item d-flex align-items-center gap-3 py-3 px-0 border-0 bg-transparent">
                                     <i class="fa-solid fa-user-tie text-secondary opacity-50"></i>
                                     <span class="fw-medium text-dark">{{ equipo.direccion }}</span>
                                 </div>
+                            </div>
+
+                            <h5 class="fw-bold text-primary text-uppercase mb-3 small mt-3" style="letter-spacing: 1px;">
+                                Manual para Desarrolladores</h5>
+                            <div class="d-flex gap-3 mb-5">
+                                <a [routerLink]="['/docs/frontend']" class="btn btn-outline-primary btn-sm rounded-pill px-4" title="Documentación de Angular (TypeDoc)">
+                                    <i class="fa-solid fa-laptop-code me-2"></i> Docs Frontend
+                                </a>
+                                <a [routerLink]="['/docs/backend']" class="btn btn-outline-secondary btn-sm rounded-pill px-4" title="Documentación de PHP (phpDocumentor)">
+                                    <i class="fa-solid fa-server me-2"></i> API Backend
+                                </a>
                             </div>
                         </div>
 
