@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Modelo para la gestión de los Cursos escolares dentro de los ciclos.
+ * 
+ * @package Dualex\Models
+ */
 class ModCursos {
     private $db;
 
@@ -7,6 +12,12 @@ class ModCursos {
         $this->db = $db;
     }
 
+    /**
+     * Obtiene todos los cursos, opcionalmente filtrados por ciclo.
+     * 
+     * @param int|null $idCiclo ID opcional del ciclo para filtrar.
+     * @return array Listado de cursos.
+     */
     public function listar($idCiclo = null) {
         $sql = "SELECT c.idCurso as id, c.nombre, c.anio_escolar, c.idCiclo, ci.nombre as ciclo, ci.grado 
                 FROM Cursos c
@@ -26,6 +37,12 @@ class ModCursos {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * Obtiene los detalles de un curso en específico.
+     * 
+     * @param int $id Identificador del curso.
+     * @return array|false Datos del curso.
+     */
     public function obtener($id) {
         $sql = "SELECT * FROM Cursos WHERE idCurso = :id";
         $stmt = $this->db->prepare($sql);
@@ -34,6 +51,12 @@ class ModCursos {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * Variante simple para recuperar cursos dado el ID de un ciclo.
+     * 
+     * @param int $idCiclo Identificador del ciclo.
+     * @return array Array de cursos.
+     */
     public function listarPorCiclo($idCiclo) {
         $sql = "SELECT * FROM Cursos WHERE idCiclo = :idCiclo ORDER BY nombre";
         $stmt = $this->db->prepare($sql);
@@ -43,7 +66,11 @@ class ModCursos {
     }
 
     /**
-     * Obtiene los cursos relacionados con un profesor (ya sea porque los coordina o porque imparte clase en ellos).
+     * Obtiene los cursos relevantes para un profesor, ya sea por ser coordinador
+     * del ciclo al que pertenece el curso, o por impartir módulos en dicho curso.
+     * 
+     * @param int $idProfesor Identificador del usuario Profesor/Coordinador.
+     * @return array Array de cursos (Unión de conjuntos).
      */
     public function listarPorProfesor($idProfesor) {
         // Cursos de ciclos que coordina
@@ -70,6 +97,12 @@ class ModCursos {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * Registra un nuevo curso formativo.
+     * 
+     * @param array $datos Datos del curso.
+     * @return array Datos del curso tras la inserción.
+     */
     public function crear($datos) {
         $sql = "INSERT INTO Cursos (nombre, anio_escolar, idCiclo) VALUES (:nombre, :anio_escolar, :idCiclo)";
         $stmt = $this->db->prepare($sql);
@@ -81,6 +114,13 @@ class ModCursos {
         return $this->obtener($this->db->lastInsertId());
     }
 
+    /**
+     * Modifica los datos de un curso.
+     * 
+     * @param int $id Identificador del curso.
+     * @param array $datos Nuevos valores.
+     * @return array Datos del curso actualizados.
+     */
     public function actualizar($id, $datos) {
         $sql = "UPDATE Cursos SET nombre = :nombre, anio_escolar = :anio_escolar, idCiclo = :idCiclo WHERE idCurso = :id";
         $stmt = $this->db->prepare($sql);
@@ -93,6 +133,12 @@ class ModCursos {
         return $this->obtener($id);
     }
 
+    /**
+     * Elimina un curso de la base de datos de manera definitiva.
+     * 
+     * @param int $id Identificador del curso a borrar.
+     * @return bool True si se eliminó correctamente.
+     */
     public function eliminar($id) {
         $sql = "DELETE FROM Cursos WHERE idCurso = :id";
         $stmt = $this->db->prepare($sql);

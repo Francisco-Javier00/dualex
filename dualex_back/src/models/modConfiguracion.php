@@ -1,4 +1,9 @@
 <?php
+/**
+ * Modelo para la configuración global del sistema (una sola fila en BD).
+ * 
+ * @package Dualex\Models
+ */
 class ModConfiguracion {
     private $conn;
     private $table_name = "Configuracion";
@@ -7,6 +12,11 @@ class ModConfiguracion {
         $this->conn = $db;
     }
 
+    /**
+     * Obtiene los valores actuales de la configuración global.
+     * 
+     * @return array|false Datos de la configuración.
+     */
     public function obtenerConfiguracion() {
         $query = "SELECT dias_aviso_caducidad as diasAvisoCaducidad, 
                          tiempo_finalizacion_convenio as tiempoFinalizacionConvenio 
@@ -16,6 +26,12 @@ class ModConfiguracion {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * Actualiza la única fila de configuración en la base de datos.
+     * 
+     * @param array $datos Valores actualizados de la configuración.
+     * @return array Estado de la operación.
+     */
     public function actualizarConfiguracion($datos) {
         // Al ser una tabla de configuración de una sola fila, hacemos el update directamente
         $query = "UPDATE " . $this->table_name . " 

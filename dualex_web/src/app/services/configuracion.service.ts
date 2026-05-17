@@ -17,14 +17,19 @@ export class ConfiguracionService {
   private readonly API_URL = `${environment.apiUrl}/index.php`;
 
   /**
-   * Obtiene la configuración actual desde la base de datos.
+   * Obtiene la configuración actual de la plataforma desde la base de datos (e.g. curso escolar activo, umbrales).
+   * 
+   * @returns Un `Observable` que emite el objeto `ConfiguracionDTO` con los ajustes globales.
    */
   getConfiguracion(): Observable<ConfiguracionDTO> {
     return this.http.get<ConfiguracionDTO>(`${this.API_URL}?c=Configuracion&m=obtenerConfiguracion`);
   }
 
   /**
-   * Actualiza los valores de configuración en la base de datos.
+   * Actualiza y persiste los valores de configuración en la base de datos.
+   * 
+   * @param config Objeto `ConfiguracionDTO` con los nuevos valores a guardar.
+   * @returns Un `Observable` con la confirmación de la actualización por parte del servidor.
    */
   updateConfiguracion(config: ConfiguracionDTO): Observable<any> {
     return this.http.post(`${this.API_URL}?c=Configuracion&m=actualizarConfiguracion`, config);

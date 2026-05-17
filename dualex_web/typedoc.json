@@ -1,0 +1,20 @@
+{
+    "$schema": "https://typedoc.org/schema.json",
+    "entryPoints": [
+        "src/app/services",
+        "src/app/models",
+        "src/app/dto"
+    ],
+    "entryPointStrategy": "expand",
+    "out": "public/assets/docs/frontend",
+    "name": "Dualex Ecosistema - Frontend API",
+    "includeVersion": true,
+    "readme": "none",
+    "exclude": [
+        "**/*.spec.ts",
+        "**/*.module.ts",
+        "**/environments/*"
+    ],
+    "theme": "default",
+    "lang": "es"
+}

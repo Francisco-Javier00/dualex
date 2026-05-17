@@ -3,6 +3,10 @@ import { BehaviorSubject } from 'rxjs';
 import { Categoria } from '../dto/dualex.dto';
 import { AuthService } from '../auth/services/auth.service';
 
+/**
+ * Servicio encargado de gestionar y proveer las categorías de navegación del menú lateral
+ * basándose en el rol del usuario autenticado (Coordinador, Profesor o Alumno).
+ */
 @Injectable({
   providedIn: 'root'
 })
@@ -45,6 +49,11 @@ export class DashboardService {
     });
   }
 
+  /**
+   * Actualiza el `BehaviorSubject` de categorías en función del rol proporcionado.
+   * 
+   * @param rol Rol del usuario autenticado (e.g., 'COORDINADOR', 'PROFESOR', 'ALUMNO').
+   */
   private actualizarCategoriasPorRol(rol: string): void {
     switch (rol) {
       case 'COORDINADOR':
@@ -61,6 +70,11 @@ export class DashboardService {
     }
   }
 
+  /**
+   * Obtiene el valor actual síncrono de las categorías asignadas al usuario.
+   * 
+   * @returns Un array de objetos `Categoria` configurados para el menú.
+   */
   obtenerCategorias(): Categoria[] {
     return this.sujetoCategorias.value;
   }

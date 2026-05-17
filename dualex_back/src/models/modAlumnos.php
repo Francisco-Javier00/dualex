@@ -1,12 +1,36 @@
 <?php
 
+/**
+ * Modelo de datos para la gestión y persistencia de Alumnos en la base de datos de Dualex.
+ * 
+ * Esta clase interactúa directamente con las tablas `Usuarios`, `Alumnos` y
+ * la tabla intermedia `Empresa_Alumnos`, gestionando la lógica de negocio y transacciones
+ * asociadas a los registros de alumnos.
+ * 
+ * @category Model
+ * @package  Dualex\Models
+ */
 class ModAlumnos {
+    /**
+     * @var PDO Conexión activa a la base de datos MySQL.
+     */
     private $db;
 
+    /**
+     * Constructor del modelo.
+     *
+     * @param PDO $db Instancia de la conexión a la base de datos.
+     */
     public function __construct($db) {
         $this->db = $db;
     }
 
+    /**
+     * Obtiene el listado completo de todos los alumnos registrados en el sistema,
+     * asociando sus datos personales de usuario, curso y empresa vinculada.
+     *
+     * @return array[] Listado de alumnos con formato de clave-valor asociativo.
+     */
     public function listar() {
         $sql = "SELECT u.idUsuario as id, u.nombre, u.apellidos, u.correo as email, 
                        a.DNI as dni, a.NUSS as nuss, a.NIA as nia, a.telefono, 
@@ -24,6 +48,12 @@ class ModAlumnos {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * Obtiene la información detallada de un alumno específico mediante su identificador.
+     *
+     * @param int $id Identificador único del alumno (ID de usuario).
+     * @return array|false Datos del alumno si se encuentra, o false si no existe.
+     */
     public function obtener($id) {
         $sql = "SELECT u.idUsuario as id, u.nombre, u.apellidos, u.correo as email, 
                        a.DNI as dni, a.NUSS as nuss, a.NIA as nia, a.telefono, 
@@ -38,6 +68,14 @@ class ModAlumnos {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * Registra un nuevo alumno en la base de datos, creando el usuario base
+     * y asociando el alumno y su empresa bajo una transacción segura.
+     *
+     * @param array $datos Datos estructurados del alumno (nombre, apellidos, email, dni, nuss, nia, telefono, repetidor, idCurso, idEmpresa).
+     * @throws Exception Si ocurre un fallo en la inserción (hace rollback de la transacción).
+     * @return array La información detallada del alumno recién creado.
+     */
     public function crear($datos) {
         try {
             $this->db->beginTransaction();
@@ -81,6 +119,14 @@ class ModAlumnos {
         }
     }
 
+    /**
+     * Actualiza la información de un alumno y su relación con la empresa bajo una transacción segura.
+     *
+     * @param int   $id    Identificador único del alumno a actualizar.
+     * @param array $datos Nuevos datos estructurados del alumno.
+     * @throws Exception Si ocurre un fallo durante la transacción.
+     * @return array Los datos actualizados del alumno.
+     */
     public function actualizar($id, $datos) {
         try {
             $this->db->beginTransaction();
@@ -131,6 +177,12 @@ class ModAlumnos {
         }
     }
 
+    /**
+     * Elimina un alumno y su correspondiente registro de la tabla Usuarios en cascada.
+     *
+     * @param int $id Identificador del alumno a eliminar.
+     * @return bool True si la operación fue exitosa, false en caso contrario.
+     */
     public function eliminar($id) {
         $sql = "DELETE FROM Usuarios WHERE idUsuario = :id";
         $stmt = $this->db->prepare($sql);
@@ -138,6 +190,13 @@ class ModAlumnos {
         return $stmt->execute();
     }
 
+    /**
+     * Obtiene los alumnos paginados, ordenados y filtrados según la petición de DataTables,
+     * aplicando reglas de visibilidad y filtros específicos de acuerdo al Rol del usuario (Coordinador, Profesor o Administrador).
+     *
+     * @param array $params Parámetros de DataTables y metadatos de sesión (incluyendo rol_token y email).
+     * @return array Estructura requerida por DataTables (draw, recordsTotal, recordsFiltered, data).
+     */
     public function obtenerDataTables($params) {
         $idModulo = $params['idModulo'] ?? ($_GET['idModulo'] ?? ($_GET['moduloId'] ?? null));
         $email = $params['email'] ?? null;
@@ -249,6 +308,12 @@ class ModAlumnos {
         ];
     }
 
+    /**
+     * Obtiene el listado de alumnos que están cursando un módulo específico.
+     *
+     * @param int $idModulo Identificador único del módulo.
+     * @return array[] Listado de alumnos vinculados al módulo.
+     */
     public function listarPorModulo($idModulo) {
         $sql = "SELECT u.idUsuario as id, u.nombre, u.apellidos, u.correo as email, 
                        a.DNI as dni, a.NUSS as nuss, a.NIA as nia, a.telefono, 
@@ -265,6 +330,13 @@ class ModAlumnos {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * Realiza la validación de negocio de los datos de un alumno, incluyendo campos obligatorios,
+     * formato de correo, límites de caracteres y algoritmo oficial de validación de DNI/NIE.
+     *
+     * @param array $datos Datos del alumno a validar.
+     * @return string[] Array con los mensajes de error encontrados (vacío si es válido).
+     */
     public function validar($datos) {
         $errores = [];
 

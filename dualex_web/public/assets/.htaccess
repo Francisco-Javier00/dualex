@@ -1,0 +1,2 @@
+# Desactiva la navegación por directorios para proteger el contenido de /assets
+Options -Indexes
