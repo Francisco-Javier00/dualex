@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { DatatableComponent } from '../shared/datatable/datatable.component';
 import { ConfirmarBorradoModalComponent } from '../shared/modals/confirmar-borrado-modal/confirmar-borrado-modal.component';
 import { Config } from 'datatables.net';
@@ -13,7 +13,7 @@ import { CursoDTO } from '../../dto/dualex.dto';
 @Component({
   selector: 'app-cursos',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, DatatableComponent, ConfirmarBorradoModalComponent],
+  imports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule, DatatableComponent, ConfirmarBorradoModalComponent],
   templateUrl: './cursos.component.html',
   styleUrl: './cursos.component.css'
 })
@@ -21,6 +21,7 @@ export class CursosComponent implements OnInit {
   private servicioAlertas = inject(AlertService);
   private cursosService = inject(CursosService);
   private ciclosService = inject(CiclosService);
+  private fb = inject(FormBuilder);
 
   cursos: CursoDTO[] = [];
   ciclosExistentes: any[] = [];
@@ -31,7 +32,19 @@ export class CursosComponent implements OnInit {
   isEditModalOpen = false;
   isEditing = false;
   tipoCiclo: 'existente' | 'nuevo' = 'existente';
-  cursoForm: any = this.initForm();
+
+  cursoFormGroup: FormGroup = this.fb.group({
+    id: [null],
+    cicloExistente: [''],
+    curso: ['', [Validators.required]],
+    siglasCurso: ['', [Validators.required]],
+    colorFondo: ['#ffffff'],
+    colorTexto: ['#000000'],
+    nombreCiclo: [''],
+    siglasCiclo: [''],
+    grado: ['Superior'],
+    anoEscolar: ['']
+  });
 
   isDeleteModalOpen = false;
   cursoToDelete: any = null;
@@ -103,25 +116,7 @@ export class CursosComponent implements OnInit {
     });
   }
 
-  /**
-   * Inicializa el objeto del formulario con valores por defecto.
-   * retorna Un objeto con la estructura inicial del formulario.
-   */
-  initForm() {
-    return {
-      id: null,
-      cicloExistente: '',
-      curso: '',
-      siglasCurso: '',
-      colorFondo: '#ffffff',
-      colorTexto: '#000000',
-      // Campos para ciclo nuevo
-      nombreCiclo: '',
-      siglasCiclo: '',
-      grado: 'Superior',
-      anoEscolar: ''
-    };
-  }
+
 
   /**
    * Gestiona las acciones disparadas desde la tabla (editar o eliminar).
@@ -143,18 +138,33 @@ export class CursosComponent implements OnInit {
     if (curso) {
       this.isEditing = true;
       this.tipoCiclo = 'existente';
-      this.cursoForm = {
-        ...this.initForm(),
+      this.cursoFormGroup.patchValue({
         id: curso.id,
         cicloExistente: curso.ciclo,
         curso: curso.curso,
         siglasCurso: curso.nombre,
-        anoEscolar: curso.anoEscolar
-      };
+        anoEscolar: curso.anoEscolar || '25-26',
+        colorFondo: '#ffffff',
+        colorTexto: '#000000',
+        nombreCiclo: '',
+        siglasCiclo: '',
+        grado: 'Superior'
+      });
     } else {
       this.isEditing = false;
       this.tipoCiclo = 'existente';
-      this.cursoForm = this.initForm();
+      this.cursoFormGroup.reset({
+        id: null,
+        cicloExistente: '',
+        curso: '',
+        siglasCurso: '',
+        colorFondo: '#ffffff',
+        colorTexto: '#000000',
+        nombreCiclo: '',
+        siglasCiclo: '',
+        grado: 'Superior',
+        anoEscolar: ''
+      });
     }
     this.isEditModalOpen = true;
   }
@@ -166,33 +176,43 @@ export class CursosComponent implements OnInit {
     this.isEditModalOpen = false;
   }
 
-  /**
-   * Valida y guarda la información del curso (creación o actualización).
-   * Si el ciclo es nuevo, también lo añade a la lista de ciclos.
-   */
   guardarCurso() {
-    const siglas = this.cursoForm.siglasCurso;
+    const val = this.cursoFormGroup.getRawValue();
+    const siglas = val.siglasCurso;
 
     // Comprobar duplicados por siglas
-    const duplicado = this.cursos.find(c => c.nombre === siglas && c.id !== this.cursoForm.id);
+    const duplicado = this.cursos.find(c => c.nombre === siglas && c.id !== val.id);
 
     if (duplicado) {
       this.servicioAlertas.error('Error', `Ya existe un curso con las siglas "${siglas}"`);
       return;
     }
 
-    if (!this.cursoForm.curso) {
-      this.servicioAlertas.error('Error', 'Debes seleccionar un curso (1º o 2º)');
+    // Validaciones dependiendo del tipo de ciclo:
+    let esValido = true;
+    if (this.tipoCiclo === 'existente') {
+      if (!val.cicloExistente || !val.curso) {
+        esValido = false;
+      }
+    } else {
+      if (!val.nombreCiclo || !val.siglasCiclo || !val.anoEscolar || !val.curso) {
+        esValido = false;
+      }
+    }
+
+    if (!esValido) {
+      this.cursoFormGroup.markAllAsTouched();
+      this.servicioAlertas.advertencia('Formulario Incompleto', 'Por favor, rellena todos los campos obligatorios marcados en rojo.');
       return;
     }
 
     // Si el ciclo es nuevo, lo guardamos también en el servicio de ciclos
     if (this.tipoCiclo === 'nuevo') {
       this.ciclosService.addCiclo({
-        nombre: this.cursoForm.nombreCiclo,
-        siglas: this.cursoForm.siglasCiclo,
-        grado: this.cursoForm.grado,
-        anoEscolar: this.cursoForm.anoEscolar
+        nombre: val.nombreCiclo,
+        siglas: val.siglasCiclo,
+        grado: val.grado,
+        anoEscolar: val.anoEscolar
       }).subscribe(() => {
         this.ciclosService.getCiclosExistentes().subscribe(ciclos => {
           this.ciclosExistentes = ciclos;
@@ -201,11 +221,11 @@ export class CursosComponent implements OnInit {
     }
 
     const cursoData: CursoDTO = {
-      id: this.isEditing ? this.cursoForm.id : Date.now(),
+      id: this.isEditing ? val.id : Date.now(),
       nombre: siglas,
-      curso: this.cursoForm.curso,
-      anoEscolar: this.tipoCiclo === 'nuevo' ? this.cursoForm.anoEscolar : '25-26',
-      ciclo: this.tipoCiclo === 'existente' ? this.cursoForm.cicloExistente : this.cursoForm.nombreCiclo
+      curso: val.curso,
+      anoEscolar: this.tipoCiclo === 'nuevo' ? val.anoEscolar : '25-26',
+      ciclo: this.tipoCiclo === 'existente' ? val.cicloExistente : val.nombreCiclo
     };
 
     if (this.isEditing) {
@@ -256,18 +276,21 @@ export class CursosComponent implements OnInit {
    */
   actualizarSiglas() {
     let siglasCiclo = '';
+    const val = this.cursoFormGroup.value;
 
     if (this.tipoCiclo === 'existente') {
-      const ciclo = this.ciclosExistentes.find(c => c.nombre === this.cursoForm.cicloExistente);
+      const ciclo = this.ciclosExistentes.find(c => c.nombre === val.cicloExistente);
       if (ciclo) {
         siglasCiclo = ciclo.siglas;
       }
     } else {
-      siglasCiclo = this.cursoForm.siglasCiclo;
+      siglasCiclo = val.siglasCiclo;
     }
 
-    if (siglasCiclo && this.cursoForm.curso) {
-      this.cursoForm.siglasCurso = `${this.cursoForm.curso}º ${siglasCiclo}`;
+    if (siglasCiclo && val.curso) {
+      this.cursoFormGroup.patchValue({
+        siglasCurso: `${val.curso}º ${siglasCiclo}`
+      });
     }
   }
 

@@ -20,7 +20,8 @@
         <!-- CAMPO: Título -->
         <div class="mb-4">
           <label class="form-label small fw-bold text-uppercase opacity-75">Título de la Actividad</label>
-          <div class="input-group shadow-sm rounded-3 overflow-hidden border">
+          <div class="input-group shadow-sm rounded-3 overflow-hidden border"
+               [class.is-invalid]="actividadForm.get('titulo')?.invalid && actividadForm.get('titulo')?.touched">
             <span class="input-group-text bg-white border-0"><i class="fa-solid fa-heading text-muted"></i></span>
             <input type="text" 
                    formControlName="titulo" 
@@ -29,7 +30,7 @@
                    [class.is-invalid]="actividadForm.get('titulo')?.invalid && actividadForm.get('titulo')?.touched">
           </div>
           <!-- Mensaje de error -->
-          <div class="text-danger extra-small mt-1" *ngIf="actividadForm.get('titulo')?.invalid && actividadForm.get('titulo')?.touched">
+          <div class="text-danger small mt-1" *ngIf="actividadForm.get('titulo')?.invalid && actividadForm.get('titulo')?.touched">
             El título es obligatorio y debe tener al menos 5 caracteres.
           </div>
         </div>
@@ -37,13 +38,18 @@
         <!-- CAMPO: Módulo -->
         <div class="mb-4">
           <label class="form-label small fw-bold text-uppercase opacity-75">Módulo Asociado</label>
-          <div class="input-group shadow-sm rounded-3 overflow-hidden border">
+          <div class="input-group shadow-sm rounded-3 overflow-hidden border"
+               [class.is-invalid]="actividadForm.get('modulo')?.invalid && actividadForm.get('modulo')?.touched">
             <span class="input-group-text bg-white border-0"><i class="fa-solid fa-book text-muted"></i></span>
             <input type="text" 
                    formControlName="modulo" 
                    class="form-control border-0 px-3" 
                    placeholder="Ej: Sistemas Informáticos"
                    [class.is-invalid]="actividadForm.get('modulo')?.invalid && actividadForm.get('modulo')?.touched">
+          </div>
+          <!-- Mensaje de error -->
+          <div class="text-danger small mt-1" *ngIf="actividadForm.get('modulo')?.invalid && actividadForm.get('modulo')?.touched">
+            El módulo asociado es obligatorio.
           </div>
         </div>
 
@@ -56,7 +62,7 @@
                     placeholder="Describe los pasos o requisitos de esta actividad..."
                     [class.is-invalid]="actividadForm.get('descripcion')?.invalid && actividadForm.get('descripcion')?.touched"></textarea>
         </div>
-        <div class="text-danger extra-small mb-4" *ngIf="actividadForm.get('descripcion')?.invalid && actividadForm.get('descripcion')?.touched">
+        <div class="text-danger small mb-4" *ngIf="actividadForm.get('descripcion')?.invalid && actividadForm.get('descripcion')?.touched">
           La descripción es obligatoria.
         </div>
 
@@ -65,7 +71,7 @@
           <button type="button" class="btn btn-light border flex-grow-1 py-2 shadow-sm rounded-3" (click)="cerrar()">
             Cancelar
           </button>
-          <button type="submit" class="btn btn-primary flex-grow-1 py-2 shadow-sm rounded-3" [disabled]="actividadForm.invalid">
+          <button type="submit" class="btn btn-primary flex-grow-1 py-2 shadow-sm rounded-3">
             <i class="fa-solid fa-save me-2"></i> {{ actividad ? 'Guardar cambios' : 'Crear Actividad' }}
           </button>
         </div>

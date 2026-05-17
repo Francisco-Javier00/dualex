@@ -170,7 +170,19 @@ class ModModulos {
         $start = (int)($params['start'] ?? 0);
         $length = (int)($params['length'] ?? 10);
         $search = $params['search']['value'] ?? '';
-        $idCoordinador = $params['idCoordinador'] ?? null;
+        
+        $idCoordinador = null; // Nunca usamos el ID del token por seguridad
+        $email = $params['email'] ?? null;
+
+        // Resolvemos el idCoordinador real de la base de datos a partir del correo
+        if (!empty($email)) {
+            $stmtUser = $this->db->prepare("SELECT idUsuario FROM Usuarios WHERE correo = :correo LIMIT 1");
+            $stmtUser->execute([':correo' => $email]);
+            $realId = $stmtUser->fetchColumn();
+            if ($realId) {
+                $idCoordinador = (int)$realId;
+            }
+        }
 
         $conditions = [];
         $binds = [];

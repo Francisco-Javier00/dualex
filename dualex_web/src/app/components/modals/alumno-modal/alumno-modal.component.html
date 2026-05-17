@@ -23,7 +23,8 @@
               <!-- Nombre -->
               <div class="col-12">
                 <label class="form-label small fw-bold text-uppercase opacity-75">Nombre</label>
-                <div class="input-group shadow-sm rounded-3 overflow-hidden border">
+                <div class="input-group shadow-sm rounded-3 overflow-hidden border"
+                     [class.is-invalid]="alumnoForm.get('nombre')?.touched && alumnoForm.get('nombre')?.invalid">
                   <span class="input-group-text bg-white border-0"><i class="fa-solid fa-user text-muted"></i></span>
                   <input type="text" formControlName="nombre" class="form-control border-0 px-3"
                     placeholder="Ej: Alejandro" maxlength="50"
@@ -38,7 +39,8 @@
               <!-- Apellidos -->
               <div class="col-12">
                 <label class="form-label small fw-bold text-uppercase opacity-75">Apellidos</label>
-                <div class="input-group shadow-sm rounded-3 overflow-hidden border">
+                <div class="input-group shadow-sm rounded-3 overflow-hidden border"
+                     [class.is-invalid]="alumnoForm.get('apellidos')?.touched && alumnoForm.get('apellidos')?.invalid">
                   <span class="input-group-text bg-white border-0"><i class="fa-solid fa-users text-muted"></i></span>
                   <input type="text" formControlName="apellidos" class="form-control border-0 px-3"
                     placeholder="Ej: García Romero" maxlength="100"
@@ -53,7 +55,8 @@
               <!-- Correo -->
               <div class="col-12">
                 <label class="form-label small fw-bold text-uppercase opacity-75">Correo Electrónico</label>
-                <div class="input-group shadow-sm rounded-3 overflow-hidden border">
+                <div class="input-group shadow-sm rounded-3 overflow-hidden border"
+                     [class.is-invalid]="alumnoForm.get('email')?.touched && alumnoForm.get('email')?.invalid">
                   <span class="input-group-text bg-white border-0"><i
                       class="fa-solid fa-envelope text-muted"></i></span>
                   <input type="email" formControlName="email" class="form-control border-0 px-3"
@@ -71,7 +74,8 @@
               <!-- Teléfono -->
               <div class="col-md-6">
                 <label class="form-label small fw-bold text-uppercase opacity-75">Teléfono</label>
-                <div class="input-group shadow-sm rounded-3 overflow-hidden border">
+                <div class="input-group shadow-sm rounded-3 overflow-hidden border"
+                     [class.is-invalid]="alumnoForm.get('telefono')?.touched && alumnoForm.get('telefono')?.invalid">
                   <span class="input-group-text bg-white border-0"><i class="fa-solid fa-phone text-muted"></i></span>
                   <input type="text" formControlName="telefono" class="form-control border-0 px-3"
                     placeholder="600 000 000" maxlength="15"
@@ -86,7 +90,8 @@
               <!-- NUSS -->
               <div class="col-md-6">
                 <label class="form-label small fw-bold text-uppercase opacity-75">NUSS</label>
-                <div class="input-group shadow-sm rounded-3 overflow-hidden border">
+                <div class="input-group shadow-sm rounded-3 overflow-hidden border"
+                     [class.is-invalid]="alumnoForm.get('nuss')?.touched && alumnoForm.get('nuss')?.invalid">
                   <span class="input-group-text bg-white border-0"><i
                       class="fa-solid fa-shield-heart text-muted"></i></span>
                   <input type="text" formControlName="nuss" class="form-control border-0 px-3" placeholder="12 dígitos"
@@ -112,7 +117,8 @@
               <!-- DNI -->
               <div class="col-md-6">
                 <label class="form-label small fw-bold text-uppercase opacity-75">DNI / NIE</label>
-                <div class="input-group shadow-sm rounded-3 overflow-hidden border">
+                <div class="input-group shadow-sm rounded-3 overflow-hidden border"
+                     [class.is-invalid]="alumnoForm.get('dni')?.touched && alumnoForm.get('dni')?.invalid">
                   <span class="input-group-text bg-white border-0"><i class="fa-solid fa-id-card text-muted"></i></span>
                   <input type="text" formControlName="dni" class="form-control border-0 px-3" placeholder="12345678X"
                     maxlength="15"
@@ -130,7 +136,8 @@
               <!-- NIA -->
               <div class="col-md-6">
                 <label class="form-label small fw-bold text-uppercase opacity-75">NIA</label>
-                <div class="input-group shadow-sm rounded-3 overflow-hidden border">
+                <div class="input-group shadow-sm rounded-3 overflow-hidden border"
+                     [class.is-invalid]="alumnoForm.get('nia')?.touched && alumnoForm.get('nia')?.invalid">
                   <span class="input-group-text bg-white border-0"><i class="fa-solid fa-hashtag text-muted"></i></span>
                   <input type="text" formControlName="nia" class="form-control border-0 px-3" placeholder="10 dígitos"
                     maxlength="10"
@@ -146,7 +153,8 @@
               <!-- Curso -->
               <div class="col-12">
                 <label class="form-label small fw-bold text-uppercase opacity-75">Curso y Ciclo</label>
-                <div class="input-group shadow-sm rounded-3 overflow-hidden border">
+                <div class="input-group shadow-sm rounded-3 overflow-hidden border"
+                     [class.is-invalid]="alumnoForm.get('idCurso')?.touched && alumnoForm.get('idCurso')?.invalid">
                   <span class="input-group-text bg-white border-0"><i
                       class="fa-solid fa-graduation-cap text-muted"></i></span>
                   <select class="form-select border-0 px-3" formControlName="idCurso"

@@ -42,7 +42,7 @@ class ConAlumnos extends BaseController {
         }
         
         // 4. Inyectamos los datos del token de sesión
-        $params['emailProfesor'] = $this->user['email'] ?? null;
+        $params['email'] = $this->user['email'] ?? null;
         $params['idUsuario'] = $this->user['id'] ?? $this->user['idUsuario'] ?? $this->user['sub'] ?? null;
         $params['rol_token'] = $this->user['roles']['dualex'] ?? null;
         

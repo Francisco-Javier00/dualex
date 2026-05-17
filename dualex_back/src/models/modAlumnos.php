@@ -140,8 +140,19 @@ class ModAlumnos {
 
     public function obtenerDataTables($params) {
         $idModulo = $params['idModulo'] ?? ($_GET['idModulo'] ?? ($_GET['moduloId'] ?? null));
-        $emailProfesor = $params['emailProfesor'] ?? null;
-        $idUsuario = $params['idUsuario'] ?? null;
+        $email = $params['email'] ?? null;
+        $idUsuario = null; // Nunca usamos el idUsuario del token por seguridad
+
+        // Resolvemos el idUsuario real de la base de datos a partir del correo del token
+        if (!empty($email)) {
+            $stmtUser = $this->db->prepare("SELECT idUsuario FROM Usuarios WHERE correo = :correo LIMIT 1");
+            $stmtUser->execute([':correo' => $email]);
+            $realId = $stmtUser->fetchColumn();
+            if ($realId) {
+                $idUsuario = (int)$realId;
+            }
+        }
+
         $idsCursos = $params['idsCursos'] ?? null;
         $rol = strtoupper($params['rol_token'] ?? '');
         $start = (int)($params['start'] ?? 0);

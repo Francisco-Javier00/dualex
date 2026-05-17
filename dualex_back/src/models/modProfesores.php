@@ -363,6 +363,19 @@ class ModProfesores {
         return $prof;
     }
 
+    public function obtenerPorCorreo($correo) {
+        $sql = "SELECT u.idUsuario as id, u.nombre, u.apellidos, u.correo, c.idCoordinador
+                FROM Usuarios u
+                JOIN Profesor p ON u.idUsuario = p.idProfesor
+                LEFT JOIN Coordinador c ON p.idProfesor = c.idCoordinador
+                WHERE u.correo = :correo AND u.tipo = 'P'";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':correo' => $correo]);
+        $prof = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($prof) $this->cargarInformacionRelacionada($prof);
+        return $prof;
+    }
+
     public function eliminar($id) {
         try {
             $this->db->beginTransaction();

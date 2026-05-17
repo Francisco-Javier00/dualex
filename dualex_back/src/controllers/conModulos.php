@@ -52,9 +52,9 @@ class ConModulos extends BaseController {
         $json = file_get_contents('php://input');
         $params = json_decode($json, true);
 
-        // Si el usuario es COORDINADOR, filtramos solo por sus ciclos
+        // Si el usuario es COORDINADOR, pasamos su correo de la sesión para filtrar sus ciclos de forma segura
         if ($this->user && isset($this->user['roles']['dualex']) && strtoupper($this->user['roles']['dualex']) === 'COORDINADOR') {
-            $params['idCoordinador'] = $this->user['id'];
+            $params['email'] = $this->user['email'] ?? null;
         }
 
         try {
