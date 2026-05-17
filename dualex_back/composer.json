@@ -1,0 +1,16 @@
+{
+    "name": "francisco-javier00/dualex-back",
+    "description": "Backend de Dualex (PHP REST API)",
+    "type": "project",
+    "require": {
+        "php": ">=7.4"
+    },
+    "require-dev": {
+        "phpdocumentor/phpdocumentor": "^3.0"
+    },
+    "config": {
+        "allow-plugins": {
+            "phpstan/extension-installer": true
+        }
+    }
+}

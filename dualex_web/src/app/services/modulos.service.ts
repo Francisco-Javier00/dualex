@@ -5,7 +5,8 @@ import { environment } from '../../environments/environment';
 import { ModuloDTO } from '../dto/dualex.dto';
 
 /**
- * Servicio encargado de la gestión de Módulos conectando con el router index.php.
+ * Servicio de Angular para la gestión de Módulos (asignaturas/clases).
+ * Se comunica con el controlador `Modulos` del backend para proveer datos a la interfaz.
  */
 @Injectable({
   providedIn: 'root'
@@ -17,14 +18,19 @@ export class ModulosService {
   private readonly API_URL = `${environment.apiUrl}/index.php?c=Modulos`;
 
   /**
-   * Obtiene la lista completa de módulos.
+   * Obtiene la lista completa de todos los módulos sin filtros.
+   * 
+   * @returns Un `Observable` con el array completo de `ModuloDTO`.
    */
   getModulos(): Observable<ModuloDTO[]> {
     return this.http.get<ModuloDTO[]>(`${this.API_URL}&m=listar`);
   }
 
   /**
-   * Obtiene los módulos asociados a un ciclo concreto usando la relación real de la BD.
+   * Obtiene los módulos asociados a un ciclo concreto filtrando por sus siglas.
+   * 
+   * @param siglasCiclo Acrónimo o siglas del ciclo formativo a consultar.
+   * @returns Un `Observable` con los módulos que pertenecen al ciclo solicitado.
    */
   getModulosPorCiclo(siglasCiclo: string): Observable<ModuloDTO[]> {
     const ciclo = encodeURIComponent(siglasCiclo);
@@ -32,35 +38,50 @@ export class ModulosService {
   }
 
   /**
-   * Procesa la solicitud de DataTables conectando con el backend.
+   * Delega al backend el filtrado, búsqueda y paginación de los módulos.
+   * 
+   * @param dataTablesParameters Parámetros de estado de la tabla visual (página, búsqueda, orden).
+   * @returns Un `Observable` con el formato esperado por DataTables.
    */
   obtenerModulosDataTables(dataTablesParameters: any): Observable<any> {
     return this.http.post<any>(`${this.API_URL}&m=obtenerDataTables`, dataTablesParameters);
   }
 
   /**
-   * Registra un nuevo módulo.
+   * Envía los datos de un nuevo módulo para su creación en la base de datos.
+   * 
+   * @param modulo El objeto `ModuloDTO` que se va a persistir.
+   * @returns Un `Observable` emitiendo el objeto persistido devuelto por la API.
    */
   createModulo(modulo: ModuloDTO): Observable<ModuloDTO> {
     return this.http.post<ModuloDTO>(`${this.API_URL}&m=crear`, modulo);
   }
 
   /**
-   * Actualiza los datos de un módulo existente.
+   * Realiza la actualización completa de las propiedades de un módulo.
+   * 
+   * @param modulo Objeto `ModuloDTO` con los datos ya modificados.
+   * @returns Un `Observable` con el resultado de la actualización.
    */
   updateModulo(modulo: ModuloDTO): Observable<ModuloDTO> {
     return this.http.put<ModuloDTO>(`${this.API_URL}&m=actualizar&id=${modulo.id}`, modulo);
   }
 
   /**
-   * Elimina un módulo.
+   * Solicita la eliminación permanente de un módulo por su clave principal.
+   * 
+   * @param id El identificador único del módulo a borrar.
+   * @returns Un `Observable` confirmando el éxito o fracaso de la eliminación.
    */
   deleteModulo(id: number): Observable<boolean> {
     return this.http.delete<boolean>(`${this.API_URL}&m=eliminar&id=${id}`);
   }
 
   /**
-   * Obtiene un módulo por su ID.
+   * Extrae los metadatos y valores de un módulo específico en base a su ID.
+   * 
+   * @param id El ID numérico del módulo a buscar.
+   * @returns Un `Observable` con los datos del módulo buscado.
    */
   getModuloById(id: number): Observable<ModuloDTO> {
     return this.http.get<ModuloDTO>(`${this.API_URL}&m=obtener&id=${id}`);

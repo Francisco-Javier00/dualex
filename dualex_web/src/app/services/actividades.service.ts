@@ -20,7 +20,10 @@ export class ActividadesService {
   private cacheActividades: ActividadDTO[] = [];
 
   /**
-   * Obtiene el catálogo completo de actividades desde la DB.
+   * Obtiene el catálogo completo de actividades desde la base de datos.
+   * Almacena el resultado en una caché local para agilizar futuras consultas.
+   * 
+   * @returns Un `Observable` que emite un array con la lista completa de actividades.
    */
   getActividades(): Observable<ActividadDTO[]> {
     return this.http.get<ActividadDTO[]>(`${this.API_URL}?c=Actividades&m=listar`).pipe(
@@ -29,7 +32,11 @@ export class ActividadesService {
   }
 
   /**
-   * Soporte para DataTables (procesamiento en servidor simulado con datos reales).
+   * Proporciona soporte para la integración con DataTables, simulando un procesamiento en el servidor 
+   * pero utilizando datos reales filtrados de la caché o de la base de datos.
+   * 
+   * @param dataTablesParameters Parámetros de paginación, búsqueda y ordenación enviados por DataTables.
+   * @returns Un `Observable` con la estructura requerida por DataTables (draw, recordsTotal, recordsFiltered, data).
    */
   obtenerActividadesDataTables(dataTablesParameters: any): Observable<any> {
     const start = dataTablesParameters.start || 0;
@@ -46,6 +53,16 @@ export class ActividadesService {
     return of(this.filtrarParaDataTables(this.cacheActividades, start, length, search, dataTablesParameters.draw));
   }
 
+  /**
+   * Filtra y pagina de forma interna un array de actividades basándose en los parámetros de búsqueda.
+   * 
+   * @param lista Array completo de actividades a filtrar.
+   * @param start Índice de inicio para la paginación.
+   * @param length Cantidad de registros por página.
+   * @param search Texto de búsqueda introducido por el usuario.
+   * @param draw Identificador de la petición para DataTables.
+   * @returns Objeto estructurado para la respuesta a DataTables.
+   */
   private filtrarParaDataTables(lista: ActividadDTO[], start: number, length: number, search: string, draw: number) {
     let filtradas = lista;
     if (search) {
@@ -65,7 +82,10 @@ export class ActividadesService {
   }
 
   /**
-   * Registra una nueva actividad en el catálogo.
+   * Registra una nueva actividad en el catálogo maestro y limpia la caché para forzar su recarga.
+   * 
+   * @param actividad Objeto con los datos de la nueva actividad.
+   * @returns Un `Observable` con la respuesta del servidor tras la creación.
    */
   createActividad(actividad: ActividadDTO): Observable<any> {
     return this.http.post(`${this.API_URL}?c=Actividades&m=crear`, actividad).pipe(
@@ -74,7 +94,10 @@ export class ActividadesService {
   }
 
   /**
-   * Actualiza los datos de una actividad existente.
+   * Actualiza los datos de una actividad existente y limpia la caché.
+   * 
+   * @param actividad Objeto con los datos actualizados de la actividad.
+   * @returns Un `Observable` con la respuesta del servidor.
    */
   updateActividad(actividad: ActividadDTO): Observable<any> {
     return this.http.post(`${this.API_URL}?c=Actividades&m=actualizar&id=${actividad.id}`, actividad).pipe(
@@ -83,7 +106,10 @@ export class ActividadesService {
   }
 
   /**
-   * Elimina una actividad del catálogo.
+   * Elimina una actividad del catálogo maestro de forma permanente.
+   * 
+   * @param id Identificador único de la actividad a eliminar.
+   * @returns Un `Observable` con el resultado de la eliminación en base de datos.
    */
   deleteActividad(id: number): Observable<any> {
     return this.http.get(`${this.API_URL}?c=Actividades&m=eliminar&id=${id}`).pipe(

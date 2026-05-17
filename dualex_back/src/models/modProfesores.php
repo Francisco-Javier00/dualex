@@ -13,6 +13,8 @@ class ModProfesores {
 
     /**
      * Devuelve el listado completo de profesores (sin paginación).
+     * 
+     * @return array Array asociativo con la lista de profesores y sus relaciones.
      */
     public function listar() {
         $sql = "SELECT u.idUsuario as id, u.nombre, u.apellidos, u.correo, c.idCoordinador
@@ -30,6 +32,12 @@ class ModProfesores {
         }
         return $data;
     }
+    /**
+     * Prepara y retorna la estructura requerida por DataTables.
+     * 
+     * @param array $params Configuración enviada desde el front.
+     * @return array Estructura con datos paginados, totales y variables de draw.
+     */
     public function obtenerDataTables($params) {
         $start = (int)($params['start'] ?? 0);
         $length = (int)($params['length'] ?? 10);
@@ -84,6 +92,12 @@ class ModProfesores {
 
     /**
      * Crea un profesor y gestiona todas sus vinculaciones en una sola transacción.
+     * (Registra al usuario, lo vincula como profesor, como coordinador si corresponde y asigna ciclos y módulos).
+     * 
+     * @param array $datos Datos provistos en el registro.
+     * @return array El profesor creado.
+     * @throws InvalidArgumentException Si las reglas de negocio no se cumplen.
+     * @throws Exception Si ocurre un fallo en la DB.
      */
     public function crear($datos) {
         try {
@@ -145,6 +159,12 @@ class ModProfesores {
 
     /**
      * Actualiza un profesor y sincroniza sus roles y asignaciones.
+     * 
+     * @param int $id Identificador del profesor.
+     * @param array $datos Información actualizada.
+     * @return array Datos modificados del profesor.
+     * @throws InvalidArgumentException Reglas de negocio incumplidas.
+     * @throws Exception Errores en cascada SQL.
      */
     public function actualizar($id, $datos) {
         try {
@@ -208,7 +228,9 @@ class ModProfesores {
     }
 
     /**
-     * Carga módulos y ciclos asociados a un profesor.
+     * Carga módulos y ciclos asociados a un profesor (Por referencia).
+     * 
+     * @param array &$prof Puntero al array del profesor que se quiere popular.
      */
     private function cargarInformacionRelacionada(&$prof) {
         $id = $prof['id'];
@@ -234,6 +256,10 @@ class ModProfesores {
 
     /**
      * Vincula un profesor con los módulos que imparte.
+     * 
+     * @param int $idProfesor ID del profesor.
+     * @param array|string $modulosSiglasOIds Lista de identificadores o siglas de módulos.
+     * @return int Número de inserciones correctas.
      */
     private function asignarModulos($idProfesor, $modulosSiglasOIds) {
         // Limpiamos asignaciones previas
@@ -274,6 +300,9 @@ class ModProfesores {
 
     /**
      * Vincula un coordinador con los ciclos que gestiona.
+     * 
+     * @param int $idProfesor ID del coordinador.
+     * @param array|string $ciclosSiglas Siglas de los ciclos a los que se vinculará.
      */
     private function asignarCiclos($idProfesor, $ciclosSiglas) {
         // Primero reseteamos cualquier ciclo que estuviera coordinando
@@ -292,7 +321,10 @@ class ModProfesores {
     }
 
     /**
-     * Normaliza listas recibidas como array o cadena separada por comas.
+     * Normaliza listas recibidas como array o cadena separada por comas a un array plano limpio.
+     * 
+     * @param mixed $valor Valor a estandarizar.
+     * @return array Array normalizado.
      */
     private function normalizarLista($valor) {
         if (is_array($valor)) {
@@ -317,6 +349,9 @@ class ModProfesores {
 
     /**
      * Devuelve todas las siglas de módulos pertenecientes a los ciclos recibidos.
+     * 
+     * @param array $ciclosSiglas Lista de siglas de ciclos.
+     * @return array IDs numéricos de los módulos.
      */
     private function obtenerModulosIdsDeCiclos(array $ciclosSiglas) {
         $ciclosSiglas = $this->normalizarLista($ciclosSiglas);
@@ -338,11 +373,22 @@ class ModProfesores {
         return $stmt->fetchAll(PDO::FETCH_COLUMN) ?: [];
     }
 
+    /**
+     * Anula todas las coordinaciones previas de un profesor.
+     * 
+     * @param int $idProfesor ID del usuario.
+     */
     private function quitarCoordinacionDeTodo($idProfesor) {
         $sql = "UPDATE Ciclos SET idCoordinador = NULL WHERE idCoordinador = :id";
         $this->db->prepare($sql)->execute([':id' => $idProfesor]);
     }
 
+    /**
+     * Verifica si el profesor tiene asignado el rol de Coordinador en la base de datos.
+     * 
+     * @param int $id ID del profesor.
+     * @return bool True si es coordinador.
+     */
     private function esCoordinador($id) {
         $sql = "SELECT idCoordinador FROM Coordinador WHERE idCoordinador = :id";
         $stmt = $this->db->prepare($sql);
@@ -350,6 +396,12 @@ class ModProfesores {
         return (bool)$stmt->fetch();
     }
 
+    /**
+     * Obtiene el perfil completo de un profesor mediante su ID.
+     * 
+     * @param int $id Identificador del usuario.
+     * @return array|false Datos del usuario o false si no existe.
+     */
     public function obtener($id) {
         $sql = "SELECT u.idUsuario as id, u.nombre, u.apellidos, u.correo, c.idCoordinador
                 FROM Usuarios u
@@ -363,6 +415,12 @@ class ModProfesores {
         return $prof;
     }
 
+    /**
+     * Obtiene el perfil completo de un profesor mediante su correo electrónico.
+     * 
+     * @param string $correo Email registrado.
+     * @return array|false Datos del profesor.
+     */
     public function obtenerPorCorreo($correo) {
         $sql = "SELECT u.idUsuario as id, u.nombre, u.apellidos, u.correo, c.idCoordinador
                 FROM Usuarios u
@@ -376,6 +434,13 @@ class ModProfesores {
         return $prof;
     }
 
+    /**
+     * Elimina por completo un usuario Profesor del sistema (y sus relaciones).
+     * 
+     * @param int $id Identificador del usuario.
+     * @return bool Estado de la operación.
+     * @throws Exception Si falla el borrado.
+     */
     public function eliminar($id) {
         try {
             $this->db->beginTransaction();

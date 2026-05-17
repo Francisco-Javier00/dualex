@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Modelo para la gestión de Módulos (Asignaturas).
+ * Gestiona relaciones complejas entre módulos, cursos y profesores.
+ * 
+ * @package Dualex\Models
+ */
 class ModModulos {
     private $db;
 
@@ -7,6 +13,12 @@ class ModModulos {
         $this->db = $db;
     }
 
+    /**
+     * Devuelve todos los módulos únicos disponibles en el sistema con información
+     * sobre a qué ciclo pertenecen (utiliza LEFT JOIN).
+     * 
+     * @return array Listado de módulos.
+     */
     public function listar() {
         // Usamos COALESCE para asegurar que el campo ciclo no sea NULL y no rompa el frontend
         $sql = "SELECT 
@@ -36,6 +48,12 @@ class ModModulos {
         return array_values($modulosUnicos);
     }
 
+    /**
+     * Obtiene los módulos que pertenecen a un ciclo formativo específico.
+     * 
+     * @param string $siglasCiclo Acrónimo del ciclo a buscar.
+     * @return array Listado de módulos filtrados.
+     */
     public function listarPorCiclo($siglasCiclo) {
         $siglasCiclo = strtoupper(trim((string)$siglasCiclo));
 
@@ -57,6 +75,13 @@ class ModModulos {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * Devuelve la información de un módulo mediante su ID.
+     * Incluye una subconsulta para resolver a qué ciclo está vinculado de forma rápida.
+     * 
+     * @param int $id Identificador del módulo.
+     * @return array|false Datos del módulo.
+     */
     public function obtener($id) {
         $sql = "SELECT m.idModulo as id, m.nombre, m.sigla, m.color, 
                        (SELECT cur.idCiclo FROM Modulo_Curso mc 
@@ -70,6 +95,12 @@ class ModModulos {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * Recupera todos los módulos que imparte un profesor específico en base a su correo electrónico.
+     * 
+     * @param string $emailProfesor Correo electrónico del usuario (profesor).
+     * @return array Módulos del profesor.
+     */
     public function obtenerModulosProfesor($emailProfesor) {
         $sql = "SELECT m.idModulo, m.nombre, m.sigla, m.color,
                        (SELECT COUNT(*) FROM Modulo_Alumno_Cursa mac WHERE mac.idModulo = m.idModulo) as numAlumnos
@@ -85,6 +116,13 @@ class ModModulos {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * Registra un nuevo módulo y lo vincula con los cursos de un ciclo determinado mediante transacción.
+     * 
+     * @param array $datos Datos del módulo (nombre, sigla, color, idCiclo).
+     * @return array Datos del módulo tras ser creado.
+     * @throws Exception Si ocurre un fallo en la DB.
+     */
     public function crear($datos) {
         try {
             $this->db->beginTransaction();
@@ -120,6 +158,15 @@ class ModModulos {
         }
     }
 
+    /**
+     * Actualiza la información de un módulo existente.
+     * Borra y recrea las relaciones con cursos si se especifica un cambio de ciclo.
+     * 
+     * @param int $id Identificador del módulo.
+     * @param array $datos Nuevos datos del módulo.
+     * @return array Datos del módulo actualizados.
+     * @throws Exception En caso de error de transacción.
+     */
     public function actualizar($id, $datos) {
         try {
             $this->db->beginTransaction();
@@ -159,6 +206,12 @@ class ModModulos {
         }
     }
 
+    /**
+     * Elimina permanentemente un módulo del sistema.
+     * 
+     * @param int $id ID del módulo.
+     * @return bool Estado de la eliminación.
+     */
     public function eliminar($id) {
         $sql = "DELETE FROM Modulos WHERE idModulo = :id";
         $stmt = $this->db->prepare($sql);
@@ -166,6 +219,14 @@ class ModModulos {
         return $stmt->execute();
     }
 
+    /**
+     * Proveedor de datos para la tabla DataTables de la vista.
+     * Implementa lógica de paginación, búsqueda en múltiples campos (nombre, sigla, ciclo)
+     * y filtrado automático de seguridad según el rol de Coordinador.
+     * 
+     * @param array $params Parámetros de petición DataTables.
+     * @return array Estructura estandarizada con `draw` y la `data` paginada.
+     */
     public function obtenerDataTables($params) {
         $start = (int)($params['start'] ?? 0);
         $length = (int)($params['length'] ?? 10);

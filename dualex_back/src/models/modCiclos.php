@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Modelo para la gestión de Ciclos Formativos.
+ * Incluye lógica transaccional para operaciones en cascada.
+ * 
+ * @package Dualex\Models
+ */
 class ModCiclos {
     private $db;
 
@@ -7,6 +13,11 @@ class ModCiclos {
         $this->db = $db;
     }
 
+    /**
+     * Recupera todos los ciclos formativos junto a sus coordinadores.
+     * 
+     * @return array Array asociativo con el listado de ciclos.
+     */
     public function listar() {
         $sql = "SELECT c.idCiclo as id, c.nombre, c.siglas, c.idCoordinador, 
                        c.grado, CONCAT('1º ', c.siglas, ', 2º ', c.siglas) AS cursos,
@@ -20,6 +31,13 @@ class ModCiclos {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * Busca un ciclo específico por su identificador único.
+     * Además, carga los cursos asociados (1º y 2º) dentro del resultado.
+     * 
+     * @param int $id Identificador del ciclo.
+     * @return array|false Datos del ciclo y sus cursos.
+     */
     public function obtener($id) {
         $sql = "SELECT idCiclo as id, nombre, siglas, idCoordinador FROM Ciclos WHERE idCiclo = :id";
         $stmt = $this->db->prepare($sql);
@@ -34,6 +52,12 @@ class ModCiclos {
         return $ciclo;
     }
 
+    /**
+     * Obtiene los cursos que pertenecen a un ciclo formativo específico.
+     * 
+     * @param int $idCiclo ID del ciclo.
+     * @return array Listado de cursos.
+     */
     private function obtenerCursos($idCiclo) {
         $sql = "SELECT * FROM Cursos WHERE idCiclo = :idCiclo";
         $stmt = $this->db->prepare($sql);
@@ -42,6 +66,14 @@ class ModCiclos {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * Registra un nuevo ciclo formativo.
+     * Implementa una transacción para asegurar la integridad de la base de datos.
+     * 
+     * @param array $datos Datos del ciclo (nombre, siglas, idCoordinador, grado).
+     * @return array Los datos completos del ciclo recién insertado.
+     * @throws Exception Si ocurre un error en la transacción.
+     */
     public function crear($datos) {
         try {
             $this->db->beginTransaction();
@@ -65,6 +97,14 @@ class ModCiclos {
         }
     }
 
+    /**
+     * Actualiza un ciclo formativo y aplica el cambio de siglas en cascada a sus cursos.
+     * 
+     * @param int $id Identificador del ciclo.
+     * @param array $datos Datos actualizados.
+     * @return array Datos del ciclo tras la modificación.
+     * @throws Exception Si la transacción falla.
+     */
     public function actualizar($id, $datos) {
         try {
             $this->db->beginTransaction();
@@ -103,6 +143,13 @@ class ModCiclos {
         }
     }
 
+    /**
+     * Elimina un ciclo y todos sus cursos asociados de forma manual mediante transacción.
+     * 
+     * @param int $id ID del ciclo a borrar.
+     * @return bool True si la operación se completó con éxito.
+     * @throws Exception Si falla la eliminación en cascada.
+     */
     public function eliminar($id) {
         try {
             $this->db->beginTransaction();
@@ -127,6 +174,12 @@ class ModCiclos {
         }
     }
 
+    /**
+     * Proporciona la estructura y el filtrado paginado para el plugin DataTables en la vista.
+     * 
+     * @param array $params Parámetros HTTP GET/POST enviados por DataTables.
+     * @return array Estructura estandarizada con `draw`, `recordsTotal`, etc.
+     */
     public function obtenerDataTables($params) {
         $start = $params['start'] ?? 0;
         $length = $params['length'] ?? 10;
