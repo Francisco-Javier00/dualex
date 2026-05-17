@@ -1,15 +1,16 @@
 import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, inject, Renderer2 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { forkJoin } from 'rxjs';
 import { CicloDTO, ModuloDTO } from '../../../dto/dualex.dto';
 import { CiclosService } from '../../../services/ciclos.service';
 import { ModulosService } from '../../../services/modulos.service';
+import { AlertService } from '../../../services/alert.service';
 
 @Component({
   selector: 'app-profesor-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule],
   templateUrl: './profesor-modal.component.html',
   styleUrls: ['./profesor-modal.component.css']
 })
@@ -17,6 +18,8 @@ export class ProfesorModalComponent implements OnInit, OnDestroy {
   private renderer = inject(Renderer2);
   private ciclosService = inject(CiclosService);
   private modulosService = inject(ModulosService);
+  private fb = inject(FormBuilder);
+  private alertService = inject(AlertService);
 
   private _profesor: any | null = null;
   @Input() modo: 'crear' | 'editar' = 'crear';
@@ -27,6 +30,14 @@ export class ProfesorModalComponent implements OnInit, OnDestroy {
   filtroCiclos = '';
   ciclosExpandidos: string[] = [];
   modulosSeleccionadosIds: number[] = [];
+
+  profesorForm: FormGroup = this.fb.group({
+    id: [null],
+    nombre: ['', [Validators.required, Validators.maxLength(50)]],
+    apellidos: ['', [Validators.required, Validators.maxLength(100)]],
+    correo: ['', [Validators.required, Validators.pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/), Validators.maxLength(100)]],
+    rol: ['PROFESOR', [Validators.required]]
+  });
 
   @Input() set profesor(val: any | null) {
     this._profesor = val;
@@ -46,9 +57,6 @@ export class ProfesorModalComponent implements OnInit, OnDestroy {
   @Output() cancelar = new EventEmitter<void>();
 
   nuevoProfesor: any = {
-    nombre: '',
-    apellidos: '',
-    correo: '',
     rol: 'PROFESOR',
     ciclos: [] as string[],
     modulos: [] as string[]
@@ -155,11 +163,16 @@ export class ProfesorModalComponent implements OnInit, OnDestroy {
     const listaModulos = this.normalizarLista(profesor.modulos);
     const rol = profesor.rol || 'PROFESOR';
 
-    this.nuevoProfesor = {
+    this.profesorForm.patchValue({
       id: profesor.id,
       nombre: profesor.nombre || '',
       apellidos: profesor.apellidos || '',
       correo: profesor.correo || '',
+      rol: rol
+    });
+
+    this.nuevoProfesor = {
+      id: profesor.id,
       rol,
       ciclos: rol === 'COORDINADOR' ? listaCiclos : [],
       modulos: listaModulos
@@ -206,10 +219,10 @@ export class ProfesorModalComponent implements OnInit, OnDestroy {
   }
 
   private resetForm(): void {
+    this.profesorForm.reset({
+      rol: 'PROFESOR'
+    });
     this.nuevoProfesor = {
-      nombre: '',
-      apellidos: '',
-      correo: '',
       rol: 'PROFESOR',
       ciclos: [],
       modulos: []
@@ -315,6 +328,7 @@ export class ProfesorModalComponent implements OnInit, OnDestroy {
   }
 
   onRolChange(rol: 'PROFESOR' | 'COORDINADOR'): void {
+    this.profesorForm.get('rol')?.setValue(rol);
     this.nuevoProfesor.rol = rol;
     if (rol !== 'COORDINADOR') {
       this.nuevoProfesor.ciclos = [];
@@ -324,29 +338,35 @@ export class ProfesorModalComponent implements OnInit, OnDestroy {
   }
 
   onGuardar(): void {
-    const ciclosFinales = this.nuevoProfesor.rol === 'COORDINADOR'
-      ? Array.from(new Set(this.nuevoProfesor.ciclos as string[]))
-      : [];
-    const modulosIdsDesdeSiglas = this.nuevoProfesor.modulos
-      .map((sigla: string): number | undefined => this.modulosBD.find(modulo => this.obtenerSiglaModulo(modulo) === sigla)?.id)
-      .filter((id: number | undefined): id is number => typeof id === 'number');
-    const modulosIdsFinales = Array.from(new Set([
-      ...this.modulosSeleccionadosIds,
-      ...modulosIdsDesdeSiglas
-    ]));
+    if (this.profesorForm.valid) {
+      const ciclosFinales = this.nuevoProfesor.rol === 'COORDINADOR'
+        ? Array.from(new Set(this.nuevoProfesor.ciclos as string[]))
+        : [];
+      const modulosIdsDesdeSiglas = this.nuevoProfesor.modulos
+        .map((sigla: string): number | undefined => this.modulosBD.find(modulo => this.obtenerSiglaModulo(modulo) === sigla)?.id)
+        .filter((id: number | undefined): id is number => typeof id === 'number');
+      const modulosIdsFinales = Array.from(new Set([
+        ...this.modulosSeleccionadosIds,
+        ...modulosIdsDesdeSiglas
+      ]));
 
-    const payload = {
-      ...this.nuevoProfesor,
-      ciclos: ciclosFinales,
-      modulos: [...new Set(
-        modulosIdsFinales
-          .map((moduloId: number) => this.obtenerModuloPorId(moduloId))
-          .filter((modulo): modulo is ModuloDTO => Boolean(modulo))
-          .map(modulo => this.obtenerSiglaModulo(modulo))
-      )],
-      modulosIds: modulosIdsFinales
-    };
+      const payload = {
+        ...this.profesorForm.value,
+        rol: this.nuevoProfesor.rol,
+        ciclos: ciclosFinales,
+        modulos: [...new Set(
+          modulosIdsFinales
+            .map((moduloId: number) => this.obtenerModuloPorId(moduloId))
+            .filter((modulo): modulo is ModuloDTO => Boolean(modulo))
+            .map(modulo => this.obtenerSiglaModulo(modulo))
+        )],
+        modulosIds: modulosIdsFinales
+      };
 
-    this.guardar.emit(payload);
+      this.guardar.emit(payload);
+    } else {
+      this.profesorForm.markAllAsTouched();
+      this.alertService.advertencia('Formulario Incompleto', 'Por favor, revisa los campos marcados en rojo antes de continuar.');
+    }
   }
 }

@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, Output, OnChanges, SimpleChanges, injec
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActividadDTO } from '../../../dto/dualex.dto';
+import { AlertService } from '../../../services/alert.service';
 
 /**
  * ActividadModalComponent
@@ -18,6 +19,7 @@ import { ActividadDTO } from '../../../dto/dualex.dto';
 export class ActividadModalComponent implements OnChanges, OnDestroy {
   private fb = inject(FormBuilder);
   private renderer = inject(Renderer2);
+  private alertService = inject(AlertService);
 
   // PROPIEDADES DE ENTRADA
   @Input() visible = false;                  // Controla la visibilidad del modal
@@ -82,6 +84,7 @@ export class ActividadModalComponent implements OnChanges, OnDestroy {
     } else {
       // Marcamos los campos como 'touched' para mostrar los errores de validación en la UI
       this.actividadForm.markAllAsTouched();
+      this.alertService.advertencia('Formulario Incompleto', 'Por favor, revisa los campos marcados en rojo antes de continuar.');
     }
   }
 

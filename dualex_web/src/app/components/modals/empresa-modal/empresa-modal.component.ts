@@ -2,6 +2,7 @@ import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, inject, Rend
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { EmpresaDTO } from '../../../dto/dualex.dto';
+import { AlertService } from '../../../services/alert.service';
 
 @Component({
   selector: 'app-empresa-modal',
@@ -12,6 +13,7 @@ import { EmpresaDTO } from '../../../dto/dualex.dto';
 })
 export class EmpresaModalComponent implements OnInit, OnDestroy {
   private renderer = inject(Renderer2);
+  private alertService = inject(AlertService);
   private _empresa: EmpresaDTO | null = null;
 
   @Input() set empresa(val: EmpresaDTO | null) {
@@ -217,6 +219,7 @@ export class EmpresaModalComponent implements OnInit, OnDestroy {
       this.guardar.emit(payload);
     } else {
       this.empresaForm.markAllAsTouched();
+      this.alertService.advertencia('Formulario Incompleto', 'Por favor, revisa los campos marcados en rojo antes de continuar.');
     }
   }
 
