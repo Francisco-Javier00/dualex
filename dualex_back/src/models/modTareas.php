@@ -223,15 +223,25 @@ class ModTareas {
      * @return array La tarea recién creada.
      */
     public function crear($datos) {
-        $codigo_auto = 'T-' . strtoupper(substr(md5(uniqid()), 0, 8));
+        // Obtener anio_escolar y siglas del ciclo del alumno
+        $sqlInfo = "SELECT cu.anio_escolar, ci.siglas 
+                    FROM Alumnos a
+                    JOIN Cursos cu ON a.idCurso = cu.idCurso
+                    JOIN Ciclos ci ON cu.idCiclo = ci.idCiclo
+                    WHERE a.idAlumnos = :idAlumno";
+        $stmtInfo = $this->db->prepare($sqlInfo);
+        $stmtInfo->execute([':idAlumno' => (int)$datos['idAlumno']]);
+        $info = $stmtInfo->fetch(PDO::FETCH_ASSOC);
         
+        $anio = $info ? trim($info['anio_escolar']) : '24-25';
+        $siglas = $info ? trim($info['siglas']) : 'DAW';
+
         $sql = "INSERT INTO Tareas (idAlumno, codigo_auto, titulo, fecha_inicio, fecha_fin, descripcion, calificacion, comentario) 
-                VALUES (:idAlumno, :codigo_auto, :titulo, :fecha_inicio, :fecha_fin, :descripcion, :calificacion, :comentario)";
+                VALUES (:idAlumno, '', :titulo, :fecha_inicio, :fecha_fin, :descripcion, :calificacion, :comentario)";
         
         $stmt = $this->db->prepare($sql);
         $stmt->execute([
             ':idAlumno'     => (int)$datos['idAlumno'],
-            ':codigo_auto'  => $codigo_auto,
             ':titulo'       => $datos['titulo'],
             ':fecha_inicio' => $datos['fechaIni'] ?? date('Y-m-d H:i:s'),
             ':fecha_fin'    => $datos['fechaFin'] ?? date('Y-m-d H:i:s'),
@@ -241,6 +251,16 @@ class ModTareas {
         ]);
         
         $idTarea = $this->db->lastInsertId();
+        
+        // Formar código definitivo: anioEscolar_siglasCiclo_T[id]
+        $codigo_auto = $anio . '_' . $siglas . '_T' . $idTarea;
+        
+        $sqlUpdate = "UPDATE Tareas SET codigo_auto = :codigo_auto WHERE idTarea = :idTarea";
+        $stmtUpdate = $this->db->prepare($sqlUpdate);
+        $stmtUpdate->execute([
+            ':codigo_auto' => $codigo_auto,
+            ':idTarea' => $idTarea
+        ]);
         
         // Guardar actividades relacionadas
         if (!empty($datos['actividadesSeleccionadas'])) {

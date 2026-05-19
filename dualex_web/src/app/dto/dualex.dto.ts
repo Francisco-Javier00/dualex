@@ -70,6 +70,7 @@ export interface Tarea {
   comentarioProfesor?: string;
   revisionesModulos?: ModuloRevision[];
   idAlumno?: number;
+  codigo_auto?: string;
 }
 
 export interface ModuloRevision {

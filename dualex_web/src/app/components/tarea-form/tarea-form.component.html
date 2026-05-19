@@ -2,9 +2,12 @@
   <!-- Cabecera de Acción -->
   <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-      <h2 class="fw-bold text-dark mb-1">
+      <h2 class="fw-bold text-dark mb-1 d-flex align-items-center gap-2 flex-wrap">
         <i class="fa-solid fa-file-pen text-primary me-2"></i>
-        {{ esEdicion ? 'Editar Tarea' : 'Nueva Tarea' }}
+        <span>{{ esEdicion ? 'Editar Tarea' : 'Nueva Tarea' }}</span>
+        <span *ngIf="esEdicion && codigoTarea" class="badge bg-white border text-secondary px-3 py-1.5 fs-6 rounded-3 font-monospace shadow-sm">
+          {{ codigoTarea }}
+        </span>
       </h2>
       <p class="text-muted">Gestiona la información, actividades y evaluaciones de la tarea seleccionada</p>
     </div>

@@ -83,6 +83,7 @@ export class TareaFormComponent implements OnInit {
   actividades: ActividadDTO[] = [];     // Catálogo maestro de actividades recuperado del servicio
   modalActividadesVisible = false;      // Controla la visibilidad del modal de selección
   esAlumno = false;                     // Flag para identificar si es un alumno
+  codigoTarea = '';                     // Código auto-generado de la tarea
 
   // Instancia del editor CKEditor
   public Editor = ClassicEditor;
@@ -179,6 +180,9 @@ export class TareaFormComponent implements OnInit {
       if (tarea) {
         if (tarea.idAlumno) {
           this.idAlumno = tarea.idAlumno;
+        }
+        if (tarea.codigo_auto) {
+          this.codigoTarea = tarea.codigo_auto;
         }
         // Mapeamos los datos del objeto al formulario reactivo
         this.tareaForm.patchValue(tarea);

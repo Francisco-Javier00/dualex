@@ -349,3 +349,10 @@ CHECK (calificacion IN ('superado', 'bien', 'notable', 'excelente', 'no superado
 
 ALTER TABLE Tareas
 MODIFY descripcion TEXT NOT NULL;
+
+UPDATE Tareas t
+JOIN Alumnos a ON t.idAlumno = a.idAlumnos
+JOIN Cursos cu ON a.idCurso = cu.idCurso
+JOIN Ciclos ci ON cu.idCiclo = ci.idCiclo
+SET t.codigo_auto = CONCAT(TRIM(cu.anio_escolar), '_', TRIM(ci.siglas), '_T', t.idTarea);
+
