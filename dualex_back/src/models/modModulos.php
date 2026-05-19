@@ -86,7 +86,9 @@ class ModModulos {
         $sql = "SELECT m.idModulo as id, m.nombre, m.sigla, m.color, 
                        (SELECT cur.idCiclo FROM Modulo_Curso mc 
                         JOIN Cursos cur ON mc.idCurso = cur.idCurso 
-                        WHERE mc.idModulo = m.idModulo LIMIT 1) as idCiclo
+                        WHERE mc.idModulo = m.idModulo LIMIT 1) as idCiclo,
+                       (SELECT mc.idCurso FROM Modulo_Curso mc 
+                        WHERE mc.idModulo = m.idModulo LIMIT 1) as idCurso
                 FROM Modulos m 
                 WHERE m.idModulo = :id";
         $stmt = $this->db->prepare($sql);
@@ -136,8 +138,12 @@ class ModModulos {
             ]);
             $idModulo = $this->db->lastInsertId();
 
-            // Vincular con los cursos del ciclo seleccionado
-            if (isset($datos['idCiclo'])) {
+            // Vincular con el curso seleccionado o fallback a todos los cursos del ciclo
+            if (!empty($datos['idCurso'])) {
+                $sqlRel = "INSERT INTO Modulo_Curso (idModulo, idCurso) VALUES (:idModulo, :idCurso)";
+                $stmtRel = $this->db->prepare($sqlRel);
+                $stmtRel->execute([':idModulo' => $idModulo, ':idCurso' => $datos['idCurso']]);
+            } else if (isset($datos['idCiclo'])) {
                 $sqlCursos = "SELECT idCurso FROM Cursos WHERE idCiclo = :idCiclo";
                 $stmtCursos = $this->db->prepare($sqlCursos);
                 $stmtCursos->execute([':idCiclo' => $datos['idCiclo']]);
@@ -181,11 +187,19 @@ class ModModulos {
             ]);
 
             // Actualizar vínculos con cursos
-            if (isset($datos['idCiclo'])) {
+            if (!empty($datos['idCurso'])) {
                 // Borrar anteriores
                 $this->db->prepare("DELETE FROM Modulo_Curso WHERE idModulo = :id")->execute([':id' => $id]);
 
-                // Insertar nuevos
+                // Insertar nuevo
+                $sqlRel = "INSERT INTO Modulo_Curso (idModulo, idCurso) VALUES (:idModulo, :idCurso)";
+                $stmtRel = $this->db->prepare($sqlRel);
+                $stmtRel->execute([':idModulo' => $id, ':idCurso' => $datos['idCurso']]);
+            } else if (isset($datos['idCiclo'])) {
+                // Borrar anteriores
+                $this->db->prepare("DELETE FROM Modulo_Curso WHERE idModulo = :id")->execute([':id' => $id]);
+
+                // Insertar nuevos (fallback)
                 $sqlCursos = "SELECT idCurso FROM Cursos WHERE idCiclo = :idCiclo";
                 $stmtCursos = $this->db->prepare($sqlCursos);
                 $stmtCursos->execute([':idCiclo' => $datos['idCiclo']]);
@@ -260,6 +274,14 @@ class ModModulos {
             $binds[':idCoordinador'] = $idCoordinador;
         }
 
+        $idsCursos = $params['idsCursos'] ?? [];
+        if (!empty($idsCursos) && is_array($idsCursos)) {
+            $idsValidados = array_filter(array_map('intval', $idsCursos));
+            if (!empty($idsValidados)) {
+                $conditions[] = "cur.idCurso IN (" . implode(',', $idsValidados) . ")";
+            }
+        }
+
         $where = !empty($conditions) ? "WHERE " . implode(" AND ", $conditions) : "";
 
         // Conteo total
@@ -282,7 +304,9 @@ class ModModulos {
         // Datos
         $sql = "SELECT m.idModulo as id, m.nombre, m.sigla, m.color, 
                        MIN(c.idCiclo) as idCiclo,
-                       GROUP_CONCAT(DISTINCT CONCAT(c.siglas, ' - ', c.nombre) SEPARATOR ', ') as cicloCompleto
+                       MIN(cur.idCurso) as idCurso,
+                       GROUP_CONCAT(DISTINCT CONCAT(c.siglas, ' - ', c.nombre) SEPARATOR ', ') as cicloCompleto,
+                       GROUP_CONCAT(DISTINCT cur.nombre SEPARATOR ', ') as cursoCompleto
                 FROM Modulos m
                 LEFT JOIN Modulo_Curso mc ON m.idModulo = mc.idModulo
                 LEFT JOIN Cursos cur ON mc.idCurso = cur.idCurso

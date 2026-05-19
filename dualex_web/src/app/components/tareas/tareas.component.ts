@@ -64,21 +64,41 @@ export class TareasComponent implements OnInit {
    */
   getCalificacionClases(calificacion: string): string {
     switch(calificacion) {
-      case 'Bien': 
+      case 'Bien': return 'bg-success-subtle border-success text-success';
       case 'Superado': return 'bg-success-subtle border-success text-success';
-      case 'No superado': return 'bg-danger-subtle border-danger text-danger';
+      case 'No Superado': return 'bg-danger-subtle border-danger text-danger';
       case 'Notable': return 'bg-info-subtle border-info text-info';
       case 'Excelente': return 'bg-primary-subtle border-primary text-primary';
-      case 'Sin calificar': return 'bg-white border-secondary text-secondary';
+      case 'Sin Calificar': return 'bg-white border-secondary text-secondary';
       default: return 'bg-light border-secondary text-dark';
     }
+  }
+
+  /**
+   * Elimina las etiquetas HTML de un texto y limpia las entidades HTML comunes.
+   */
+  stripHtmlTags(html?: string): string {
+    if (!html) return '';
+    return html
+      .replace(/<[^>]*>/g, '')
+      .replace(/&nbsp;/g, ' ')
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'")
+      .trim();
   }
 
   /**
    * Navegación al formulario de creación.
    */
   crearTarea(): void {
-    this.router.navigate(['/tarea/nueva']);
+    if (this.alumnoId) {
+      this.router.navigate(['/tarea/nueva'], { queryParams: { alumnoId: this.alumnoId } });
+    } else {
+      this.router.navigate(['/tarea/nueva']);
+    }
   }
 
   /**

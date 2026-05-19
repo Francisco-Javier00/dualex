@@ -74,13 +74,13 @@ class ModCursos {
      */
     public function listarPorProfesor($idProfesor) {
         // Cursos de ciclos que coordina
-        $sqlC = "SELECT c.idCurso as id, c.nombre, c.anio_escolar, c.idCiclo, ci.nombre as ciclo, ci.grado 
+        $sqlC = "SELECT c.idCurso as id, c.nombre, c.anio_escolar, c.idCiclo, ci.nombre as ciclo, ci.siglas as siglasCiclo, ci.grado 
                  FROM Cursos c
                  JOIN Ciclos ci ON c.idCiclo = ci.idCiclo
                  WHERE ci.idCoordinador = :id1";
         
         // Cursos donde imparte algún módulo (basado en los alumnos que cursan sus módulos)
-        $sqlP = "SELECT DISTINCT c.idCurso as id, c.nombre, c.anio_escolar, c.idCiclo, ci.nombre as ciclo, ci.grado
+        $sqlP = "SELECT DISTINCT c.idCurso as id, c.nombre, c.anio_escolar, c.idCiclo, ci.nombre as ciclo, ci.siglas as siglasCiclo, ci.grado
                  FROM Cursos c
                  JOIN Ciclos ci ON c.idCiclo = ci.idCiclo
                  JOIN Alumnos a ON c.idCurso = a.idCurso

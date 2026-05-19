@@ -191,10 +191,14 @@ footer a:hover {
 
 .card-img-container img {
   transition: transform 0.5s ease;
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translateZ(0);
 }
 
 .category-card:hover .card-img-container img {
-  transform: scale(1.05);
+  transform: scale(1.05) translateZ(0);
 }
 
 .btn-primary-light {
@@ -432,7 +436,7 @@ footer a:hover {
   visibility: hidden !important;
   z-index: -1 !important;
 }
-/* Forzar que los iconos hereden el color del botón en hover */
+/* Forzar que los iconos hereden el color del botï¿½n en hover */
 .btn:hover i {
   color: inherit !important;
 }

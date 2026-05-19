@@ -13,19 +13,100 @@ class ModTareas {
     }
 
     /**
+     * Mapea el texto de calificación del frontend al valor de base de datos.
+     */
+    private function mapCalificacionToDb($val) {
+        if (!$val || strtolower($val) === 'sin calificar') {
+            return null;
+        }
+        $valLower = strtolower(trim($val));
+        if ($valLower === 'superado') return 'superado';
+        if ($valLower === 'bien') return 'bien';
+        if ($valLower === 'notable') return 'notable';
+        if ($valLower === 'excelente') return 'excelente';
+        if ($valLower === 'no superado') return 'no superado';
+        return null;
+    }
+
+    /**
+     * Mapea el valor de la base de datos al formato del frontend.
+     */
+    private function mapCalificacionFromDb($val) {
+        if (!$val) {
+            return 'Sin Calificar';
+        }
+        $valLower = strtolower(trim($val));
+        if ($valLower === 'superado') return 'Superado';
+        if ($valLower === 'bien') return 'Bien';
+        if ($valLower === 'notable') return 'Notable';
+        if ($valLower === 'excelente') return 'Excelente';
+        if ($valLower === 'no superado') return 'No Superado';
+        return 'Sin Calificar';
+    }
+
+    /**
+     * Helper para obtener las siglas de los módulos de una tarea.
+     */
+    private function obtenerModulosSiglas($idTarea) {
+        $sql = "SELECT DISTINCT m.sigla, m.color 
+                FROM Tarea_Actividad ta
+                JOIN Modulo_Actividad ma ON ta.idActividad = ma.idActividad
+                JOIN Modulos m ON ma.idModulo = m.idModulo
+                WHERE ta.idTarea = :idTarea";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':idTarea' => $idTarea]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Helper para calcular el progreso (revisado/total) de una tarea.
+     */
+    private function obtenerProgreso($idTarea) {
+        $sql = "SELECT revisada FROM Modulo_Tarea_Revision WHERE idTarea = :idTarea";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':idTarea' => $idTarea]);
+        $revisions = $stmt->fetchAll(PDO::FETCH_COLUMN);
+        
+        $total = count($revisions);
+        $actual = 0;
+        foreach ($revisions as $rev) {
+            $val = is_numeric($rev) ? (int)$rev : ord($rev);
+            if ($val === 1) {
+                $actual++;
+            }
+        }
+        return [
+            'actual' => $actual,
+            'total' => $total > 0 ? $total : 1
+        ];
+    }
+
+    /**
      * Lista todas las tareas globales almacenadas en el sistema uniendo datos del alumno respectivo.
      * 
      * @return array Vector con las tareas y sus autores.
      */
     public function listar() {
-        $sql = "SELECT t.*, u.nombre as nombre_alumno, u.apellidos as apellidos_alumno 
+        $sql = "SELECT t.idTarea as id, t.codigo_auto, t.titulo, t.fecha_inicio as fechaIni, t.fecha_fin as fechaFin, t.fecha_fin as fechaLimite, t.descripcion, t.calificacion, t.comentario as comentarioEmpresa, t.idAlumno, u.nombre as nombre_alumno, u.apellidos as apellidos_alumno 
                 FROM Tareas t 
-                JOIN Alumnos a ON t.id_alumno = a.idAlumnos
+                JOIN Alumnos a ON t.idAlumno = a.idAlumnos
                 JOIN Usuarios u ON a.idAlumnos = u.idUsuario
-                ORDER BY t.id DESC";
+                ORDER BY t.idTarea DESC";
         $stmt = $this->db->prepare($sql);
         $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $tareas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        foreach ($tareas as &$t) {
+            $t['id'] = (int)$t['id'];
+            $t['idAlumno'] = (int)$t['idAlumno'];
+            $t['calificacion'] = $this->mapCalificacionFromDb($t['calificacion']);
+            $t['fechaIni'] = $t['fechaIni'] ? substr($t['fechaIni'], 0, 10) : null;
+            $t['fechaFin'] = $t['fechaFin'] ? substr($t['fechaFin'], 0, 10) : null;
+            $t['fechaLimite'] = $t['fechaLimite'] ? substr($t['fechaLimite'], 0, 10) : null;
+            $t['modulos'] = $this->obtenerModulosSiglas($t['id']);
+            $t['progreso'] = $this->obtenerProgreso($t['id']);
+        }
+        return $tareas;
     }
 
     /**
@@ -35,11 +116,26 @@ class ModTareas {
      * @return array Lista de tareas.
      */
     public function listarPorAlumno($idAlumno) {
-        $sql = "SELECT * FROM Tareas WHERE id_alumno = :id_alumno ORDER BY id DESC";
+        $sql = "SELECT t.idTarea as id, t.codigo_auto, t.titulo, t.fecha_inicio as fechaIni, t.fecha_fin as fechaFin, t.fecha_fin as fechaLimite, t.descripcion, t.calificacion, t.comentario as comentarioEmpresa, t.idAlumno
+                FROM Tareas t 
+                WHERE t.idAlumno = :idAlumno 
+                ORDER BY t.idTarea DESC";
         $stmt = $this->db->prepare($sql);
-        $stmt->bindParam(':id_alumno', $idAlumno, PDO::PARAM_INT);
+        $stmt->bindParam(':idAlumno', $idAlumno, PDO::PARAM_INT);
         $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $tareas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        foreach ($tareas as &$t) {
+            $t['id'] = (int)$t['id'];
+            $t['idAlumno'] = (int)$t['idAlumno'];
+            $t['calificacion'] = $this->mapCalificacionFromDb($t['calificacion']);
+            $t['fechaIni'] = $t['fechaIni'] ? substr($t['fechaIni'], 0, 10) : null;
+            $t['fechaFin'] = $t['fechaFin'] ? substr($t['fechaFin'], 0, 10) : null;
+            $t['fechaLimite'] = $t['fechaLimite'] ? substr($t['fechaLimite'], 0, 10) : null;
+            $t['modulos'] = $this->obtenerModulosSiglas($t['id']);
+            $t['progreso'] = $this->obtenerProgreso($t['id']);
+        }
+        return $tareas;
     }
 
     /**
@@ -49,68 +145,249 @@ class ModTareas {
      * @return array|false Datos de la tarea solicitada.
      */
     public function obtener($id) {
-        $sql = "SELECT * FROM Tareas WHERE id = :id";
+        $sql = "SELECT t.idTarea as id, t.codigo_auto, t.titulo, t.fecha_inicio as fechaIni, t.fecha_fin as fechaFin, t.fecha_fin as fechaLimite, t.descripcion, t.calificacion, t.comentario as comentarioEmpresa, t.idAlumno
+                FROM Tareas t 
+                WHERE t.idTarea = :id";
         $stmt = $this->db->prepare($sql);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         $stmt->execute();
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        $t = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$t) {
+            return false;
+        }
+        
+        $t['id'] = (int)$t['id'];
+        $t['idAlumno'] = (int)$t['idAlumno'];
+        $t['fechaIni'] = $t['fechaIni'] ? substr($t['fechaIni'], 0, 10) : null;
+        $t['fechaFin'] = $t['fechaFin'] ? substr($t['fechaFin'], 0, 10) : null;
+        $t['fechaLimite'] = $t['fechaLimite'] ? substr($t['fechaLimite'], 0, 10) : null;
+        $t['evaluacionEmpresa'] = $this->mapCalificacionFromDb($t['calificacion']);
+        $t['calificacion'] = $t['evaluacionEmpresa'];
+        
+        // Adjuntar siglas de módulos
+        $t['modulos'] = $this->obtenerModulosSiglas($t['id']);
+        
+        // Adjuntar progreso
+        $t['progreso'] = $this->obtenerProgreso($t['id']);
+        
+        // Adjuntar IDs de actividades seleccionadas
+        $sqlAct = "SELECT idActividad FROM Tarea_Actividad WHERE idTarea = :idTarea";
+        $stmtAct = $this->db->prepare($sqlAct);
+        $stmtAct->execute([':idTarea' => $id]);
+        $t['actividadesSeleccionadas'] = array_map('intval', $stmtAct->fetchAll(PDO::FETCH_COLUMN));
+        
+        // Adjuntar revisiones por módulo
+        $sqlRev = "SELECT m.nombre as modulo, mtr.revisada, mtr.observaciones 
+                   FROM Modulo_Tarea_Revision mtr
+                   JOIN Modulos m ON mtr.idModulo = m.idModulo
+                   WHERE mtr.idTarea = :idTarea";
+        $stmtRev = $this->db->prepare($sqlRev);
+        $stmtRev->execute([':idTarea' => $id]);
+        $revisions = $stmtRev->fetchAll(PDO::FETCH_ASSOC);
+        
+        $t['revisionesModulos'] = [];
+        $t['revisadoProfesor'] = true;
+        $t['comentarioProfesor'] = '';
+        
+        if (count($revisions) > 0) {
+            foreach ($revisions as $rev) {
+                $val = is_numeric($rev['revisada']) ? (int)$rev['revisada'] : ord($rev['revisada']);
+                $isRevisada = ($val === 1);
+                
+                $t['revisionesModulos'][] = [
+                    'modulo' => $rev['modulo'],
+                    'revisado' => $isRevisada
+                ];
+                
+                if (!$isRevisada) {
+                    $t['revisadoProfesor'] = false;
+                }
+                
+                // Mapear observaciones al comentario profesor general
+                if (empty($t['comentarioProfesor']) && !empty($rev['observaciones'])) {
+                    $t['comentarioProfesor'] = $rev['observaciones'];
+                }
+            }
+        } else {
+            $t['revisadoProfesor'] = false;
+        }
+        
+        return $t;
     }
 
     /**
      * Inserta una nueva entrega/tarea del cuaderno del alumno en el sistema.
      * 
-     * @param array $datos Estructura del cuerpo de la petición con titulo, fecha, progreso, etc.
+     * @param array $datos Estructura del cuerpo de la petición.
      * @return array La tarea recién creada.
      */
     public function crear($datos) {
-        $sql = "INSERT INTO Tareas (id_alumno, titulo, descripcion, modulos, fecha_ini, fecha_fin, calificacion, progreso_actual, progreso_total) 
-                VALUES (:id_alumno, :titulo, :descripcion, :modulos, :fecha_ini, :fecha_fin, :calificacion, :prog_act, :prog_tot)";
+        // Obtener anio_escolar y siglas del ciclo del alumno
+        $sqlInfo = "SELECT cu.anio_escolar, ci.siglas 
+                    FROM Alumnos a
+                    JOIN Cursos cu ON a.idCurso = cu.idCurso
+                    JOIN Ciclos ci ON cu.idCiclo = ci.idCiclo
+                    WHERE a.idAlumnos = :idAlumno";
+        $stmtInfo = $this->db->prepare($sqlInfo);
+        $stmtInfo->execute([':idAlumno' => (int)$datos['idAlumno']]);
+        $info = $stmtInfo->fetch(PDO::FETCH_ASSOC);
+        
+        $anio = $info ? trim($info['anio_escolar']) : '24-25';
+        $siglas = $info ? trim($info['siglas']) : 'DAW';
+
+        $sql = "INSERT INTO Tareas (idAlumno, codigo_auto, titulo, fecha_inicio, fecha_fin, descripcion, calificacion, comentario) 
+                VALUES (:idAlumno, '', :titulo, :fecha_inicio, :fecha_fin, :descripcion, :calificacion, :comentario)";
+        
         $stmt = $this->db->prepare($sql);
-        
-        // El campo modulos en Angular es un array, lo guardamos como JSON o string separado por comas
-        $modulosStr = is_array($datos['modulos']) ? implode(', ', $datos['modulos']) : $datos['modulos'];
-        
         $stmt->execute([
-            ':id_alumno'    => $datos['idAlumno'],
+            ':idAlumno'     => (int)$datos['idAlumno'],
             ':titulo'       => $datos['titulo'],
+            ':fecha_inicio' => $datos['fechaIni'] ?? date('Y-m-d H:i:s'),
+            ':fecha_fin'    => $datos['fechaFin'] ?? date('Y-m-d H:i:s'),
             ':descripcion'  => $datos['descripcion'] ?? '',
-            ':modulos'      => $modulosStr,
-            ':fecha_ini'    => $datos['fechaIni'] ?? date('Y-m-d'),
-            ':fecha_fin'    => $datos['fechaFin'] ?? null,
-            ':calificacion' => $datos['calificacion'] ?? 'Sin calificar',
-            ':prog_act'     => $datos['progreso']['actual'] ?? 0,
-            ':prog_tot'     => $datos['progreso']['total'] ?? 1
+            ':calificacion' => $this->mapCalificacionToDb($datos['evaluacionEmpresa'] ?? $datos['calificacion'] ?? null),
+            ':comentario'   => $datos['comentarioEmpresa'] ?? null
         ]);
-        return $this->obtener($this->db->lastInsertId());
+        
+        $idTarea = $this->db->lastInsertId();
+        
+        // Formar código definitivo: anioEscolar_siglasCiclo_T[id]
+        $codigo_auto = $anio . '_' . $siglas . '_T' . $idTarea;
+        
+        $sqlUpdate = "UPDATE Tareas SET codigo_auto = :codigo_auto WHERE idTarea = :idTarea";
+        $stmtUpdate = $this->db->prepare($sqlUpdate);
+        $stmtUpdate->execute([
+            ':codigo_auto' => $codigo_auto,
+            ':idTarea' => $idTarea
+        ]);
+        
+        // Guardar actividades relacionadas
+        if (!empty($datos['actividadesSeleccionadas'])) {
+            $sqlAct = "INSERT INTO Tarea_Actividad (idTarea, idActividad) VALUES (:idTarea, :idActividad)";
+            $stmtAct = $this->db->prepare($sqlAct);
+            foreach ($datos['actividadesSeleccionadas'] as $actId) {
+                $stmtAct->execute([':idTarea' => $idTarea, ':idActividad' => (int)$actId]);
+            }
+        }
+        
+        // Calcular módulos únicos de las actividades para crear la revisión
+        $modules = [];
+        if (!empty($datos['actividadesSeleccionadas'])) {
+            $sqlMods = "SELECT DISTINCT ma.idModulo, m.nombre 
+                        FROM Modulo_Actividad ma
+                        JOIN Modulos m ON ma.idModulo = m.idModulo
+                        WHERE ma.idActividad IN (" . implode(',', array_map('intval', $datos['actividadesSeleccionadas'])) . ")";
+            $stmtMods = $this->db->prepare($sqlMods);
+            $stmtMods->execute();
+            $modules = $stmtMods->fetchAll(PDO::FETCH_ASSOC);
+        }
+        
+        $revisionesMap = [];
+        if (!empty($datos['revisionesModulos'])) {
+            foreach ($datos['revisionesModulos'] as $rev) {
+                $revisionesMap[$rev['modulo']] = (bool)$rev['revisado'];
+            }
+        }
+        
+        $comentarioProfesor = $datos['comentarioProfesor'] ?? '';
+        
+        if (!empty($modules)) {
+            foreach ($modules as $mod) {
+                $revisadaVal = (isset($revisionesMap[$mod['nombre']]) && $revisionesMap[$mod['nombre']]) ? 1 : 0;
+                $sqlRev = "INSERT INTO Modulo_Tarea_Revision (idModulo, idTarea, revisada, observaciones) 
+                           VALUES (:idModulo, :idTarea, $revisadaVal, :observaciones)";
+                $stmtRev = $this->db->prepare($sqlRev);
+                $stmtRev->execute([
+                    ':idModulo' => $mod['idModulo'],
+                    ':idTarea' => $idTarea,
+                    ':observaciones' => $comentarioProfesor
+                ]);
+            }
+        }
+        
+        return $this->obtener($idTarea);
     }
 
     /**
-     * Aplica modificaciones sobre una tarea existente (Ej. cambios del profesor en la calificación).
+     * Aplica modificaciones sobre una tarea existente.
      * 
      * @param int $id ID de la tarea a alterar.
      * @param array $datos Matriz con la información en su nuevo estado.
      * @return array Registro de la tarea tras guardarse.
      */
     public function actualizar($id, $datos) {
-        $modulosStr = is_array($datos['modulos']) ? implode(', ', $datos['modulos']) : $datos['modulos'];
-        
         $sql = "UPDATE Tareas SET 
-                titulo = :titulo, descripcion = :descripcion, modulos = :modulos, 
-                fecha_ini = :fecha_ini, fecha_fin = :fecha_fin, calificacion = :calificacion, 
-                progreso_actual = :prog_act, progreso_total = :prog_tot 
-                WHERE id = :id";
+                titulo = :titulo, 
+                fecha_inicio = :fecha_inicio, 
+                fecha_fin = :fecha_fin, 
+                descripcion = :descripcion, 
+                calificacion = :calificacion, 
+                comentario = :comentario 
+                WHERE idTarea = :id";
         $stmt = $this->db->prepare($sql);
         $stmt->execute([
-            ':id'           => $id,
-            ':titulo'       => $datos['titulo'],
-            ':descripcion'  => $datos['descripcion'],
-            ':modulos'      => $modulosStr,
-            ':fecha_ini'    => $datos['fechaIni'],
-            ':fecha_fin'    => $datos['fechaFin'],
-            ':calificacion' => $datos['calificacion'],
-            ':prog_act'     => $datos['progreso']['actual'],
-            ':prog_tot'     => $datos['progreso']['total']
+            ':id' => $id,
+            ':titulo' => $datos['titulo'],
+            ':fecha_inicio' => $datos['fechaIni'],
+            ':fecha_fin' => $datos['fechaFin'],
+            ':descripcion' => $datos['descripcion'] ?? '',
+            ':calificacion' => $this->mapCalificacionToDb($datos['evaluacionEmpresa'] ?? $datos['calificacion'] ?? null),
+            ':comentario' => $datos['comentarioEmpresa'] ?? null
         ]);
+        
+        // Actualizar actividades relacionadas
+        $sqlDelAct = "DELETE FROM Tarea_Actividad WHERE idTarea = :idTarea";
+        $stmtDelAct = $this->db->prepare($sqlDelAct);
+        $stmtDelAct->execute([':idTarea' => $id]);
+        
+        if (!empty($datos['actividadesSeleccionadas'])) {
+            $sqlAct = "INSERT INTO Tarea_Actividad (idTarea, idActividad) VALUES (:idTarea, :idActividad)";
+            $stmtAct = $this->db->prepare($sqlAct);
+            foreach ($datos['actividadesSeleccionadas'] as $actId) {
+                $stmtAct->execute([':idTarea' => $id, ':idActividad' => (int)$actId]);
+            }
+        }
+        
+        // Actualizar revisiones de módulos
+        $modules = [];
+        if (!empty($datos['actividadesSeleccionadas'])) {
+            $sqlMods = "SELECT DISTINCT ma.idModulo, m.nombre 
+                        FROM Modulo_Actividad ma
+                        JOIN Modulos m ON ma.idModulo = m.idModulo
+                        WHERE ma.idActividad IN (" . implode(',', array_map('intval', $datos['actividadesSeleccionadas'])) . ")";
+            $stmtMods = $this->db->prepare($sqlMods);
+            $stmtMods->execute();
+            $modules = $stmtMods->fetchAll(PDO::FETCH_ASSOC);
+        }
+        
+        $revisionesMap = [];
+        if (!empty($datos['revisionesModulos'])) {
+            foreach ($datos['revisionesModulos'] as $rev) {
+                $revisionesMap[$rev['modulo']] = (bool)$rev['revisado'];
+            }
+        }
+        
+        $comentarioProfesor = $datos['comentarioProfesor'] ?? '';
+        
+        $sqlDelRev = "DELETE FROM Modulo_Tarea_Revision WHERE idTarea = :idTarea";
+        $stmtDelRev = $this->db->prepare($sqlDelRev);
+        $stmtDelRev->execute([':idTarea' => $id]);
+        
+        if (!empty($modules)) {
+            foreach ($modules as $mod) {
+                $revisadaVal = (isset($revisionesMap[$mod['nombre']]) && $revisionesMap[$mod['nombre']]) ? 1 : 0;
+                $sqlRev = "INSERT INTO Modulo_Tarea_Revision (idModulo, idTarea, revisada, observaciones) 
+                           VALUES (:idModulo, :idTarea, $revisadaVal, :observaciones)";
+                $stmtRev = $this->db->prepare($sqlRev);
+                $stmtRev->execute([
+                    ':idModulo' => $mod['idModulo'],
+                    ':idTarea' => $id,
+                    ':observaciones' => $comentarioProfesor
+                ]);
+            }
+        }
+        
         return $this->obtener($id);
     }
 
@@ -121,7 +398,7 @@ class ModTareas {
      * @return bool True tras confirmarse el DELETE en la BD.
      */
     public function eliminar($id) {
-        $sql = "DELETE FROM Tareas WHERE id = :id";
+        $sql = "DELETE FROM Tareas WHERE idTarea = :id";
         $stmt = $this->db->prepare($sql);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         return $stmt->execute();

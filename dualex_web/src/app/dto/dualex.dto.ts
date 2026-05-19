@@ -51,7 +51,7 @@ export interface ModuloProfesor {
 
 export interface Tarea {
   id: number;
-  modulos: string[];
+  modulos: { sigla: string; color: string }[];
   titulo: string;
   fechaLimite: string;
   calificacion: string;
@@ -70,6 +70,7 @@ export interface Tarea {
   comentarioProfesor?: string;
   revisionesModulos?: ModuloRevision[];
   idAlumno?: number;
+  codigo_auto?: string;
 }
 
 export interface ModuloRevision {
@@ -125,7 +126,10 @@ export interface CursoDTO {
   nombre: string;
   curso: number;
   anoEscolar: string;
+  anio_escolar?: string;
   ciclo: string;
+  siglasCiclo?: string;
+  idCiclo?: number;
   grado?: string;
 }
 

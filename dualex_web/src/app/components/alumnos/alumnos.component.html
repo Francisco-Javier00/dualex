@@ -27,16 +27,37 @@
       </div>
     </div>
 
-    @if (puedeGestionarAlumnos) {
-      <div class="d-flex gap-2">
+    <div class="d-flex gap-2 align-items-center flex-wrap">
+      @if (todosLosCursos.length > 0) {
+        <div class="d-flex align-items-center gap-2 me-md-2">
+          <label for="filtroCurso" class="text-muted mb-0 fw-semibold" style="white-space: nowrap;">
+            <i class="fa-solid fa-filter me-1 text-primary"></i> Filtrar por:
+          </label>
+          <select id="filtroCurso" class="form-select border shadow-sm rounded-3 px-3 bg-white text-dark fw-medium"
+                  style="min-width: 210px; max-width: 250px; font-size: 0.85rem; height: 38px; cursor: pointer;"
+                  (change)="onFiltroChange($event)">
+            <option value="all">Todos los ciclos y cursos</option>
+            <ng-container *ngFor="let cicloKey of getCiclosKeys()">
+              <option [value]="'ciclo:' + cicloKey" class="fw-bold text-primary">
+                Ciclo: {{ cicloKey }}
+              </option>
+              <option *ngFor="let curso of cursosAgrupados[cicloKey]" [value]="'curso:' + curso.id">
+                &nbsp;&nbsp;{{ curso.nombre }}
+              </option>
+            </ng-container>
+          </select>
+        </div>
+      }
+
+      @if (puedeGestionarAlumnos) {
         <button class="btn btn-outline-primary px-4 shadow-sm" (click)="importarExcel()">
           <i class="fa-solid fa-file-excel me-2"></i> Importar Excel
         </button>
         <button class="btn btn-primary px-4 shadow-sm" (click)="crearNuevo()">
           <i class="fa-solid fa-user-plus me-2"></i> Nuevo Alumno
         </button>
-      </div>
-    }
+      }
+    </div>
   </div>
 
   <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
@@ -68,6 +89,8 @@
   <app-alumno-modal
     [visible]="modalAlumnoVisible"
     [alumno]="alumnoSeleccionado"
+    [cursosCoordinados]="cursosGestionados"
+    [ciclosCoordinados]="ciclosCoordinados"
     (cerrar)="onCerrarModal()"
     (guardar)="onGuardarAlumno($event)">
   </app-alumno-modal>

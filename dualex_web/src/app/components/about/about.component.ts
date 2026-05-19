@@ -14,7 +14,7 @@ import { take } from 'rxjs';
 export class AboutComponent {
   private authService = inject(AuthService);
   private router = inject(Router);
-  
+
   version = '1.0';
   fechaPublicacion = 'Junio 2026';
 
@@ -40,4 +40,14 @@ export class AboutComponent {
       'Juan Carlos Díaz del Castillo'
     ]
   };
+
+  clickCount = 0;
+  mostrarManuales = false;
+
+  activarManuales(): void {
+    this.clickCount++;
+    if (this.clickCount >= 15) {
+      this.mostrarManuales = true;
+    }
+  }
 }

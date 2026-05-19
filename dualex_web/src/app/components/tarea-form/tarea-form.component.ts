@@ -46,6 +46,8 @@ import translations from 'ckeditor5/translations/es.js';
 // Servicios y DTOs
 import { TareasService } from '../../services/tareas.service';
 import { ActividadesService } from '../../services/actividades.service';
+import { AlertService } from '../../services/alert.service';
+import { AuthService } from '../../auth/services/auth.service';
 import { ActividadDTO, Tarea } from '../../dto/dualex.dto';
 
 // Componentes compartidos
@@ -70,13 +72,18 @@ export class TareaFormComponent implements OnInit {
   private router = inject(Router);
   private tareasService = inject(TareasService);
   public location = inject(Location);
+  private alertService = inject(AlertService);
+  private authService = inject(AuthService);
 
   // Variables de Estado
   tareaForm!: FormGroup;               // Objeto raíz del formulario reactivo
   esEdicion = false;                    // Flag para diferenciar entre Crear y Editar
   idTarea: number | null = null;        // Almacena el ID si estamos editando
+  idAlumno: number | null = null;       // Almacena el ID del alumno si lo estamos especificando
   actividades: ActividadDTO[] = [];     // Catálogo maestro de actividades recuperado del servicio
   modalActividadesVisible = false;      // Controla la visibilidad del modal de selección
+  esAlumno = false;                     // Flag para identificar si es un alumno
+  codigoTarea = '';                     // Código auto-generado de la tarea
 
   // Instancia del editor CKEditor
   public Editor = ClassicEditor;
@@ -133,9 +140,18 @@ export class TareaFormComponent implements OnInit {
    * INICIALIZACIÓN DEL COMPONENTE
    */
   ngOnInit(): void {
+    this.esAlumno = this.authService.currentUserValue?.rol === 'ALUMNO';
     this.crearFormulario();
     this.cargarActividades(); // Cargamos el catálogo para mapear IDs a Títulos
     
+    // Detectamos el alumnoId en los queryParams (si viene de la vista de un alumno)
+    this.route.queryParams.subscribe(params => {
+      const aId = params['alumnoId'];
+      if (aId) {
+        this.idAlumno = +aId;
+      }
+    });
+
     // Detectamos si la URL contiene un ID para activar el modo edición
     this.route.paramMap.subscribe(params => {
       const id = params.get('id');
@@ -162,11 +178,17 @@ export class TareaFormComponent implements OnInit {
   cargarDatosTarea(id: number): void {
     this.tareasService.getTareaById(id).subscribe(tarea => {
       if (tarea) {
+        if (tarea.idAlumno) {
+          this.idAlumno = tarea.idAlumno;
+        }
+        if (tarea.codigo_auto) {
+          this.codigoTarea = tarea.codigo_auto;
+        }
         // Mapeamos los datos del objeto al formulario reactivo
         this.tareaForm.patchValue(tarea);
         // Regeneramos el listado de módulos revisables según las actividades cargadas
         if (tarea.actividadesSeleccionadas) {
-          this.actualizarRevisionesModulos(tarea.actividadesSeleccionadas);
+          this.actualizarRevisionesModulos(tarea.actividadesSeleccionadas, tarea.revisionesModulos);
         }
       }
     });
@@ -189,6 +211,10 @@ export class TareaFormComponent implements OnInit {
       revisadoProfesor: [false],
       comentarioProfesor: ['']
     });
+    
+    if (this.esAlumno) {
+      this.tareaForm.get('comentarioProfesor')?.disable();
+    }
   }
 
   /**
@@ -211,7 +237,7 @@ export class TareaFormComponent implements OnInit {
    * Calcula los módulos únicos presentes en las actividades seleccionadas y crea 
    * un control de revisión (checkbox) para cada uno de ellos.
    */
-  private actualizarRevisionesModulos(ids: number[]): void {
+  private actualizarRevisionesModulos(ids: number[], revisionesCargadas?: any[]): void {
     if (!ids || ids.length === 0) {
       this.revisionesModulosArray.clear();
       return;
@@ -226,6 +252,15 @@ export class TareaFormComponent implements OnInit {
     
     // Mantenemos el estado de los checkboxes actuales para no resetearlos al añadir/quitar actividades
     const estadosActuales = new Map<string, boolean>();
+    
+    // Si hay revisiones previamente cargadas desde el backend, las sembramos primero
+    if (revisionesCargadas && revisionesCargadas.length > 0) {
+      revisionesCargadas.forEach(rev => {
+        estadosActuales.set(rev.modulo, rev.revisado);
+      });
+    }
+
+    // También mantenemos el estado de los checkboxes en pantalla si ya existen controles en el FormArray
     this.revisionesModulosArray.controls.forEach(ctrl => {
       const val = ctrl.value;
       estadosActuales.set(val.modulo, val.revisado);
@@ -234,10 +269,14 @@ export class TareaFormComponent implements OnInit {
     // Reconstruimos el FormArray con los módulos únicos detectados
     this.revisionesModulosArray.clear();
     modulosUnicos.forEach(mod => {
-      this.revisionesModulosArray.push(this.fb.group({
+      const grupo = this.fb.group({
         modulo: [mod],
         revisado: [estadosActuales.get(mod) || false]
-      }));
+      });
+      if (this.esAlumno) {
+        grupo.disable();
+      }
+      this.revisionesModulosArray.push(grupo);
     });
   }
 
@@ -279,23 +318,24 @@ export class TareaFormComponent implements OnInit {
   guardar(): void {
     if (this.tareaForm.valid) {
       const datos = { 
-        ...this.tareaForm.value,
-        id: this.idTarea
+        ...this.tareaForm.getRawValue(),
+        id: this.idTarea,
+        idAlumno: this.idAlumno
       };
 
       if (this.esEdicion) {
         this.tareasService.updateTarea(datos).subscribe(() => {
-          alert('Tarea actualizada correctamente.');
+          this.alertService.exito('Tarea actualizada', 'La tarea se ha guardado correctamente.');
           this.volver();
         });
       } else {
         this.tareasService.createTarea(datos).subscribe(() => {
-          alert('Tarea registrada correctamente.');
+          this.alertService.exito('Tarea registrada', 'La tarea se ha creado correctamente.');
           this.volver();
         });
       }
     } else {
-      alert('Por favor, completa los campos obligatorios antes de continuar.');
+      this.alertService.advertencia('Formulario no válido', 'Por favor, completa los campos obligatorios antes de continuar.');
     }
   }
 

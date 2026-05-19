@@ -11,54 +11,76 @@
     </button>
   </div>
 
-  <div class="row" *ngIf="tareas.length > 0; else noTareas">
-    <div class="col-12" *ngFor="let tarea of tareas">
-      <div class="card rounded-3 border-0 mb-4 shadow-sm task-card bg-white">
-        <div class="row g-0 h-100">
-          <!-- Columna Lateral: Módulos -->
-          <div class="col-auto d-flex flex-column justify-content-center align-items-center border-end p-3 bg-light-subtle rounded-start-3" style="min-width: 120px;">
-            <div class="d-flex flex-column gap-1 w-100">
-              <span *ngFor="let m of tarea.modulos" class="badge bg-primary text-white px-3 py-2 rounded-3 shadow-sm text-center">
-                {{ m }}
-              </span>
+  <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4" *ngIf="tareas.length > 0; else noTareas">
+    <div class="col animate-fade-in" *ngFor="let tarea of tareas">
+      <div class="card h-100 rounded-4 border-0 shadow-sm premium-task-card overflow-hidden"
+           [style.border-top]="'4px solid ' + (tarea.modulos.length > 0 ? tarea.modulos[0].color : '#3F51B5')">
+        <div class="card-body p-4 d-flex flex-column justify-content-between">
+          <div>
+            <!-- Header: Monospace Code & Modules -->
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <span class="text-uppercase small fw-bold text-muted monospace-code me-2">{{ tarea.codigo_auto }}</span>
+              <div class="d-flex gap-1 flex-wrap justify-content-end">
+                <span *ngFor="let m of tarea.modulos" 
+                      [style.backgroundColor]="m.color || '#3F51B5'"
+                      class="badge text-white px-2 py-1 rounded-pill small-badge shadow-sm">
+                  {{ m.sigla }}
+                </span>
+              </div>
             </div>
+
+            <!-- Title -->
+            <h5 class="card-title fw-bold text-dark mb-2 text-line-clamp-2" [title]="tarea.titulo">{{ tarea.titulo }}</h5>
+
+            <!-- Description Snippet -->
+            <p class="card-text text-muted small mb-4 text-line-clamp-2">
+              {{ stripHtmlTags(tarea.descripcion) }}
+            </p>
           </div>
 
-          <!-- Contenido Principal -->
-          <div class="col p-4 d-flex flex-column justify-content-center">
-            <h4 class="fw-bold text-dark mb-4">{{ tarea.titulo }}</h4>
-            
-            <div class="d-flex align-items-center text-muted gap-5 flex-wrap">
-              <!-- Fecha Límite -->
-              <div class="d-flex align-items-center">
-                <span class="small fw-bold text-dark me-2">Fecha limite:</span>
-                <span class="small">{{ tarea.fechaLimite }}</span>
+          <div>
+            <!-- Progress section -->
+            <div class="mb-4">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <span class="extra-small fw-bold text-muted text-uppercase">Revisión Profesor</span>
+                <span class="small fw-bold text-primary">{{ tarea.progreso.actual }}/{{ tarea.progreso.total }}</span>
               </div>
-              
-              <!-- Calificación -->
-              <div class="d-flex align-items-center">
-                <span class="small fw-bold text-dark me-2">Calificación:</span>
-                <span class="badge rounded-3 border px-3 py-1 calificacion-badge" [ngClass]="getCalificacionClases(tarea.calificacion)">
+              <div class="progress rounded-pill shadow-inner" style="height: 6px;">
+                <div class="progress-bar progress-bar-striped progress-bar-animated rounded-pill" 
+                     role="progressbar" 
+                     [style.width.%]="(tarea.progreso.actual / tarea.progreso.total) * 100"
+                     [style.backgroundColor]="tarea.modulos.length > 0 ? tarea.modulos[0].color : '#3F51B5'">
+                </div>
+              </div>
+            </div>
+
+            <!-- Footer: Date, Calificacion, Actions -->
+            <div class="pt-3 border-top d-flex flex-column gap-3">
+              <div class="d-flex justify-content-between align-items-center">
+                <!-- Fecha -->
+                <div class="d-flex align-items-center text-muted">
+                  <i class="fa-regular fa-calendar-days me-2 opacity-75"></i>
+                  <span class="small">{{ tarea.fechaLimite }}</span>
+                </div>
+                <!-- Calificación Badge -->
+                <span class="badge rounded-3 border px-3 py-1.5 calificacion-badge" 
+                      [ngClass]="getCalificacionClases(tarea.calificacion)">
                   {{ tarea.calificacion }}
                 </span>
               </div>
 
-              <!-- Progreso -->
-              <div class="d-flex align-items-center">
-                <span class="small fw-bold text-dark me-2">Progreso:</span>
-                <span class="small fw-bold text-primary">{{ tarea.progreso.actual }}/{{ tarea.progreso.total }}</span>
+              <!-- Buttons footer row -->
+              <div class="d-flex justify-content-between align-items-center pt-2">
+                <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-3 py-1.5 fw-bold" 
+                        (click)="verTarea(tarea)">
+                  <i class="fa-solid fa-eye me-1"></i> Ver Detalles
+                </button>
+                <button type="button" class="btn btn-link text-danger p-1 action-btn hover-scale-danger" 
+                        (click)="eliminarTarea(tarea)" title="Eliminar Tarea">
+                  <i class="fa-solid fa-trash-can fs-5"></i>
+                </button>
               </div>
             </div>
-          </div>
-
-          <!-- Acciones (Derecha) -->
-          <div class="col-auto d-flex align-items-center pe-4">
-            <button class="btn btn-link text-primary p-2 action-btn" (click)="verTarea(tarea)" title="Ver tarea">
-              <i class="fa-solid fa-eye fs-4"></i>
-            </button>
-            <button class="btn btn-link text-danger p-2 action-btn" (click)="eliminarTarea(tarea)" title="Eliminar">
-              <i class="fa-solid fa-trash-can fs-3"></i>
-            </button>
           </div>
         </div>
       </div>

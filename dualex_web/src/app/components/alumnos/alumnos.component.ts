@@ -42,6 +42,11 @@ export class AlumnosComponent implements OnInit, OnDestroy {
 
   // Lista de cursos que el coordinador gestiona
   cursosGestionados: number[] = [];
+  todosLosCursos: CursoDTO[] = [];
+  cursosAgrupados: { [ciclo: string]: CursoDTO[] } = {};
+  cursosFiltradosIds: number[] = [];
+  ciclosCoordinados: string[] = [];
+
   private suscripcionUsuario?: Subscription;
   rolUsuarioActual: string | null = null;
 
@@ -62,7 +67,26 @@ export class AlumnosComponent implements OnInit, OnDestroy {
         next: (profesor) => {
           this.cursosService.getCursosByProfesor(profesor.id).subscribe({
             next: (cursos: CursoDTO[]) => {
-              this.cursosGestionados = cursos.map(c => c.id);
+              // Parse cycles coordinated by the coordinator (e.g. "DAW, DAM")
+              const ciclosCoordinados = profesor.ciclos ? profesor.ciclos.split(',').map((c: string) => c.trim()) : [];
+              this.ciclosCoordinados = ciclosCoordinados;
+              
+              // Only keep courses whose siglasCiclo is coordinated by the coordinator
+              const cursosFiltrados = cursos.filter(c => c.siglasCiclo && ciclosCoordinados.includes(c.siglasCiclo));
+
+              this.todosLosCursos = cursosFiltrados;
+              this.cursosGestionados = cursosFiltrados.map(c => c.id);
+
+              // Agrupar cursos por ciclo (usando siglasCiclo para brevedad)
+              this.cursosAgrupados = {};
+              cursosFiltrados.forEach(c => {
+                const cicloKey = c.siglasCiclo || 'Sin ciclo';
+                if (!this.cursosAgrupados[cicloKey]) {
+                  this.cursosAgrupados[cicloKey] = [];
+                }
+                this.cursosAgrupados[cicloKey].push(c);
+              });
+
               this.procesarParametrosRuta();
             },
             error: () => this.procesarParametrosRuta() // Continuar aunque falle
@@ -73,6 +97,30 @@ export class AlumnosComponent implements OnInit, OnDestroy {
     } else {
       this.procesarParametrosRuta();
     }
+  }
+
+  getCiclosKeys(): string[] {
+    return Object.keys(this.cursosAgrupados).sort();
+  }
+
+  onFiltroChange(event: Event): void {
+    const selectElement = event.target as HTMLSelectElement;
+    const value = selectElement.value;
+
+    this.cursosFiltradosIds = [];
+
+    if (value === 'all') {
+      // Sin filtro adicional, usa los cursos gestionados por defecto
+    } else if (value.startsWith('ciclo:')) {
+      const cicloKey = value.substring(6);
+      const cursosCiclo = this.cursosAgrupados[cicloKey] || [];
+      this.cursosFiltradosIds = cursosCiclo.map(c => c.id);
+    } else if (value.startsWith('curso:')) {
+      const cursoId = Number(value.substring(6));
+      this.cursosFiltradosIds = [cursoId];
+    }
+
+    this.datatable.refrescar(false);
   }
 
   private procesarParametrosRuta(): void {
@@ -108,7 +156,9 @@ export class AlumnosComponent implements OnInit, OnDestroy {
           dataTablesParameters.emailProfesor = usuarioActual.email;
         }
 
-        if (this.cursosGestionados.length > 0) {
+        if (this.cursosFiltradosIds.length > 0) {
+          dataTablesParameters.idsCursos = this.cursosFiltradosIds;
+        } else if (this.cursosGestionados.length > 0) {
           dataTablesParameters.idsCursos = this.cursosGestionados;
         }
 

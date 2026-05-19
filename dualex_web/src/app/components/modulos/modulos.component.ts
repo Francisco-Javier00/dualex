@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { DatatableComponent } from '../shared/datatable/datatable.component';
@@ -6,8 +6,12 @@ import { ConfirmarBorradoModalComponent } from '../shared/modals/confirmar-borra
 import { ModuloModalComponent } from '../modals/modulo-modal/modulo-modal.component';
 import { ModulosService } from '../../services/modulos.service';
 import { AlertService } from '../../services/alert.service';
-import { ModuloDTO } from '../../dto/dualex.dto';
+import { ModuloDTO, CursoDTO } from '../../dto/dualex.dto';
 import { Config } from 'datatables.net';
+import { AuthService } from '../../auth/services/auth.service';
+import { ProfesoresService } from '../../services/profesores.service';
+import { CursosService } from '../../services/cursos.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-modulos',
@@ -15,9 +19,12 @@ import { Config } from 'datatables.net';
   imports: [CommonModule, RouterModule, DatatableComponent, ConfirmarBorradoModalComponent, ModuloModalComponent],
   templateUrl: './modulos.component.html'
 })
-export class ModulosComponent implements OnInit {
+export class ModulosComponent implements OnInit, OnDestroy {
   private modulosService = inject(ModulosService);
   private alertService = inject(AlertService);
+  private authService = inject(AuthService);
+  private profesoresService = inject(ProfesoresService);
+  private cursosService = inject(CursosService);
 
   @ViewChild(DatatableComponent) datatable!: DatatableComponent;
 
@@ -26,11 +33,67 @@ export class ModulosComponent implements OnInit {
   modalModuloVisible = false;
   moduloSeleccionado: ModuloDTO | null = null;
 
+  // Lista de cursos que el coordinador gestiona
+  cursosGestionados: number[] = [];
+  todosLosCursos: CursoDTO[] = [];
+  cursosAgrupados: { [ciclo: string]: CursoDTO[] } = {};
+  cursosFiltradosIds: number[] = [];
+  ciclosCoordinados: string[] = [];
+
+  private suscripcionUsuario?: Subscription;
+  rolUsuarioActual: string | null = null;
+
   ngOnInit(): void {
+    this.suscripcionUsuario = this.authService.perfilUsuario$.subscribe(perfil => {
+      this.rolUsuarioActual = perfil?.rol ?? null;
+    });
+
+    const usuarioActual = this.authService.currentUserValue;
+
+    // Si es coordinador, obtenemos sus cursos antes de inicializar/cargar la tabla
+    if (usuarioActual && usuarioActual.rol === 'COORDINADOR' && usuarioActual.email) {
+      this.profesoresService.getProfesorByEmail(usuarioActual.email).subscribe({
+        next: (profesor) => {
+          this.cursosService.getCursosByProfesor(profesor.id).subscribe({
+            next: (cursos: CursoDTO[]) => {
+              // Parse cycles coordinated by the coordinator (e.g. "DAW, DAM")
+              const ciclosCoordinados = profesor.ciclos ? profesor.ciclos.split(',').map((c: string) => c.trim()) : [];
+              this.ciclosCoordinados = ciclosCoordinados;
+              
+              // Only keep courses whose siglasCiclo is coordinated by the coordinator
+              const cursosFiltrados = cursos.filter(c => c.siglasCiclo && ciclosCoordinados.includes(c.siglasCiclo));
+
+              this.todosLosCursos = cursosFiltrados;
+              this.cursosGestionados = cursosFiltrados.map(c => c.id);
+
+              // Agrupar cursos por ciclo (usando siglasCiclo para brevedad)
+              this.cursosAgrupados = {};
+              cursosFiltrados.forEach(c => {
+                const cicloKey = c.siglasCiclo || 'Sin ciclo';
+                if (!this.cursosAgrupados[cicloKey]) {
+                  this.cursosAgrupados[cicloKey] = [];
+                }
+                this.cursosAgrupados[cicloKey].push(c);
+              });
+
+              // Refrescar tabla para que recoja los cursos cargados
+              this.datatable.refrescar(false);
+            }
+          });
+        }
+      });
+    }
+
     this.dtOptions = {
       serverSide: true,
       processing: true,
       ajax: (dataTablesParameters: any, callback: any) => {
+        if (this.cursosFiltradosIds.length > 0) {
+          dataTablesParameters.idsCursos = this.cursosFiltradosIds;
+        } else if (this.cursosGestionados.length > 0) {
+          dataTablesParameters.idsCursos = this.cursosGestionados;
+        }
+
         this.modulosService.obtenerModulosDataTables(dataTablesParameters).subscribe(resp => {
           callback({
             recordsTotal: resp.recordsTotal,
@@ -56,6 +119,11 @@ export class ModulosComponent implements OnInit {
         { data: 'sigla', className: 'text-center text-muted' },
         { 
           data: 'cicloCompleto',
+          className: 'text-center text-muted',
+          render: (data: any) => data || 'Sin asignar'
+        },
+        { 
+          data: 'cursoCompleto',
           className: 'text-center text-muted',
           render: (data: any) => data || 'Sin asignar'
         },
@@ -153,5 +221,33 @@ export class ModulosComponent implements OnInit {
 
   private recargarTabla(): void {
     this.datatable.refrescar();
+  }
+
+  getCiclosKeys(): string[] {
+    return Object.keys(this.cursosAgrupados).sort();
+  }
+
+  onFiltroChange(event: Event): void {
+    const selectElement = event.target as HTMLSelectElement;
+    const value = selectElement.value;
+
+    this.cursosFiltradosIds = [];
+
+    if (value === 'all') {
+      // Sin filtro adicional
+    } else if (value.startsWith('ciclo:')) {
+      const cicloKey = value.substring(6);
+      const cursosCiclo = this.cursosAgrupados[cicloKey] || [];
+      this.cursosFiltradosIds = cursosCiclo.map(c => c.id);
+    } else if (value.startsWith('curso:')) {
+      const cursoId = Number(value.substring(6));
+      this.cursosFiltradosIds = [cursoId];
+    }
+
+    this.datatable.refrescar(false);
+  }
+
+  ngOnDestroy(): void {
+    this.suscripcionUsuario?.unsubscribe();
   }
 }

@@ -1,39 +1,77 @@
-.task-card {
-  min-height: 130px;
+.premium-task-card {
   background-color: #ffffff;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.3s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important;
+  border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-.task-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+.premium-task-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.03) !important;
 }
 
-.modules-col {
-  width: 160px;
+.monospace-code {
+  font-family: var(--bs-font-monospace);
+  letter-spacing: -0.2px;
+  opacity: 0.8;
+  white-space: nowrap;
+  font-size: 0.72rem;
 }
 
-.task-title {
-  font-size: 1.4rem;
-  margin-top: -0.5rem;
+/* Custom Text Line Clamp */
+.text-line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;  
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-height: 2.7rem; /* Ensures consistent layout height for two lines of text */
 }
 
-.task-details {
-  margin-bottom: -0.5rem;
+/* Small Badges for Modules */
+.small-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  padding: 0.35em 0.65em;
 }
 
-/* Fixes for badges */
-.badge {
-  font-size: 0.85rem;
+/* Progress bar inside cards */
+.shadow-inner {
+  background-color: #e9ecef;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+
+.extra-small {
+  font-size: 0.68rem;
   letter-spacing: 0.5px;
 }
 
+/* Calificación Badge */
 .calificacion-badge {
-  font-size: 0.9rem;
-  min-width: 110px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  min-width: 95px;
+  text-align: center;
 }
 
-/* Make icons look crisp */
+/* Actions and animations */
 .action-btn {
-  opacity: 1 !important;
+  opacity: 0.7;
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s ease, color 0.2s ease;
 }
+
+.hover-scale-danger:hover {
+  transform: scale(1.2);
+  opacity: 1;
+}
+
+.btn-outline-primary {
+  transition: all 0.25s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.btn-outline-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(13, 110, 253, 0.15);
+}
+

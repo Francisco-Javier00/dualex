@@ -70,8 +70,8 @@ class ConModulos extends BaseController {
         $json = file_get_contents('php://input');
         $datos = json_decode($json, true);
         
-        if (empty($datos['nombre']) || empty($datos['sigla']) || empty($datos['idCiclo'])) {
-            $this->sendError("Faltan campos obligatorios (nombre, sigla, ciclo).", 400);
+        if (empty($datos['nombre']) || empty($datos['sigla']) || empty($datos['idCiclo']) || empty($datos['idCurso'])) {
+            $this->sendError("Faltan campos obligatorios (nombre, sigla, ciclo, curso).", 400);
         }
 
         try {
@@ -91,8 +91,8 @@ class ConModulos extends BaseController {
         $json = file_get_contents('php://input');
         $datos = json_decode($json, true);
 
-        if (empty($datos['nombre']) || empty($datos['sigla']) || empty($datos['idCiclo'])) {
-            $this->sendError("Faltan campos obligatorios.", 400);
+        if (empty($datos['nombre']) || empty($datos['sigla']) || empty($datos['idCiclo']) || empty($datos['idCurso'])) {
+            $this->sendError("Faltan campos obligatorios (nombre, sigla, ciclo, curso).", 400);
         }
 
         try {
