@@ -109,6 +109,10 @@ export class EmpresasComponent implements OnInit {
             `;
           }
         },
+        {
+          data: 'firmante',
+          render: (data: string) => data ? data : '<span class="text-muted italic">Sin asignar</span>'
+        },
         { data: 'inicioConvenio' },
         { data: 'finConvenio' },
         ...(this.puedeEditar ? [{

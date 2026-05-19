@@ -357,3 +357,40 @@ JOIN Cursos cu ON a.idCurso = cu.idCurso
 JOIN Ciclos ci ON cu.idCiclo = ci.idCiclo
 SET t.codigo_auto = CONCAT(TRIM(cu.anio_escolar), '_', TRIM(ci.siglas), '_T', t.idTarea);
 
+ALTER TABLE Tareas
+MODIFY titulo VARCHAR(255) NOT NULL;
+
+-- ELIMINAR FOREIGN KEYS
+
+ALTER TABLE Tarea_Actividad
+DROP FOREIGN KEY fk_tarea_actividad_tarea;
+
+ALTER TABLE Modulo_Tarea_Revision
+DROP FOREIGN KEY fk_modulo_tarea_revision_tarea;
+
+-- MODIFICAR TIPOS
+
+ALTER TABLE Tareas
+MODIFY idTarea INT UNSIGNED NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE Tarea_Actividad
+MODIFY idTarea INT UNSIGNED NOT NULL;
+
+ALTER TABLE Modulo_Tarea_Revision
+MODIFY idTarea INT UNSIGNED NOT NULL;
+
+-- VOLVER A CREAR FOREIGN KEYS
+
+ALTER TABLE Tarea_Actividad
+ADD CONSTRAINT fk_tarea_actividad_tarea
+FOREIGN KEY (idTarea)
+REFERENCES Tareas(idTarea)
+ON DELETE CASCADE
+ON UPDATE CASCADE;
+
+ALTER TABLE Modulo_Tarea_Revision
+ADD CONSTRAINT fk_modulo_tarea_revision_tarea
+FOREIGN KEY (idTarea)
+REFERENCES Tareas(idTarea)
+ON DELETE CASCADE
+ON UPDATE CASCADE;

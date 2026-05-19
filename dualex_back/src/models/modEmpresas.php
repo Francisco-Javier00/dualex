@@ -27,9 +27,11 @@ class ModEmpresas {
      * @return array Arreglo con la lista de todas las empresas y sus contactos estructurados.
      */
     public function listar() {
-        $sql = "SELECT idEmpresa as id, siglas, nombre, url_Convenio as convenioUrl, inicioConvenio 
-                FROM Empresa 
-                ORDER BY nombre";
+        $sql = "SELECT e.idEmpresa as id, e.siglas, e.nombre, e.url_Convenio as convenioUrl, e.inicioConvenio,
+                       e.idCoordinador, CONCAT(u.nombre, ' ', u.apellidos) as firmante
+                FROM Empresa e
+                LEFT JOIN Usuarios u ON e.idCoordinador = u.idUsuario
+                ORDER BY e.nombre";
         $stmt = $this->db->prepare($sql);
         $stmt->execute();
         // Se formatea el array para añadir contactos y calcular la fecha de fin de convenio
@@ -43,8 +45,11 @@ class ModEmpresas {
      * @return array|null Un array asociativo con todos los datos de la empresa si existe, o null en caso contrario.
      */
     public function obtener($id) {
-        $sql = "SELECT idEmpresa as id, siglas, nombre, url_Convenio as convenioUrl, inicioConvenio 
-                FROM Empresa WHERE idEmpresa = :id";
+        $sql = "SELECT e.idEmpresa as id, e.siglas, e.nombre, e.url_Convenio as convenioUrl, e.inicioConvenio,
+                       e.idCoordinador, CONCAT(u.nombre, ' ', u.apellidos) as firmante
+                FROM Empresa e
+                LEFT JOIN Usuarios u ON e.idCoordinador = u.idUsuario
+                WHERE e.idEmpresa = :id";
         $stmt = $this->db->prepare($sql);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         $stmt->execute();
@@ -75,14 +80,15 @@ class ModEmpresas {
             $fechaMySql = $fechaPartes[2] . '-' . $fechaPartes[1] . '-' . $fechaPartes[0] . ' 00:00:00';
 
             // 1. Inserción de los datos principales de la Empresa
-            $sql = "INSERT INTO Empresa (siglas, nombre, url_Convenio, inicioConvenio) 
-                    VALUES (:siglas, :nombre, :url_Convenio, :inicioConvenio)";
+            $sql = "INSERT INTO Empresa (siglas, nombre, url_Convenio, inicioConvenio, idCoordinador) 
+                    VALUES (:siglas, :nombre, :url_Convenio, :inicioConvenio, :idCoordinador)";
             $stmt = $this->db->prepare($sql);
             $stmt->execute([
                 ':siglas' => $datos['siglas'],
                 ':nombre' => $datos['nombre'],
                 ':url_Convenio' => $datos['convenioUrl'],
-                ':inicioConvenio' => $fechaMySql
+                ':inicioConvenio' => $fechaMySql,
+                ':idCoordinador' => $datos['idCoordinador'] ?? null
             ]);
             
             // Guardamos el ID recién generado de la tabla Empresa
@@ -244,9 +250,10 @@ class ModEmpresas {
             $columnsMap = [
                 0 => 'e.siglas',
                 1 => 'e.nombre',
-                2 => 'e.url_Convenio',
-                3 => 'e.inicioConvenio',
-                4 => 'e.inicioConvenio' // Fin convenio deriva de inicioConvenio
+                3 => 'e.url_Convenio',
+                4 => 'firmante',
+                5 => 'e.inicioConvenio',
+                6 => 'e.inicioConvenio' // Fin convenio deriva de inicioConvenio
             ];
 
             if (isset($columnsMap[$orderColumnIndex])) {
@@ -261,8 +268,10 @@ class ModEmpresas {
         }
 
         // Query final maestra de extracción de datos
-        $sql = "SELECT e.idEmpresa as id, e.siglas, e.nombre, e.url_Convenio as convenioUrl, e.inicioConvenio 
+        $sql = "SELECT e.idEmpresa as id, e.siglas, e.nombre, e.url_Convenio as convenioUrl, e.inicioConvenio,
+                       e.idCoordinador, CONCAT(u.nombre, ' ', u.apellidos) as firmante
                 FROM Empresa e 
+                LEFT JOIN Usuarios u ON e.idCoordinador = u.idUsuario
                 $where 
                 $orderBy 
                 $limit";

@@ -88,6 +88,7 @@ class ConEmpresas extends BaseController {
         
         try {
             // El modelo devuelve la empresa recién creada con su ID generado.
+            $datos['idCoordinador'] = $this->user['id'] ?? $this->user['idUsuario'] ?? $this->user['sub'] ?? null;
             $res = $this->modelo->crear($datos);
             $this->sendResponse($res, 201);
         } catch (Exception $e) {

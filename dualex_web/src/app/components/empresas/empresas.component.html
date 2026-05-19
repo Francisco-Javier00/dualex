@@ -28,7 +28,7 @@
   <app-shared-datatable
     tableId="tabla-empresas"
     [dtOptions]="dtOptions"
-    [columnTitles]="puedeEditar ? ['Siglas', 'Nombre', 'Ciclos', 'Convenio', 'Inicio Convenio', 'Fin Convenio', 'Acciones'] : ['Siglas', 'Nombre', 'Ciclos', 'Convenio', 'Inicio Convenio', 'Fin Convenio']"
+    [columnTitles]="puedeEditar ? ['Siglas', 'Nombre', 'Ciclos', 'Convenio', 'Firmante', 'Inicio Convenio', 'Fin Convenio', 'Acciones'] : ['Siglas', 'Nombre', 'Ciclos', 'Convenio', 'Firmante', 'Inicio Convenio', 'Fin Convenio']"
     (actionClick)="onTableAction($event)">
   </app-shared-datatable>
 </div>
