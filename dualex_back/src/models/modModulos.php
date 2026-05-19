@@ -301,20 +301,36 @@ class ModModulos {
         $stmtF->execute();
         $totalFiltrados = $stmtF->fetchColumn();
 
+        // 2.5. Ordenación dinámica
+        $orderBy = " ORDER BY m.nombre";
+        if (isset($params['order']) && count($params['order']) > 0) {
+            $orderColumnIndex = intval($params['order'][0]['column']);
+            $orderDir = isset($params['order'][0]['dir']) && strtolower($params['order'][0]['dir']) === 'desc' ? 'DESC' : 'ASC';
+            
+            $columnsMap = [
+                0 => 'm.nombre',
+                1 => 'm.sigla'
+            ];
+
+            if (isset($columnsMap[$orderColumnIndex])) {
+                $orderBy = " ORDER BY " . $columnsMap[$orderColumnIndex] . " " . $orderDir;
+            }
+        }
+
         // Datos
-        $sql = "SELECT m.idModulo as id, m.nombre, m.sigla, m.color, 
+        $sql = "SELECT m.idModulo as id, m.nombre, sigla, color, 
                        MIN(c.idCiclo) as idCiclo,
                        MIN(cur.idCurso) as idCurso,
-                       GROUP_CONCAT(DISTINCT CONCAT(c.siglas, ' - ', c.nombre) SEPARATOR ', ') as cicloCompleto,
+                       GROUP_CONCAT(DISTINCT CONCAT(siglas, ' - ', c.nombre) SEPARATOR ', ') as cicloCompleto,
                        GROUP_CONCAT(DISTINCT cur.nombre SEPARATOR ', ') as cursoCompleto
-                FROM Modulos m
-                LEFT JOIN Modulo_Curso mc ON m.idModulo = mc.idModulo
-                LEFT JOIN Cursos cur ON mc.idCurso = cur.idCurso
-                LEFT JOIN Ciclos c ON cur.idCiclo = c.idCiclo
-                $where 
-                GROUP BY m.idModulo, m.nombre, m.sigla, m.color
-                ORDER BY m.nombre
-                LIMIT :start, :length";
+                 FROM Modulos m
+                 LEFT JOIN Modulo_Curso mc ON m.idModulo = mc.idModulo
+                 LEFT JOIN Cursos cur ON mc.idCurso = cur.idCurso
+                 LEFT JOIN Ciclos c ON cur.idCiclo = c.idCiclo
+                 $where 
+                 GROUP BY m.idModulo, m.nombre, sigla, color
+                 $orderBy
+                 LIMIT :start, :length";
         
         $stmt = $this->db->prepare($sql);
         foreach ($binds as $key => $val) {

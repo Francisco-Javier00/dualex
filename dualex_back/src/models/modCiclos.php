@@ -19,9 +19,9 @@ class ModCiclos {
      * @return array Array asociativo con el listado de ciclos.
      */
     public function listar() {
-        $sql = "SELECT c.idCiclo as id, c.nombre, c.siglas, c.idCoordinador, 
-                       c.grado, CONCAT('1º ', c.siglas, ', 2º ', c.siglas) AS cursos,
-                       u.nombre as nombreCoordinador, u.apellidos as apellidosCoordinador 
+        $sql = "SELECT idCiclo as id, c.nombre, siglas, c.idCoordinador, 
+                       grado, CONCAT('1º ', siglas, ', 2º ', siglas) AS cursos,
+                       u.nombre as nombreCoordinador, apellidos as apellidosCoordinador 
                 FROM Ciclos c
                 LEFT JOIN Coordinador co ON c.idCoordinador = co.idCoordinador
                 LEFT JOIN Usuarios u ON co.idCoordinador = u.idUsuario
@@ -197,14 +197,32 @@ class ModCiclos {
         else $stmtF->execute();
         $totalFiltrados = $stmtF->fetchColumn();
 
-        $sql = "SELECT c.idCiclo as id, c.nombre, c.siglas, c.idCoordinador, 
-                       c.grado, CONCAT('1º ', c.siglas, ', 2º ', c.siglas) AS cursos,
-                       u.nombre as nombreCoordinador, u.apellidos as apellidosCoordinador 
+        // 2.5. Ordenación dinámica
+        $orderBy = " ORDER BY c.nombre";
+        if (isset($params['order']) && count($params['order']) > 0) {
+            $orderColumnIndex = intval($params['order'][0]['column']);
+            $orderDir = isset($params['order'][0]['dir']) && strtolower($params['order'][0]['dir']) === 'desc' ? 'DESC' : 'ASC';
+            
+            $columnsMap = [
+                0 => 'c.nombre',
+                1 => 'c.siglas',
+                2 => 'c.grado',
+                3 => 'u.nombre'
+            ];
+
+            if (isset($columnsMap[$orderColumnIndex])) {
+                $orderBy = " ORDER BY " . $columnsMap[$orderColumnIndex] . " " . $orderDir;
+            }
+        }
+
+        $sql = "SELECT idCiclo as id, c.nombre, siglas, c.idCoordinador, 
+                       grado, CONCAT('1º ', siglas, ', 2º ', siglas) AS cursos,
+                       u.nombre as nombreCoordinador, apellidos as apellidosCoordinador 
                 FROM Ciclos c
                 LEFT JOIN Coordinador co ON c.idCoordinador = co.idCoordinador
                 LEFT JOIN Usuarios u ON co.idCoordinador = u.idUsuario
                 $where 
-                ORDER BY c.nombre
+                $orderBy
                 LIMIT :start, :length";
         
         $stmt = $this->db->prepare($sql);

@@ -83,6 +83,8 @@ export interface ActividadDTO {
   titulo: string;
   descripcion: string;
   modulo: string;
+  idModulo?: number;
+  idModulos?: number[];
 }
 
 export interface AlumnoDTO {

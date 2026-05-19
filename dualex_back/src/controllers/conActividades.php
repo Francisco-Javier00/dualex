@@ -26,17 +26,36 @@ class ConActividades extends BaseController {
         $this->sendResponse($data);
     }
 
+    public function obtenerDataTables() {
+        // Capturar parámetros de la petición (JSON POST)
+        $json = file_get_contents('php://input');
+        $params = json_decode($json, true) ?? [];
+        
+        $data = $this->modelo->obtenerDataTables($params);
+        $this->sendResponse($data);
+    }
+
     public function crear() {
         $this->checkRole(['PROFESOR', 'COORDINADOR']);
         $json = file_get_contents('php://input');
         $datos = json_decode($json, true);
 
-        if (!$datos || !isset($datos['titulo']) || !isset($datos['descripcion'])) {
-            $this->sendError("Datos insuficientes para crear la actividad.", 400);
+        if (!$datos) {
+            $this->sendError("Datos no proporcionados.", 400);
         }
 
-        $res = $this->modelo->crear($datos);
-        $this->sendResponse($res, 201);
+        // Validación del lado del servidor
+        $errores = $this->modelo->validar($datos);
+        if (!empty($errores)) {
+            $this->sendError(implode(" ", $errores), 400);
+        }
+
+        try {
+            $res = $this->modelo->crear($datos);
+            $this->sendResponse($res, 201);
+        } catch (Exception $e) {
+            $this->sendError($e->getMessage(), 500);
+        }
     }
 
     public function actualizar() {
@@ -49,16 +68,26 @@ class ConActividades extends BaseController {
         $json = file_get_contents('php://input');
         $datos = json_decode($json, true);
 
-        if (!$datos || !isset($datos['titulo']) || !isset($datos['descripcion'])) {
-            $this->sendError("Datos insuficientes para actualizar la actividad.", 400);
+        if (!$datos) {
+            $this->sendError("Datos no proporcionados.", 400);
         }
 
-        $res = $this->modelo->actualizar($id, $datos);
-        $this->sendResponse($res);
+        // Validación del lado del servidor
+        $errores = $this->modelo->validar($datos);
+        if (!empty($errores)) {
+            $this->sendError(implode(" ", $errores), 400);
+        }
+
+        try {
+            $res = $this->modelo->actualizar($id, $datos);
+            $this->sendResponse($res);
+        } catch (Exception $e) {
+            $this->sendError($e->getMessage(), 500);
+        }
     }
 
     public function eliminar() {
-        $this->checkRole(['COORDINADOR']);
+        $this->checkRole(['PROFESOR', 'COORDINADOR']);
         $id = $_GET['id'] ?? null;
         if (!$id) {
             $this->sendError("ID de actividad no proporcionado.", 400);

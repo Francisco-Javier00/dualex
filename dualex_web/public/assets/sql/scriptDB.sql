@@ -1,3 +1,4 @@
+CREATE DATABASE IF NOT EXISTS `dualex`;
 USE `dualex`;
 
 CREATE TABLE Usuarios (

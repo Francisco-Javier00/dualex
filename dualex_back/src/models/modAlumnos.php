@@ -32,17 +32,17 @@ class ModAlumnos {
      * @return array[] Listado de alumnos con formato de clave-valor asociativo.
      */
     public function listar() {
-        $sql = "SELECT u.idUsuario as id, u.nombre, u.apellidos, u.correo as email, 
-                       a.DNI as dni, a.NUSS as nuss, a.NIA as nia, a.telefono, 
-                       CAST(a.repetidor AS UNSIGNED) as repetidor, 
+        $sql = "SELECT idUsuario as id, u.nombre, apellidos, correo as email, 
+                       DNI as dni, NUSS as nuss, NIA as nia, telefono, 
+                       CAST(repetidor AS UNSIGNED) as repetidor, 
                        a.idCurso, c.nombre as nombreCurso,
-                       ea.idEmpresa
+                       idEmpresa
                 FROM Usuarios u
-                JOIN Alumnos a ON u.idUsuario = a.idAlumnos
+                JOIN Alumnos a ON idUsuario = idAlumnos
                 JOIN Cursos c ON a.idCurso = c.idCurso
-                LEFT JOIN Empresa_Alumnos ea ON a.idAlumnos = ea.idAlumno
-                WHERE u.tipo = 'A'
-                ORDER BY u.apellidos, u.nombre";
+                LEFT JOIN Empresa_Alumnos ea ON idAlumnos = idAlumno
+                WHERE tipo = 'A'
+                ORDER BY apellidos, u.nombre";
         $stmt = $this->db->prepare($sql);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -55,13 +55,13 @@ class ModAlumnos {
      * @return array|false Datos del alumno si se encuentra, o false si no existe.
      */
     public function obtener($id) {
-        $sql = "SELECT u.idUsuario as id, u.nombre, u.apellidos, u.correo as email, 
-                       a.DNI as dni, a.NUSS as nuss, a.NIA as nia, a.telefono, 
-                       CAST(a.repetidor AS UNSIGNED) as repetidor, a.idCurso, ea.idEmpresa
+        $sql = "SELECT idUsuario as id, nombre, apellidos, correo as email, 
+                       DNI as dni, NUSS as nuss, NIA as nia, telefono, 
+                       CAST(repetidor AS UNSIGNED) as repetidor, idCurso, idEmpresa
                 FROM Usuarios u
-                JOIN Alumnos a ON u.idUsuario = a.idAlumnos
-                LEFT JOIN Empresa_Alumnos ea ON a.idAlumnos = ea.idAlumno
-                WHERE u.idUsuario = :id";
+                JOIN Alumnos a ON idUsuario = idAlumnos
+                LEFT JOIN Empresa_Alumnos ea ON idAlumnos = idAlumno
+                WHERE idUsuario = :id";
         $stmt = $this->db->prepare($sql);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         $stmt->execute();
@@ -219,14 +219,14 @@ class ModAlumnos {
         $search = $params['search']['value'] ?? '';
 
         // Base de la consulta con DISTINCT para evitar duplicados
-        $sql = "SELECT DISTINCT u.idUsuario as id, u.nombre, u.apellidos, u.correo as email, 
-                       a.DNI as dni, a.NUSS as nuss, a.NIA as nia, a.telefono, a.idCurso,
-                       CAST(a.repetidor AS UNSIGNED) as repetidor,
-                       c.nombre as nombreCurso, ea.idEmpresa
+        $sql = "SELECT DISTINCT idUsuario as id, u.nombre, apellidos, correo as email, 
+                       DNI as dni, NUSS as nuss, NIA as nia, telefono, a.idCurso,
+                       CAST(repetidor AS UNSIGNED) as repetidor,
+                       c.nombre as nombreCurso, idEmpresa
                 FROM Usuarios u
-                INNER JOIN Alumnos a ON u.idUsuario = a.idAlumnos 
+                INNER JOIN Alumnos a ON idUsuario = idAlumnos 
                 LEFT JOIN Cursos c ON a.idCurso = c.idCurso
-                LEFT JOIN Empresa_Alumnos ea ON a.idAlumnos = ea.idAlumno ";
+                LEFT JOIN Empresa_Alumnos ea ON idAlumnos = idAlumno ";
 
         // Construcción de condiciones
         $conditions = [];
@@ -234,7 +234,7 @@ class ModAlumnos {
         $joinClause = "";
 
         if ($search) {
-            $conditions[] = "(u.nombre LIKE :search1 OR u.apellidos LIKE :search2 OR u.correo LIKE :search3 OR a.DNI LIKE :search4)";
+            $conditions[] = "(u.nombre LIKE :search1 OR apellidos LIKE :search2 OR correo LIKE :search3 OR DNI LIKE :search4)";
             $binds[':search1'] = "%$search%";
             $binds[':search2'] = "%$search%";
             $binds[':search3'] = "%$search%";
@@ -243,7 +243,7 @@ class ModAlumnos {
         
         // 1. Filtrado por módulo específico
         if (!empty($idModulo) && $idModulo !== 'null') {
-            $joinClause .= " INNER JOIN Modulo_Alumno_Cursa mac ON a.idAlumnos = mac.idAlumnos ";
+            $joinClause .= " INNER JOIN Modulo_Alumno_Cursa mac ON idAlumnos = mac.idAlumnos ";
             $conditions[] = "mac.idModulo = :idModulo";
             $binds[':idModulo'] = (int)$idModulo;
         } 
@@ -270,7 +270,7 @@ class ModAlumnos {
         }
         // 4. Si es Profesor, ve los alumnos de los módulos que imparte
         else if (empty($conditions) && strtoupper($rol) === 'PROFESOR' && !empty($idUsuario)) {
-            $joinClause .= " INNER JOIN Modulo_Alumno_Cursa mac ON a.idAlumnos = mac.idAlumnos ";
+            $joinClause .= " INNER JOIN Modulo_Alumno_Cursa mac ON idAlumnos = mac.idAlumnos ";
             $joinClause .= " INNER JOIN Modulo_Profesor mp ON mac.idModulo = mp.idModulo ";
             $conditions[] = "mp.idProfesor = :idUsuario";
             $binds[':idUsuario'] = (int)$idUsuario;
@@ -278,8 +278,28 @@ class ModAlumnos {
 
         $whereClause = !empty($conditions) ? " WHERE " . implode(" AND ", $conditions) : "";
 
+        // 2.5. Ordenación dinámica
+        $orderBy = " ORDER BY apellidos, u.nombre";
+        if (isset($params['order']) && count($params['order']) > 0) {
+            $orderColumnIndex = intval($params['order'][0]['column']);
+            $orderDir = isset($params['order'][0]['dir']) && strtolower($params['order'][0]['dir']) === 'desc' ? 'DESC' : 'ASC';
+            
+            $columnsMap = [
+                0 => 'u.nombre',
+                1 => 'apellidos',
+                2 => 'correo',
+                3 => 'DNI',
+                4 => 'telefono',
+                5 => 'c.nombre'
+            ];
+
+            if (isset($columnsMap[$orderColumnIndex])) {
+                $orderBy = " ORDER BY " . $columnsMap[$orderColumnIndex] . " " . $orderDir;
+            }
+        }
+
         // Consulta de datos con paginado
-        $sqlData = $sql . $joinClause . $whereClause . " ORDER BY u.apellidos, u.nombre LIMIT :start, :length";
+        $sqlData = $sql . $joinClause . $whereClause . $orderBy . " LIMIT :start, :length";
         $stmtData = $this->db->prepare($sqlData);
         foreach ($binds as $key => $val) {
             $stmtData->bindValue($key, $val, is_int($val) ? PDO::PARAM_INT : PDO::PARAM_STR);
@@ -290,8 +310,8 @@ class ModAlumnos {
         $data = $stmtData->fetchAll(PDO::FETCH_ASSOC);
 
         // Consulta de conteo para DataTables
-        $sqlCount = "SELECT COUNT(DISTINCT a.idAlumnos) FROM Usuarios u 
-                     INNER JOIN Alumnos a ON u.idUsuario = a.idAlumnos 
+        $sqlCount = "SELECT COUNT(DISTINCT idAlumnos) FROM Usuarios u 
+                     INNER JOIN Alumnos a ON idUsuario = idAlumnos 
                      LEFT JOIN Cursos c ON a.idCurso = c.idCurso " . $joinClause . $whereClause;
         $stmtCount = $this->db->prepare($sqlCount);
         foreach ($binds as $key => $val) {
@@ -315,15 +335,15 @@ class ModAlumnos {
      * @return array[] Listado de alumnos vinculados al módulo.
      */
     public function listarPorModulo($idModulo) {
-        $sql = "SELECT u.idUsuario as id, u.nombre, u.apellidos, u.correo as email, 
-                       a.DNI as dni, a.NUSS as nuss, a.NIA as nia, a.telefono, 
-                       CAST(a.repetidor AS UNSIGNED) as repetidor, a.idCurso, ea.idEmpresa
+        $sql = "SELECT idUsuario as id, u.nombre, apellidos, correo as email, 
+                       DNI as dni, NUSS as nuss, NIA as nia, telefono, 
+                       CAST(repetidor AS UNSIGNED) as repetidor, idCurso, idEmpresa
                 FROM Usuarios u
-                JOIN Alumnos a ON u.idUsuario = a.idAlumnos
-                JOIN Modulo_Alumno_Cursa mac ON a.idAlumnos = mac.idAlumnos
-                LEFT JOIN Empresa_Alumnos ea ON a.idAlumnos = ea.idAlumno
+                JOIN Alumnos a ON idUsuario = idAlumnos
+                JOIN Modulo_Alumno_Cursa mac ON idAlumnos = mac.idAlumnos
+                LEFT JOIN Empresa_Alumnos ea ON idAlumnos = ea.idAlumno
                 WHERE mac.idModulo = :idModulo
-                ORDER BY u.apellidos, u.nombre";
+                ORDER BY apellidos, u.nombre";
         $stmt = $this->db->prepare($sql);
         $stmt->bindParam(':idModulo', $idModulo, PDO::PARAM_INT);
         $stmt->execute();
