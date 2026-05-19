@@ -23,6 +23,8 @@ export class AlumnoModalComponent implements OnInit, OnChanges, OnDestroy {
 
   @Input() alumno: AlumnoDTO | null = null;
   @Input() visible = false;
+  @Input() cursosCoordinados: number[] = [];
+  @Input() ciclosCoordinados: string[] = [];
 
   @Output() cerrar = new EventEmitter<void>();
   @Output() guardar = new EventEmitter<AlumnoDTO>();
@@ -72,21 +74,44 @@ export class AlumnoModalComponent implements OnInit, OnChanges, OnDestroy {
     };
   }
 
+  todosLosCursos: CursoDTO[] = [];
   cursos: CursoDTO[] = [];
+  todasLasEmpresas: EmpresaDTO[] = [];
   empresas: EmpresaDTO[] = [];
 
   ngOnInit(): void {
     // Carga de Cursos
     this.cursosService.getCursos().subscribe(data => {
-      this.cursos = data.map(c => ({ ...c, id: Number(c.id) }));
+      this.todosLosCursos = data.map(c => ({ ...c, id: Number(c.id) }));
+      this.aplicarFiltroCursos();
       if (this.alumno) this.aplicarDatosAlumno();
     });
 
     // Carga de Empresas
     this.empresasService.getEmpresas().subscribe((data: EmpresaDTO[]) => {
-      this.empresas = data.map((e: EmpresaDTO) => ({ ...e, id: Number(e.id) }));
+      this.todasLasEmpresas = data.map((e: EmpresaDTO) => ({ ...e, id: Number(e.id) }));
+      this.aplicarFiltroEmpresas();
       if (this.alumno) this.aplicarDatosAlumno();
     });
+  }
+
+  aplicarFiltroCursos(): void {
+    if (this.cursosCoordinados && this.cursosCoordinados.length > 0) {
+      this.cursos = this.todosLosCursos.filter(c => this.cursosCoordinados.includes(c.id));
+    } else {
+      this.cursos = [...this.todosLosCursos];
+    }
+  }
+
+  aplicarFiltroEmpresas(): void {
+    if (this.ciclosCoordinados && this.ciclosCoordinados.length > 0) {
+      this.empresas = this.todasLasEmpresas.filter(e => {
+        const siglasEmpresa = e.ciclosInfo ? e.ciclosInfo.map((c: any) => c.siglas) : [];
+        return siglasEmpresa.some((s: string) => this.ciclosCoordinados.includes(s));
+      });
+    } else {
+      this.empresas = [...this.todasLasEmpresas];
+    }
   }
 
   private aplicarDatosAlumno(): void {
@@ -103,6 +128,14 @@ export class AlumnoModalComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+    if (changes['cursosCoordinados']) {
+      this.aplicarFiltroCursos();
+    }
+
+    if (changes['ciclosCoordinados']) {
+      this.aplicarFiltroEmpresas();
+    }
+
     if (changes['alumno'] && this.alumno) {
       this.aplicarDatosAlumno();
     }

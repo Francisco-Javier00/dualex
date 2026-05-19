@@ -89,6 +89,8 @@
   <app-alumno-modal
     [visible]="modalAlumnoVisible"
     [alumno]="alumnoSeleccionado"
+    [cursosCoordinados]="cursosGestionados"
+    [ciclosCoordinados]="ciclosCoordinados"
     (cerrar)="onCerrarModal()"
     (guardar)="onGuardarAlumno($event)">
   </app-alumno-modal>
