@@ -61,13 +61,31 @@ class ModProfesores {
         $stmtFilter->execute();
         $recordsFiltered = $stmtFilter->fetch(PDO::FETCH_ASSOC)['total'];
 
+        // 2.5. Ordenación dinámica
+        $orderBy = " ORDER BY u.apellidos, u.nombre";
+        if (isset($params['order']) && count($params['order']) > 0) {
+            $orderColumnIndex = intval($params['order'][0]['column']);
+            $orderDir = isset($params['order'][0]['dir']) && strtolower($params['order'][0]['dir']) === 'desc' ? 'DESC' : 'ASC';
+            
+            $columnsMap = [
+                0 => 'u.nombre',
+                1 => 'u.apellidos',
+                2 => 'u.correo',
+                3 => 'c.idCoordinador'
+            ];
+
+            if (isset($columnsMap[$orderColumnIndex])) {
+                $orderBy = " ORDER BY " . $columnsMap[$orderColumnIndex] . " " . $orderDir;
+            }
+        }
+
         // 3. Obtención de datos con paginación
         $sqlData = "SELECT u.idUsuario as id, u.nombre, u.apellidos, u.correo, c.idCoordinador
                     FROM Usuarios u
                     JOIN Profesor p ON u.idUsuario = p.idProfesor
                     LEFT JOIN Coordinador c ON p.idProfesor = c.idCoordinador
                     WHERE u.tipo = 'P'" . $where . "
-                    ORDER BY u.apellidos, u.nombre
+                    $orderBy
                     LIMIT :start, :length";
         
         $stmtData = $this->db->prepare($sqlData);

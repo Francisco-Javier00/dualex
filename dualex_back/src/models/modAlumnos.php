@@ -278,8 +278,28 @@ class ModAlumnos {
 
         $whereClause = !empty($conditions) ? " WHERE " . implode(" AND ", $conditions) : "";
 
+        // 2.5. Ordenación dinámica
+        $orderBy = " ORDER BY u.apellidos, u.nombre";
+        if (isset($params['order']) && count($params['order']) > 0) {
+            $orderColumnIndex = intval($params['order'][0]['column']);
+            $orderDir = isset($params['order'][0]['dir']) && strtolower($params['order'][0]['dir']) === 'desc' ? 'DESC' : 'ASC';
+            
+            $columnsMap = [
+                0 => 'u.nombre',
+                1 => 'u.apellidos',
+                2 => 'u.correo',
+                3 => 'a.DNI',
+                4 => 'a.telefono',
+                5 => 'c.nombre'
+            ];
+
+            if (isset($columnsMap[$orderColumnIndex])) {
+                $orderBy = " ORDER BY " . $columnsMap[$orderColumnIndex] . " " . $orderDir;
+            }
+        }
+
         // Consulta de datos con paginado
-        $sqlData = $sql . $joinClause . $whereClause . " ORDER BY u.apellidos, u.nombre LIMIT :start, :length";
+        $sqlData = $sql . $joinClause . $whereClause . $orderBy . " LIMIT :start, :length";
         $stmtData = $this->db->prepare($sqlData);
         foreach ($binds as $key => $val) {
             $stmtData->bindValue($key, $val, is_int($val) ? PDO::PARAM_INT : PDO::PARAM_STR);

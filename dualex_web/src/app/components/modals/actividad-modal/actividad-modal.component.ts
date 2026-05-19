@@ -1,14 +1,29 @@
-import { Component, EventEmitter, Input, Output, OnChanges, SimpleChanges, inject, Renderer2, OnDestroy } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnChanges, SimpleChanges, inject, Renderer2, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActividadDTO } from '../../../dto/dualex.dto';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
+import { forkJoin } from 'rxjs';
+import { ActividadDTO, CicloDTO, ModuloDTO } from '../../../dto/dualex.dto';
 import { AlertService } from '../../../services/alert.service';
+import { CiclosService } from '../../../services/ciclos.service';
+import { ModulosService } from '../../../services/modulos.service';
 
-/**
- * ActividadModalComponent
- * Modal reutilizable para CREAR o MODIFICAR una actividad del catálogo maestro.
- * Utiliza formularios reactivos de Angular para la validación y captura de datos.
- */
+// Validador personalizado para asegurar que el array de idModulos no esté vacío
+export function arrayNotEmptyValidator(): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const isArray = Array.isArray(control.value);
+    const isEmpty = !isArray || control.value.length === 0;
+    return isEmpty ? { arrayEmpty: true } : null;
+  };
+}
+
+interface NodoCiclo {
+  id: number;
+  nombre: string;
+  siglas: string;
+  modulos: ModuloDTO[];
+  expanded?: boolean;
+}
+
 @Component({
   selector: 'app-actividad-modal',
   standalone: true,
@@ -16,54 +31,153 @@ import { AlertService } from '../../../services/alert.service';
   templateUrl: './actividad-modal.component.html',
   styleUrl: './actividad-modal.component.css'
 })
-export class ActividadModalComponent implements OnChanges, OnDestroy {
+export class ActividadModalComponent implements OnChanges, OnDestroy, OnInit {
   private fb = inject(FormBuilder);
   private renderer = inject(Renderer2);
   private alertService = inject(AlertService);
+  private ciclosService = inject(CiclosService);
+  private modulosService = inject(ModulosService);
 
-  // PROPIEDADES DE ENTRADA
-  @Input() visible = false;                  // Controla la visibilidad del modal
-  @Input() actividad: ActividadDTO | null = null; // Si se recibe, el modal entra en modo edición
+  @Input() visible = false;
+  @Input() actividad: ActividadDTO | null = null;
 
-  // EVENTOS DE SALIDA
-  @Output() visibleChange = new EventEmitter<boolean>(); // Emisor para vinculación bidireccional
-  @Output() guardarEvent = new EventEmitter<ActividadDTO>(); // Emite los datos al guardar
-  @Output() cancelarEvent = new EventEmitter<void>();        // Emite al cerrar sin guardar
+  @Output() visibleChange = new EventEmitter<boolean>();
+  @Output() guardarEvent = new EventEmitter<ActividadDTO>();
+  @Output() cancelarEvent = new EventEmitter<void>();
 
-  // Formulario reactivo
   actividadForm: FormGroup;
 
+  // Árbol jerárquico
+  arbolCiclos: NodoCiclo[] = [];
+  cargandoArbol = false;
+
   constructor() {
-    // Inicialización de la estructura del formulario
     this.actividadForm = this.fb.group({
       id: [null],
-      titulo: ['', [Validators.required, Validators.minLength(5)]],
-      descripcion: ['', [Validators.required]],
-      modulo: ['', [Validators.required]]
+      titulo: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(60)]],
+      descripcion: ['', [Validators.maxLength(255)]],
+      idModulos: [[], [arrayNotEmptyValidator()]] // Array de IDs de módulos seleccionados
     });
   }
 
+  ngOnInit(): void {
+    this.cargarDatosArbol();
+  }
+
   /**
-   * Ciclo de vida: Se activa cuando cambian las entradas (visible o actividad).
+   * Carga en paralelo la lista de ciclos y módulos para poblar el árbol.
    */
+  cargarDatosArbol(): void {
+    this.cargandoArbol = true;
+    forkJoin({
+      ciclos: this.ciclosService.getCiclos(),
+      modulos: this.modulosService.getModulos()
+    }).subscribe({
+      next: ({ ciclos, modulos }) => {
+        // Mapeamos los ciclos para estructurar el árbol
+        this.arbolCiclos = ciclos.map((c: CicloDTO) => ({
+          id: c.id || 0,
+          nombre: c.nombre,
+          siglas: c.siglas,
+          expanded: false,
+          modulos: modulos.filter((m: ModuloDTO) => m.ciclo === c.siglas)
+        }));
+        this.cargandoArbol = false;
+        
+        // Si ya hay una actividad de entrada cargada en modo edición, sincronizamos sus checkboxes
+        if (this.actividad) {
+          this.sincronizarCheckboxesEdicion();
+        }
+      },
+      error: () => {
+        this.cargandoArbol = false;
+        this.alertService.error('Error del Servidor', 'No se pudieron recuperar las asignaturas y ciclos formativos.');
+      }
+    });
+  }
+
   ngOnChanges(changes: SimpleChanges): void {
-    // Si cambia la visibilidad, gestionamos el scroll del body
     if (changes['visible']) {
       this.toggleBodyScroll(changes['visible'].currentValue);
     }
 
-    // Si recibimos una actividad para editar, cargamos sus datos en el formulario
     if (changes['actividad'] && this.actividad) {
-      this.actividadForm.patchValue(this.actividad);
+      this.actividadForm.patchValue({
+        id: this.actividad.id,
+        titulo: this.actividad.titulo,
+        descripcion: this.actividad.descripcion
+      });
+      this.sincronizarCheckboxesEdicion();
     } else if (changes['visible'] && changes['visible'].currentValue === true && !this.actividad) {
-      // Si abrimos el modal para crear (sin actividad), reseteamos el formulario
-      this.actividadForm.reset();
+      this.actividadForm.reset({
+        id: null,
+        titulo: '',
+        descripcion: '',
+        idModulos: []
+      });
+    }
+  }
+
+  sincronizarCheckboxesEdicion(): void {
+    if (!this.actividad) return;
+
+    let arrayIds: number[] = [];
+    const rawIds = (this.actividad as any).idModulos;
+
+    if (Array.isArray(rawIds)) {
+      arrayIds = rawIds.map(num => typeof num === 'string' ? parseInt(num, 10) : num);
+    } else if (typeof rawIds === 'string' && rawIds.trim() !== '') {
+      arrayIds = rawIds.split(',').map(num => parseInt(num.trim(), 10)).filter(num => !isNaN(num));
+    } else if (typeof rawIds === 'number') {
+      arrayIds = [rawIds];
+    }
+
+    this.actividadForm.patchValue({ idModulos: arrayIds });
+
+    // Expandimos automáticamente aquellos ciclos que tengan al menos un módulo seleccionado
+    if (this.arbolCiclos && this.arbolCiclos.length > 0) {
+      this.arbolCiclos.forEach(ciclo => {
+        const tieneModulosSeleccionados = ciclo.modulos.some(m => arrayIds.includes(m.id));
+        if (tieneModulosSeleccionados) {
+          ciclo.expanded = true;
+        }
+      });
     }
   }
 
   /**
-   * Bloquea o libera el scroll de la página de fondo.
+   * Expande o colapsa el nodo de un ciclo al pulsar sobre él.
    */
+  toggleCiclo(ciclo: NodoCiclo): void {
+    ciclo.expanded = !ciclo.expanded;
+  }
+
+  isModuloSelected(idModulo: any): boolean {
+    const seleccionados: any[] = this.actividadForm.get('idModulos')?.value || [];
+    return seleccionados.some(id => Number(id) === Number(idModulo));
+  }
+
+  /**
+   * Gestiona la selección y deselección de un checkbox de módulo.
+   */
+  toggleModuloSelection(idModulo: any): void {
+    const control = this.actividadForm.get('idModulos');
+    if (!control) return;
+
+    const targetId = Number(idModulo);
+    let seleccionados: number[] = [...control.value].map(id => Number(id));
+
+    if (seleccionados.includes(targetId)) {
+      seleccionados = seleccionados.filter(id => id !== targetId);
+    } else {
+      seleccionados.push(targetId);
+    }
+
+    control.setValue(seleccionados);
+    control.markAsDirty();
+    control.markAsTouched();
+  }
+
   private toggleBodyScroll(isVisible: boolean): void {
     if (isVisible) {
       this.renderer.addClass(document.documentElement, 'modal-open');
@@ -74,23 +188,21 @@ export class ActividadModalComponent implements OnChanges, OnDestroy {
     }
   }
 
-  /**
-   * Envía los datos capturados al componente padre si el formulario es válido.
-   */
   onSubmit(): void {
     if (this.actividadForm.valid) {
       this.guardarEvent.emit(this.actividadForm.value);
       this.cerrar();
     } else {
-      // Marcamos los campos como 'touched' para mostrar los errores de validación en la UI
       this.actividadForm.markAllAsTouched();
-      this.alertService.advertencia('Formulario Incompleto', 'Por favor, revisa los campos marcados en rojo antes de continuar.');
+      const controlModulos = this.actividadForm.get('idModulos');
+      if (controlModulos && controlModulos.errors?.['arrayEmpty']) {
+        this.alertService.advertencia('Falta Asignatura', 'Debe seleccionar al menos un módulo formativo/asignatura del árbol para registrar la actividad.');
+      } else {
+        this.alertService.advertencia('Formulario Incompleto', 'Por favor, rellene los campos obligatorios del formulario.');
+      }
     }
   }
 
-  /**
-   * Cierra el modal y notifica al padre.
-   */
   cerrar(): void {
     this.visible = false;
     this.visibleChange.emit(false);
@@ -98,9 +210,6 @@ export class ActividadModalComponent implements OnChanges, OnDestroy {
     this.toggleBodyScroll(false);
   }
 
-  /**
-   * Limpieza de seguridad al destruir el componente.
-   */
   ngOnDestroy(): void {
     this.toggleBodyScroll(false);
   }

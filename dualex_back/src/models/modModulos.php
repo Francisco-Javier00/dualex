@@ -301,6 +301,22 @@ class ModModulos {
         $stmtF->execute();
         $totalFiltrados = $stmtF->fetchColumn();
 
+        // 2.5. Ordenación dinámica
+        $orderBy = " ORDER BY m.nombre";
+        if (isset($params['order']) && count($params['order']) > 0) {
+            $orderColumnIndex = intval($params['order'][0]['column']);
+            $orderDir = isset($params['order'][0]['dir']) && strtolower($params['order'][0]['dir']) === 'desc' ? 'DESC' : 'ASC';
+            
+            $columnsMap = [
+                0 => 'm.nombre',
+                1 => 'm.sigla'
+            ];
+
+            if (isset($columnsMap[$orderColumnIndex])) {
+                $orderBy = " ORDER BY " . $columnsMap[$orderColumnIndex] . " " . $orderDir;
+            }
+        }
+
         // Datos
         $sql = "SELECT m.idModulo as id, m.nombre, m.sigla, m.color, 
                        MIN(c.idCiclo) as idCiclo,
@@ -313,7 +329,7 @@ class ModModulos {
                 LEFT JOIN Ciclos c ON cur.idCiclo = c.idCiclo
                 $where 
                 GROUP BY m.idModulo, m.nombre, m.sigla, m.color
-                ORDER BY m.nombre
+                $orderBy
                 LIMIT :start, :length";
         
         $stmt = $this->db->prepare($sql);

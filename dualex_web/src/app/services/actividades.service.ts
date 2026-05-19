@@ -1,12 +1,11 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, map, of, tap } from 'rxjs';
+import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { ActividadDTO } from '../dto/dualex.dto';
 
 /**
- * Servicio para gestionar el catálogo maestro de actividades.
- * Conecta con la tabla ACTIVIDADES de la DB.
+ * Servicio de Angular para la gestión de Actividades conectando al backend PHP.
  */
 @Injectable({
   providedIn: 'root'
@@ -14,106 +13,65 @@ import { ActividadDTO } from '../dto/dualex.dto';
 export class ActividadesService {
   private http = inject(HttpClient);
 
-  // URL de la API PHP (Docker Compose mapea dualex_back directamente al puerto 8080)
-  private readonly API_URL = `${environment.apiUrl}/index.php`;
-
-  private cacheActividades: ActividadDTO[] = [];
+  // URL del router central de la API PHP
+  private readonly API_URL = `${environment.apiUrl}/index.php?c=Actividades`;
 
   /**
-   * Obtiene el catálogo completo de actividades desde la base de datos.
-   * Almacena el resultado en una caché local para agilizar futuras consultas.
+   * Obtiene la lista completa de todas las actividades registradas sin paginar.
    * 
-   * @returns Un `Observable` que emite un array con la lista completa de actividades.
+   * @returns Un `Observable` con un array de objetos `ActividadDTO`.
    */
   getActividades(): Observable<ActividadDTO[]> {
-    return this.http.get<ActividadDTO[]>(`${this.API_URL}?c=Actividades&m=listar`).pipe(
-      tap((data: ActividadDTO[]) => this.cacheActividades = data)
-    );
+    return this.http.get<ActividadDTO[]>(`${this.API_URL}&m=listar`);
   }
 
   /**
-   * Proporciona soporte para la integración con DataTables, simulando un procesamiento en el servidor 
-   * pero utilizando datos reales filtrados de la caché o de la base de datos.
+   * Obtiene los datos detallados de una actividad específica por su ID.
    * 
-   * @param dataTablesParameters Parámetros de paginación, búsqueda y ordenación enviados por DataTables.
-   * @returns Un `Observable` con la estructura requerida por DataTables (draw, recordsTotal, recordsFiltered, data).
+   * @param id Identificador único de la actividad.
+   * @returns Un `Observable` que emite el objeto `ActividadDTO` encontrado.
+   */
+  getActividadById(id: number): Observable<ActividadDTO> {
+    return this.http.get<ActividadDTO>(`${this.API_URL}&m=obtener&id=${id}`);
+  }
+
+  /**
+   * Procesa la solicitud de paginación, ordenación y filtrado conectando con el backend para DataTables.
+   * 
+   * @param dataTablesParameters Parámetros estándar de la librería DataTables.
+   * @returns Un `Observable` con los datos estructurados para renderizar la tabla dinámica.
    */
   obtenerActividadesDataTables(dataTablesParameters: any): Observable<any> {
-    const start = dataTablesParameters.start || 0;
-    const length = dataTablesParameters.length || 10;
-    const search = dataTablesParameters.search?.value?.toLowerCase() || '';
-
-    // Si no tenemos cache, cargamos primero
-    if (this.cacheActividades.length === 0) {
-      return this.getActividades().pipe(
-        map((data: ActividadDTO[]) => this.filtrarParaDataTables(data, start, length, search, dataTablesParameters.draw))
-      );
-    }
-
-    return of(this.filtrarParaDataTables(this.cacheActividades, start, length, search, dataTablesParameters.draw));
+    return this.http.post<any>(`${this.API_URL}&m=obtenerDataTables`, dataTablesParameters);
   }
 
   /**
-   * Filtra y pagina de forma interna un array de actividades basándose en los parámetros de búsqueda.
+   * Envía una petición POST al servidor para registrar una nueva actividad.
    * 
-   * @param lista Array completo de actividades a filtrar.
-   * @param start Índice de inicio para la paginación.
-   * @param length Cantidad de registros por página.
-   * @param search Texto de búsqueda introducido por el usuario.
-   * @param draw Identificador de la petición para DataTables.
-   * @returns Objeto estructurado para la respuesta a DataTables.
-   */
-  private filtrarParaDataTables(lista: ActividadDTO[], start: number, length: number, search: string, draw: number) {
-    let filtradas = lista;
-    if (search) {
-      filtradas = filtradas.filter(a =>
-        a.titulo.toLowerCase().includes(search) ||
-        a.descripcion.toLowerCase().includes(search) ||
-        a.modulo.toLowerCase().includes(search)
-      );
-    }
-
-    return {
-      draw: draw,
-      recordsTotal: lista.length,
-      recordsFiltered: filtradas.length,
-      data: filtradas.slice(start, start + length)
-    };
-  }
-
-  /**
-   * Registra una nueva actividad en el catálogo maestro y limpia la caché para forzar su recarga.
-   * 
-   * @param actividad Objeto con los datos de la nueva actividad.
-   * @returns Un `Observable` con la respuesta del servidor tras la creación.
+   * @param actividad Objeto `ActividadDTO` con los datos de la actividad a registrar.
+   * @returns Un `Observable` con el resultado de la creación.
    */
   createActividad(actividad: ActividadDTO): Observable<any> {
-    return this.http.post(`${this.API_URL}?c=Actividades&m=crear`, actividad).pipe(
-      tap(() => this.cacheActividades = []) // Limpiar cache para forzar recarga
-    );
+    return this.http.post<any>(`${this.API_URL}&m=crear`, actividad);
   }
 
   /**
-   * Actualiza los datos de una actividad existente y limpia la caché.
+   * Envía una petición PUT al servidor para actualizar los datos de una actividad existente.
    * 
-   * @param actividad Objeto con los datos actualizados de la actividad.
-   * @returns Un `Observable` con la respuesta del servidor.
+   * @param actividad Objeto `ActividadDTO` con los datos actualizados y el ID correspondiente.
+   * @returns Un `Observable` con la respuesta de la modificación.
    */
   updateActividad(actividad: ActividadDTO): Observable<any> {
-    return this.http.post(`${this.API_URL}?c=Actividades&m=actualizar&id=${actividad.id}`, actividad).pipe(
-      tap(() => this.cacheActividades = [])
-    );
+    return this.http.put<any>(`${this.API_URL}&m=actualizar&id=${actividad.id}`, actividad);
   }
 
   /**
-   * Elimina una actividad del catálogo maestro de forma permanente.
+   * Elimina una actividad del sistema de forma permanente.
    * 
    * @param id Identificador único de la actividad a eliminar.
-   * @returns Un `Observable` con el resultado de la eliminación en base de datos.
+   * @returns Un `Observable` indicando el éxito de la operación.
    */
   deleteActividad(id: number): Observable<any> {
-    return this.http.get(`${this.API_URL}?c=Actividades&m=eliminar&id=${id}`).pipe(
-      tap(() => this.cacheActividades = [])
-    );
+    return this.http.delete<any>(`${this.API_URL}&m=eliminar&id=${id}`);
   }
 }

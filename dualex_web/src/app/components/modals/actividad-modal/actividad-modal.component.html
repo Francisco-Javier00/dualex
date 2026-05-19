@@ -1,4 +1,4 @@
-<!-- OVERLAY: Fondo oscuro traslúcido (estático, no se cierra al hacer clic) -->
+<!-- OVERLAY: Fondo oscuro traslúcido -->
 <div class="modal-overlay" *ngIf="visible">
   
   <!-- CONTENEDOR DEL MODAL -->
@@ -13,66 +13,143 @@
       <button class="btn-close" (click)="cerrar()"></button>
     </div>
 
-    <!-- CUERPO: Formulario reactivo -->
+    <!-- CUERPO: Formulario reactivo en dos columnas -->
     <div class="modal-body py-4">
       <form [formGroup]="actividadForm" (ngSubmit)="onSubmit()">
-        
-        <!-- CAMPO: Título -->
-        <div class="mb-4">
-          <label class="form-label small fw-bold text-uppercase opacity-75">Título de la Actividad</label>
-          <div class="input-group shadow-sm rounded-3 overflow-hidden border"
-               [class.is-invalid]="actividadForm.get('titulo')?.invalid && actividadForm.get('titulo')?.touched">
-            <span class="input-group-text bg-white border-0"><i class="fa-solid fa-heading text-muted"></i></span>
-            <input type="text" 
-                   formControlName="titulo" 
-                   class="form-control border-0 px-3" 
-                   placeholder="Ej: Instalación de servidor Apache"
-                   [class.is-invalid]="actividadForm.get('titulo')?.invalid && actividadForm.get('titulo')?.touched">
+        <div class="row g-4">
+          
+          <!-- COLUMNA IZQUIERDA: Detalles básicos (Título y Descripción) -->
+          <div class="col-12 col-md-5">
+            <h6 class="text-primary text-uppercase small fw-bold mb-3">Información de la Actividad</h6>
+            
+            <div class="d-flex flex-column gap-3">
+              <!-- CAMPO: Título -->
+              <div>
+                <label class="form-label small fw-bold text-uppercase opacity-75">Título de la Actividad</label>
+                <div class="input-group shadow-sm rounded-3 overflow-hidden border"
+                     [class.is-invalid]="actividadForm.get('titulo')?.invalid && actividadForm.get('titulo')?.touched">
+                  <span class="input-group-text bg-white border-0"><i class="fa-solid fa-heading text-muted"></i></span>
+                  <input type="text" 
+                         formControlName="titulo" 
+                         class="form-control border-0 px-3" 
+                         placeholder="Ej: Instalación de servidor Apache"
+                         [class.is-invalid]="actividadForm.get('titulo')?.invalid && actividadForm.get('titulo')?.touched">
+                </div>
+                <div class="text-danger small mt-1" *ngIf="actividadForm.get('titulo')?.invalid && actividadForm.get('titulo')?.touched">
+                  El título debe tener entre 5 y 60 caracteres.
+                </div>
+              </div>
+
+              <!-- CAMPO: Descripción -->
+              <div>
+                <label class="form-label small fw-bold text-uppercase opacity-75">Descripción detallada</label>
+                <textarea formControlName="descripcion" 
+                          class="form-control shadow-sm rounded-3 border px-3" 
+                          rows="8" 
+                          placeholder="Describe los pasos, requerimientos o competencias de esta actividad práctica..."
+                          [class.is-invalid]="actividadForm.get('descripcion')?.invalid && actividadForm.get('descripcion')?.touched"></textarea>
+                <div class="text-danger small mt-1" *ngIf="actividadForm.get('descripcion')?.invalid && actividadForm.get('descripcion')?.touched">
+                  La descripción no puede superar los 255 caracteres.
+                </div>
+              </div>
+            </div>
           </div>
-          <!-- Mensaje de error -->
-          <div class="text-danger small mt-1" *ngIf="actividadForm.get('titulo')?.invalid && actividadForm.get('titulo')?.touched">
-            El título es obligatorio y debe tener al menos 5 caracteres.
+
+          <!-- COLUMNA DERECHA: Selector en árbol de Ciclos y Módulos con estilo artístico de Profesores -->
+          <div class="col-12 col-md-7 border-start-md ps-md-4">
+            <h6 class="text-primary text-uppercase small fw-bold mb-3">Asociar a Módulos Formativos</h6>
+            
+            <div class="tree-legend d-flex justify-content-between small text-muted mb-2 px-1">
+              <span>{{ arbolCiclos.length }} ciclos formativos</span>
+              <span>{{ actividadForm.get('idModulos')?.value?.length || 0 }} seleccionados</span>
+            </div>
+
+            <!-- Estructura del árbol con la clase premium .tree-shell -->
+            <div class="tree-shell shadow-sm rounded-3 border overflow-auto" style="max-height: 350px;">
+              <div *ngIf="cargandoArbol" class="text-center py-5">
+                <div class="spinner-border text-primary spinner-sm mb-2" role="status"></div>
+                <div class="small text-muted">Cargando ciclos y asignaturas...</div>
+              </div>
+
+              <div *ngIf="!cargandoArbol && arbolCiclos.length === 0" class="text-center py-5 text-muted small">
+                No se encontraron ciclos ni módulos disponibles.
+              </div>
+
+              <!-- ÁRBOL JERÁRQUICO -->
+              <div class="arbol-ciclos" *ngIf="!cargandoArbol && arbolCiclos.length > 0">
+                <div class="cycle-card border-bottom" *ngFor="let ciclo of arbolCiclos">
+                  
+                  <!-- BOTÓN CABECERA DEL CICLO -->
+                  <button
+                    type="button"
+                    class="cycle-header w-100 border-0 bg-white d-flex align-items-center justify-content-between p-3 text-start"
+                    [class.selected]="ciclo.expanded"
+                    (click)="toggleCiclo(ciclo)"
+                  >
+                    <div class="cycle-left d-flex align-items-center gap-3">
+                      <div class="custom-checkbox-mini d-flex align-items-center justify-content-center">
+                        <i class="fa-solid" [ngClass]="ciclo.expanded ? 'fa-folder-open text-primary' : 'fa-folder text-slate-400'"></i>
+                      </div>
+
+                      <div class="cycle-meta">
+                        <div class="cycle-name fw-bold text-dark" style="font-size: 0.95rem;">{{ ciclo.nombre }}</div>
+                        <div class="cycle-subtitle small text-muted d-flex align-items-center gap-2">
+                          <span class="cycle-siglas fw-bold text-secondary">{{ ciclo.siglas }}</span>
+                          <span class="cycle-dot"></span>
+                          <span>{{ ciclo.modulos.length }} módulos</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="cycle-state">
+                      <i class="fa-solid text-muted" [ngClass]="ciclo.expanded ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                    </div>
+                  </button>
+
+                  <!-- LISTA DE MÓDULOS DEL CICLO -->
+                  <div class="module-list bg-light p-2 border-top" *ngIf="ciclo.expanded">
+                    <div *ngIf="ciclo.modulos.length === 0" class="empty-state text-muted small p-3 text-center">
+                      No hay módulos formativos asociados a este ciclo.
+                    </div>
+                    
+                    <div *ngIf="ciclo.modulos.length > 0">
+                      <button
+                        *ngFor="let modulo of ciclo.modulos"
+                        type="button"
+                        class="module-row w-100 d-flex align-items-center gap-3 border-0 bg-transparent py-2 px-4 text-start"
+                        [class.active]="isModuloSelected(modulo.id)"
+                        (click)="toggleModuloSelection(modulo.id)"
+                      >
+                        <!-- Checkbox miniatura idéntico a profesores -->
+                        <div class="custom-checkbox-mini module-check d-flex align-items-center justify-content-center">
+                          <i class="fa-solid fa-check text-white" style="font-size: 0.6rem;" *ngIf="isModuloSelected(modulo.id)"></i>
+                        </div>
+                        <div class="module-info">
+                          <span class="module-name text-dark fw-semibold" style="font-size: 0.9rem;">{{ modulo.nombre }}</span>
+                          <span class="module-sigla text-muted small ms-2">({{ modulo.siglas }})</span>
+                        </div>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Error de validación si no hay módulos seleccionados -->
+            <div class="text-danger small mt-2" 
+                 *ngIf="actividadForm.get('idModulos')?.invalid && actividadForm.get('idModulos')?.touched">
+              Debe seleccionar al menos un módulo formativo de la lista.
+            </div>
           </div>
         </div>
 
-        <!-- CAMPO: Módulo -->
-        <div class="mb-4">
-          <label class="form-label small fw-bold text-uppercase opacity-75">Módulo Asociado</label>
-          <div class="input-group shadow-sm rounded-3 overflow-hidden border"
-               [class.is-invalid]="actividadForm.get('modulo')?.invalid && actividadForm.get('modulo')?.touched">
-            <span class="input-group-text bg-white border-0"><i class="fa-solid fa-book text-muted"></i></span>
-            <input type="text" 
-                   formControlName="modulo" 
-                   class="form-control border-0 px-3" 
-                   placeholder="Ej: Sistemas Informáticos"
-                   [class.is-invalid]="actividadForm.get('modulo')?.invalid && actividadForm.get('modulo')?.touched">
-          </div>
-          <!-- Mensaje de error -->
-          <div class="text-danger small mt-1" *ngIf="actividadForm.get('modulo')?.invalid && actividadForm.get('modulo')?.touched">
-            El módulo asociado es obligatorio.
-          </div>
-        </div>
-
-        <!-- CAMPO: Descripción -->
-        <div class="mb-2">
-          <label class="form-label small fw-bold text-uppercase opacity-75">Descripción detallada</label>
-          <textarea formControlName="descripcion" 
-                    class="form-control shadow-sm rounded-3 border px-3" 
-                    rows="5" 
-                    placeholder="Describe los pasos o requisitos de esta actividad..."
-                    [class.is-invalid]="actividadForm.get('descripcion')?.invalid && actividadForm.get('descripcion')?.touched"></textarea>
-        </div>
-        <div class="text-danger small mb-4" *ngIf="actividadForm.get('descripcion')?.invalid && actividadForm.get('descripcion')?.touched">
-          La descripción es obligatoria.
-        </div>
-
-        <!-- ACCIONES -->
+        <!-- ACCIONES (PIE DEL FORMULARIO) -->
         <div class="d-flex gap-2 mt-5">
-          <button type="button" class="btn btn-light border flex-grow-1 py-2 shadow-sm rounded-3" (click)="cerrar()">
+          <button type="button" class="btn btn-light border flex-grow-1 py-2 shadow-sm rounded-3 fw-bold text-secondary" (click)="cerrar()">
             Cancelar
           </button>
-          <button type="submit" class="btn btn-primary flex-grow-1 py-2 shadow-sm rounded-3">
-            <i class="fa-solid fa-save me-2"></i> {{ actividad ? 'Guardar cambios' : 'Crear Actividad' }}
+          <button type="submit" class="btn btn-primary flex-grow-1 py-2 shadow-sm rounded-3 fw-bold">
+            <i class="fa-solid fa-save me-2"></i> {{ actividad ? 'Guardar Cambios' : 'Crear Actividad' }}
           </button>
         </div>
       </form>
