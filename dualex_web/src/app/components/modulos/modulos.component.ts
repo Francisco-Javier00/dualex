@@ -38,6 +38,7 @@ export class ModulosComponent implements OnInit, OnDestroy {
   todosLosCursos: CursoDTO[] = [];
   cursosAgrupados: { [ciclo: string]: CursoDTO[] } = {};
   cursosFiltradosIds: number[] = [];
+  ciclosCoordinados: string[] = [];
 
   private suscripcionUsuario?: Subscription;
   rolUsuarioActual: string | null = null;
@@ -57,6 +58,7 @@ export class ModulosComponent implements OnInit, OnDestroy {
             next: (cursos: CursoDTO[]) => {
               // Parse cycles coordinated by the coordinator (e.g. "DAW, DAM")
               const ciclosCoordinados = profesor.ciclos ? profesor.ciclos.split(',').map((c: string) => c.trim()) : [];
+              this.ciclosCoordinados = ciclosCoordinados;
               
               // Only keep courses whose siglasCiclo is coordinated by the coordinator
               const cursosFiltrados = cursos.filter(c => c.siglasCiclo && ciclosCoordinados.includes(c.siglasCiclo));
@@ -117,6 +119,11 @@ export class ModulosComponent implements OnInit, OnDestroy {
         { data: 'sigla', className: 'text-center text-muted' },
         { 
           data: 'cicloCompleto',
+          className: 'text-center text-muted',
+          render: (data: any) => data || 'Sin asignar'
+        },
+        { 
+          data: 'cursoCompleto',
           className: 'text-center text-muted',
           render: (data: any) => data || 'Sin asignar'
         },

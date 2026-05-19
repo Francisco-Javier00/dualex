@@ -42,7 +42,7 @@
                 Ciclo: {{ cicloKey }}
               </option>
               <option *ngFor="let curso of cursosAgrupados[cicloKey]" [value]="'curso:' + curso.id">
-                &nbsp;&nbsp;{{ curso.nombre }} ({{ curso.anio_escolar || curso.anoEscolar }})
+                &nbsp;&nbsp;{{ curso.nombre }}
               </option>
             </ng-container>
           </select>

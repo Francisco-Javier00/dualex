@@ -44,22 +44,46 @@
           </div>
         </div>
 
-        <!-- Ciclo Formativo (Fila completa) -->
-        <div class="mb-4">
-          <label class="form-label small fw-bold text-uppercase opacity-75">Ciclo Formativo</label>
-          <div class="input-group shadow-sm rounded-3 overflow-hidden border"
-               [class.is-invalid]="moduloForm.get('idCiclo')?.touched && moduloForm.get('idCiclo')?.invalid">
-            <span class="input-group-text bg-white border-0"><i class="fa-solid fa-graduation-cap text-muted"></i></span>
-            <select formControlName="idCiclo" class="form-select border-0 px-3"
-                    [class.is-invalid]="moduloForm.get('idCiclo')?.touched && moduloForm.get('idCiclo')?.invalid">
-              <option [ngValue]="null" disabled>Selecciona un ciclo formativo...</option>
-              <option *ngFor="let ciclo of ciclos" [ngValue]="ciclo.id">
-                {{ ciclo.siglas }} - {{ ciclo.nombre }}
-              </option>
-            </select>
+        <!-- Ciclo y Curso (Lado a lado) -->
+        <div class="row">
+          <!-- Ciclo Formativo -->
+          <div class="col-md-8 mb-4">
+            <label class="form-label small fw-bold text-uppercase opacity-75">Ciclo Formativo</label>
+            <div class="input-group shadow-sm rounded-3 overflow-hidden border"
+                 [class.is-invalid]="moduloForm.get('idCiclo')?.touched && moduloForm.get('idCiclo')?.invalid">
+              <span class="input-group-text bg-white border-0"><i class="fa-solid fa-graduation-cap text-muted"></i></span>
+              <select formControlName="idCiclo" class="form-select border-0 px-3"
+                      [class.is-invalid]="moduloForm.get('idCiclo')?.touched && moduloForm.get('idCiclo')?.invalid">
+                <option [ngValue]="null" disabled>Selecciona un ciclo...</option>
+                <option *ngFor="let ciclo of ciclos" [ngValue]="ciclo.id">
+                  {{ ciclo.siglas }} - {{ ciclo.nombre }}
+                </option>
+              </select>
+            </div>
+            <div class="text-danger small mt-1" *ngIf="moduloForm.get('idCiclo')?.touched && moduloForm.get('idCiclo')?.errors?.['required']">
+              Debes seleccionar un ciclo
+            </div>
           </div>
-          <div class="text-danger small mt-1" *ngIf="moduloForm.get('idCiclo')?.touched && moduloForm.get('idCiclo')?.errors?.['required']">
-            Debes seleccionar un ciclo
+
+          <!-- Curso -->
+          <div class="col-md-4 mb-4">
+            <label class="form-label small fw-bold text-uppercase opacity-75">Curso</label>
+            <div class="input-group shadow-sm rounded-3 overflow-hidden border"
+                 [class.is-invalid]="moduloForm.get('idCurso')?.touched && moduloForm.get('idCurso')?.invalid">
+              <span class="input-group-text bg-white border-0"><i class="fa-solid fa-calendar-days text-muted"></i></span>
+              <select formControlName="idCurso" class="form-select border-0 px-3"
+                      [class.is-invalid]="moduloForm.get('idCurso')?.touched && moduloForm.get('idCurso')?.invalid">
+                <option [ngValue]="null" disabled>
+                  {{ moduloForm.get('idCiclo')?.value ? 'Curso...' : 'Ciclo...' }}
+                </option>
+                <option *ngFor="let curso of cursosFiltrados" [ngValue]="curso.id">
+                  {{ curso.nombre }}
+                </option>
+              </select>
+            </div>
+            <div class="text-danger small mt-1" *ngIf="moduloForm.get('idCurso')?.touched && moduloForm.get('idCurso')?.errors?.['required']">
+              Requerido
+            </div>
           </div>
         </div>
 

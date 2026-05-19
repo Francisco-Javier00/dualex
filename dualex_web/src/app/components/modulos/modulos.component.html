@@ -26,7 +26,7 @@
                 Ciclo: {{ cicloKey }}
               </option>
               <option *ngFor="let curso of cursosAgrupados[cicloKey]" [value]="'curso:' + curso.id">
-                &nbsp;&nbsp;{{ curso.nombre }} ({{ curso.anio_escolar || curso.anoEscolar }})
+                &nbsp;&nbsp;{{ curso.nombre }}
               </option>
             </ng-container>
           </select>
@@ -44,7 +44,7 @@
       <app-shared-datatable
         tableId="tabla-modulos"
         [dtOptions]="dtOptions"
-        [columnTitles]="['Color', 'Nombre del Módulo', 'Siglas', 'Ciclo Formativo', 'Acciones']"
+        [columnTitles]="['Color', 'Nombre del Módulo', 'Siglas', 'Ciclo Formativo', 'Curso', 'Acciones']"
         (actionClick)="onTableAction($event)">
       </app-shared-datatable>
     </div>
@@ -65,5 +65,6 @@
 <app-modulo-modal
   [(visible)]="modalModuloVisible"
   [modulo]="moduloSeleccionado"
+  [ciclosCoordinados]="ciclosCoordinados"
   (guardarEvent)="onGuardarModulo($event)">
 </app-modulo-modal>
