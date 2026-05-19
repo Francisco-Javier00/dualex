@@ -19,9 +19,9 @@ class ModCiclos {
      * @return array Array asociativo con el listado de ciclos.
      */
     public function listar() {
-        $sql = "SELECT c.idCiclo as id, c.nombre, c.siglas, c.idCoordinador, 
-                       c.grado, CONCAT('1º ', c.siglas, ', 2º ', c.siglas) AS cursos,
-                       u.nombre as nombreCoordinador, u.apellidos as apellidosCoordinador 
+        $sql = "SELECT idCiclo as id, c.nombre, siglas, c.idCoordinador, 
+                       grado, CONCAT('1º ', siglas, ', 2º ', siglas) AS cursos,
+                       u.nombre as nombreCoordinador, apellidos as apellidosCoordinador 
                 FROM Ciclos c
                 LEFT JOIN Coordinador co ON c.idCoordinador = co.idCoordinador
                 LEFT JOIN Usuarios u ON co.idCoordinador = u.idUsuario
@@ -215,9 +215,9 @@ class ModCiclos {
             }
         }
 
-        $sql = "SELECT c.idCiclo as id, c.nombre, c.siglas, c.idCoordinador, 
-                       c.grado, CONCAT('1º ', c.siglas, ', 2º ', c.siglas) AS cursos,
-                       u.nombre as nombreCoordinador, u.apellidos as apellidosCoordinador 
+        $sql = "SELECT idCiclo as id, c.nombre, siglas, c.idCoordinador, 
+                       grado, CONCAT('1º ', siglas, ', 2º ', siglas) AS cursos,
+                       u.nombre as nombreCoordinador, apellidos as apellidosCoordinador 
                 FROM Ciclos c
                 LEFT JOIN Coordinador co ON c.idCoordinador = co.idCoordinador
                 LEFT JOIN Usuarios u ON co.idCoordinador = u.idUsuario

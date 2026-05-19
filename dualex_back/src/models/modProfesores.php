@@ -3,6 +3,8 @@
  * Modelo para la gestión de Profesores.
  * Este modelo maneja la persistencia de usuarios con tipo 'P' (Profesor),
  * gestionando sus roles de coordinador, sus ciclos asignados y sus módulos docentes.
+ * 
+ * @package Dualex\Models
  */
 class ModProfesores {
     private $db;
@@ -17,12 +19,12 @@ class ModProfesores {
      * @return array Array asociativo con la lista de profesores y sus relaciones.
      */
     public function listar() {
-        $sql = "SELECT u.idUsuario as id, u.nombre, u.apellidos, u.correo, c.idCoordinador
+        $sql = "SELECT idUsuario as id, nombre, apellidos, correo, idCoordinador
                 FROM Usuarios u
-                JOIN Profesor p ON u.idUsuario = p.idProfesor
-                LEFT JOIN Coordinador c ON p.idProfesor = c.idCoordinador
-                WHERE u.tipo = 'P'
-                ORDER BY u.apellidos, u.nombre";
+                JOIN Profesor p ON idUsuario = p.idProfesor
+                LEFT JOIN Coordinador c ON p.idProfesor = idCoordinador
+                WHERE tipo = 'P'
+                ORDER BY apellidos, nombre";
         $stmt = $this->db->prepare($sql);
         $stmt->execute();
         $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -51,27 +53,27 @@ class ModProfesores {
         $where = "";
         $binds = [];
         if ($search) {
-            $where = " AND (u.nombre LIKE :s OR u.apellidos LIKE :s OR u.correo LIKE :s)";
+            $where = " AND (nombre LIKE :s OR apellidos LIKE :s OR correo LIKE :s)";
             $binds[':s'] = "%$search%";
         }
 
-        $sqlFilter = "SELECT COUNT(*) as total FROM Usuarios u WHERE u.tipo = 'P'" . $where;
+        $sqlFilter = "SELECT COUNT(*) as total FROM Usuarios u WHERE tipo = 'P'" . $where;
         $stmtFilter = $this->db->prepare($sqlFilter);
         foreach ($binds as $key => $val) $stmtFilter->bindValue($key, $val);
         $stmtFilter->execute();
         $recordsFiltered = $stmtFilter->fetch(PDO::FETCH_ASSOC)['total'];
 
         // 2.5. Ordenación dinámica
-        $orderBy = " ORDER BY u.apellidos, u.nombre";
+        $orderBy = " ORDER BY apellidos, nombre";
         if (isset($params['order']) && count($params['order']) > 0) {
             $orderColumnIndex = intval($params['order'][0]['column']);
             $orderDir = isset($params['order'][0]['dir']) && strtolower($params['order'][0]['dir']) === 'desc' ? 'DESC' : 'ASC';
             
             $columnsMap = [
-                0 => 'u.nombre',
-                1 => 'u.apellidos',
-                2 => 'u.correo',
-                3 => 'c.idCoordinador'
+                0 => 'nombre',
+                1 => 'apellidos',
+                2 => 'correo',
+                3 => 'idCoordinador'
             ];
 
             if (isset($columnsMap[$orderColumnIndex])) {
@@ -80,11 +82,11 @@ class ModProfesores {
         }
 
         // 3. Obtención de datos con paginación
-        $sqlData = "SELECT u.idUsuario as id, u.nombre, u.apellidos, u.correo, c.idCoordinador
+        $sqlData = "SELECT idUsuario as id, nombre, apellidos, correo, idCoordinador
                     FROM Usuarios u
-                    JOIN Profesor p ON u.idUsuario = p.idProfesor
-                    LEFT JOIN Coordinador c ON p.idProfesor = c.idCoordinador
-                    WHERE u.tipo = 'P'" . $where . "
+                    JOIN Profesor p ON idUsuario = p.idProfesor
+                    LEFT JOIN Coordinador c ON p.idProfesor = idCoordinador
+                    WHERE tipo = 'P'" . $where . "
                     $orderBy
                     LIMIT :start, :length";
         
@@ -421,11 +423,11 @@ class ModProfesores {
      * @return array|false Datos del usuario o false si no existe.
      */
     public function obtener($id) {
-        $sql = "SELECT u.idUsuario as id, u.nombre, u.apellidos, u.correo, c.idCoordinador
+        $sql = "SELECT idUsuario as id, nombre, apellidos, correo, idCoordinador
                 FROM Usuarios u
-                JOIN Profesor p ON u.idUsuario = p.idProfesor
-                LEFT JOIN Coordinador c ON p.idProfesor = c.idCoordinador
-                WHERE u.idUsuario = :id AND u.tipo = 'P'";
+                JOIN Profesor p ON idUsuario = p.idProfesor
+                LEFT JOIN Coordinador c ON p.idProfesor = idCoordinador
+                WHERE idUsuario = :id AND tipo = 'P'";
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':id' => $id]);
         $prof = $stmt->fetch(PDO::FETCH_ASSOC);
