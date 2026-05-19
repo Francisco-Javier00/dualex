@@ -260,6 +260,14 @@ class ModModulos {
             $binds[':idCoordinador'] = $idCoordinador;
         }
 
+        $idsCursos = $params['idsCursos'] ?? [];
+        if (!empty($idsCursos) && is_array($idsCursos)) {
+            $idsValidados = array_filter(array_map('intval', $idsCursos));
+            if (!empty($idsValidados)) {
+                $conditions[] = "cur.idCurso IN (" . implode(',', $idsValidados) . ")";
+            }
+        }
+
         $where = !empty($conditions) ? "WHERE " . implode(" AND ", $conditions) : "";
 
         // Conteo total
