@@ -51,7 +51,7 @@ export interface ModuloProfesor {
 
 export interface Tarea {
   id: number;
-  modulos: string[];
+  modulos: { sigla: string; color: string }[];
   titulo: string;
   fechaLimite: string;
   calificacion: string;

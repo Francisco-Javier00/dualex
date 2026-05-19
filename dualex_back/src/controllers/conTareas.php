@@ -10,29 +10,53 @@ class ConTareas extends BaseController {
     }
 
     public function listar() {
-        $data = $this->modelo->listar();
-        $this->sendResponse($data);
+        $this->checkRole(['ALUMNO', 'PROFESOR', 'COORDINADOR']);
+        try {
+            $userRole = strtoupper($this->user['roles']['dualex'] ?? '');
+            if ($userRole === 'ALUMNO') {
+                $email = $this->user['email'] ?? '';
+                $stmt = $this->db->prepare("SELECT idUsuario FROM Usuarios WHERE correo = :email");
+                $stmt->execute([':email' => $email]);
+                $idAlumno = $stmt->fetchColumn();
+                $data = $this->modelo->listarPorAlumno($idAlumno);
+            } else {
+                $data = $this->modelo->listar();
+            }
+            $this->sendResponse($data);
+        } catch (Exception $e) {
+            $this->sendError($e);
+        }
     }
 
     public function listarPorAlumno() {
+        $this->checkRole(['ALUMNO', 'PROFESOR', 'COORDINADOR']);
         $idAlumno = $_GET['idAlumno'] ?? null;
         if (!$idAlumno) {
             $this->sendError("ID de alumno no proporcionado.", 400);
         }
-        $data = $this->modelo->listarPorAlumno($idAlumno);
-        $this->sendResponse($data);
+        try {
+            $data = $this->modelo->listarPorAlumno($idAlumno);
+            $this->sendResponse($data);
+        } catch (Exception $e) {
+            $this->sendError($e);
+        }
     }
 
     public function obtener() {
+        $this->checkRole(['ALUMNO', 'PROFESOR', 'COORDINADOR']);
         $id = $_GET['id'] ?? null;
         if (!$id) {
             $this->sendError("ID no proporcionado.", 400);
         }
-        $data = $this->modelo->obtener($id);
-        if (!$data) {
-            $this->sendError("Tarea no encontrada.", 404);
+        try {
+            $data = $this->modelo->obtener($id);
+            if (!$data) {
+                $this->sendError("Tarea no encontrada.", 404);
+            }
+            $this->sendResponse($data);
+        } catch (Exception $e) {
+            $this->sendError($e);
         }
-        $this->sendResponse($data);
     }
 
     public function crear() {
@@ -42,8 +66,26 @@ class ConTareas extends BaseController {
         if (!$datos) {
             $this->sendError("Datos no válidos.", 400);
         }
-        $res = $this->modelo->crear($datos);
-        $this->sendResponse($res, 201);
+        
+        $userRole = strtoupper($this->user['roles']['dualex'] ?? '');
+        if ($userRole === 'ALUMNO') {
+            $email = $this->user['email'] ?? '';
+            $stmt = $this->db->prepare("SELECT idUsuario FROM Usuarios WHERE correo = :email");
+            $stmt->execute([':email' => $email]);
+            $idAlumno = $stmt->fetchColumn();
+            $datos['idAlumno'] = $idAlumno ? $idAlumno : null;
+        }
+        
+        if (empty($datos['idAlumno'])) {
+            $this->sendError("ID de alumno no especificado.", 400);
+        }
+        
+        try {
+            $res = $this->modelo->crear($datos);
+            $this->sendResponse($res, 201);
+        } catch (Exception $e) {
+            $this->sendError($e);
+        }
     }
 
     public function actualizar() {
@@ -54,8 +96,25 @@ class ConTareas extends BaseController {
         }
         $json = file_get_contents('php://input');
         $datos = json_decode($json, true);
-        $res = $this->modelo->actualizar($id, $datos);
-        $this->sendResponse($res);
+        if (!$datos) {
+            $this->sendError("Datos no válidos.", 400);
+        }
+        
+        $userRole = strtoupper($this->user['roles']['dualex'] ?? '');
+        if ($userRole === 'ALUMNO') {
+            $email = $this->user['email'] ?? '';
+            $stmt = $this->db->prepare("SELECT idUsuario FROM Usuarios WHERE correo = :email");
+            $stmt->execute([':email' => $email]);
+            $idAlumno = $stmt->fetchColumn();
+            $datos['idAlumno'] = $idAlumno ? $idAlumno : null;
+        }
+        
+        try {
+            $res = $this->modelo->actualizar($id, $datos);
+            $this->sendResponse($res);
+        } catch (Exception $e) {
+            $this->sendError($e);
+        }
     }
 
     public function eliminar() {
@@ -64,7 +123,12 @@ class ConTareas extends BaseController {
         if (!$id) {
             $this->sendError("ID no proporcionado.", 400);
         }
-        $success = $this->modelo->eliminar($id);
-        $this->sendResponse(["success" => $success]);
+        try {
+            $success = $this->modelo->eliminar($id);
+            $this->sendResponse(["success" => $success]);
+        } catch (Exception $e) {
+            $this->sendError($e);
+        }
     }
 }
+?>

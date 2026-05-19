@@ -337,3 +337,15 @@ FOREIGN KEY (idCoordinador)
 REFERENCES Coordinador(idCoordinador)
 ON UPDATE CASCADE
 ON DELETE SET NULL;
+
+ALTER TABLE Tareas
+DROP CONSTRAINT chk_tareas_calificacion;
+
+UPDATE Tareas SET calificacion = NULL; -- Importante para evitar errores de CHECK con NULL
+
+ALTER TABLE Tareas
+ADD CONSTRAINT chk_tareas_calificacion
+CHECK (calificacion IN ('superado', 'bien', 'notable', 'excelente', 'no superado'));
+
+ALTER TABLE Tareas
+MODIFY descripcion TEXT NOT NULL;

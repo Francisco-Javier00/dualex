@@ -78,7 +78,11 @@ export class TareasComponent implements OnInit {
    * Navegación al formulario de creación.
    */
   crearTarea(): void {
-    this.router.navigate(['/tarea/nueva']);
+    if (this.alumnoId) {
+      this.router.navigate(['/tarea/nueva'], { queryParams: { alumnoId: this.alumnoId } });
+    } else {
+      this.router.navigate(['/tarea/nueva']);
+    }
   }
 
   /**

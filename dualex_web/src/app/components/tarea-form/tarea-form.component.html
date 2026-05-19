@@ -22,28 +22,31 @@
     <!-- Primera Fila: Título y Fechas -->
     <div class="row g-3 mb-4">
       <div class="col-lg-6">
-        <label class="form-label fw-bold text-muted small text-uppercase">Título de la Tarea</label>
-        <div class="input-group">
-          <span class="input-group-text bg-white text-primary"
-            style="width: 40px; justify-content: center; font-weight: 900; font-family: 'Times New Roman', serif; font-size: 1.2rem; height: 45px;">H</span>
-          <input type="text" class="form-control bg-light-subtle" formControlName="titulo"
-            placeholder="Ej: Implementación de ..." style="height: 45px;">
+        <label class="form-label small fw-bold text-uppercase opacity-75">Título de la Tarea</label>
+        <div class="input-group shadow-sm rounded-3 overflow-hidden border"
+             [class.is-invalid]="tareaForm.get('titulo')?.invalid && tareaForm.get('titulo')?.touched">
+          <span class="input-group-text bg-white border-0"><i class="fa-solid fa-heading text-muted"></i></span>
+          <input type="text" class="form-control border-0 px-3" formControlName="titulo"
+            placeholder="Ej: Implementación de ..." style="height: 45px;"
+            [class.is-invalid]="tareaForm.get('titulo')?.invalid && tareaForm.get('titulo')?.touched">
         </div>
       </div>
       <div class="col-lg-3 col-md-6">
-        <label class="form-label fw-bold text-muted small text-uppercase">Fecha Inicio</label>
-        <div class="input-group">
-          <span class="input-group-text bg-white" style="height: 45px;"><i
-              class="fa-solid fa-calendar-day text-primary"></i></span>
-          <input type="date" class="form-control bg-light-subtle" formControlName="fechaIni" style="height: 45px;">
+        <label class="form-label small fw-bold text-uppercase opacity-75">Fecha Inicio</label>
+        <div class="input-group shadow-sm rounded-3 overflow-hidden border"
+             [class.is-invalid]="tareaForm.get('fechaIni')?.invalid && tareaForm.get('fechaIni')?.touched">
+          <span class="input-group-text bg-white border-0"><i class="fa-solid fa-calendar-day text-muted"></i></span>
+          <input type="date" class="form-control border-0 px-3" formControlName="fechaIni" style="height: 45px;"
+            [class.is-invalid]="tareaForm.get('fechaIni')?.invalid && tareaForm.get('fechaIni')?.touched">
         </div>
       </div>
       <div class="col-lg-3 col-md-6">
-        <label class="form-label fw-bold text-muted small text-uppercase">Fecha Fin</label>
-        <div class="input-group">
-          <span class="input-group-text bg-white" style="height: 45px;"><i
-              class="fa-solid fa-calendar-check text-primary"></i></span>
-          <input type="date" class="form-control bg-light-subtle" formControlName="fechaFin" style="height: 45px;">
+        <label class="form-label small fw-bold text-uppercase opacity-75">Fecha Fin</label>
+        <div class="input-group shadow-sm rounded-3 overflow-hidden border"
+             [class.is-invalid]="tareaForm.get('fechaFin')?.invalid && tareaForm.get('fechaFin')?.touched">
+          <span class="input-group-text bg-white border-0"><i class="fa-solid fa-calendar-check text-muted"></i></span>
+          <input type="date" class="form-control border-0 px-3" formControlName="fechaFin" style="height: 45px;"
+            [class.is-invalid]="tareaForm.get('fechaFin')?.invalid && tareaForm.get('fechaFin')?.touched">
         </div>
       </div>
     </div>
@@ -100,11 +103,14 @@
       <div class="row g-4">
         <!-- Calificación (Izquierda) -->
         <div class="col-lg-4">
-          <label class="form-label fw-bold text-muted small text-uppercase">Calificación</label>
-          <select class="form-select bg-light-subtle rounded-3" formControlName="evaluacionEmpresa"
-            style="height: 45px;">
-            <option *ngFor="let opt of evaluacionEmpresaOptions" [value]="opt">{{ opt }}</option>
-          </select>
+          <label class="form-label small fw-bold text-uppercase opacity-75">Calificación</label>
+          <div class="input-group shadow-sm rounded-3 overflow-hidden border">
+            <span class="input-group-text bg-white border-0"><i class="fa-solid fa-star text-muted"></i></span>
+            <select class="form-select border-0 px-3" formControlName="evaluacionEmpresa"
+              style="height: 45px;">
+              <option *ngFor="let opt of evaluacionEmpresaOptions" [value]="opt">{{ opt }}</option>
+            </select>
+          </div>
         </div>
         <!-- Comentario con Rich Text (Derecha) -->
         <div class="col-lg-8">
