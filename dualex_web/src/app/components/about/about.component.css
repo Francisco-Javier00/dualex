@@ -20,3 +20,18 @@
 .leading-relaxed {
     line-height: 1.7;
 }
+
+.fade-in-manuals {
+    animation: fadeIn 0.5s ease-out forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
