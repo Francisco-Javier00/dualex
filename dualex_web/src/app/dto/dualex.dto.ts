@@ -125,7 +125,9 @@ export interface CursoDTO {
   nombre: string;
   curso: number;
   anoEscolar: string;
+  anio_escolar?: string;
   ciclo: string;
+  siglasCiclo?: string;
   grado?: string;
 }
 
