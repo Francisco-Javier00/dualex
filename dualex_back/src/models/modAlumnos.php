@@ -1,4 +1,7 @@
 <?php
+require_once __DIR__ . '/../../../dualex_web/vendor/autoload.php';
+use League\Csv\Reader;
+
 
 /**
  * Modelo de datos para la gestión y persistencia de Alumnos en la base de datos de Dualex.
@@ -224,9 +227,9 @@ class ModAlumnos {
                        CAST(repetidor AS UNSIGNED) as repetidor,
                        c.nombre as nombreCurso, idEmpresa
                 FROM Usuarios u
-                INNER JOIN Alumnos a ON idUsuario = idAlumnos 
+                INNER JOIN Alumnos a ON u.idUsuario = a.idAlumnos 
                 LEFT JOIN Cursos c ON a.idCurso = c.idCurso
-                LEFT JOIN Empresa_Alumnos ea ON idAlumnos = idAlumno ";
+                LEFT JOIN Empresa_Alumnos ea ON a.idAlumnos = ea.idAlumno ";
 
         // Construcción de condiciones
         $conditions = [];
@@ -243,7 +246,7 @@ class ModAlumnos {
         
         // 1. Filtrado por módulo específico
         if (!empty($idModulo) && $idModulo !== 'null') {
-            $joinClause .= " INNER JOIN Modulo_Alumno_Cursa mac ON idAlumnos = mac.idAlumnos ";
+            $joinClause .= " INNER JOIN Modulo_Alumno_Cursa mac ON a.idAlumnos = mac.idAlumnos ";
             $conditions[] = "mac.idModulo = :idModulo";
             $binds[':idModulo'] = (int)$idModulo;
         } 
@@ -270,7 +273,7 @@ class ModAlumnos {
         }
         // 4. Si es Profesor, ve los alumnos de los módulos que imparte
         else if (empty($conditions) && strtoupper($rol) === 'PROFESOR' && !empty($idUsuario)) {
-            $joinClause .= " INNER JOIN Modulo_Alumno_Cursa mac ON idAlumnos = mac.idAlumnos ";
+            $joinClause .= " INNER JOIN Modulo_Alumno_Cursa mac ON a.idAlumnos = mac.idAlumnos ";
             $joinClause .= " INNER JOIN Modulo_Profesor mp ON mac.idModulo = mp.idModulo ";
             $conditions[] = "mp.idProfesor = :idUsuario";
             $binds[':idUsuario'] = (int)$idUsuario;
@@ -310,8 +313,8 @@ class ModAlumnos {
         $data = $stmtData->fetchAll(PDO::FETCH_ASSOC);
 
         // Consulta de conteo para DataTables
-        $sqlCount = "SELECT COUNT(DISTINCT idAlumnos) FROM Usuarios u 
-                     INNER JOIN Alumnos a ON idUsuario = idAlumnos 
+        $sqlCount = "SELECT COUNT(DISTINCT a.idAlumnos) FROM Usuarios u 
+                     INNER JOIN Alumnos a ON u.idUsuario = a.idAlumnos 
                      LEFT JOIN Cursos c ON a.idCurso = c.idCurso " . $joinClause . $whereClause;
         $stmtCount = $this->db->prepare($sqlCount);
         foreach ($binds as $key => $val) {
@@ -404,4 +407,146 @@ class ModAlumnos {
 
         return $errores;
     }
+
+    /**
+     * Importa alumnos de forma masiva desde un archivo CSV.
+     * Si un alumno ya existe (por correo, DNI, NUSS o NIA), lo ignora.
+     * Cada inserción se realiza bajo una transacción (implementada en crear()).
+     *
+     * @param string $filePath Ruta al archivo temporal del CSV.
+     * @param int    $idCurso  ID del curso al que se asignarán los alumnos.
+     * @throws Exception En caso de errores graves de formato o lectura.
+     * @return array Resumen del proceso (imported, skipped, errors).
+     */
+    public function importarCSV($filePath, $idCurso) {
+
+    if (!file_exists($filePath)) {
+        throw new Exception("Archivo no encontrado.");
+    }
+
+    // Leer CSV
+    $csv = Reader::createFromPath($filePath, 'r'); //CREAR LECTOR CSV
+    $csv->setHeaderOffset(0); //CABECERA
+    $csv->setDelimiter(';'); //DELIMITADOR (en mi caso es ';')
+
+    // Convertir encoding
+    $csv->addStreamFilter('convert.iconv.ISO-8859-1/UTF-8'); //ENCODING
+
+    $records = iterator_to_array($csv->getRecords());
+
+    $imported = 0;
+    $skipped = 0;
+    $errors = [];
+    $rowNumber = 1;
+
+    foreach ($records as $row) {
+
+        $rowNumber++;
+
+        // Cabeceras en minúscula
+        $row = array_change_key_case($row, CASE_LOWER);
+
+        $nombre = trim($row['nombre'] ?? '');
+        $apellidos = trim($row['apellidos'] ?? '');
+        $email = trim($row['email'] ?? '');
+        $dni = trim($row['dni'] ?? '');
+        $nuss = trim($row['nuss'] ?? '');
+        $nia = trim($row['nia'] ?? '');
+        $telefono = trim($row['telefono'] ?? '');
+        $repetidor = trim($row['repetidor'] ?? '');
+
+        // Ignorar filas completamente vacías
+        if (
+            $nombre === '' &&
+            $apellidos === '' &&
+            $email === '' &&
+            $dni === '' &&
+            $nuss === '' &&
+            $nia === '' &&
+            $telefono === ''
+        ) {
+            continue;
+        }
+
+        // Validar obligatorios
+        if (
+            $nombre === '' ||
+            $apellidos === '' ||
+            $email === '' ||
+            $dni === '' ||
+            $nuss === '' ||
+            $nia === '' ||
+            $telefono === ''
+        ) {
+            $errors[] = "Fila $rowNumber: Faltan campos obligatorios.";
+            continue;
+        }
+
+        // Normalizar repetidor 
+        $repetidorVal = in_array(
+            strtolower($repetidor),
+            ['si', 'sí', '1', 'true', 'yes']
+        ) ? 1 : 0;
+
+        $studentData = [
+            'nombre' => $nombre,
+            'apellidos' => $apellidos,
+            'email' => $email,
+            'dni' => $dni,
+            'nuss' => $nuss,
+            'nia' => $nia,
+            'telefono' => $telefono,
+            'repetidor' => $repetidorVal,
+            'idCurso' => $idCurso,
+            'idEmpresa' => null
+        ];
+
+        // Comprobar si ya existe
+        $sqlExiste = "SELECT COUNT(*) 
+                      FROM Alumnos 
+                      WHERE NIA = :nia 
+                      OR DNI = :dni 
+                      OR NUSS = :nuss";
+
+        $stmtExiste = $this->db->prepare($sqlExiste);
+
+        $stmtExiste->execute([
+            ':nia' => $nia,
+            ':dni' => $dni,
+            ':nuss' => $nuss
+        ]);
+
+        if ($stmtExiste->fetchColumn() > 0) {
+            $skipped++;
+            continue;
+        }
+
+        // Validar datos
+        $erroresValidacion = $this->validar($studentData);
+
+        if (!empty($erroresValidacion)) {
+            $errors[] = "Fila $rowNumber: " . implode(' ', $erroresValidacion);
+            continue;
+        }
+
+        // Insertar
+        try {
+
+            $this->crear($studentData);
+
+            $imported++;
+
+        } catch (Exception $e) {
+
+            $errors[] = "Fila $rowNumber: " . $e->getMessage();
+        }
+    }
+
+    return [
+        'imported' => $imported,
+        'skipped' => $skipped,
+        'errors' => $errors
+    ];
 }
+}
+

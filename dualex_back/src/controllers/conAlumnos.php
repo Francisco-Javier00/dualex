@@ -110,4 +110,40 @@ class ConAlumnos extends BaseController {
         $data = $this->modelo->listarPorModulo($idModulo);
         $this->sendResponse($data);
     }
+
+    public function importarCSV() {
+        $this->checkRole(['COORDINADOR']);
+        
+        // El idCurso puede venir en $_POST debido a FormData
+        $idCurso = $_POST['idCurso'] ?? null;
+        if (!$idCurso) {
+            $this->sendError("ID de curso no proporcionado.", 400);
+        }
+
+        if (!isset($_FILES['file']) || $_FILES['file']['error'] !== UPLOAD_ERR_OK) {
+            $this->sendError("No se ha subido ningún archivo o ha ocurrido un error al subirlo.", 400);
+        }
+
+        $fileTmpPath = $_FILES['file']['tmp_name'];
+        $fileName = $_FILES['file']['name'];
+        
+        $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+        if ($ext !== 'csv') {
+            $this->sendError("El archivo debe estar en formato .csv.", 400);
+        }
+
+        try {
+            $resultado = $this->modelo->importarCSV($fileTmpPath, $idCurso);
+
+            try {
+                $this->sendResponse($resultado);
+            } catch (Exception $e) {
+                $this->sendError($e->getMessage(), 400);
+            }
+
+        } catch (Exception $e) {
+            $this->sendError($e->getMessage(), 400);
+        }
+    }
 }
+

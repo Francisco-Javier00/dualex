@@ -4,6 +4,7 @@ import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { DatatableComponent } from '../shared/datatable/datatable.component';
 import { ConfirmarBorradoModalComponent } from '../shared/modals/confirmar-borrado-modal/confirmar-borrado-modal.component';
 import { AlumnoModalComponent } from '../modals/alumno-modal/alumno-modal.component';
+import { ImportarAlumnosModalComponent } from '../modals/importar-alumnos-modal/importar-alumnos-modal.component';
 import { AlumnosService } from '../../services/alumnos.service';
 import { ModulosService } from '../../services/modulos.service';
 import { ProfesoresService } from '../../services/profesores.service';
@@ -17,10 +18,11 @@ import { Subscription } from 'rxjs';
 @Component({
   selector: 'app-alumnos',
   standalone: true,
-  imports: [CommonModule, RouterModule, DatatableComponent, ConfirmarBorradoModalComponent, AlumnoModalComponent],
+  imports: [CommonModule, RouterModule, DatatableComponent, ConfirmarBorradoModalComponent, AlumnoModalComponent, ImportarAlumnosModalComponent],
   templateUrl: './alumnos.component.html'
 })
 export class AlumnosComponent implements OnInit, OnDestroy {
+
   private alumnosService = inject(AlumnosService);
   private modulosService = inject(ModulosService);
   private profesoresService = inject(ProfesoresService);
@@ -35,6 +37,8 @@ export class AlumnosComponent implements OnInit, OnDestroy {
   dtOptions: Config = {};
   modalBorradoVisible = false;
   modalAlumnoVisible = false;
+  modalImportarVisible = false;
+  importandoCSV = false;
   alumnoSeleccionado: AlumnoDTO | null = null;
   moduloId: string | null = null;
   nombreModulo: string | null = null;
@@ -70,7 +74,7 @@ export class AlumnosComponent implements OnInit, OnDestroy {
               // Parse cycles coordinated by the coordinator (e.g. "DAW, DAM")
               const ciclosCoordinados = profesor.ciclos ? profesor.ciclos.split(',').map((c: string) => c.trim()) : [];
               this.ciclosCoordinados = ciclosCoordinados;
-              
+
               // Only keep courses whose siglasCiclo is coordinated by the coordinator
               const cursosFiltrados = cursos.filter(c => c.siglasCiclo && ciclosCoordinados.includes(c.siglasCiclo));
 
@@ -234,8 +238,52 @@ export class AlumnosComponent implements OnInit, OnDestroy {
     if (!this.puedeGestionarAlumnos) {
       return;
     }
-    this.alertService.informacion('Importar Excel', 'AquÃ­ podrÃ¡s seleccionar un archivo Excel (.xls o .xlsx) para cargar alumnos de forma masiva.');
+    this.modalImportarVisible = true;
   }
+
+  onCerrarImportar(): void {
+    this.modalImportarVisible = false;
+  }
+
+  onConfirmarImportar(event: { file: File, idCurso: number }): void {
+    this.importandoCSV = true;
+    this.alumnosService.importarAlumnosCSV(event.file, event.idCurso).subscribe({
+      next: (res) => {
+        this.importandoCSV = false;
+        this.modalImportarVisible = false;
+        
+        let msg = `Se han importado ${res.imported} alumnos correctamente.`;
+        if (res.skipped > 0) {
+          msg += ` Se han omitido ${res.skipped} alumnos porque ya existían.`;
+        }
+        
+        if (res.errors && res.errors.length > 0) {
+          // Si hay errores, los mostramos y no autolimpiamos para que el usuario pueda revisarlos
+          const errorDetails = res.errors.slice(0, 5).join('\n');
+          const errorCount = res.errors.length;
+          this.alertService.advertencia(
+            'Importación con Observaciones', 
+            `${msg} Sin embargo, se detectaron ${errorCount} errores en el proceso. Primeros errores:\n${errorDetails}`,
+            false,
+            8000
+          );
+          console.warn('Errores de importación:', res.errors);
+        } else {
+          this.alertService.exito('Importación Exitosa', msg);
+        }
+        
+        this.datatable.refrescar();
+      },
+      error: (err) => {
+        this.importandoCSV = false;
+        this.alertService.error(
+          'Error al importar', 
+          err.error?.message || err.error?.error || 'No se pudo procesar el archivo de alumnos.'
+        );
+      }
+    });
+  }
+
 
   onTableAction(event: { action: string, data: any }): void {
     if (event.action === 'edit') {
