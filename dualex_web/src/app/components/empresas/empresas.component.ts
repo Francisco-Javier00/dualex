@@ -42,7 +42,8 @@ export class EmpresasComponent implements OnInit {
 
   configuracionEmpresa: ConfiguracionDTO = {
     diasAvisoCaducidad: 30,
-    tiempoFinalizacionConvenio: 4
+    tiempoFinalizacionConvenio: 4,
+    urlConvenio: ''
   };
 
   contactosAdicionales: ContactoEmpresaDTO[] = [];
@@ -412,12 +413,17 @@ export class EmpresasComponent implements OnInit {
       return;
     }
 
+    if (!this.configuracionEmpresa.urlConvenio.trim()) {
+      this.alertService.error('Campo requerido', 'La URL del convenio no puede estar vacía.');
+      return;
+    }
+
     // Ahora guardamos en la base de datos a través del servicio
     this.configuracionService.updateConfiguracion(this.configuracionEmpresa).subscribe({
       next: () => {
         this.alertService.exito(
           'Configuración guardada',
-          'Los valores de aviso y finalización del convenio se han actualizado en el servidor.'
+          'Los valores de aviso y finalización del convenio y la URL se han actualizado en el servidor.'
         );
         this.modalConfiguracionVisible = false;
       },

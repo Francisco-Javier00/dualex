@@ -168,4 +168,5 @@ export interface ProfesorDTO {
 export interface ConfiguracionDTO {
   diasAvisoCaducidad: number;
   tiempoFinalizacionConvenio: number;
+  urlConvenio: string;
 }

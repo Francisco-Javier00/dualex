@@ -27,7 +27,7 @@ class ModEmpresas {
      * @return array Arreglo con la lista de todas las empresas y sus contactos estructurados.
      */
     public function listar() {
-        $sql = "SELECT e.idEmpresa as id, e.siglas, e.nombre, e.url_Convenio as convenioUrl, e.inicioConvenio,
+        $sql = "SELECT e.idEmpresa as id, e.siglas, e.nombre, e.urlConvenio as convenioUrl, e.inicioConvenio,
                        e.idCoordinador, CONCAT(u.nombre, ' ', u.apellidos) as firmante
                 FROM Empresa e
                 LEFT JOIN Usuario u ON e.idCoordinador = u.idUsuario
@@ -45,7 +45,7 @@ class ModEmpresas {
      * @return array|null Un array asociativo con todos los datos de la empresa si existe, o null en caso contrario.
      */
     public function obtener($id) {
-        $sql = "SELECT e.idEmpresa as id, e.siglas, e.nombre, e.url_Convenio as convenioUrl, e.inicioConvenio,
+        $sql = "SELECT e.idEmpresa as id, e.siglas, e.nombre, e.urlConvenio as convenioUrl, e.inicioConvenio,
                        e.idCoordinador, CONCAT(u.nombre, ' ', u.apellidos) as firmante
                 FROM Empresa e
                 LEFT JOIN Usuario u ON e.idCoordinador = u.idUsuario
@@ -80,13 +80,13 @@ class ModEmpresas {
             $fechaMySql = $fechaPartes[2] . '-' . $fechaPartes[1] . '-' . $fechaPartes[0] . ' 00:00:00';
 
             // 1. Inserción de los datos principales de la Empresa
-            $sql = "INSERT INTO Empresa (siglas, nombre, url_Convenio, inicioConvenio, idCoordinador) 
-                    VALUES (:siglas, :nombre, :url_Convenio, :inicioConvenio, :idCoordinador)";
+            $sql = "INSERT INTO Empresa (siglas, nombre, urlConvenio, inicioConvenio, idCoordinador) 
+                    VALUES (:siglas, :nombre, :urlConvenio, :inicioConvenio, :idCoordinador)";
             $stmt = $this->db->prepare($sql);
             $stmt->execute([
                 ':siglas' => $datos['siglas'],
                 ':nombre' => $datos['nombre'],
-                ':url_Convenio' => $datos['convenioUrl'],
+                ':urlConvenio' => $datos['convenioUrl'],
                 ':inicioConvenio' => $fechaMySql,
                 ':idCoordinador' => $datos['idCoordinador'] ?? null
             ]);
@@ -146,14 +146,14 @@ class ModEmpresas {
                 $fechaPartes = explode('/', $datos['inicioConvenio']);
                 $fechaMySql = $fechaPartes[2] . '-' . $fechaPartes[1] . '-' . $fechaPartes[0] . ' 00:00:00';
 
-                $sql = "UPDATE Empresa SET siglas = :siglas, nombre = :nombre, url_Convenio = :url_Convenio, inicioConvenio = :inicioConvenio 
+                $sql = "UPDATE Empresa SET siglas = :siglas, nombre = :nombre, urlConvenio = :urlConvenio, inicioConvenio = :inicioConvenio 
                         WHERE idEmpresa = :id";
                 $stmt = $this->db->prepare($sql);
                 $stmt->execute([
                     ':id' => $id,
                     ':siglas' => $datos['siglas'],
                     ':nombre' => $datos['nombre'],
-                    ':url_Convenio' => $datos['convenioUrl'],
+                    ':urlConvenio' => $datos['convenioUrl'],
                     ':inicioConvenio' => $fechaMySql
                 ]);
 
@@ -227,7 +227,7 @@ class ModEmpresas {
         $where = "";
         // Si el usuario escribió en el cuadro de búsqueda
         if ($search) {
-            $where = " WHERE e.siglas LIKE :search OR e.nombre LIKE :search OR e.url_Convenio LIKE :search";
+            $where = " WHERE e.siglas LIKE :search OR e.nombre LIKE :search OR e.urlConvenio LIKE :search";
         }
 
         // Obtener el recuento total de elementos en la tabla ignorando filtros
@@ -250,7 +250,7 @@ class ModEmpresas {
             $columnsMap = [
                 0 => 'e.siglas',
                 1 => 'e.nombre',
-                3 => 'e.url_Convenio',
+                3 => 'e.urlConvenio',
                 4 => 'firmante',
                 5 => 'e.inicioConvenio',
                 6 => 'e.inicioConvenio' // Fin convenio deriva de inicioConvenio
@@ -268,7 +268,7 @@ class ModEmpresas {
         }
 
         // Query final maestra de extracción de datos
-        $sql = "SELECT e.idEmpresa as id, e.siglas, e.nombre, e.url_Convenio as convenioUrl, e.inicioConvenio,
+        $sql = "SELECT e.idEmpresa as id, e.siglas, e.nombre, e.urlConvenio as convenioUrl, e.inicioConvenio,
                        e.idCoordinador, CONCAT(u.nombre, ' ', u.apellidos) as firmante
                 FROM Empresa e 
                 LEFT JOIN Usuario u ON e.idCoordinador = u.idUsuario

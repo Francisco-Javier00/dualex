@@ -147,6 +147,26 @@
                   </td>
                   <td>Duración máxima del convenio antes de considerar su finalización.</td>
                 </tr>
+                <tr>
+                  <td class="fw-semibold">URL convenio</td>
+                  <td class="empresas-config-value-cell">
+                    <div class="empresas-config-value-wrap">
+                      <input
+                        type="url"
+                        class="form-control empresas-config-url-input"
+                        [class.is-invalid]="!configuracionEmpresa.urlConvenio.trim()"
+                        [(ngModel)]="configuracionEmpresa.urlConvenio"
+                        placeholder="https://ejemplo.com/convenio"
+                        required>
+                    </div>
+                  </td>
+                  <td>
+                    URL base para los convenios de empresa.
+                    @if (!configuracionEmpresa.urlConvenio.trim()) {
+                      <div class="text-danger small mt-1">Este campo es obligatorio.</div>
+                    }
+                  </td>
+                </tr>
               </tbody>
             </table>
           </div>

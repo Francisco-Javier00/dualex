@@ -286,6 +286,11 @@
   white-space: nowrap;
 }
 
+.empresas-config-url-input {
+  min-width: 320px;
+  text-align: left;
+}
+
 .empresas-add-contact {
   width: 28px;
   height: 28px;

@@ -35,6 +35,12 @@ class ConConfiguracion {
             return ["error" => "Tiempo de finalización inválido. Debe ser un número entre 1 y 255."];
         }
 
+        $url = $datos['urlConvenio'] ?? '';
+        if (!empty($url) && !filter_var($url, FILTER_VALIDATE_URL)) {
+            http_response_code(400);
+            return ["error" => "La URL del convenio no es válida."];
+        }
+
         return $this->modelo->actualizarConfiguracion($datos);
     }
 }
