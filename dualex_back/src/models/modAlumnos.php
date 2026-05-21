@@ -1,8 +1,6 @@
 <?php
-require_once __DIR__ . '/../../../dualex_web/vendor/autoload.php';
+require_once __DIR__ . '/../../vendor/autoload.php';
 use PhpOffice\PhpSpreadsheet\IOFactory;
-
-
 
 /**
  * Modelo de datos para la gestión y persistencia de Alumnos en la base de datos de Dualex.

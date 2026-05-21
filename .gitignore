@@ -1,6 +1,0 @@
-# Dependency directories
-vendor/
-node_modules/
-
-# Environments
-.env
