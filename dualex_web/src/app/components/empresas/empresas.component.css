@@ -348,3 +348,54 @@
 :host ::ng-deep .table tbody td .action-buttons {
   min-width: 92px;
 }
+
+:host ::ng-deep .action-link {
+  position: relative;
+}
+
+:host ::ng-deep .action-link[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(6px);
+  background: #222;
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  transition: all 0.2s ease;
+}
+
+:host ::ng-deep .action-link[data-tooltip]::before {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-2px);
+  border: 6px solid transparent;
+  border-bottom-color: #222;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  z-index: 1000;
+  transition: all 0.2s ease;
+}
+
+:host ::ng-deep .action-link[data-tooltip]:hover::after,
+:host ::ng-deep .action-link[data-tooltip]:hover::before {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(4px);
+}
+
+:host ::ng-deep .action-link[data-tooltip]:hover::before {
+  transform: translateX(-50%) translateY(-4px);
+}

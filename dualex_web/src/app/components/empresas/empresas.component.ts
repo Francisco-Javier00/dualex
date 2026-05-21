@@ -122,7 +122,7 @@ export class EmpresasComponent implements OnInit {
           searchable: false,
           render: () => `
             <div class="d-flex justify-content-center align-items-center gap-2 action-buttons w-100">
-              <button class="btn btn-sm btn-outline-info shadow-sm action-link" data-action="link" title="Enlazar">
+              <button class="btn btn-sm btn-outline-info shadow-sm action-link" data-action="link" title="Enlazar empresa con ciclos" data-tooltip="Enlazar empresa con ciclos">
                 <i class="fa-solid fa-link"></i>
               </button>
               <button class="btn btn-sm btn-outline-primary shadow-sm action-edit" data-action="edit" title="Editar">
