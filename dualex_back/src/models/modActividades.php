@@ -8,7 +8,7 @@
  */
 class ModActividades {
     private $conn;
-    private $table_name = "Actividades";
+    private $table_name = "Actividad";
 
     public function __construct($db) {
         $this->conn = $db;
@@ -59,7 +59,7 @@ class ModActividades {
                          IFNULL(GROUP_CONCAT(m.idModulo SEPARATOR ','), '') as idModulos
                   FROM " . $this->table_name . " a
                   LEFT JOIN Modulo_Actividad ma ON a.idActividad = ma.idActividad
-                  LEFT JOIN Modulos m ON ma.idModulo = m.idModulo
+                  LEFT JOIN Modulo m ON ma.idModulo = m.idModulo
                   GROUP BY a.idActividad
                   ORDER BY a.idActividad DESC";
         $stmt = $this->conn->prepare($query);
@@ -76,7 +76,7 @@ class ModActividades {
                          IFNULL(GROUP_CONCAT(m.idModulo SEPARATOR ','), '') as idModulos
                   FROM " . $this->table_name . " a
                   LEFT JOIN Modulo_Actividad ma ON a.idActividad = ma.idActividad
-                  LEFT JOIN Modulos m ON ma.idModulo = m.idModulo
+                  LEFT JOIN Modulo m ON ma.idModulo = m.idModulo
                   WHERE a.idActividad = :id
                   GROUP BY a.idActividad";
         $stmt = $this->conn->prepare($query);
@@ -128,7 +128,7 @@ class ModActividades {
                          IFNULL(GROUP_CONCAT(m.idModulo SEPARATOR ','), '') as idModulos
                   FROM " . $this->table_name . " a
                   LEFT JOIN Modulo_Actividad ma ON a.idActividad = ma.idActividad
-                  LEFT JOIN Modulos m ON ma.idModulo = m.idModulo
+                  LEFT JOIN Modulo m ON ma.idModulo = m.idModulo
                   GROUP BY a.idActividad
                   $whereClause
                   ORDER BY $orderField $orderDir
@@ -153,7 +153,7 @@ class ModActividades {
             $queryFiltered = "SELECT COUNT(DISTINCT a.idActividad) as total
                               FROM " . $this->table_name . " a
                               LEFT JOIN Modulo_Actividad ma ON a.idActividad = ma.idActividad
-                              LEFT JOIN Modulos m ON ma.idModulo = m.idModulo
+                              LEFT JOIN Modulo m ON ma.idModulo = m.idModulo
                               WHERE a.titulo LIKE :search OR a.descripcion LIKE :search OR m.nombre LIKE :search";
             $stmtFiltered = $this->conn->prepare($queryFiltered);
             $stmtFiltered->bindValue(':search', '%' . $searchVal . '%', PDO::PARAM_STR);

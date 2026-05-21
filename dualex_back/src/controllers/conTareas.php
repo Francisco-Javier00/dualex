@@ -15,7 +15,7 @@ class ConTareas extends BaseController {
             $userRole = strtoupper($this->user['roles']['dualex'] ?? '');
             if ($userRole === 'ALUMNO') {
                 $email = $this->user['email'] ?? '';
-                $stmt = $this->db->prepare("SELECT idUsuario FROM Usuarios WHERE correo = :email");
+                $stmt = $this->db->prepare("SELECT idUsuario FROM Usuario WHERE correo = :email");
                 $stmt->execute([':email' => $email]);
                 $idAlumno = $stmt->fetchColumn();
                 $data = $this->modelo->listarPorAlumno($idAlumno);
@@ -70,7 +70,7 @@ class ConTareas extends BaseController {
         $userRole = strtoupper($this->user['roles']['dualex'] ?? '');
         if ($userRole === 'ALUMNO') {
             $email = $this->user['email'] ?? '';
-            $stmt = $this->db->prepare("SELECT idUsuario FROM Usuarios WHERE correo = :email");
+            $stmt = $this->db->prepare("SELECT idUsuario FROM Usuario WHERE correo = :email");
             $stmt->execute([':email' => $email]);
             $idAlumno = $stmt->fetchColumn();
             $datos['idAlumno'] = $idAlumno ? $idAlumno : null;
@@ -103,7 +103,7 @@ class ConTareas extends BaseController {
         $userRole = strtoupper($this->user['roles']['dualex'] ?? '');
         if ($userRole === 'ALUMNO') {
             $email = $this->user['email'] ?? '';
-            $stmt = $this->db->prepare("SELECT idUsuario FROM Usuarios WHERE correo = :email");
+            $stmt = $this->db->prepare("SELECT idUsuario FROM Usuario WHERE correo = :email");
             $stmt->execute([':email' => $email]);
             $idAlumno = $stmt->fetchColumn();
             $datos['idAlumno'] = $idAlumno ? $idAlumno : null;

@@ -2,7 +2,7 @@
 
 /**
  * Modelo para la gestión de Módulos (Asignaturas).
- * Gestiona relaciones complejas entre módulos, cursos y profesores.
+ * Gestiona relaciones complejas entre módulos, Curso y profesores.
  * 
  * @package Dualex\Models
  */
@@ -27,10 +27,10 @@ class ModModulos {
                     m.sigla as siglas, 
                     m.color, 
                     IFNULL(c.siglas, 'S/C') as ciclo
-                FROM Modulos m
+                FROM Modulo m
                 LEFT JOIN Modulo_Curso mc ON m.idModulo = mc.idModulo
-                LEFT JOIN Cursos cur ON mc.idCurso = cur.idCurso
-                LEFT JOIN Ciclos c ON cur.idCiclo = c.idCiclo
+                LEFT JOIN Curso cur ON mc.idCurso = cur.idCurso
+                LEFT JOIN Ciclo c ON cur.idCiclo = c.idCiclo
                 ORDER BY m.nombre";
         
         $stmt = $this->db->prepare($sql);
@@ -62,10 +62,10 @@ class ModModulos {
                     m.nombre,
                     m.sigla as siglas,
                     c.siglas as ciclo
-                FROM Modulos m
+                FROM Modulo m
                 JOIN Modulo_Curso mc ON m.idModulo = mc.idModulo
-                JOIN Cursos cur ON mc.idCurso = cur.idCurso
-                JOIN Ciclos c ON cur.idCiclo = c.idCiclo
+                JOIN Curso cur ON mc.idCurso = cur.idCurso
+                JOIN Ciclo c ON cur.idCiclo = c.idCiclo
                 WHERE c.siglas = :siglasCiclo
                 ORDER BY m.nombre";
 
@@ -85,11 +85,11 @@ class ModModulos {
     public function obtener($id) {
         $sql = "SELECT m.idModulo as id, m.nombre, m.sigla, m.color, 
                        (SELECT cur.idCiclo FROM Modulo_Curso mc 
-                        JOIN Cursos cur ON mc.idCurso = cur.idCurso 
+                        JOIN Curso cur ON mc.idCurso = cur.idCurso 
                         WHERE mc.idModulo = m.idModulo LIMIT 1) as idCiclo,
                        (SELECT mc.idCurso FROM Modulo_Curso mc 
                         WHERE mc.idModulo = m.idModulo LIMIT 1) as idCurso
-                FROM Modulos m 
+                FROM Modulo m 
                 WHERE m.idModulo = :id";
         $stmt = $this->db->prepare($sql);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
@@ -106,10 +106,10 @@ class ModModulos {
     public function obtenerModulosProfesor($emailProfesor) {
         $sql = "SELECT m.idModulo, m.nombre, m.sigla, m.color,
                        (SELECT COUNT(*) FROM Modulo_Alumno_Cursa mac WHERE mac.idModulo = m.idModulo) as numAlumnos
-                FROM Modulos m
+                FROM Modulo m
                 JOIN Modulo_Profesor mp ON m.idModulo = mp.idModulo
                 JOIN Profesor p ON mp.idProfesor = p.idProfesor
-                JOIN Usuarios u ON p.idProfesor = u.idUsuario
+                JOIN Usuario u ON p.idProfesor = u.idUsuario
                 WHERE u.correo = :emailProfesor
                 ORDER BY m.nombre";
         $stmt = $this->db->prepare($sql);
@@ -119,7 +119,7 @@ class ModModulos {
     }
 
     /**
-     * Registra un nuevo módulo y lo vincula con los cursos de un ciclo determinado mediante transacción.
+     * Registra un nuevo módulo y lo vincula con los Curso de un ciclo determinado mediante transacción.
      * 
      * @param array $datos Datos del módulo (nombre, sigla, color, idCiclo).
      * @return array Datos del módulo tras ser creado.
@@ -129,7 +129,7 @@ class ModModulos {
         try {
             $this->db->beginTransaction();
 
-            $sql = "INSERT INTO Modulos (nombre, sigla, color) VALUES (:nombre, :sigla, :color)";
+            $sql = "INSERT INTO Modulo (nombre, sigla, color) VALUES (:nombre, :sigla, :color)";
             $stmt = $this->db->prepare($sql);
             $stmt->execute([
                 ':nombre' => $datos['nombre'],
@@ -138,13 +138,13 @@ class ModModulos {
             ]);
             $idModulo = $this->db->lastInsertId();
 
-            // Vincular con el curso seleccionado o fallback a todos los cursos del ciclo
+            // Vincular con el curso seleccionado o fallback a todos los Curso del ciclo
             if (!empty($datos['idCurso'])) {
                 $sqlRel = "INSERT INTO Modulo_Curso (idModulo, idCurso) VALUES (:idModulo, :idCurso)";
                 $stmtRel = $this->db->prepare($sqlRel);
                 $stmtRel->execute([':idModulo' => $idModulo, ':idCurso' => $datos['idCurso']]);
             } else if (isset($datos['idCiclo'])) {
-                $sqlCursos = "SELECT idCurso FROM Cursos WHERE idCiclo = :idCiclo";
+                $sqlCursos = "SELECT idCurso FROM Curso WHERE idCiclo = :idCiclo";
                 $stmtCursos = $this->db->prepare($sqlCursos);
                 $stmtCursos->execute([':idCiclo' => $datos['idCiclo']]);
                 $cursos = $stmtCursos->fetchAll(PDO::FETCH_ASSOC);
@@ -166,7 +166,7 @@ class ModModulos {
 
     /**
      * Actualiza la información de un módulo existente.
-     * Borra y recrea las relaciones con cursos si se especifica un cambio de ciclo.
+     * Borra y recrea las relaciones con Curso si se especifica un cambio de ciclo.
      * 
      * @param int $id Identificador del módulo.
      * @param array $datos Nuevos datos del módulo.
@@ -177,7 +177,7 @@ class ModModulos {
         try {
             $this->db->beginTransaction();
 
-            $sql = "UPDATE Modulos SET nombre = :nombre, sigla = :sigla, color = :color WHERE idModulo = :id";
+            $sql = "UPDATE Modulo SET nombre = :nombre, sigla = :sigla, color = :color WHERE idModulo = :id";
             $stmt = $this->db->prepare($sql);
             $stmt->execute([
                 ':id'     => $id,
@@ -186,7 +186,7 @@ class ModModulos {
                 ':color'  => $datos['color']
             ]);
 
-            // Actualizar vínculos con cursos
+            // Actualizar vínculos con Curso
             if (!empty($datos['idCurso'])) {
                 // Borrar anteriores
                 $this->db->prepare("DELETE FROM Modulo_Curso WHERE idModulo = :id")->execute([':id' => $id]);
@@ -200,7 +200,7 @@ class ModModulos {
                 $this->db->prepare("DELETE FROM Modulo_Curso WHERE idModulo = :id")->execute([':id' => $id]);
 
                 // Insertar nuevos (fallback)
-                $sqlCursos = "SELECT idCurso FROM Cursos WHERE idCiclo = :idCiclo";
+                $sqlCursos = "SELECT idCurso FROM Curso WHERE idCiclo = :idCiclo";
                 $stmtCursos = $this->db->prepare($sqlCursos);
                 $stmtCursos->execute([':idCiclo' => $datos['idCiclo']]);
                 $cursos = $stmtCursos->fetchAll(PDO::FETCH_ASSOC);
@@ -227,7 +227,7 @@ class ModModulos {
      * @return bool Estado de la eliminación.
      */
     public function eliminar($id) {
-        $sql = "DELETE FROM Modulos WHERE idModulo = :id";
+        $sql = "DELETE FROM Modulo WHERE idModulo = :id";
         $stmt = $this->db->prepare($sql);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         return $stmt->execute();
@@ -251,7 +251,7 @@ class ModModulos {
 
         // Resolvemos el idCoordinador real de la base de datos a partir del correo
         if (!empty($email)) {
-            $stmtUser = $this->db->prepare("SELECT idUsuario FROM Usuarios WHERE correo = :correo LIMIT 1");
+            $stmtUser = $this->db->prepare("SELECT idUsuario FROM Usuario WHERE correo = :correo LIMIT 1");
             $stmtUser->execute([':correo' => $email]);
             $realId = $stmtUser->fetchColumn();
             if ($realId) {
@@ -285,14 +285,14 @@ class ModModulos {
         $where = !empty($conditions) ? "WHERE " . implode(" AND ", $conditions) : "";
 
         // Conteo total
-        $total = $this->db->query("SELECT COUNT(*) FROM Modulos")->fetchColumn();
+        $total = $this->db->query("SELECT COUNT(*) FROM Modulo")->fetchColumn();
 
         // Conteo filtrado
         $sqlCount = "SELECT COUNT(DISTINCT m.idModulo) 
-                     FROM Modulos m
+                     FROM Modulo m
                      LEFT JOIN Modulo_Curso mc ON m.idModulo = mc.idModulo
-                     LEFT JOIN Cursos cur ON mc.idCurso = cur.idCurso
-                     LEFT JOIN Ciclos c ON cur.idCiclo = c.idCiclo
+                     LEFT JOIN Curso cur ON mc.idCurso = cur.idCurso
+                     LEFT JOIN Ciclo c ON cur.idCiclo = c.idCiclo
                      $where";
         $stmtF = $this->db->prepare($sqlCount);
         foreach ($binds as $key => $val) {
@@ -323,10 +323,10 @@ class ModModulos {
                        MIN(cur.idCurso) as idCurso,
                        GROUP_CONCAT(DISTINCT CONCAT(siglas, ' - ', c.nombre) SEPARATOR ', ') as cicloCompleto,
                        GROUP_CONCAT(DISTINCT cur.nombre SEPARATOR ', ') as cursoCompleto
-                 FROM Modulos m
+                 FROM Modulo m
                  LEFT JOIN Modulo_Curso mc ON m.idModulo = mc.idModulo
-                 LEFT JOIN Cursos cur ON mc.idCurso = cur.idCurso
-                 LEFT JOIN Ciclos c ON cur.idCiclo = c.idCiclo
+                 LEFT JOIN Curso cur ON mc.idCurso = cur.idCurso
+                 LEFT JOIN Ciclo c ON cur.idCiclo = c.idCiclo
                  $where 
                  GROUP BY m.idModulo, m.nombre, sigla, color
                  $orderBy

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Modelo para la gestión de las Tareas asignadas y entregadas por los alumnos.
+ * Modelo para la gestión de las Tarea asignadas y entregadas por los Alumno.
  * 
  * @package Dualex\Models
  */
@@ -51,7 +51,7 @@ class ModTareas {
         $sql = "SELECT DISTINCT m.sigla, m.color 
                 FROM Tarea_Actividad ta
                 JOIN Modulo_Actividad ma ON ta.idActividad = ma.idActividad
-                JOIN Modulos m ON ma.idModulo = m.idModulo
+                JOIN Modulo m ON ma.idModulo = m.idModulo
                 WHERE ta.idTarea = :idTarea";
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':idTarea' => $idTarea]);
@@ -82,15 +82,15 @@ class ModTareas {
     }
 
     /**
-     * Lista todas las tareas globales almacenadas en el sistema uniendo datos del alumno respectivo.
+     * Lista todas las Tarea globales almacenadas en el sistema uniendo datos del alumno respectivo.
      * 
-     * @return array Vector con las tareas y sus autores.
+     * @return array Vector con las Tarea y sus autores.
      */
     public function listar() {
         $sql = "SELECT t.idTarea as id, t.codigo_auto, t.titulo, t.fecha_inicio as fechaIni, t.fecha_fin as fechaFin, t.fecha_fin as fechaLimite, t.descripcion, t.calificacion, t.comentario as comentarioEmpresa, t.idAlumno, u.nombre as nombre_alumno, u.apellidos as apellidos_alumno 
-                FROM Tareas t 
-                JOIN Alumnos a ON t.idAlumno = a.idAlumnos
-                JOIN Usuarios u ON a.idAlumnos = u.idUsuario
+                FROM Tarea t 
+                JOIN Alumno a ON t.idAlumno = a.idAlumno
+                JOIN Usuario u ON a.idAlumno = u.idUsuario
                 ORDER BY t.idTarea DESC";
         $stmt = $this->db->prepare($sql);
         $stmt->execute();
@@ -110,14 +110,14 @@ class ModTareas {
     }
 
     /**
-     * Recupera exclusivamente las tareas ligadas a un alumno específico.
+     * Recupera exclusivamente las Tarea ligadas a un alumno específico.
      * 
      * @param int $idAlumno ID del estudiante.
-     * @return array Lista de tareas.
+     * @return array Lista de Tarea.
      */
     public function listarPorAlumno($idAlumno) {
         $sql = "SELECT t.idTarea as id, t.codigo_auto, t.titulo, t.fecha_inicio as fechaIni, t.fecha_fin as fechaFin, t.fecha_fin as fechaLimite, t.descripcion, t.calificacion, t.comentario as comentarioEmpresa, t.idAlumno
-                FROM Tareas t 
+                FROM Tarea t 
                 WHERE t.idAlumno = :idAlumno 
                 ORDER BY t.idTarea DESC";
         $stmt = $this->db->prepare($sql);
@@ -146,7 +146,7 @@ class ModTareas {
      */
     public function obtener($id) {
         $sql = "SELECT t.idTarea as id, t.codigo_auto, t.titulo, t.fecha_inicio as fechaIni, t.fecha_fin as fechaFin, t.fecha_fin as fechaLimite, t.descripcion, t.calificacion, t.comentario as comentarioEmpresa, t.idAlumno
-                FROM Tareas t 
+                FROM Tarea t 
                 WHERE t.idTarea = :id";
         $stmt = $this->db->prepare($sql);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
@@ -180,7 +180,7 @@ class ModTareas {
         // Adjuntar revisiones por módulo
         $sqlRev = "SELECT m.nombre as modulo, mtr.revisada, mtr.observaciones 
                    FROM Modulo_Tarea_Revision mtr
-                   JOIN Modulos m ON mtr.idModulo = m.idModulo
+                   JOIN Modulo m ON mtr.idModulo = m.idModulo
                    WHERE mtr.idTarea = :idTarea";
         $stmtRev = $this->db->prepare($sqlRev);
         $stmtRev->execute([':idTarea' => $id]);
@@ -225,10 +225,10 @@ class ModTareas {
     public function crear($datos) {
         // Obtener anio_escolar y siglas del ciclo del alumno
         $sqlInfo = "SELECT cu.anio_escolar, ci.siglas 
-                    FROM Alumnos a
-                    JOIN Cursos cu ON a.idCurso = cu.idCurso
-                    JOIN Ciclos ci ON cu.idCiclo = ci.idCiclo
-                    WHERE a.idAlumnos = :idAlumno";
+                    FROM Alumno a
+                    JOIN Curso cu ON a.idCurso = cu.idCurso
+                    JOIN Ciclo ci ON cu.idCiclo = ci.idCiclo
+                    WHERE a.idAlumno = :idAlumno";
         $stmtInfo = $this->db->prepare($sqlInfo);
         $stmtInfo->execute([':idAlumno' => (int)$datos['idAlumno']]);
         $info = $stmtInfo->fetch(PDO::FETCH_ASSOC);
@@ -236,7 +236,7 @@ class ModTareas {
         $anio = $info ? trim($info['anio_escolar']) : '24-25';
         $siglas = $info ? trim($info['siglas']) : 'DAW';
 
-        $sql = "INSERT INTO Tareas (idAlumno, codigo_auto, titulo, fecha_inicio, fecha_fin, descripcion, calificacion, comentario) 
+        $sql = "INSERT INTO Tarea (idAlumno, codigo_auto, titulo, fecha_inicio, fecha_fin, descripcion, calificacion, comentario) 
                 VALUES (:idAlumno, '', :titulo, :fecha_inicio, :fecha_fin, :descripcion, :calificacion, :comentario)";
         
         $stmt = $this->db->prepare($sql);
@@ -255,7 +255,7 @@ class ModTareas {
         // Formar código definitivo: anioEscolar_siglasCiclo_T[id]
         $codigo_auto = $anio . '_' . $siglas . '_T' . $idTarea;
         
-        $sqlUpdate = "UPDATE Tareas SET codigo_auto = :codigo_auto WHERE idTarea = :idTarea";
+        $sqlUpdate = "UPDATE Tarea SET codigo_auto = :codigo_auto WHERE idTarea = :idTarea";
         $stmtUpdate = $this->db->prepare($sqlUpdate);
         $stmtUpdate->execute([
             ':codigo_auto' => $codigo_auto,
@@ -276,7 +276,7 @@ class ModTareas {
         if (!empty($datos['actividadesSeleccionadas'])) {
             $sqlMods = "SELECT DISTINCT ma.idModulo, m.nombre 
                         FROM Modulo_Actividad ma
-                        JOIN Modulos m ON ma.idModulo = m.idModulo
+                        JOIN Modulo m ON ma.idModulo = m.idModulo
                         WHERE ma.idActividad IN (" . implode(',', array_map('intval', $datos['actividadesSeleccionadas'])) . ")";
             $stmtMods = $this->db->prepare($sqlMods);
             $stmtMods->execute();
@@ -317,7 +317,7 @@ class ModTareas {
      * @return array Registro de la tarea tras guardarse.
      */
     public function actualizar($id, $datos) {
-        $sql = "UPDATE Tareas SET 
+        $sql = "UPDATE Tarea SET 
                 titulo = :titulo, 
                 fecha_inicio = :fecha_inicio, 
                 fecha_fin = :fecha_fin, 
@@ -354,7 +354,7 @@ class ModTareas {
         if (!empty($datos['actividadesSeleccionadas'])) {
             $sqlMods = "SELECT DISTINCT ma.idModulo, m.nombre 
                         FROM Modulo_Actividad ma
-                        JOIN Modulos m ON ma.idModulo = m.idModulo
+                        JOIN Modulo m ON ma.idModulo = m.idModulo
                         WHERE ma.idActividad IN (" . implode(',', array_map('intval', $datos['actividadesSeleccionadas'])) . ")";
             $stmtMods = $this->db->prepare($sqlMods);
             $stmtMods->execute();
@@ -398,7 +398,7 @@ class ModTareas {
      * @return bool True tras confirmarse el DELETE en la BD.
      */
     public function eliminar($id) {
-        $sql = "DELETE FROM Tareas WHERE idTarea = :id";
+        $sql = "DELETE FROM Tarea WHERE idTarea = :id";
         $stmt = $this->db->prepare($sql);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         return $stmt->execute();

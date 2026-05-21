@@ -30,7 +30,7 @@ class ModEmpresas {
         $sql = "SELECT e.idEmpresa as id, e.siglas, e.nombre, e.url_Convenio as convenioUrl, e.inicioConvenio,
                        e.idCoordinador, CONCAT(u.nombre, ' ', u.apellidos) as firmante
                 FROM Empresa e
-                LEFT JOIN Usuarios u ON e.idCoordinador = u.idUsuario
+                LEFT JOIN Usuario u ON e.idCoordinador = u.idUsuario
                 ORDER BY e.nombre";
         $stmt = $this->db->prepare($sql);
         $stmt->execute();
@@ -48,7 +48,7 @@ class ModEmpresas {
         $sql = "SELECT e.idEmpresa as id, e.siglas, e.nombre, e.url_Convenio as convenioUrl, e.inicioConvenio,
                        e.idCoordinador, CONCAT(u.nombre, ' ', u.apellidos) as firmante
                 FROM Empresa e
-                LEFT JOIN Usuarios u ON e.idCoordinador = u.idUsuario
+                LEFT JOIN Usuario u ON e.idCoordinador = u.idUsuario
                 WHERE e.idEmpresa = :id";
         $stmt = $this->db->prepare($sql);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
@@ -104,7 +104,7 @@ class ModEmpresas {
                 }
             }
 
-            // 4. Inserción iterativa de los ciclos seleccionados en ciclo_empresa
+            // 4. Inserción iterativa de los Ciclo seleccionados en ciclo_empresa
             if (isset($datos['ciclos']) && is_array($datos['ciclos'])) {
                 foreach ($datos['ciclos'] as $siglaCiclo) {
                     $this->insertarCicloEmpresa($idEmpresa, trim($siglaCiclo));
@@ -172,7 +172,7 @@ class ModEmpresas {
                 }
             }
 
-            // 3. Actualización de ciclos (esto siempre se intenta si vienen en el array)
+            // 3. Actualización de Ciclo (esto siempre se intenta si vienen en el array)
             if (isset($datos['ciclos']) && is_array($datos['ciclos'])) {
                 $stmtDelCiclos = $this->db->prepare("DELETE FROM Ciclo_Empresa WHERE idEmpresa = :id");
                 $stmtDelCiclos->execute([':id' => $id]);
@@ -271,7 +271,7 @@ class ModEmpresas {
         $sql = "SELECT e.idEmpresa as id, e.siglas, e.nombre, e.url_Convenio as convenioUrl, e.inicioConvenio,
                        e.idCoordinador, CONCAT(u.nombre, ' ', u.apellidos) as firmante
                 FROM Empresa e 
-                LEFT JOIN Usuarios u ON e.idCoordinador = u.idUsuario
+                LEFT JOIN Usuario u ON e.idCoordinador = u.idUsuario
                 $where 
                 $orderBy 
                 $limit";
@@ -323,8 +323,8 @@ class ModEmpresas {
             $finDt->modify("+$aniosConvenio years");
             $empresa['finConvenio'] = $finDt->format('d/m/Y');
 
-            // Obtenemos los ciclos vinculados a esta empresa
-            $sqlCiclos = "SELECT c.siglas, ce.tutor FROM Ciclos c 
+            // Obtenemos los Ciclo vinculados a esta empresa
+            $sqlCiclos = "SELECT c.siglas, ce.tutor FROM Ciclo c 
                           INNER JOIN Ciclo_Empresa ce ON c.idCiclo = ce.idCiclo 
                           WHERE ce.idEmpresa = :id";
             $stmtCiclos = $this->db->prepare($sqlCiclos);
@@ -392,7 +392,7 @@ class ModEmpresas {
      */
     private function insertarCicloEmpresa($idEmpresa, $siglaCiclo, $tutor = null) {
         // Primero buscamos el ID del ciclo basándonos en la sigla
-        $stmtBusca = $this->db->prepare("SELECT idCiclo FROM Ciclos WHERE siglas = :siglas LIMIT 1");
+        $stmtBusca = $this->db->prepare("SELECT idCiclo FROM Ciclo WHERE siglas = :siglas LIMIT 1");
         $stmtBusca->execute([':siglas' => $siglaCiclo]);
         $ciclo = $stmtBusca->fetch(PDO::FETCH_ASSOC);
 
