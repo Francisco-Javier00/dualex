@@ -95,11 +95,11 @@ export class AlumnosService {
    * @param idCurso Identificador del curso asignado.
    * @returns Un `Observable` con el resultado de la importación (imported, skipped, errors).
    */
-  importarAlumnosCSV(file: File, idCurso: number): Observable<any> {
+  importarAlumnosExcel(file: File, idCurso: number): Observable<any> {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('idCurso', idCurso.toString());
-    return this.http.post<any>(`${this.API_URL}&m=importarCSV`, formData);
+    return this.http.post<any>(`${this.API_URL}&m=importarExcel`, formData);
   }
 }
 

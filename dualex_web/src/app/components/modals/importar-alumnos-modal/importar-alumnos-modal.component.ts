@@ -79,7 +79,7 @@ export class ImportarAlumnosModalComponent implements OnChanges, OnDestroy {
 
   onFileChange(event: any): void {
     const file = event.target.files[0];
-    if (file && file.name.toLowerCase().endsWith('.csv')) {
+    if (file && (file.name.toLowerCase().endsWith('.xlsx') || file.name.toLowerCase().endsWith('.xls'))) {
       this.archivoSeleccionado = file;
     }
   }
@@ -87,7 +87,7 @@ export class ImportarAlumnosModalComponent implements OnChanges, OnDestroy {
   onFileDrop(event: DragEvent): void {
     event.preventDefault();
     const file = event.dataTransfer?.files[0];
-    if (file && file.name.toLowerCase().endsWith('.csv')) {
+    if (file && (file.name.toLowerCase().endsWith('.xlsx') || file.name.toLowerCase().endsWith('.xls'))) {
       this.archivoSeleccionado = file;
     }
   }

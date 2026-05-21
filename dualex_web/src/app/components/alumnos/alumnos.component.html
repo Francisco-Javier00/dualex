@@ -86,7 +86,7 @@
 </app-alumno-modal>
 
 <!-- Modal de Importar Alumnos -->
-<app-importar-alumnos-modal [visible]="modalImportarVisible" [todosLosCursos]="todosLosCursos" [importando]="importandoCSV"
-  (cerrar)="onCerrarImportar()" (importar)="onConfirmarImportar($event)">
+<app-importar-alumnos-modal [visible]="modalImportarVisible" [todosLosCursos]="todosLosCursos"
+  [importando]="importandoExcel" (cerrar)="onCerrarImportar()" (importar)="onConfirmarImportar($event)">
 </app-importar-alumnos-modal>
 }

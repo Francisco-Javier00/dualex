@@ -38,7 +38,7 @@ export class AlumnosComponent implements OnInit, OnDestroy {
   modalBorradoVisible = false;
   modalAlumnoVisible = false;
   modalImportarVisible = false;
-  importandoCSV = false;
+  importandoExcel = false;
   alumnoSeleccionado: AlumnoDTO | null = null;
   moduloId: string | null = null;
   nombreModulo: string | null = null;
@@ -246,23 +246,23 @@ export class AlumnosComponent implements OnInit, OnDestroy {
   }
 
   onConfirmarImportar(event: { file: File, idCurso: number }): void {
-    this.importandoCSV = true;
-    this.alumnosService.importarAlumnosCSV(event.file, event.idCurso).subscribe({
+    this.importandoExcel = true;
+    this.alumnosService.importarAlumnosExcel(event.file, event.idCurso).subscribe({
       next: (res) => {
-        this.importandoCSV = false;
+        this.importandoExcel = false;
         this.modalImportarVisible = false;
-        
+
         let msg = `Se han importado ${res.imported} alumnos correctamente.`;
         if (res.skipped > 0) {
           msg += ` Se han omitido ${res.skipped} alumnos porque ya existían.`;
         }
-        
+
         if (res.errors && res.errors.length > 0) {
           // Si hay errores, los mostramos y no autolimpiamos para que el usuario pueda revisarlos
           const errorDetails = res.errors.slice(0, 5).join('\n');
           const errorCount = res.errors.length;
           this.alertService.advertencia(
-            'Importación con Observaciones', 
+            'Importación con Observaciones',
             `${msg} Sin embargo, se detectaron ${errorCount} errores en el proceso. Primeros errores:\n${errorDetails}`,
             false,
             8000
@@ -271,13 +271,13 @@ export class AlumnosComponent implements OnInit, OnDestroy {
         } else {
           this.alertService.exito('Importación Exitosa', msg);
         }
-        
+
         this.datatable.refrescar();
       },
       error: (err) => {
-        this.importandoCSV = false;
+        this.importandoExcel = false;
         this.alertService.error(
-          'Error al importar', 
+          'Error al importar',
           err.error?.message || err.error?.error || 'No se pudo procesar el archivo de alumnos.'
         );
       }

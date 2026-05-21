@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../../../dualex_web/vendor/autoload.php';
-use League\Csv\Reader;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+
 
 
 /**
@@ -409,144 +410,101 @@ class ModAlumnos {
     }
 
     /**
-     * Importa alumnos de forma masiva desde un archivo CSV.
+     * Importa alumnos de forma masiva desde un archivo .xlsx / .xls.
      * Si un alumno ya existe (por correo, DNI, NUSS o NIA), lo ignora.
      * Cada inserción se realiza bajo una transacción (implementada en crear()).
      *
-     * @param string $filePath Ruta al archivo temporal del CSV.
+     * @param string $filePath Ruta al archivo temporal del excel.
      * @param int    $idCurso  ID del curso al que se asignarán los alumnos.
      * @throws Exception En caso de errores graves de formato o lectura.
      * @return array Resumen del proceso (imported, skipped, errors).
      */
-    public function importarCSV($filePath, $idCurso) {
-
-    if (!file_exists($filePath)) {
-        throw new Exception("Archivo no encontrado.");
-    }
-
-    // Leer CSV
-    $csv = Reader::createFromPath($filePath, 'r'); //CREAR LECTOR CSV
-    $csv->setHeaderOffset(0); //CABECERA
-    $csv->setDelimiter(';'); //DELIMITADOR (en mi caso es ';')
-
-    // Convertir encoding
-    $csv->addStreamFilter('convert.iconv.ISO-8859-1/UTF-8'); //ENCODING
-
-    $records = iterator_to_array($csv->getRecords());
-
-    $imported = 0;
-    $skipped = 0;
-    $errors = [];
-    $rowNumber = 1;
-
-    foreach ($records as $row) {
-
-        $rowNumber++;
-
-        // Cabeceras en minúscula
-        $row = array_change_key_case($row, CASE_LOWER);
-
-        $nombre = trim($row['nombre'] ?? '');
-        $apellidos = trim($row['apellidos'] ?? '');
-        $email = trim($row['email'] ?? '');
-        $dni = trim($row['dni'] ?? '');
-        $nuss = trim($row['nuss'] ?? '');
-        $nia = trim($row['nia'] ?? '');
-        $telefono = trim($row['telefono'] ?? '');
-        $repetidor = trim($row['repetidor'] ?? '');
-
-        // Ignorar filas completamente vacías
-        if (
-            $nombre === '' &&
-            $apellidos === '' &&
-            $email === '' &&
-            $dni === '' &&
-            $nuss === '' &&
-            $nia === '' &&
-            $telefono === ''
-        ) {
-            continue;
+    public function importarExcel($filePath, $idCurso) {
+        if (!file_exists($filePath)) {
+            throw new Exception("Archivo no encontrado.");
         }
 
-        // Validar obligatorios
-        if (
-            $nombre === '' ||
-            $apellidos === '' ||
-            $email === '' ||
-            $dni === '' ||
-            $nuss === '' ||
-            $nia === '' ||
-            $telefono === ''
-        ) {
-            $errors[] = "Fila $rowNumber: Faltan campos obligatorios.";
-            continue;
+        // Cargar Excel
+        $spreadsheet = IOFactory::load($filePath);
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Convertimos todo a array
+        $rows = $sheet->toArray(null, true, true, true);
+
+        $imported = 0;
+        $errors = [];
+        $rowNumber = 1;
+
+        // Sacamos cabecera (primera fila)
+        $header = array_map(function($h) {
+            return strtolower(trim($h));
+        }, $rows[1]);
+
+        unset($rows[1]); // quitamos cabecera
+
+        foreach ($rows as $row) {
+            $rowNumber++;
+
+            // Normalizar claves con cabecera
+            $data = [];
+            $i = 0;
+
+            foreach ($header as $key) {
+                $i++;
+                $data[$key] = trim($row[array_keys($row)[$i - 1]] ?? '');
+            }
+
+            // Mapear campos (igual que antes)
+            $nombre = $data['nombre'] ?? '';
+            $apellidos = $data['apellidos'] ?? '';
+            $email = $data['email'] ?? '';
+            $dni = $data['dni'] ?? '';
+            $nuss = $data['nuss'] ?? '';
+            $nia = $data['nia'] ?? '';
+            $telefono = $data['telefono'] ?? '';
+            $repetidor = $data['repetidor'] ?? '';
+
+            // Fila vacía → saltar
+            if ($nombre === '' && $apellidos === '' && $email === '') {
+                continue;
+            }
+
+            // Validación básica (igual que CSV)
+            if ($nombre === '' || $apellidos === '' || $email === '' ||
+                $dni === '' || $nuss === '' || $nia === '' || $telefono === '') {
+
+                $errors[] = "Fila $rowNumber: Faltan campos obligatorios.";
+                continue;
+            }
+
+            // Repetidor
+            $repetidorVal = in_array(strtolower($repetidor), ['si','sí','1','true','yes']) ? 1 : 0;
+
+            $studentData = [
+                'nombre' => $nombre,
+                'apellidos' => $apellidos,
+                'email' => $email,
+                'dni' => $dni,
+                'nuss' => $nuss,
+                'nia' => $nia,
+                'telefono' => $telefono,
+                'repetidor' => $repetidorVal,
+                'idCurso' => $idCurso,
+                'idEmpresa' => null
+            ];
+
+            try {
+                $this->crear($studentData);
+                $imported++;
+            } catch (Exception $e) {
+                $errors[] = "Fila $rowNumber: " . $e->getMessage();
+            }
         }
 
-        // Normalizar repetidor 
-        $repetidorVal = in_array(
-            strtolower($repetidor),
-            ['si', 'sí', '1', 'true', 'yes']
-        ) ? 1 : 0;
-
-        $studentData = [
-            'nombre' => $nombre,
-            'apellidos' => $apellidos,
-            'email' => $email,
-            'dni' => $dni,
-            'nuss' => $nuss,
-            'nia' => $nia,
-            'telefono' => $telefono,
-            'repetidor' => $repetidorVal,
-            'idCurso' => $idCurso,
-            'idEmpresa' => null
+        return [
+            'imported' => $imported,
+            'errors' => $errors
         ];
-
-        // Comprobar si ya existe
-        $sqlExiste = "SELECT COUNT(*) 
-                      FROM Alumnos 
-                      WHERE NIA = :nia 
-                      OR DNI = :dni 
-                      OR NUSS = :nuss";
-
-        $stmtExiste = $this->db->prepare($sqlExiste);
-
-        $stmtExiste->execute([
-            ':nia' => $nia,
-            ':dni' => $dni,
-            ':nuss' => $nuss
-        ]);
-
-        if ($stmtExiste->fetchColumn() > 0) {
-            $skipped++;
-            continue;
-        }
-
-        // Validar datos
-        $erroresValidacion = $this->validar($studentData);
-
-        if (!empty($erroresValidacion)) {
-            $errors[] = "Fila $rowNumber: " . implode(' ', $erroresValidacion);
-            continue;
-        }
-
-        // Insertar
-        try {
-
-            $this->crear($studentData);
-
-            $imported++;
-
-        } catch (Exception $e) {
-
-            $errors[] = "Fila $rowNumber: " . $e->getMessage();
-        }
     }
-
-    return [
-        'imported' => $imported,
-        'skipped' => $skipped,
-        'errors' => $errors
-    ];
-}
 }
 

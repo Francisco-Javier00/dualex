@@ -111,7 +111,7 @@ class ConAlumnos extends BaseController {
         $this->sendResponse($data);
     }
 
-    public function importarCSV() {
+    public function importarExcel() {
         $this->checkRole(['COORDINADOR']);
         
         // El idCurso puede venir en $_POST debido a FormData
@@ -128,12 +128,13 @@ class ConAlumnos extends BaseController {
         $fileName = $_FILES['file']['name'];
         
         $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-        if ($ext !== 'csv') {
-            $this->sendError("El archivo debe estar en formato .csv.", 400);
+
+        if (!in_array($ext, ['xlsx', 'xls'])) {
+            $this->sendError("El archivo debe estar en formato Excel (.xlsx o .xls).", 400);
         }
 
         try {
-            $resultado = $this->modelo->importarCSV($fileTmpPath, $idCurso);
+            $resultado = $this->modelo->importarExcel($fileTmpPath, $idCurso);
 
             try {
                 $this->sendResponse($resultado);
