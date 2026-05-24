@@ -246,7 +246,7 @@ class ModModulos {
         $length = (int)($params['length'] ?? 10);
         $search = $params['search']['value'] ?? '';
         
-        $idCoordinador = null; // Nunca usamos el ID del token por seguridad
+        $idCoordinador = null;
         $email = $params['email'] ?? null;
 
         // Resolvemos el idCoordinador real de la base de datos a partir del correo

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { Config } from 'datatables.net';
+import 'datatables.net-responsive-bs5';
 import { DatatableComponent } from '../shared/datatable/datatable.component';
 import { ConfirmarBorradoModalComponent } from '../shared/modals/confirmar-borrado-modal/confirmar-borrado-modal.component';
 import { EmpresaModalComponent } from '../modals/empresa-modal/empresa-modal.component';
@@ -72,6 +73,8 @@ export class EmpresasComponent implements OnInit {
     this.cargarCiclos();
 
     this.dtOptions = {
+      order: [],
+      responsive: true,
       serverSide: true,
       processing: true,
       ajax: (dataTablesParameters: any, callback: any) => {
@@ -90,9 +93,19 @@ export class EmpresasComponent implements OnInit {
         });
       },
       columns: [
-        { data: 'siglas' },
+        {
+          title: ' ',
+          className: 'dtr-control all',
+          orderable: false,
+          data: null,
+          defaultContent: '',
+          responsivePriority: 1
+        },
+        { data: 'siglas', responsivePriority: 2 },
         {
           data: 'nombre',
+          className: 'text-truncate',
+          responsivePriority: 3,
           render: (data: string) => `
             <button
               type="button"
@@ -105,10 +118,12 @@ export class EmpresasComponent implements OnInit {
         },
         {
           data: 'ciclos',
+          responsivePriority: 4,
           render: (data: string) => data ? data : '<span class="text-muted italic">No asignado</span>'
         },
         {
           data: 'convenioUrl',
+          responsivePriority: 7,
           render: (data: string) => {
             return `
               <a class="btn btn-sm btn-outline-primary shadow-sm" href="${data}" target="_blank">
@@ -119,15 +134,17 @@ export class EmpresasComponent implements OnInit {
         },
         {
           data: 'firmante',
+          responsivePriority: 8,
           render: (data: string) => data ? data : '<span class="text-muted italic">Sin asignar</span>'
         },
-        { data: 'inicioConvenio' },
-        { data: 'finConvenio' },
+        { data: 'inicioConvenio', responsivePriority: 9 },
+        { data: 'finConvenio', responsivePriority: 10 },
         ...(this.puedeEditar ? [{
           data: null,
           className: 'text-center',
           orderable: false,
           searchable: false,
+          responsivePriority: 5,
           render: () => `
             <div class="d-flex justify-content-center align-items-center gap-2 action-buttons w-100">
               <button class="btn btn-sm btn-outline-info shadow-sm action-link" data-action="link" title="Enlazar empresa con ciclos" data-tooltip="Enlazar empresa con ciclos">

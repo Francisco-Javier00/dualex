@@ -204,7 +204,7 @@ class ModAlumnos {
     public function obtenerDataTables($params) {
         $idModulo = $params['idModulo'] ?? ($_GET['idModulo'] ?? ($_GET['moduloId'] ?? null));
         $email = $params['email'] ?? null;
-        $idUsuario = null; // Nunca usamos el idUsuario del token por seguridad
+        $idUsuario = null;
 
         // Resolvemos el idUsuario real de la base de datos a partir del correo del token
         if (!empty($email)) {
@@ -298,12 +298,14 @@ class ModAlumnos {
             $orderDir = isset($params['order'][0]['dir']) && strtolower($params['order'][0]['dir']) === 'desc' ? 'DESC' : 'ASC';
             
             $columnsMap = [
-                0 => 'u.nombre',
-                1 => 'apellidos',
-                2 => 'correo',
-                3 => 'DNI',
-                4 => 'telefono',
-                5 => 'c.nombre'
+                1 => 'u.nombre',
+                2 => 'apellidos',
+                3 => 'correo',
+                4 => 'c.nombre',
+                5 => 'DNI',
+                6 => 'NUSS',
+                7 => 'NIA',
+                8 => 'telefono'
             ];
 
             if (isset($columnsMap[$orderColumnIndex])) {

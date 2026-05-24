@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { Config } from 'datatables.net';
+import 'datatables.net-responsive-bs5';
 import { DatatableComponent } from '../shared/datatable/datatable.component';
 import { ConfirmarBorradoModalComponent } from '../shared/modals/confirmar-borrado-modal/confirmar-borrado-modal.component';
 import { ProfesorModalComponent } from '../modals/profesor-modal/profesor-modal.component';
@@ -33,6 +34,8 @@ export class ProfesoresComponent implements OnInit {
 
   ngOnInit(): void {
     this.dtOptions = {
+      order: [],
+      responsive: true,
       serverSide: true,
       processing: true,
       lengthChange: true,
@@ -47,12 +50,21 @@ export class ProfesoresComponent implements OnInit {
         });
       },
       columns: [
-        { data: 'nombre' },
-        { data: 'apellidos' },
-        { data: 'correo' },
-        { data: 'rol' },
+        {
+          title: ' ',
+          className: 'dtr-control all',
+          orderable: false,
+          data: null,
+          defaultContent: '',
+          responsivePriority: 1
+        },
+        { data: 'nombre', responsivePriority: 2 },
+        { data: 'apellidos', responsivePriority: 3 },
+        { data: 'correo', responsivePriority: 4 },
+        { data: 'rol', responsivePriority: 5 },
         {
           data: 'modulos',
+          responsivePriority: 7,
           render: (data: any, type: any, row: any) => {
             if (data && data.trim() !== '') return data;
             return row?.rol === 'COORDINADOR'
@@ -62,6 +74,7 @@ export class ProfesoresComponent implements OnInit {
         },
         {
           data: 'ciclos',
+          responsivePriority: 8,
           render: (data: any, type: any, row: any) => {
             if (data && data.trim() !== '') return data;
             return row?.rol === 'COORDINADOR'
@@ -71,8 +84,10 @@ export class ProfesoresComponent implements OnInit {
         },
         {
           data: null,
+          className: 'text-center align-middle',
           orderable: false,
           searchable: false,
+          responsivePriority: 6,
           render: () => `
             <div class="d-flex justify-content-center gap-2 action-buttons">
               <button class="btn btn-sm btn-outline-primary shadow-sm action-edit" data-action="edit" title="Editar">
