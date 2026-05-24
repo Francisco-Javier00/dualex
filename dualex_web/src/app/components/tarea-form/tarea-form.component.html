@@ -1,21 +1,23 @@
 <div class="container-fluid py-4 mt-4 px-md-5 px-3" [formGroup]="tareaForm">
   <!-- Cabecera de Acción -->
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-      <h2 class="fw-bold text-dark mb-1 d-flex align-items-center gap-2 flex-wrap">
-        <i class="fa-solid fa-file-pen text-primary me-2"></i>
-        <span>{{ esEdicion ? 'Editar Tarea' : 'Nueva Tarea' }}</span>
-        <span *ngIf="esEdicion && codigoTarea" class="badge bg-white border text-secondary px-3 py-1.5 fs-6 rounded-3 font-monospace shadow-sm">
-          {{ codigoTarea }}
-        </span>
-      </h2>
-      <p class="text-muted">Gestiona la información, actividades y evaluaciones de la tarea seleccionada</p>
+  <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+    <div class="d-flex align-items-start gap-3">
+      <button type="button" class="btn back-btn mt-1" (click)="volver()" title="Volver">
+        <i class="fa-solid fa-arrow-left"></i>
+      </button>
+      <div>
+        <h2 class="fw-bold text-dark mb-1 d-flex align-items-center gap-2 flex-wrap">
+          <i class="fa-solid fa-file-pen text-primary me-2"></i>
+          <span>{{ esEdicion ? 'Editar Tarea' : 'Nueva Tarea' }}</span>
+          <span *ngIf="esEdicion && codigoTarea" class="badge bg-white border text-secondary px-3 py-1.5 fs-6 rounded-3 font-monospace shadow-sm">
+            {{ codigoTarea }}
+          </span>
+        </h2>
+        <p class="text-muted mb-0">Gestiona la información, actividades y evaluaciones de la tarea seleccionada</p>
+      </div>
     </div>
     <div class="d-flex gap-2">
-      <button type="button" class="btn bg-white border rounded-3 px-4" (click)="volver()">
-        <i class="fa-solid fa-arrow-left me-2"></i> Volver
-      </button>
-      <button type="button" class="btn btn-primary rounded-3 px-4 shadow-sm" (click)="guardar()" [disabled]="tareaForm.invalid">
+      <button type="button" class="btn btn-primary rounded-3 px-4 py-2 shadow-sm" (click)="guardar()" [disabled]="tareaForm.invalid">
         <i class="fa-solid fa-save me-2"></i> Guardar Tarea
       </button>
     </div>
@@ -97,51 +99,44 @@
       </div>
     </div>
 
-
     <hr class="my-4 opacity-25">
 
-    <!-- Sección de Evaluación Empresa -->
-    <div class="mb-4">
-      <h5 class="fw-bold mb-3"><i class="fa-solid fa-building text-secondary me-2"></i>Evaluación Empresa</h5>
-      <div class="row g-4">
-        <!-- Calificación (Izquierda) -->
-        <div class="col-lg-4">
-          <label class="form-label small fw-bold text-uppercase opacity-75">Calificación</label>
-          <div class="input-group shadow-sm rounded-3 overflow-hidden border">
-            <span class="input-group-text bg-white border-0"><i class="fa-solid fa-star text-muted"></i></span>
-            <select class="form-select border-0 px-3" formControlName="evaluacionEmpresa"
-              style="height: 45px;">
-              <option *ngFor="let opt of evaluacionEmpresaOptions" [value]="opt">{{ opt }}</option>
-            </select>
+    <div class="row g-4">
+      <!-- Columna Izquierda: Evaluación Empresa -->
+      <div class="col-lg-6">
+        <h5 class="fw-bold mb-3"><i class="fa-solid fa-building text-secondary me-2"></i>Evaluación Empresa</h5>
+        
+        <div class="bg-white p-3 rounded-4 border shadow-sm d-flex flex-column gap-3">
+          <div>
+            <label class="form-label small fw-bold text-uppercase opacity-75">Calificación</label>
+            <div class="input-group shadow-sm rounded-3 overflow-hidden border">
+              <span class="input-group-text bg-white border-0"><i class="fa-solid fa-star text-muted"></i></span>
+              <select class="form-select border-0 px-3" formControlName="evaluacionEmpresa" style="height: 45px;">
+                <option *ngFor="let opt of evaluacionEmpresaOptions" [value]="opt">{{ opt }}</option>
+              </select>
+            </div>
           </div>
-        </div>
-        <!-- Comentario con Rich Text (Derecha) -->
-        <div class="col-lg-8">
-          <label class="form-label fw-bold text-muted small text-uppercase">Comentario Empresa</label>
-          <div class="editor-container border rounded-3 overflow-hidden shadow-sm bg-white">
-            <ckeditor [editor]="Editor" [config]="config" formControlName="comentarioEmpresa"></ckeditor>
+          
+          <div>
+            <label class="form-label fw-bold text-muted small text-uppercase">Comentario Empresa</label>
+            <textarea formControlName="comentarioEmpresa" class="form-control border shadow-sm rounded-3 px-3 py-2" rows="3" placeholder="Escribe las observaciones de la empresa..."></textarea>
           </div>
         </div>
       </div>
-    </div>
 
-    <hr class="my-4 opacity-25">
-
-    <!-- Sección de Evaluación Profesor -->
-    <div class="row g-4">
-      <div class="col-12">
+      <!-- Columna Derecha: Evaluación Profesor -->
+      <div class="col-lg-6">
         <h5 class="fw-bold mb-3"><i class="fa-solid fa-chalkboard-user text-secondary me-2"></i>Evaluación Profesor</h5>
 
-        <div class="row">
-          <!-- Revisión por Módulos (Izquierda) -->
-          <div class="col-lg-4">
-            <label class="form-label fw-bold text-muted small text-uppercase mb-2">Modulos</label>
-            <div class="d-flex flex-column gap-2" formArrayName="revisionesModulos"
-              *ngIf="revisionesModulosArray.length > 0; else noModulos">
-              <div *ngFor="let mod of revisionesModulosArray.controls; let i=index" [formGroupName]="i"
-                class="d-flex justify-content-between align-items-center bg-light-subtle px-3 py-1.5 rounded-3 border shadow-sm"
-                style="min-height: 40px;">
-                <span class="small fw-bold" style="font-size: 0.85rem;">{{ mod.value.modulo }}</span>
+        <!-- Lista de Módulos a evaluar con sus comentarios específicos, uno debajo de otro -->
+        <div class="d-flex flex-column gap-3" formArrayName="revisionesModulos" *ngIf="revisionesModulosArray.controls.length > 0; else noModulos">
+          <div *ngFor="let mod of revisionesModulosArray.controls; let i=index" [formGroupName]="i" class="w-100">
+            <div class="bg-light-subtle p-3 rounded-3 border shadow-sm flex-column d-flex gap-2">
+              
+              <div class="d-flex justify-content-between align-items-center">
+                <span class="small fw-bold text-dark" style="font-size: 0.9rem;">
+                  <i class="fa-solid fa-book text-secondary me-1"></i> {{ mod.value.modulo }}
+                </span>
                 <div class="form-check form-switch mb-0 d-flex align-items-center gap-2">
                   <input class="form-check-input" type="checkbox" formControlName="revisado" [id]="'mod-check-' + i" style="width: 2em; height: 1em; margin-top: 0.15em;">
                   <label class="form-check-label extra-small text-muted mb-0" [for]="'mod-check-' + i" style="font-size: 0.75rem;">
@@ -149,24 +144,26 @@
                   </label>
                 </div>
               </div>
-            </div>
-            <ng-template #noModulos>
-              <div
-                class="bg-light-subtle p-3 rounded-3 border border-dashed text-center d-flex align-items-center justify-content-center"
-                style="min-height: 50px;">
-                <span class="text-muted small italic">No hay módulos vinculados</span>
-              </div>
-            </ng-template>
-          </div>
 
-          <!-- Comentario Profesor (Derecha) -->
-          <div class="col-lg-8">
-            <label class="form-label fw-bold text-muted small text-uppercase">Comentario profesor</label>
-            <div class="editor-container editor-profesor-mini border rounded-3 overflow-hidden shadow-sm bg-white">
-              <ckeditor [editor]="Editor" [config]="config" formControlName="comentarioProfesor"></ckeditor>
+              <!-- Cuadro de Comentario para este módulo (más pequeño) -->
+              <div class="mt-1">
+                <textarea 
+                  formControlName="comentario" 
+                  class="form-control form-control-sm border shadow-xs rounded-2" 
+                  rows="2" 
+                  placeholder="Escribe una observación para este módulo..."></textarea>
+              </div>
             </div>
           </div>
         </div>
+
+        <ng-template #noModulos>
+          <div
+            class="bg-light-subtle p-4 rounded-3 border border-dashed text-center d-flex align-items-center justify-content-center"
+            style="min-height: 80px;">
+            <span class="text-muted small italic">No hay módulos vinculados a esta tarea.</span>
+          </div>
+        </ng-template>
       </div>
     </div>
   </div>

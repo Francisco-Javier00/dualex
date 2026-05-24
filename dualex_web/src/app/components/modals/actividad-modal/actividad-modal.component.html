@@ -49,7 +49,8 @@
                           placeholder="Describe los pasos, requerimientos o competencias de esta actividad práctica..."
                           [class.is-invalid]="actividadForm.get('descripcion')?.invalid && actividadForm.get('descripcion')?.touched"></textarea>
                 <div class="text-danger small mt-1" *ngIf="actividadForm.get('descripcion')?.invalid && actividadForm.get('descripcion')?.touched">
-                  La descripción no puede superar los 255 caracteres.
+                  <span *ngIf="actividadForm.get('descripcion')?.errors?.['required']">La descripción es obligatoria.</span>
+                  <span *ngIf="actividadForm.get('descripcion')?.errors?.['maxlength']">La descripción no puede superar los 255 caracteres.</span>
                 </div>
               </div>
             </div>
@@ -79,8 +80,9 @@
               <div class="arbol-ciclos" *ngIf="!cargandoArbol && arbolCiclos.length > 0">
                 <div class="cycle-card border-bottom" *ngFor="let ciclo of arbolCiclos">
                   
-                  <!-- BOTÓN CABECERA DEL CICLO -->
+                  <!-- BOTÓN CABECERA DEL CICLO (Para no-coordinadores) -->
                   <button
+                    *ngIf="!esCoordinador"
                     type="button"
                     class="cycle-header w-100 border-0 bg-white d-flex align-items-center justify-content-between p-3 text-start"
                     [class.selected]="ciclo.expanded"
@@ -106,8 +108,29 @@
                     </div>
                   </button>
 
+                  <!-- CABECERA ESTÁTICA DEL CICLO (Para coordinadores, sin colapsar) -->
+                  <div
+                    *ngIf="esCoordinador"
+                    class="cycle-header w-100 border-0 bg-white d-flex align-items-center p-3 text-start"
+                  >
+                    <div class="cycle-left d-flex align-items-center gap-3">
+                      <div class="custom-checkbox-mini d-flex align-items-center justify-content-center">
+                        <i class="fa-solid fa-folder-open text-primary"></i>
+                      </div>
+
+                      <div class="cycle-meta">
+                        <div class="cycle-name fw-bold text-dark" style="font-size: 0.95rem;">{{ ciclo.nombre }}</div>
+                        <div class="cycle-subtitle small text-muted d-flex align-items-center gap-2">
+                          <span class="cycle-siglas fw-bold text-secondary">{{ ciclo.siglas }}</span>
+                          <span class="cycle-dot"></span>
+                          <span>{{ ciclo.modulos.length }} módulos</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
                   <!-- LISTA DE MÓDULOS DEL CICLO -->
-                  <div class="module-list bg-light p-2 border-top" *ngIf="ciclo.expanded">
+                  <div class="module-list bg-light p-2 border-top" *ngIf="esCoordinador || ciclo.expanded">
                     <div *ngIf="ciclo.modulos.length === 0" class="empty-state text-muted small p-3 text-center">
                       No hay módulos formativos asociados a este ciclo.
                     </div>

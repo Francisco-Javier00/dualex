@@ -22,7 +22,7 @@ export class ActividadesComponent implements OnInit {
 
   @ViewChild(DatatableComponent) datatable!: DatatableComponent;
 
-  dtOptions: Config = {};
+  dtOptions: any = {};
   modalBorradoVisible = false;
   modalActividadVisible = false;
   actividadSeleccionada: ActividadDTO | null = null;

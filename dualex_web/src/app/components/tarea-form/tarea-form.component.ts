@@ -372,20 +372,23 @@ export class TareaFormComponent implements OnInit {
 
     const modulosUnicos = [...new Set(modulosSeleccionados)];
 
-    // Mantenemos el estado de los checkboxes actuales para no resetearlos al añadir/quitar actividades
+    // Mantenemos el estado de los checkboxes y comentarios actuales para no resetearlos al añadir/quitar actividades
     const estadosActuales = new Map<string, boolean>();
+    const comentariosActuales = new Map<string, string>();
 
     // Si hay revisiones previamente cargadas desde el backend, las sembramos primero
     if (revisionesCargadas && revisionesCargadas.length > 0) {
       revisionesCargadas.forEach(rev => {
         estadosActuales.set(rev.modulo, rev.revisado);
+        comentariosActuales.set(rev.modulo, rev.comentario || '');
       });
     }
 
-    // También mantenemos el estado de los checkboxes en pantalla si ya existen controles en el FormArray
+    // También mantenemos el estado de los checkboxes y comentarios en pantalla si ya existen controles en el FormArray
     this.revisionesModulosArray.controls.forEach(ctrl => {
       const val = ctrl.value;
       estadosActuales.set(val.modulo, val.revisado);
+      comentariosActuales.set(val.modulo, val.comentario || '');
     });
 
     // Reconstruimos el FormArray con los módulos únicos detectados
@@ -393,7 +396,8 @@ export class TareaFormComponent implements OnInit {
     modulosUnicos.forEach(mod => {
       const grupo = this.fb.group({
         modulo: [mod],
-        revisado: [estadosActuales.get(mod) || false]
+        revisado: [estadosActuales.get(mod) || false],
+        comentario: [comentariosActuales.get(mod) || '']
       });
 
       let disableControl = false;
@@ -476,6 +480,10 @@ export class TareaFormComponent implements OnInit {
    * Navegación hacia atrás.
    */
   volver(): void {
-    this.location.back();
+    if (this.idAlumno) {
+      this.router.navigate(['/tareas', this.idAlumno]);
+    } else {
+      this.router.navigate(['/tareas']);
+    }
   }
 }
