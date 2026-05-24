@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/../../vendor/autoload.php';
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 /**
  * Modelo de datos para la gestión y persistencia de Alumno en la base de datos de Dualex.
@@ -226,7 +228,7 @@ class ModAlumnos {
                 FROM Usuario u
                 INNER JOIN Alumno a ON u.idUsuario = a.idAlumno 
                 LEFT JOIN Curso c ON a.idCurso = c.idCurso
-                LEFT JOIN Empresa_Alumno ea ON a.idAlumno = ea.idAlumno ";
+                LEFT JOIN Empresa_Alumno ea ON a.idAlumno = ea.idAlumno "
 
         // Construcción de condiciones
         $conditions = [];
@@ -244,8 +246,6 @@ class ModAlumnos {
         // 1. Filtrado por módulo específico
         if (!empty($idModulo) && $idModulo !== 'null') {
             $joinClause .= " INNER JOIN Modulo_Alumno_Cursa mac ON a.idAlumno = mac.idAlumno ";
-            $conditions[] = "mac.idModulo = :idModulo";
-            $binds[':idModulo'] = (int)$idModulo;
         } 
         // 2. Si es COORDINADOR, aplicamos su filtro de ciclo SIEMPRE (es el más restrictivo para él)
         if (strtoupper($rol) === 'COORDINADOR' && !empty($idUsuario)) {
@@ -270,7 +270,11 @@ class ModAlumnos {
         }
         // 4. Si es Profesor, ve los Alumno de los módulos que imparte
         else if (empty($conditions) && strtoupper($rol) === 'PROFESOR' && !empty($idUsuario)) {
+<<<<<<< HEAD
             $joinClause .= " INNER JOIN Modulo_Alumno_Cursa mac ON a.idAlumno = mac.idAlumno ";
+=======
+            $joinClause .= " INNER JOIN Modulo_Alumno_Cursa mac ON a.idAlumnos = mac.idAlumnos ";
+>>>>>>> origin/main
             $joinClause .= " INNER JOIN Modulo_Profesor mp ON mac.idModulo = mp.idModulo ";
             $conditions[] = "mp.idProfesor = :idUsuario";
             $binds[':idUsuario'] = (int)$idUsuario;
@@ -310,9 +314,15 @@ class ModAlumnos {
         $data = $stmtData->fetchAll(PDO::FETCH_ASSOC);
 
         // Consulta de conteo para DataTables
+<<<<<<< HEAD
         $sqlCount = "SELECT COUNT(DISTINCT a.idAlumno) FROM Usuario u 
                      INNER JOIN Alumno a ON u.idUsuario = a.idAlumno 
                      LEFT JOIN Curso c ON a.idCurso = c.idCurso " . $joinClause . $whereClause;
+=======
+        $sqlCount = "SELECT COUNT(DISTINCT a.idAlumnos) FROM Usuarios u 
+                     INNER JOIN Alumnos a ON u.idUsuario = a.idAlumnos 
+                     LEFT JOIN Cursos c ON a.idCurso = c.idCurso " . $joinClause . $whereClause;
+>>>>>>> origin/main
         $stmtCount = $this->db->prepare($sqlCount);
         foreach ($binds as $key => $val) {
             $stmtCount->bindValue($key, $val, is_int($val) ? PDO::PARAM_INT : PDO::PARAM_STR);
@@ -404,4 +414,103 @@ class ModAlumnos {
 
         return $errores;
     }
+
+    /**
+     * Importa alumnos de forma masiva desde un archivo .xlsx / .xls.
+     * Si un alumno ya existe (por correo, DNI, NUSS o NIA), lo ignora.
+     * Cada inserción se realiza bajo una transacción (implementada en crear()).
+     *
+     * @param string $filePath Ruta al archivo temporal del excel.
+     * @param int    $idCurso  ID del curso al que se asignarán los alumnos.
+     * @throws Exception En caso de errores graves de formato o lectura.
+     * @return array Resumen del proceso (imported, skipped, errors).
+     */
+    public function importarExcel($filePath, $idCurso) {
+        if (!file_exists($filePath)) {
+            throw new Exception("Archivo no encontrado.");
+        }
+
+        // Cargar Excel
+        $spreadsheet = IOFactory::load($filePath);
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Convertimos todo a array
+        $rows = $sheet->toArray(null, true, true, true);
+
+        $imported = 0;
+        $errors = [];
+        $rowNumber = 1;
+
+        // Sacamos cabecera (primera fila)
+        $header = array_map(function($h) {
+            return strtolower(trim($h));
+        }, $rows[1]);
+
+        unset($rows[1]); // quitamos cabecera
+
+        foreach ($rows as $row) {
+            $rowNumber++;
+
+            // Normalizar claves con cabecera
+            $data = [];
+            $i = 0;
+
+            foreach ($header as $key) {
+                $i++;
+                $data[$key] = trim($row[array_keys($row)[$i - 1]] ?? '');
+            }
+
+            // Mapear campos (igual que antes)
+            $nombre = $data['nombre'] ?? '';
+            $apellidos = $data['apellidos'] ?? '';
+            $email = $data['email'] ?? '';
+            $dni = $data['dni'] ?? '';
+            $nuss = $data['nuss'] ?? '';
+            $nia = $data['nia'] ?? '';
+            $telefono = $data['telefono'] ?? '';
+            $repetidor = $data['repetidor'] ?? '';
+
+            // Fila vacía → saltar
+            if ($nombre === '' && $apellidos === '' && $email === '') {
+                continue;
+            }
+
+            // Validación básica (igual que CSV)
+            if ($nombre === '' || $apellidos === '' || $email === '' ||
+                $dni === '' || $nuss === '' || $nia === '' || $telefono === '') {
+
+                $errors[] = "Fila $rowNumber: Faltan campos obligatorios.";
+                continue;
+            }
+
+            // Repetidor
+            $repetidorVal = in_array(strtolower($repetidor), ['si','sí','1','true','yes']) ? 1 : 0;
+
+            $studentData = [
+                'nombre' => $nombre,
+                'apellidos' => $apellidos,
+                'email' => $email,
+                'dni' => $dni,
+                'nuss' => $nuss,
+                'nia' => $nia,
+                'telefono' => $telefono,
+                'repetidor' => $repetidorVal,
+                'idCurso' => $idCurso,
+                'idEmpresa' => null
+            ];
+
+            try {
+                $this->crear($studentData);
+                $imported++;
+            } catch (Exception $e) {
+                $errors[] = "Fila $rowNumber: " . $e->getMessage();
+            }
+        }
+
+        return [
+            'imported' => $imported,
+            'errors' => $errors
+        ];
+    }
 }
+

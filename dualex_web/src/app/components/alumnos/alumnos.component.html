@@ -12,50 +12,51 @@
 
         <!-- Etiqueta visual del módulo -->
         @if (moduloObj) {
-          <div class="d-flex align-items-center mt-2 mb-1">
-            <span class="badge rounded-pill text-white px-3 py-2 shadow-sm d-flex align-items-center gap-2"
-                  [style.background-color]="moduloObj.color" style="font-size: 0.85rem;">
-              <i class="fa-solid fa-book"></i>
-              Módulo: {{ moduloObj.sigla }} - {{ moduloObj.nombre }}
-            </span>
-          </div>
+        <div class="d-flex align-items-center mt-2 mb-1">
+          <span class="badge rounded-pill text-white px-3 py-2 shadow-sm d-flex align-items-center gap-2"
+            [style.background-color]="moduloObj.color" style="font-size: 0.85rem;">
+            <i class="fa-solid fa-book"></i>
+            Módulo: {{ moduloObj.sigla }} - {{ moduloObj.nombre }}
+          </span>
+        </div>
         }
 
         <p class="text-muted mb-0 mt-2">
-          {{ nombreModulo ? 'Listado de estudiantes inscritos en tu clase' : 'Listado completo de tus estudiantes matriculados en todos tus módulos' }}
+          {{ nombreModulo ? 'Listado de estudiantes inscritos en tu clase' : 'Listado completo de tus estudiantes
+          matriculados en todos tus módulos' }}
         </p>
       </div>
     </div>
 
     <div class="d-flex gap-2 align-items-center flex-wrap">
       @if (todosLosCursos.length > 0) {
-        <div class="d-flex align-items-center gap-2 me-md-2">
-          <label for="filtroCurso" class="text-muted mb-0 fw-semibold" style="white-space: nowrap;">
-            <i class="fa-solid fa-filter me-1 text-primary"></i> Filtrar por:
-          </label>
-          <select id="filtroCurso" class="form-select border shadow-sm rounded-3 px-3 bg-white text-dark fw-medium"
-                  style="min-width: 210px; max-width: 250px; font-size: 0.85rem; height: 38px; cursor: pointer;"
-                  (change)="onFiltroChange($event)">
-            <option value="all">Todos los ciclos y cursos</option>
-            <ng-container *ngFor="let cicloKey of getCiclosKeys()">
-              <option [value]="'ciclo:' + cicloKey" class="fw-bold text-primary">
-                Ciclo: {{ cicloKey }}
-              </option>
-              <option *ngFor="let curso of cursosAgrupados[cicloKey]" [value]="'curso:' + curso.id">
-                &nbsp;&nbsp;{{ curso.nombre }}
-              </option>
-            </ng-container>
-          </select>
-        </div>
+      <div class="d-flex align-items-center gap-2 me-md-2">
+        <label for="filtroCurso" class="text-muted mb-0 fw-semibold" style="white-space: nowrap;">
+          <i class="fa-solid fa-filter me-1 text-primary"></i> Filtrar por:
+        </label>
+        <select id="filtroCurso" class="form-select border shadow-sm rounded-3 px-3 bg-white text-dark fw-medium"
+          style="min-width: 210px; max-width: 250px; font-size: 0.85rem; height: 38px; cursor: pointer;"
+          (change)="onFiltroChange($event)">
+          <option value="all">Todos los ciclos y cursos</option>
+          <ng-container *ngFor="let cicloKey of getCiclosKeys()">
+            <option [value]="'ciclo:' + cicloKey" class="fw-bold text-primary">
+              Ciclo: {{ cicloKey }}
+            </option>
+            <option *ngFor="let curso of cursosAgrupados[cicloKey]" [value]="'curso:' + curso.id">
+              &nbsp;&nbsp;{{ curso.nombre }}
+            </option>
+          </ng-container>
+        </select>
+      </div>
       }
 
       @if (puedeGestionarAlumnos) {
-        <button class="btn btn-outline-primary px-4 shadow-sm" (click)="importarExcel()">
-          <i class="fa-solid fa-file-excel me-2"></i> Importar Excel
-        </button>
-        <button class="btn btn-primary px-4 shadow-sm" (click)="crearNuevo()">
-          <i class="fa-solid fa-user-plus me-2"></i> Nuevo Alumno
-        </button>
+      <button class="btn btn-outline-primary px-4 shadow-sm" (click)="importarExcel()">
+        <i class="fa-solid fa-file-excel me-2"></i> Importar Excel
+      </button>
+      <button class="btn btn-primary px-4 shadow-sm" (click)="crearNuevo()">
+        <i class="fa-solid fa-user-plus me-2"></i> Nuevo Alumno
+      </button>
       }
     </div>
   </div>
@@ -75,23 +76,19 @@
 </div>
 
 @if (puedeGestionarAlumnos) {
-  <!-- Modal de confirmación de borrado -->
-  <app-confirmar-borrado-modal
-    [visible]="modalBorradoVisible"
-    [titulo]="'Eliminar Alumno'"
-    [mensaje]="'¿Estás seguro de que deseas eliminar al alumno &quot;' + (alumnoSeleccionado ? (alumnoSeleccionado.nombre + ' ' + alumnoSeleccionado.apellidos) : '') + '&quot;? Esta acción no se puede deshacer y borrará su historial.'"
-    [palabraClave]="'confirmar'"
-    (confirmarEvent)="onConfirmarBorrado()"
-    (cancelarEvent)="onCancelarBorrado()">
-  </app-confirmar-borrado-modal>
+<!-- Modal de confirmación de borrado -->
+<app-confirmar-borrado-modal [visible]="modalBorradoVisible" [titulo]="'Eliminar Alumno'"
+  [mensaje]="'¿Estás seguro de que deseas eliminar al alumno &quot;' + (alumnoSeleccionado ? (alumnoSeleccionado.nombre + ' ' + alumnoSeleccionado.apellidos) : '') + '&quot;? Esta acción no se puede deshacer y borrará su historial.'"
+  [palabraClave]="'confirmar'" (confirmarEvent)="onConfirmarBorrado()" (cancelarEvent)="onCancelarBorrado()">
+</app-confirmar-borrado-modal>
 
-  <!-- Modal de Añadir/Editar Alumno -->
-  <app-alumno-modal
-    [visible]="modalAlumnoVisible"
-    [alumno]="alumnoSeleccionado"
-    [cursosCoordinados]="cursosGestionados"
-    [ciclosCoordinados]="ciclosCoordinados"
-    (cerrar)="onCerrarModal()"
-    (guardar)="onGuardarAlumno($event)">
-  </app-alumno-modal>
+<!-- Modal de Añadir/Editar Alumno -->
+<app-alumno-modal [visible]="modalAlumnoVisible" [alumno]="alumnoSeleccionado" [cursosCoordinados]="cursosGestionados"
+  [ciclosCoordinados]="ciclosCoordinados" (cerrar)="onCerrarModal()" (guardar)="onGuardarAlumno($event)">
+</app-alumno-modal>
+
+<!-- Modal de Importar Alumnos -->
+<app-importar-alumnos-modal [visible]="modalImportarVisible" [todosLosCursos]="todosLosCursos"
+  [importando]="importandoExcel" (cerrar)="onCerrarImportar()" (importar)="onConfirmarImportar($event)">
+</app-importar-alumnos-modal>
 }

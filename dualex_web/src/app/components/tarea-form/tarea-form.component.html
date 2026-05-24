@@ -69,7 +69,7 @@
               </div>
               <span class="fw-bold small text-dark">Seleccionadas</span>
             </div>
-            <button type="button" class="btn btn-primary btn-sm px-3 rounded-2 shadow-sm" style="height: 35px;"
+            <button *ngIf="puedoEditarActividades()" type="button" class="btn btn-primary btn-sm px-3 rounded-2 shadow-sm" style="height: 35px;"
               (click)="abrirModalActividades()">
               <i class="fa-solid fa-plus me-1"></i> Añadir
             </button>
@@ -79,7 +79,7 @@
             <div *ngFor="let act of getActividadesSeleccionadas()"
               class="bg-white p-2 px-3 rounded-3 border d-flex justify-content-between align-items-center shadow-sm animate-fade-in">
               <span class="small text-truncate me-2">{{ act.titulo }}</span>
-              <i class="fa-solid fa-xmark text-muted pointer hover-danger" (click)="toggleActividad(act.id)"></i>
+              <i *ngIf="puedoEditarActividades()" class="fa-solid fa-xmark text-muted pointer hover-danger" (click)="toggleActividad(act.id)"></i>
             </div>
             <div *ngIf="getActividadesSeleccionadas().length === 0" class="text-muted small italic py-5 text-center">
               Ninguna seleccionada
@@ -139,11 +139,12 @@
             <div class="d-flex flex-column gap-2" formArrayName="revisionesModulos"
               *ngIf="revisionesModulosArray.length > 0; else noModulos">
               <div *ngFor="let mod of revisionesModulosArray.controls; let i=index" [formGroupName]="i"
-                class="d-flex justify-content-between align-items-center bg-light-subtle px-3 py-2 rounded-3 border shadow-sm">
-                <span class="small fw-bold">{{ mod.value.modulo }}</span>
+                class="d-flex justify-content-between align-items-center bg-light-subtle px-3 py-1.5 rounded-3 border shadow-sm"
+                style="min-height: 40px;">
+                <span class="small fw-bold" style="font-size: 0.85rem;">{{ mod.value.modulo }}</span>
                 <div class="form-check form-switch mb-0 d-flex align-items-center gap-2">
-                  <input class="form-check-input" type="checkbox" formControlName="revisado" [id]="'mod-check-' + i">
-                  <label class="form-check-label extra-small text-muted" [for]="'mod-check-' + i">
+                  <input class="form-check-input" type="checkbox" formControlName="revisado" [id]="'mod-check-' + i" style="width: 2em; height: 1em; margin-top: 0.15em;">
+                  <label class="form-check-label extra-small text-muted mb-0" [for]="'mod-check-' + i" style="font-size: 0.75rem;">
                     {{ mod.get('revisado')?.value ? 'Revisado' : 'Pendiente' }}
                   </label>
                 </div>
@@ -161,7 +162,7 @@
           <!-- Comentario Profesor (Derecha) -->
           <div class="col-lg-8">
             <label class="form-label fw-bold text-muted small text-uppercase">Comentario profesor</label>
-            <div class="editor-container border rounded-3 overflow-hidden shadow-sm bg-white">
+            <div class="editor-container editor-profesor-mini border rounded-3 overflow-hidden shadow-sm bg-white">
               <ckeditor [editor]="Editor" [config]="config" formControlName="comentarioProfesor"></ckeditor>
             </div>
           </div>
