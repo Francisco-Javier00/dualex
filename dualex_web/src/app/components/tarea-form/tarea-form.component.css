@@ -17,6 +17,15 @@
   min-height: 150px; /* Aumentado de 100px */
 }
 
+/* Editor del profesor más pequeño */
+.editor-profesor-mini :host ::ng-deep .ck-editor__editable_inline,
+.editor-profesor-mini ::ng-deep .ck-editor__editable_inline,
+:host ::ng-deep .editor-profesor-mini .ck-editor__editable_inline {
+  min-height: 80px !important;
+  height: 100px !important;
+  padding: 0 15px !important;
+}
+
 :host ::ng-deep .ck-toolbar {
   border: none !important;
   border-bottom: 1px solid #f1f3f5 !important;

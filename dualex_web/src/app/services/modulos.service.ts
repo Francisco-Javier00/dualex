@@ -86,4 +86,15 @@ export class ModulosService {
   getModuloById(id: number): Observable<ModuloDTO> {
     return this.http.get<ModuloDTO>(`${this.API_URL}&m=obtener&id=${id}`);
   }
+
+  /**
+   * Obtiene la lista de módulos que imparte un profesor en base a su correo electrónico.
+   * 
+   * @param email Correo electrónico opcional del profesor. Si no se pasa, el backend resolverá por token.
+   * @returns Un `Observable` con la lista de módulos del profesor.
+   */
+  getModulosProfesor(email?: string): Observable<any[]> {
+    const url = email ? `${this.API_URL}&m=listarProfesor&emailProfesor=${encodeURIComponent(email)}` : `${this.API_URL}&m=listarProfesor`;
+    return this.http.get<any[]>(url);
+  }
 }

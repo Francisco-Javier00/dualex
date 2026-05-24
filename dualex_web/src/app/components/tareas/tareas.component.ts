@@ -4,6 +4,7 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ConfirmarBorradoModalComponent } from '../shared/modals/confirmar-borrado-modal/confirmar-borrado-modal.component';
 import { TareasService } from '../../services/tareas.service';
 import { Tarea } from '../../dto/dualex.dto';
+import { AuthService } from '../../auth/services/auth.service';
 
 /**
  * TareasComponent
@@ -23,17 +24,20 @@ export class TareasComponent implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private tareasService = inject(TareasService);
+  private authService = inject(AuthService);
   
   // ESTADO DEL COMPONENTE
   modalBorradoVisible = false;           // Controla el modal de confirmación
   tareaSeleccionada: Tarea | null = null; // Tarea que se pretende borrar o editar
   tareas: Tarea[] = [];                 // Lista de tareas cargadas
   alumnoId: number | null = null;       // ID del alumno si la ruta es /tareas/:alumnoId
+  esProfesor = false;                   // Flag para saber si es perfil profesor
 
   /**
    * Inicialización: Suscripción a los parámetros de la ruta para detectar cambios dinámicos.
    */
   ngOnInit(): void {
+    this.esProfesor = this.authService.currentUserValue?.rol === 'PROFESOR';
     this.route.paramMap.subscribe(params => {
       const id = params.get('alumnoId');
       this.alumnoId = id ? +id : null;

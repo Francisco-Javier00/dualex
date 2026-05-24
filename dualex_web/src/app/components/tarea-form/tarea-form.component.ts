@@ -9,20 +9,20 @@ import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
  * Se cargan todos los plugins necesarios para habilitar funciones avanzadas como
  * tablas, imágenes (Base64), redimensionamiento, alineación, etc.
  */
-import { 
-  ClassicEditor, 
-  Bold, 
-  Essentials, 
-  Italic, 
-  Paragraph, 
-  Link, 
-  List, 
-  Image, 
-  ImageToolbar, 
-  ImageCaption, 
-  ImageStyle, 
-  ImageUpload, 
-  ImageResize, 
+import {
+  ClassicEditor,
+  Bold,
+  Essentials,
+  Italic,
+  Paragraph,
+  Link,
+  List,
+  Image,
+  ImageToolbar,
+  ImageCaption,
+  ImageStyle,
+  ImageUpload,
+  ImageResize,
   MediaEmbed,
   Table,
   TableToolbar,
@@ -48,6 +48,7 @@ import { TareasService } from '../../services/tareas.service';
 import { ActividadesService } from '../../services/actividades.service';
 import { AlertService } from '../../services/alert.service';
 import { AuthService } from '../../auth/services/auth.service';
+import { ModulosService } from '../../services/modulos.service';
 import { ActividadDTO, Tarea } from '../../dto/dualex.dto';
 
 // Componentes compartidos
@@ -71,6 +72,7 @@ export class TareaFormComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private tareasService = inject(TareasService);
+  private modulosService = inject(ModulosService);
   public location = inject(Location);
   private alertService = inject(AlertService);
   private authService = inject(AuthService);
@@ -83,11 +85,14 @@ export class TareaFormComponent implements OnInit {
   actividades: ActividadDTO[] = [];     // Catálogo maestro de actividades recuperado del servicio
   modalActividadesVisible = false;      // Controla la visibilidad del modal de selección
   esAlumno = false;                     // Flag para identificar si es un alumno
+  esProfesor = false;                   // Flag para identificar si es un profesor/coordinador
+  modulosTutor: any[] = [];             // Listado de módulos que imparte el profesor
+  tareaBloqueada = false;               // Flag para saber si la tarea está bloqueada
   codigoTarea = '';                     // Código auto-generado de la tarea
 
   // Instancia del editor CKEditor
   public Editor = ClassicEditor;
-  
+
   /**
    * CONFIGURACIÓN DE CKEDITOR 5
    * Define la barra de herramientas, plugins y comportamientos de imágenes/tablas.
@@ -97,20 +102,20 @@ export class TareaFormComponent implements OnInit {
     language: 'es',
     translations: [translations],
     plugins: [
-      Essentials, Paragraph, Bold, Italic, Link, List, 
+      Essentials, Paragraph, Bold, Italic, Link, List,
       Image, ImageToolbar, ImageCaption, ImageStyle, ImageUpload, ImageResize,
       MediaEmbed, Table, TableToolbar, TableColumnResize, Heading, Indent, BlockQuote, Autoformat,
       Underline, Strikethrough, Font, Alignment, Highlight, RemoveFormat,
       Base64UploadAdapter // Permite subir imágenes directamente como cadenas Base64
     ],
     toolbar: [
-      'undo', 'redo', '|', 
-      'heading', '|', 
+      'undo', 'redo', '|',
+      'heading', '|',
       'bold', 'italic', 'underline', 'strikethrough', '|',
       'fontSize', 'fontColor', 'fontBackgroundColor', 'highlight', '|',
       'alignment', '|',
       'bulletedList', 'numberedList', 'blockQuote', '|',
-      'insertTable', 'uploadImage', 'mediaEmbed', '|', 
+      'insertTable', 'uploadImage', 'mediaEmbed', '|',
       'outdent', 'indent', '|',
       'removeFormat'
     ],
@@ -128,11 +133,11 @@ export class TareaFormComponent implements OnInit {
 
   // Opciones para el selector de evaluación de la empresa (según normativa Dualex)
   evaluacionEmpresaOptions = [
-    'Sin Calificar', 
-    'Superado', 
-    'Bien', 
-    'Notable', 
-    'Excelente', 
+    'Sin Calificar',
+    'Superado',
+    'Bien',
+    'Notable',
+    'Excelente',
     'No Superado'
   ];
 
@@ -140,10 +145,19 @@ export class TareaFormComponent implements OnInit {
    * INICIALIZACIÓN DEL COMPONENTE
    */
   ngOnInit(): void {
-    this.esAlumno = this.authService.currentUserValue?.rol === 'ALUMNO';
+    const user = this.authService.currentUserValue;
+    this.esAlumno = user?.rol === 'ALUMNO';
+    this.esProfesor = user?.rol === 'PROFESOR' || user?.rol === 'COORDINADOR';
     this.crearFormulario();
     this.cargarActividades(); // Cargamos el catálogo para mapear IDs a Títulos
-    
+
+    if (this.esProfesor && user?.email) {
+      this.modulosService.getModulosProfesor(user.email).subscribe(mods => {
+        this.modulosTutor = mods || [];
+        this.actualizarControlesPorTutor();
+      });
+    }
+
     // Detectamos el alumnoId en los queryParams (si viene de la vista de un alumno)
     this.route.queryParams.subscribe(params => {
       const aId = params['alumnoId'];
@@ -190,6 +204,8 @@ export class TareaFormComponent implements OnInit {
         if (tarea.actividadesSeleccionadas) {
           this.actualizarRevisionesModulos(tarea.actividadesSeleccionadas, tarea.revisionesModulos);
         }
+        // Aplicamos la lógica de bloqueo y permisos
+        this.aplicarBloqueos(tarea);
       }
     });
   }
@@ -211,7 +227,7 @@ export class TareaFormComponent implements OnInit {
       revisadoProfesor: [false],
       comentarioProfesor: ['']
     });
-    
+
     if (this.esAlumno) {
       this.tareaForm.get('comentarioProfesor')?.disable();
     }
@@ -233,6 +249,102 @@ export class TareaFormComponent implements OnInit {
   }
 
   /**
+   * Comprueba si un módulo (por nombre o siglas) pertenece al profesor actual.
+   */
+  perteneceAlTutor(nombreModulo: string): boolean {
+    if (!this.esProfesor) return true;
+    return this.modulosTutor.some(m =>
+      m.nombre?.toLowerCase() === nombreModulo.toLowerCase() ||
+      m.sigla?.toLowerCase() === nombreModulo.toLowerCase()
+    );
+  }
+
+  /**
+   * Recorre la lista de controles de revisión y deshabilita los que no pertenecen al tutor.
+   */
+  actualizarControlesPorTutor(): void {
+    if (!this.esProfesor) return;
+    this.revisionesModulosArray.controls.forEach(ctrl => {
+      const modName = ctrl.get('modulo')?.value;
+      if (modName && !this.perteneceAlTutor(modName)) {
+        ctrl.disable({ emitEvent: false });
+      } else {
+        if (!this.esAlumno) {
+          ctrl.enable({ emitEvent: false });
+        }
+      }
+    });
+  }
+
+  /**
+   * Comprueba si la tarea debe bloquearse según las reglas del negocio:
+   * - Si está totalmente revisada (todas las revisiones de módulos están en 'true')
+   * - O si se ha superado la fecha límite (fechaFin).
+   */
+  checkBloqueada(tarea: Tarea): boolean {
+    if (!tarea) return false;
+
+    // 1. Revisada por completo
+    const revisada = !!tarea.revisadoProfesor;
+
+    // 2. Pasada de fecha
+    let pasadaFecha = false;
+    if (tarea.fechaFin) {
+      const fechaFinDate = new Date(tarea.fechaFin);
+      fechaFinDate.setHours(23, 59, 59, 999);
+      pasadaFecha = new Date() > fechaFinDate;
+    }
+
+    return revisada || pasadaFecha;
+  }
+
+  /**
+   * Comprueba si el usuario actual tiene permisos para modificar la sección
+   * de actividades relacionadas.
+   */
+  puedoEditarActividades(): boolean {
+    if (this.esAlumno) {
+      return !this.tareaBloqueada;
+    }
+    return true;
+  }
+
+  /**
+   * Aplica la lógica de bloqueo sobre los controles del formulario según el rol y estado.
+   */
+  aplicarBloqueos(tarea: Tarea): void {
+    this.tareaBloqueada = this.checkBloqueada(tarea);
+
+    if (this.tareaBloqueada) {
+      if (this.esAlumno) {
+        // Alumno: bloqueado absoluto
+        this.tareaForm.disable();
+      } else if (this.esProfesor) {
+        // Profesor: bloquea campos generales y de empresa, permitiendo solo su evaluación y actividades
+        this.tareaForm.get('titulo')?.disable();
+        this.tareaForm.get('fechaIni')?.disable();
+        this.tareaForm.get('fechaFin')?.disable();
+        this.tareaForm.get('descripcion')?.disable();
+        this.tareaForm.get('evaluacionEmpresa')?.disable();
+        this.tareaForm.get('comentarioEmpresa')?.disable();
+
+        // Habilita comentarios y módulos de su competencia
+        this.tareaForm.get('comentarioProfesor')?.enable();
+        this.actualizarControlesPorTutor();
+      }
+    } else {
+      // Tarea no bloqueada: comportamiento estándar
+      if (this.esAlumno) {
+        this.tareaForm.get('comentarioProfesor')?.disable();
+        this.revisionesModulosArray.disable();
+      } else {
+        this.tareaForm.enable();
+        this.actualizarControlesPorTutor();
+      }
+    }
+  }
+
+  /**
    * Lógica de Módulos Dinámicos:
    * Calcula los módulos únicos presentes en las actividades seleccionadas y crea 
    * un control de revisión (checkbox) para cada uno de ellos.
@@ -244,15 +356,25 @@ export class TareaFormComponent implements OnInit {
     }
 
     // Identificamos los nombres de los módulos únicos implicados
-    const modulosSeleccionados = this.actividades
+    const modulosSeleccionados: string[] = [];
+    this.actividades
       .filter(a => ids.includes(a.id))
-      .map(a => a.modulo);
+      .forEach(a => {
+        if (a.modulo) {
+          a.modulo.split(',').forEach(m => {
+            const trimmed = m.trim();
+            if (trimmed && trimmed !== 'Sin módulos') {
+              modulosSeleccionados.push(trimmed);
+            }
+          });
+        }
+      });
 
     const modulosUnicos = [...new Set(modulosSeleccionados)];
-    
+
     // Mantenemos el estado de los checkboxes actuales para no resetearlos al añadir/quitar actividades
     const estadosActuales = new Map<string, boolean>();
-    
+
     // Si hay revisiones previamente cargadas desde el backend, las sembramos primero
     if (revisionesCargadas && revisionesCargadas.length > 0) {
       revisionesCargadas.forEach(rev => {
@@ -273,9 +395,20 @@ export class TareaFormComponent implements OnInit {
         modulo: [mod],
         revisado: [estadosActuales.get(mod) || false]
       });
+
+      let disableControl = false;
       if (this.esAlumno) {
+        disableControl = true;
+      } else if (this.esProfesor) {
+        if (!this.perteneceAlTutor(mod)) {
+          disableControl = true;
+        }
+      }
+
+      if (disableControl) {
         grupo.disable();
       }
+
       this.revisionesModulosArray.push(grupo);
     });
   }
@@ -317,7 +450,7 @@ export class TareaFormComponent implements OnInit {
    */
   guardar(): void {
     if (this.tareaForm.valid) {
-      const datos = { 
+      const datos = {
         ...this.tareaForm.getRawValue(),
         id: this.idTarea,
         idAlumno: this.idAlumno
