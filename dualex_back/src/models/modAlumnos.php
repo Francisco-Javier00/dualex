@@ -1,13 +1,15 @@
 <?php
-require_once __DIR__ . '/../../vendor/autoload.php';
+if (file_exists(__DIR__ . '/../../vendor/autoload.php')) {
+    require_once __DIR__ . '/../../vendor/autoload.php';
+}
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 /**
- * Modelo de datos para la gestión y persistencia de Alumnos en la base de datos de Dualex.
+ * Modelo de datos para la gestión y persistencia de Alumno en la base de datos de Dualex.
  * 
- * Esta clase interactúa directamente con las tablas `Usuarios`, `Alumnos` y
- * la tabla intermedia `Empresa_Alumnos`, gestionando la lógica de negocio y transacciones
- * asociadas a los registros de alumnos.
+ * Esta clase interactúa directamente con las tablas `Usuario`, `Alumno` y
+ * la tabla intermedia `Empresa_Alumno`, gestionando la lógica de negocio y transacciones
+ * asociadas a los registros de Alumno.
  * 
  * @category Model
  * @package  Dualex\Models
@@ -28,10 +30,10 @@ class ModAlumnos {
     }
 
     /**
-     * Obtiene el listado completo de todos los alumnos registrados en el sistema,
+     * Obtiene el listado completo de todos los Alumno registrados en el sistema,
      * asociando sus datos personales de usuario, curso y empresa vinculada.
      *
-     * @return array[] Listado de alumnos con formato de clave-valor asociativo.
+     * @return array[] Listado de Alumno con formato de clave-valor asociativo.
      */
     public function listar() {
         $sql = "SELECT idUsuario as id, u.nombre, apellidos, correo as email, 
@@ -39,10 +41,10 @@ class ModAlumnos {
                        CAST(repetidor AS UNSIGNED) as repetidor, 
                        a.idCurso, c.nombre as nombreCurso,
                        idEmpresa
-                FROM Usuarios u
-                JOIN Alumnos a ON idUsuario = idAlumnos
-                JOIN Cursos c ON a.idCurso = c.idCurso
-                LEFT JOIN Empresa_Alumnos ea ON idAlumnos = idAlumno
+                FROM Usuario u
+                JOIN Alumno a ON u.idUsuario = a.idAlumno
+                JOIN Curso c ON a.idCurso = c.idCurso
+                LEFT JOIN Empresa_Alumno ea ON a.idAlumno = ea.idAlumno
                 WHERE tipo = 'A'
                 ORDER BY apellidos, u.nombre";
         $stmt = $this->db->prepare($sql);
@@ -60,9 +62,9 @@ class ModAlumnos {
         $sql = "SELECT idUsuario as id, nombre, apellidos, correo as email, 
                        DNI as dni, NUSS as nuss, NIA as nia, telefono, 
                        CAST(repetidor AS UNSIGNED) as repetidor, idCurso, idEmpresa
-                FROM Usuarios u
-                JOIN Alumnos a ON idUsuario = idAlumnos
-                LEFT JOIN Empresa_Alumnos ea ON idAlumnos = idAlumno
+                FROM Usuario u
+                JOIN Alumno a ON u.idUsuario = a.idAlumno
+                LEFT JOIN Empresa_Alumno ea ON a.idAlumno = ea.idAlumno
                 WHERE idUsuario = :id";
         $stmt = $this->db->prepare($sql);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
@@ -82,7 +84,7 @@ class ModAlumnos {
         try {
             $this->db->beginTransaction();
 
-            $sqlU = "INSERT INTO Usuarios (nombre, apellidos, correo, tipo) VALUES (:nombre, :apellidos, :correo, 'A')";
+            $sqlU = "INSERT INTO Usuario (nombre, apellidos, correo, tipo) VALUES (:nombre, :apellidos, :correo, 'A')";
             $stmtU = $this->db->prepare($sqlU);
             $stmtU->execute([
                 ':nombre'    => $datos['nombre'],
@@ -91,7 +93,7 @@ class ModAlumnos {
             ]);
             $idUsuario = $this->db->lastInsertId();
 
-            $sqlA = "INSERT INTO Alumnos (idAlumnos, DNI, NUSS, NIA, telefono, repetidor, idCurso) 
+            $sqlA = "INSERT INTO Alumno (idAlumno, DNI, NUSS, NIA, telefono, repetidor, idCurso) 
                      VALUES (:id, :dni, :nuss, :nia, :telefono, :repetidor, :idCurso)";
             $stmtA = $this->db->prepare($sqlA);
             $stmtA->bindValue(':id', $idUsuario, PDO::PARAM_INT);
@@ -106,7 +108,7 @@ class ModAlumnos {
 
             // Gestión de la empresa (tabla intermedia)
             if (isset($datos['idEmpresa']) && !empty($datos['idEmpresa'])) {
-                $sqlEA = "INSERT INTO Empresa_Alumnos (idEmpresa, idAlumno) VALUES (:idEmpresa, :idAlumno)";
+                $sqlEA = "INSERT INTO Empresa_Alumno (idEmpresa, idAlumno) VALUES (:idEmpresa, :idAlumno)";
                 $stmtEA = $this->db->prepare($sqlEA);
                 $stmtEA->bindValue(':idEmpresa', $datos['idEmpresa'], PDO::PARAM_INT);
                 $stmtEA->bindValue(':idAlumno', $idUsuario, PDO::PARAM_INT);
@@ -133,7 +135,7 @@ class ModAlumnos {
         try {
             $this->db->beginTransaction();
 
-            $sqlU = "UPDATE Usuarios SET nombre = :nombre, apellidos = :apellidos, correo = :correo WHERE idUsuario = :id";
+            $sqlU = "UPDATE Usuario SET nombre = :nombre, apellidos = :apellidos, correo = :correo WHERE idUsuario = :id";
             $stmtU = $this->db->prepare($sqlU);
             $stmtU->execute([
                 ':id'        => $id,
@@ -142,10 +144,10 @@ class ModAlumnos {
                 ':correo'    => $datos['email']
             ]);
 
-            $sqlA = "UPDATE Alumnos SET 
+            $sqlA = "UPDATE Alumno SET 
                      DNI = :dni, NUSS = :nuss, NIA = :nia, telefono = :telefono, 
                      repetidor = :repetidor, idCurso = :idCurso 
-                     WHERE idAlumnos = :id";
+                     WHERE idAlumno = :id";
             $stmtA = $this->db->prepare($sqlA);
             $stmtA->bindValue(':id', $id, PDO::PARAM_INT);
             $stmtA->bindValue(':dni', $datos['dni'], PDO::PARAM_STR);
@@ -157,14 +159,14 @@ class ModAlumnos {
             $stmtA->bindValue(':idCurso', $datos['idCurso'], PDO::PARAM_INT);
             $stmtA->execute();
             // Primero borramos la relación anterior
-            $sqlDelete = "DELETE FROM Empresa_Alumnos WHERE idAlumno = :id";
+            $sqlDelete = "DELETE FROM Empresa_Alumno WHERE idAlumno = :id";
             $stmtDel = $this->db->prepare($sqlDelete);
             $stmtDel->bindValue(':id', $id, PDO::PARAM_INT);
             $stmtDel->execute();
 
             // Si hay una nueva empresa, la insertamos
             if (isset($datos['idEmpresa']) && !empty($datos['idEmpresa'])) {
-                $sqlEA = "INSERT INTO Empresa_Alumnos (idEmpresa, idAlumno) VALUES (:idEmpresa, :idAlumno)";
+                $sqlEA = "INSERT INTO Empresa_Alumno (idEmpresa, idAlumno) VALUES (:idEmpresa, :idAlumno)";
                 $stmtEA = $this->db->prepare($sqlEA);
                 $stmtEA->bindValue(':idEmpresa', $datos['idEmpresa'], PDO::PARAM_INT);
                 $stmtEA->bindValue(':idAlumno', $id, PDO::PARAM_INT);
@@ -180,20 +182,20 @@ class ModAlumnos {
     }
 
     /**
-     * Elimina un alumno y su correspondiente registro de la tabla Usuarios en cascada.
+     * Elimina un alumno y su correspondiente registro de la tabla Usuario en cascada.
      *
      * @param int $id Identificador del alumno a eliminar.
      * @return bool True si la operación fue exitosa, false en caso contrario.
      */
     public function eliminar($id) {
-        $sql = "DELETE FROM Usuarios WHERE idUsuario = :id";
+        $sql = "DELETE FROM Usuario WHERE idUsuario = :id";
         $stmt = $this->db->prepare($sql);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         return $stmt->execute();
     }
 
     /**
-     * Obtiene los alumnos paginados, ordenados y filtrados según la petición de DataTables,
+     * Obtiene los Alumno paginados, ordenados y filtrados según la petición de DataTables,
      * aplicando reglas de visibilidad y filtros específicos de acuerdo al Rol del usuario (Coordinador, Profesor o Administrador).
      *
      * @param array $params Parámetros de DataTables y metadatos de sesión (incluyendo rol_token y email).
@@ -206,7 +208,7 @@ class ModAlumnos {
 
         // Resolvemos el idUsuario real de la base de datos a partir del correo del token
         if (!empty($email)) {
-            $stmtUser = $this->db->prepare("SELECT idUsuario FROM Usuarios WHERE correo = :correo LIMIT 1");
+            $stmtUser = $this->db->prepare("SELECT idUsuario FROM Usuario WHERE correo = :correo LIMIT 1");
             $stmtUser->execute([':correo' => $email]);
             $realId = $stmtUser->fetchColumn();
             if ($realId) {
@@ -225,10 +227,10 @@ class ModAlumnos {
                        DNI as dni, NUSS as nuss, NIA as nia, telefono, a.idCurso,
                        CAST(repetidor AS UNSIGNED) as repetidor,
                        c.nombre as nombreCurso, idEmpresa
-                FROM Usuarios u
-                INNER JOIN Alumnos a ON u.idUsuario = a.idAlumnos 
-                LEFT JOIN Cursos c ON a.idCurso = c.idCurso
-                LEFT JOIN Empresa_Alumnos ea ON a.idAlumnos = ea.idAlumno ";
+                FROM Usuario u
+                INNER JOIN Alumno a ON u.idUsuario = a.idAlumno 
+                LEFT JOIN Curso c ON a.idCurso = c.idCurso
+                 LEFT JOIN Empresa_Alumno ea ON a.idAlumno = ea.idAlumno ";
 
         // Construcción de condiciones
         $conditions = [];
@@ -245,17 +247,15 @@ class ModAlumnos {
         
         // 1. Filtrado por módulo específico
         if (!empty($idModulo) && $idModulo !== 'null') {
-            $joinClause .= " INNER JOIN Modulo_Alumno_Cursa mac ON a.idAlumnos = mac.idAlumnos ";
-            $conditions[] = "mac.idModulo = :idModulo";
-            $binds[':idModulo'] = (int)$idModulo;
+            $joinClause .= " INNER JOIN Modulo_Alumno_Cursa mac ON a.idAlumno = mac.idAlumno ";
         } 
         // 2. Si es COORDINADOR, aplicamos su filtro de ciclo SIEMPRE (es el más restrictivo para él)
         if (strtoupper($rol) === 'COORDINADOR' && !empty($idUsuario)) {
-            $joinClause .= " INNER JOIN Ciclos cic ON c.idCiclo = cic.idCiclo ";
+            $joinClause .= " INNER JOIN Ciclo cic ON c.idCiclo = cic.idCiclo ";
             $conditions[] = "cic.idCoordinador = :idUsuario";
             $binds[':idUsuario'] = (int)$idUsuario;
             
-            // Si además ha filtrado por cursos específicos desde el frontal, los añadimos como filtro extra
+            // Si además ha filtrado por Curso específicos desde el frontal, los añadimos como filtro extra
             if (!empty($idsCursos) && is_array($idsCursos)) {
                 $idsValidados = array_filter(array_map('intval', $idsCursos));
                 if (!empty($idsValidados)) {
@@ -263,16 +263,16 @@ class ModAlumnos {
                 }
             }
         }
-        // 3. Si NO es coordinador pero hay una lista de cursos (caso Profesor con selección manual)
+        // 3. Si NO es coordinador pero hay una lista de Curso (caso Profesor con selección manual)
         else if (!empty($idsCursos) && is_array($idsCursos)) {
             $idsValidados = array_filter(array_map('intval', $idsCursos));
             if (!empty($idsValidados)) {
                 $conditions[] = "a.idCurso IN (" . implode(',', $idsValidados) . ")";
             }
         }
-        // 4. Si es Profesor, ve los alumnos de los módulos que imparte
+        // 4. Si es Profesor, ve los Alumno de los módulos que imparte
         else if (empty($conditions) && strtoupper($rol) === 'PROFESOR' && !empty($idUsuario)) {
-            $joinClause .= " INNER JOIN Modulo_Alumno_Cursa mac ON a.idAlumnos = mac.idAlumnos ";
+            $joinClause .= " INNER JOIN Modulo_Alumno_Cursa mac ON a.idAlumno = mac.idAlumno ";
             $joinClause .= " INNER JOIN Modulo_Profesor mp ON mac.idModulo = mp.idModulo ";
             $conditions[] = "mp.idProfesor = :idUsuario";
             $binds[':idUsuario'] = (int)$idUsuario;
@@ -312,9 +312,9 @@ class ModAlumnos {
         $data = $stmtData->fetchAll(PDO::FETCH_ASSOC);
 
         // Consulta de conteo para DataTables
-        $sqlCount = "SELECT COUNT(DISTINCT a.idAlumnos) FROM Usuarios u 
-                     INNER JOIN Alumnos a ON u.idUsuario = a.idAlumnos 
-                     LEFT JOIN Cursos c ON a.idCurso = c.idCurso " . $joinClause . $whereClause;
+        $sqlCount = "SELECT COUNT(DISTINCT a.idAlumno) FROM Usuario u 
+                     INNER JOIN Alumno a ON u.idUsuario = a.idAlumno 
+                     LEFT JOIN Curso c ON a.idCurso = c.idCurso " . $joinClause . $whereClause;
         $stmtCount = $this->db->prepare($sqlCount);
         foreach ($binds as $key => $val) {
             $stmtCount->bindValue($key, $val, is_int($val) ? PDO::PARAM_INT : PDO::PARAM_STR);
@@ -331,19 +331,19 @@ class ModAlumnos {
     }
 
     /**
-     * Obtiene el listado de alumnos que están cursando un módulo específico.
+     * Obtiene el listado de Alumno que están cursando un módulo específico.
      *
      * @param int $idModulo Identificador único del módulo.
-     * @return array[] Listado de alumnos vinculados al módulo.
+     * @return array[] Listado de Alumno vinculados al módulo.
      */
     public function listarPorModulo($idModulo) {
         $sql = "SELECT idUsuario as id, u.nombre, apellidos, correo as email, 
                        DNI as dni, NUSS as nuss, NIA as nia, telefono, 
                        CAST(repetidor AS UNSIGNED) as repetidor, idCurso, idEmpresa
-                FROM Usuarios u
-                JOIN Alumnos a ON idUsuario = idAlumnos
-                JOIN Modulo_Alumno_Cursa mac ON idAlumnos = mac.idAlumnos
-                LEFT JOIN Empresa_Alumnos ea ON idAlumnos = ea.idAlumno
+                FROM Usuario u
+                JOIN Alumno a ON u.idUsuario = a.idAlumno
+                JOIN Modulo_Alumno_Cursa mac ON a.idAlumno = mac.idAlumno
+                LEFT JOIN Empresa_Alumno ea ON a.idAlumno = ea.idAlumno
                 WHERE mac.idModulo = :idModulo
                 ORDER BY apellidos, u.nombre";
         $stmt = $this->db->prepare($sql);

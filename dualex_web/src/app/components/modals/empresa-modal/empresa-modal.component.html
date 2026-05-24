@@ -124,6 +124,19 @@
               }
             </div>
 
+            <div class="col-12">
+              <label class="form-label small fw-bold text-uppercase opacity-75">Correo Ppal.</label>
+              <div class="input-group shadow-sm rounded-3 overflow-hidden border" [class.is-invalid]="isInvalid('correo')">
+                <span class="input-group-text bg-white border-0"><i class="fa-solid fa-envelope text-muted"></i></span>
+                <input type="email" formControlName="correo" class="form-control border-0 px-3" 
+                       [class.is-invalid]="isInvalid('correo')"
+                       placeholder="Ej: maria@empresa.com">
+              </div>
+              @if (isInvalid('correo')) {
+                <div class="text-danger small mt-1 animate-fade-in">{{ getErrorMessage('correo') }}</div>
+              }
+            </div>
+
             <!-- Contactos Adicionales (Bucle) -->
             <div formArrayName="contactosAdicionales" class="col-12">
               @for (group of contactosAdicionales.controls; track $index) {
@@ -144,6 +157,15 @@
                       <input type="text" formControlName="numeroContacto" class="form-control border-0 px-3" 
                              [class.is-invalid]="group.get('numeroContacto')?.invalid && (group.get('numeroContacto')?.dirty || group.get('numeroContacto')?.touched)"
                              placeholder="Ej: 600111222">
+                    </div>
+                  </div>
+                  <div class="col-md-5">
+                    <label class="form-label small fw-bold text-uppercase opacity-75">Correo {{$index + 1}}</label>
+                    <div class="input-group shadow-sm rounded-3 overflow-hidden border" [class.is-invalid]="group.get('correo')?.invalid && (group.get('correo')?.dirty || group.get('correo')?.touched)">
+                      <span class="input-group-text bg-white border-0"><i class="fa-solid fa-envelope text-muted"></i></span>
+                      <input type="email" formControlName="correo" class="form-control border-0 px-3" 
+                             [class.is-invalid]="group.get('correo')?.invalid && (group.get('correo')?.dirty || group.get('correo')?.touched)"
+                             placeholder="Ej: pedro@empresa.com">
                     </div>
                   </div>
                   <div class="col-md-1 d-flex align-items-end pb-1">

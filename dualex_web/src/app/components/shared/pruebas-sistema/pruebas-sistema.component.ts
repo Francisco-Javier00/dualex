@@ -87,10 +87,15 @@ export class PruebasSistemaComponent implements OnInit {
 
     let nombre = 'Juan Carlos';
     let apellidos = 'Díaz del Castillo';
+    let id = 1;
 
     if (rol === 'PROFESOR') {
       nombre = 'Santiago';
       apellidos = 'Pizarro Pizarro';
+    } else if (rol === 'COORDINADOR_GENERAL') {
+      nombre = 'Laura';
+      apellidos = 'Coordinadora';
+      id = 3;
     } else if (rol === 'ALUMNO') {
       nombre = 'Francisco Javier';
       apellidos = 'Martínez Fernández';
@@ -99,12 +104,13 @@ export class PruebasSistemaComponent implements OnInit {
     const header = toBase64Url(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
 
     const payloadStr = JSON.stringify({
-      id: 1,
+      id,
       nombre,
       apellidos,
       email: `dev.${rol.toLowerCase()}@dualex.es`,
       foto: null,
-      roles: { dualex: rol.toLowerCase() },
+      roles: { dualex: (rol === 'COORDINADOR_GENERAL' ? 'COORDINADOR' : rol).toLowerCase() },
+      esGeneral: rol === 'COORDINADOR_GENERAL',
       iat: Math.floor(Date.now() / 1000),
       exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24)
     });

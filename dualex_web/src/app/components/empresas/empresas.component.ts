@@ -24,7 +24,7 @@ export class EmpresasComponent implements OnInit {
   private empresasService = inject(EmpresasService);
   private configuracionService = inject(ConfiguracionService);
   private alertService = inject(AlertService);
-  private authService = inject(AuthService);
+  authService = inject(AuthService);
   private ciclosService = inject(CiclosService);
 
   @ViewChild(DatatableComponent) datatable?: DatatableComponent;
@@ -42,7 +42,8 @@ export class EmpresasComponent implements OnInit {
 
   configuracionEmpresa: ConfiguracionDTO = {
     diasAvisoCaducidad: 30,
-    tiempoFinalizacionConvenio: 4
+    tiempoFinalizacionConvenio: 4,
+    urlConvenio: ''
   };
 
   contactosAdicionales: ContactoEmpresaDTO[] = [];
@@ -55,11 +56,18 @@ export class EmpresasComponent implements OnInit {
     inicioConvenio: '',
     finConvenio: '',
     contacto: '',
-    numeroContacto: ''
+    numeroContacto: '',
+    correo: ''
   };
 
   ngOnInit(): void {
     this.puedeEditar = this.authService.currentUserValue?.rol === 'COORDINADOR';
+    if (this.puedeEditar) {
+      this.configuracionService.esGeneral().subscribe({
+        next: res => this.authService.setEsGeneral(res.esGeneral),
+        error: () => this.authService.setEsGeneral(false)
+      });
+    }
     this.cargarConfiguracion();
     this.cargarCiclos();
 
@@ -122,7 +130,7 @@ export class EmpresasComponent implements OnInit {
           searchable: false,
           render: () => `
             <div class="d-flex justify-content-center align-items-center gap-2 action-buttons w-100">
-              <button class="btn btn-sm btn-outline-info shadow-sm action-link" data-action="link" title="Enlazar">
+              <button class="btn btn-sm btn-outline-info shadow-sm action-link" data-action="link" title="Enlazar empresa con ciclos" data-tooltip="Enlazar empresa con ciclos">
                 <i class="fa-solid fa-link"></i>
               </button>
               <button class="btn btn-sm btn-outline-primary shadow-sm action-edit" data-action="edit" title="Editar">
@@ -277,9 +285,11 @@ export class EmpresasComponent implements OnInit {
       inicioConvenio: this.formatearFechaParaGuardar(this.nuevaEmpresa.inicioConvenio),
       contacto: this.nuevaEmpresa.contacto.trim(),
       numeroContacto: this.nuevaEmpresa.numeroContacto.trim(),
+      correo: this.nuevaEmpresa.correo ? this.nuevaEmpresa.correo.trim() : '',
       contactosAdicionales: this.contactosAdicionales.map(contacto => ({
         contacto: contacto.contacto.trim(),
-        numeroContacto: contacto.numeroContacto.trim()
+        numeroContacto: contacto.numeroContacto.trim(),
+        correo: contacto.correo ? contacto.correo.trim() : ''
       }))
     };
 
@@ -412,12 +422,17 @@ export class EmpresasComponent implements OnInit {
       return;
     }
 
+    if (!this.configuracionEmpresa.urlConvenio.trim()) {
+      this.alertService.error('Campo requerido', 'La URL del convenio no puede estar vacía.');
+      return;
+    }
+
     // Ahora guardamos en la base de datos a través del servicio
     this.configuracionService.updateConfiguracion(this.configuracionEmpresa).subscribe({
       next: () => {
         this.alertService.exito(
           'Configuración guardada',
-          'Los valores de aviso y finalización del convenio se han actualizado en el servidor.'
+          'Los valores de aviso y finalización del convenio y la URL se han actualizado en el servidor.'
         );
         this.modalConfiguracionVisible = false;
       },
@@ -436,7 +451,7 @@ export class EmpresasComponent implements OnInit {
   agregarContactoAdicional(): void {
     this.contactosAdicionales = [
       ...this.contactosAdicionales,
-      { contacto: '', numeroContacto: '' }
+      { contacto: '', numeroContacto: '', correo: '' }
     ];
   }
 

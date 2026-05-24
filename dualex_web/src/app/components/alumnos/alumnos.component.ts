@@ -58,6 +58,58 @@ export class AlumnosComponent implements OnInit, OnDestroy {
     return this.rolUsuarioActual === 'COORDINADOR';
   }
 
+  get columnTitles(): string[] {
+    const base = ['Nombre', 'Apellidos', 'Correo', 'Curso/Ciclo'];
+    if (this.rolUsuarioActual !== 'PROFESOR') {
+      base.push('NIA', 'NUSS', 'DNI', 'Teléfono');
+    }
+    base.push('Acciones');
+    return base;
+  }
+
+  private construirColumnas(): any[] {
+    const rol = this.rolUsuarioActual;
+    const puedeGestionar = this.puedeGestionarAlumnos;
+    const cols: any[] = [
+      { data: 'nombre', width: '25%' },
+      { data: 'apellidos', width: '25%' },
+      { data: 'email', width: '25%' },
+      { data: 'nombreCurso', defaultContent: '<span class="text-muted">Sin curso</span>', width: '15%' },
+    ];
+    if (rol !== 'PROFESOR') {
+      cols.push(
+        { data: 'nia' },
+        { data: 'nuss' },
+        { data: 'dni' },
+        { data: 'telefono' }
+      );
+    }
+    cols.push({
+      data: null,
+      orderable: false,
+      searchable: false,
+      width: '10%',
+      render: () => `
+        <div class="d-flex gap-2 justify-content-center">
+          ${rol === 'PROFESOR' ? `
+            <button class="btn btn-sm btn-outline-success shadow-sm" data-action="tasks" title="Ver Tareas">
+              <i class="fa-solid fa-clipboard-list"></i>
+            </button>
+          ` : ''}
+          ${puedeGestionar ? `
+            <button class="btn btn-sm btn-outline-primary shadow-sm" data-action="edit" title="Editar">
+              <i class="fa-solid fa-user-pen"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-danger shadow-sm" data-action="delete" title="Eliminar">
+              <i class="fa-solid fa-user-minus"></i>
+            </button>
+          ` : ''}
+        </div>
+      `
+    });
+    return cols;
+  }
+
   ngOnInit(): void {
     this.suscripcionUsuario = this.authService.perfilUsuario$.subscribe(perfil => {
       this.rolUsuarioActual = perfil?.rol ?? null;
@@ -174,36 +226,7 @@ export class AlumnosComponent implements OnInit, OnDestroy {
           });
         });
       },
-      columns: [
-        { data: 'nombre' },
-        { data: 'apellidos' },
-        { data: 'email' },
-        { data: 'nombreCurso', defaultContent: '<span class="text-muted">Sin curso</span>' },
-        { data: 'nia' },
-        { data: 'nuss' },
-        { data: 'dni' },
-        { data: 'telefono' },
-        {
-          data: null,
-          orderable: false,
-          searchable: false,
-          render: () => `
-            <div class="d-flex gap-2 justify-content-center">
-              <button class="btn btn-sm btn-outline-success shadow-sm" data-action="tasks" title="Ver Tareas">
-                <i class="fa-solid fa-clipboard-list"></i>
-              </button>
-              ${this.puedeGestionarAlumnos ? `
-                <button class="btn btn-sm btn-outline-primary shadow-sm" data-action="edit" title="Editar">
-                  <i class="fa-solid fa-user-pen"></i>
-                </button>
-                <button class="btn btn-sm btn-outline-danger shadow-sm" data-action="delete" title="Eliminar">
-                  <i class="fa-solid fa-user-minus"></i>
-                </button>
-              ` : ''}
-            </div>
-          `
-        }
-      ],
+      columns: this.construirColumnas(),
       language: {
         emptyTable: 'No hay alumnos registrados',
         info: 'Mostrando _START_ a _END_ de _TOTAL_ alumnos',

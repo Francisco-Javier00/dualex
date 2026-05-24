@@ -1,8 +1,8 @@
 <?php
 /**
  * Modelo para la gestión de Profesores.
- * Este modelo maneja la persistencia de usuarios con tipo 'P' (Profesor),
- * gestionando sus roles de coordinador, sus ciclos asignados y sus módulos docentes.
+ * Este modelo maneja la persistencia de Usuario con tipo 'P' (Profesor),
+ * gestionando sus roles de coordinador, sus Ciclo asignados y sus módulos docentes.
  * 
  * @package Dualex\Models
  */
@@ -20,7 +20,7 @@ class ModProfesores {
      */
     public function listar() {
         $sql = "SELECT idUsuario as id, nombre, apellidos, correo, idCoordinador
-                FROM Usuarios u
+                FROM Usuario u
                 JOIN Profesor p ON idUsuario = p.idProfesor
                 LEFT JOIN Coordinador c ON p.idProfesor = idCoordinador
                 WHERE tipo = 'P'
@@ -46,7 +46,7 @@ class ModProfesores {
         $search = $params['search']['value'] ?? '';
 
         // 1. Conteo total de registros
-        $sqlTotal = "SELECT COUNT(*) as total FROM Usuarios WHERE tipo = 'P'";
+        $sqlTotal = "SELECT COUNT(*) as total FROM Usuario WHERE tipo = 'P'";
         $recordsTotal = $this->db->query($sqlTotal)->fetch(PDO::FETCH_ASSOC)['total'];
 
         // 2. Filtros de búsqueda
@@ -57,7 +57,7 @@ class ModProfesores {
             $binds[':s'] = "%$search%";
         }
 
-        $sqlFilter = "SELECT COUNT(*) as total FROM Usuarios u WHERE tipo = 'P'" . $where;
+        $sqlFilter = "SELECT COUNT(*) as total FROM Usuario u WHERE tipo = 'P'" . $where;
         $stmtFilter = $this->db->prepare($sqlFilter);
         foreach ($binds as $key => $val) $stmtFilter->bindValue($key, $val);
         $stmtFilter->execute();
@@ -83,7 +83,7 @@ class ModProfesores {
 
         // 3. Obtención de datos con paginación
         $sqlData = "SELECT idUsuario as id, nombre, apellidos, correo, idCoordinador
-                    FROM Usuarios u
+                    FROM Usuario u
                     JOIN Profesor p ON idUsuario = p.idProfesor
                     LEFT JOIN Coordinador c ON p.idProfesor = idCoordinador
                     WHERE tipo = 'P'" . $where . "
@@ -97,7 +97,7 @@ class ModProfesores {
         $stmtData->execute();
         $data = $stmtData->fetchAll(PDO::FETCH_ASSOC);
 
-        // 4. Enriquecemos cada fila con sus módulos y ciclos
+        // 4. Enriquecemos cada fila con sus módulos y Ciclo
         foreach ($data as &$row) {
             $this->cargarInformacionRelacionada($row);
         }
@@ -112,7 +112,7 @@ class ModProfesores {
 
     /**
      * Crea un profesor y gestiona todas sus vinculaciones en una sola transacción.
-     * (Registra al usuario, lo vincula como profesor, como coordinador si corresponde y asigna ciclos y módulos).
+     * (Registra al usuario, lo vincula como profesor, como coordinador si corresponde y asigna Ciclo y módulos).
      * 
      * @param array $datos Datos provistos en el registro.
      * @return array El profesor creado.
@@ -140,8 +140,8 @@ class ModProfesores {
                 $ciclos = [];
             }
 
-            // A. Insertar en tabla Usuarios
-            $sqlU = "INSERT INTO Usuarios (nombre, apellidos, correo, tipo) VALUES (:nombre, :apellidos, :correo, 'P')";
+            // A. Insertar en tabla Usuario
+            $sqlU = "INSERT INTO Usuario (nombre, apellidos, correo, tipo) VALUES (:nombre, :apellidos, :correo, 'P')";
             $stmtU = $this->db->prepare($sqlU);
             $stmtU->execute([
                 ':nombre'    => $datos['nombre'],
@@ -154,7 +154,7 @@ class ModProfesores {
             $sqlP = "INSERT INTO Profesor (idProfesor) VALUES (:id)";
             $this->db->prepare($sqlP)->execute([':id' => $idUsuario]);
 
-            // C. Gestión de Rol y Ciclos
+            // C. Gestión de Rol y Ciclo
             if ($rol === 'COORDINADOR') {
                 $sqlC = "INSERT INTO Coordinador (idCoordinador) VALUES (:id)";
                 $this->db->prepare($sqlC)->execute([':id' => $idUsuario]);
@@ -208,7 +208,7 @@ class ModProfesores {
             }
 
             // A. Actualizar datos básicos
-            $sqlU = "UPDATE Usuarios SET nombre = :nombre, apellidos = :apellidos, correo = :correo WHERE idUsuario = :id";
+            $sqlU = "UPDATE Usuario SET nombre = :nombre, apellidos = :apellidos, correo = :correo WHERE idUsuario = :id";
             $this->db->prepare($sqlU)->execute([
                 ':id'        => $id,
                 ':nombre'    => $datos['nombre'],
@@ -248,7 +248,7 @@ class ModProfesores {
     }
 
     /**
-     * Carga módulos y ciclos asociados a un profesor (Por referencia).
+     * Carga módulos y Ciclo asociados a un profesor (Por referencia).
      * 
      * @param array &$prof Puntero al array del profesor que se quiere popular.
      */
@@ -258,7 +258,7 @@ class ModProfesores {
         unset($prof['idCoordinador']);
 
         // Módulos que imparte
-        $sqlMod = "SELECT m.sigla FROM Modulos m 
+        $sqlMod = "SELECT m.sigla FROM Modulo m 
                    JOIN Modulo_Profesor mp ON m.idModulo = mp.idModulo 
                    WHERE mp.idProfesor = :id";
         $stmtMod = $this->db->prepare($sqlMod);
@@ -266,8 +266,8 @@ class ModProfesores {
         $modulos = $stmtMod->fetchAll(PDO::FETCH_COLUMN);
         $prof['modulos'] = $modulos ? implode(', ', $modulos) : '';
 
-        // Ciclos que coordina
-        $sqlCic = "SELECT ci.siglas FROM Ciclos ci WHERE ci.idCoordinador = :id";
+        // Ciclo que coordina
+        $sqlCic = "SELECT ci.siglas FROM Ciclo ci WHERE ci.idCoordinador = :id";
         $stmtCic = $this->db->prepare($sqlCic);
         $stmtCic->execute([':id' => $id]);
         $ciclos = $stmtCic->fetchAll(PDO::FETCH_COLUMN);
@@ -292,7 +292,7 @@ class ModProfesores {
         $insertados = 0;
 
         if (!empty($modulosSiglasOIds)) {
-            $sqlId = "SELECT idModulo FROM Modulos WHERE sigla = :sigla LIMIT 1";
+            $sqlId = "SELECT idModulo FROM Modulo WHERE sigla = :sigla LIMIT 1";
             $stmtId = $this->db->prepare($sqlId);
             $sqlIns = "INSERT INTO Modulo_Profesor (idProfesor, idModulo) VALUES (:idP, :idM)";
             $stmtIns = $this->db->prepare($sqlIns);
@@ -319,10 +319,10 @@ class ModProfesores {
     }
 
     /**
-     * Vincula un coordinador con los ciclos que gestiona.
+     * Vincula un coordinador con los Ciclo que gestiona.
      * 
      * @param int $idProfesor ID del coordinador.
-     * @param array|string $ciclosSiglas Siglas de los ciclos a los que se vinculará.
+     * @param array|string $ciclosSiglas Siglas de los Ciclo a los que se vinculará.
      */
     private function asignarCiclos($idProfesor, $ciclosSiglas) {
         // Primero reseteamos cualquier ciclo que estuviera coordinando
@@ -331,7 +331,7 @@ class ModProfesores {
         if (is_string($ciclosSiglas)) $ciclosSiglas = array_map('trim', explode(',', $ciclosSiglas));
 
         if (!empty($ciclosSiglas)) {
-            $sql = "UPDATE Ciclos SET idCoordinador = :id WHERE siglas = :sigla";
+            $sql = "UPDATE Ciclo SET idCoordinador = :id WHERE siglas = :sigla";
             $stmt = $this->db->prepare($sql);
             foreach ($ciclosSiglas as $sigla) {
                 if (empty($sigla)) continue;
@@ -368,9 +368,9 @@ class ModProfesores {
     }
 
     /**
-     * Devuelve todas las siglas de módulos pertenecientes a los ciclos recibidos.
+     * Devuelve todas las siglas de módulos pertenecientes a los Ciclo recibidos.
      * 
-     * @param array $ciclosSiglas Lista de siglas de ciclos.
+     * @param array $ciclosSiglas Lista de siglas de Ciclo.
      * @return array IDs numéricos de los módulos.
      */
     private function obtenerModulosIdsDeCiclos(array $ciclosSiglas) {
@@ -381,10 +381,10 @@ class ModProfesores {
 
         $placeholders = implode(',', array_fill(0, count($ciclosSiglas), '?'));
         $sql = "SELECT DISTINCT m.idModulo
-                FROM Modulos m
+                FROM Modulo m
                 JOIN Modulo_Curso mc ON m.idModulo = mc.idModulo
-                JOIN Cursos cur ON mc.idCurso = cur.idCurso
-                JOIN Ciclos ci ON cur.idCiclo = ci.idCiclo
+                JOIN Curso cur ON mc.idCurso = cur.idCurso
+                JOIN Ciclo ci ON cur.idCiclo = ci.idCiclo
                 WHERE ci.siglas IN ($placeholders)
                 ORDER BY m.idModulo";
         $stmt = $this->db->prepare($sql);
@@ -399,7 +399,7 @@ class ModProfesores {
      * @param int $idProfesor ID del usuario.
      */
     private function quitarCoordinacionDeTodo($idProfesor) {
-        $sql = "UPDATE Ciclos SET idCoordinador = NULL WHERE idCoordinador = :id";
+        $sql = "UPDATE Ciclo SET idCoordinador = NULL WHERE idCoordinador = :id";
         $this->db->prepare($sql)->execute([':id' => $idProfesor]);
     }
 
@@ -424,7 +424,7 @@ class ModProfesores {
      */
     public function obtener($id) {
         $sql = "SELECT idUsuario as id, nombre, apellidos, correo, idCoordinador
-                FROM Usuarios u
+                FROM Usuario u
                 JOIN Profesor p ON idUsuario = p.idProfesor
                 LEFT JOIN Coordinador c ON p.idProfesor = idCoordinador
                 WHERE idUsuario = :id AND tipo = 'P'";
@@ -443,7 +443,7 @@ class ModProfesores {
      */
     public function obtenerPorCorreo($correo) {
         $sql = "SELECT u.idUsuario as id, u.nombre, u.apellidos, u.correo, c.idCoordinador
-                FROM Usuarios u
+                FROM Usuario u
                 JOIN Profesor p ON u.idUsuario = p.idProfesor
                 LEFT JOIN Coordinador c ON p.idProfesor = c.idCoordinador
                 WHERE u.correo = :correo AND u.tipo = 'P'";
@@ -465,7 +465,7 @@ class ModProfesores {
         try {
             $this->db->beginTransaction();
             $this->quitarCoordinacionDeTodo($id);
-            $this->db->prepare("DELETE FROM Usuarios WHERE idUsuario = :id AND tipo = 'P'")->execute([':id' => $id]);
+            $this->db->prepare("DELETE FROM Usuario WHERE idUsuario = :id AND tipo = 'P'")->execute([':id' => $id]);
             $this->db->commit();
             return true;
         } catch (Exception $e) {

@@ -64,10 +64,12 @@
   <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
     <div class="card-body p-0">
       @if (dtOptions.ajax) {
-      <app-shared-datatable tableId="tabla-alumnos" [dtOptions]="dtOptions"
-        [columnTitles]="['Nombre', 'Apellidos', 'Correo', 'Curso/Ciclo', 'NIA', 'NUSS', 'DNI', 'Teléfono', 'Acciones']"
-        (actionClick)="onTableAction($event)">
-      </app-shared-datatable>
+        <app-shared-datatable
+          tableId="tabla-alumnos"
+          [dtOptions]="dtOptions"
+          [columnTitles]="columnTitles"
+          (actionClick)="onTableAction($event)">
+        </app-shared-datatable>
       }
     </div>
   </div>

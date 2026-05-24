@@ -27,10 +27,10 @@ class ModEmpresas {
      * @return array Arreglo con la lista de todas las empresas y sus contactos estructurados.
      */
     public function listar() {
-        $sql = "SELECT e.idEmpresa as id, e.siglas, e.nombre, e.url_Convenio as convenioUrl, e.inicioConvenio,
+        $sql = "SELECT e.idEmpresa as id, e.siglas, e.nombre, e.urlConvenio as convenioUrl, e.inicioConvenio,
                        e.idCoordinador, CONCAT(u.nombre, ' ', u.apellidos) as firmante
                 FROM Empresa e
-                LEFT JOIN Usuarios u ON e.idCoordinador = u.idUsuario
+                LEFT JOIN Usuario u ON e.idCoordinador = u.idUsuario
                 ORDER BY e.nombre";
         $stmt = $this->db->prepare($sql);
         $stmt->execute();
@@ -45,10 +45,10 @@ class ModEmpresas {
      * @return array|null Un array asociativo con todos los datos de la empresa si existe, o null en caso contrario.
      */
     public function obtener($id) {
-        $sql = "SELECT e.idEmpresa as id, e.siglas, e.nombre, e.url_Convenio as convenioUrl, e.inicioConvenio,
+        $sql = "SELECT e.idEmpresa as id, e.siglas, e.nombre, e.urlConvenio as convenioUrl, e.inicioConvenio,
                        e.idCoordinador, CONCAT(u.nombre, ' ', u.apellidos) as firmante
                 FROM Empresa e
-                LEFT JOIN Usuarios u ON e.idCoordinador = u.idUsuario
+                LEFT JOIN Usuario u ON e.idCoordinador = u.idUsuario
                 WHERE e.idEmpresa = :id";
         $stmt = $this->db->prepare($sql);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
@@ -80,13 +80,13 @@ class ModEmpresas {
             $fechaMySql = $fechaPartes[2] . '-' . $fechaPartes[1] . '-' . $fechaPartes[0] . ' 00:00:00';
 
             // 1. Inserción de los datos principales de la Empresa
-            $sql = "INSERT INTO Empresa (siglas, nombre, url_Convenio, inicioConvenio, idCoordinador) 
-                    VALUES (:siglas, :nombre, :url_Convenio, :inicioConvenio, :idCoordinador)";
+            $sql = "INSERT INTO Empresa (siglas, nombre, urlConvenio, inicioConvenio, idCoordinador) 
+                    VALUES (:siglas, :nombre, :urlConvenio, :inicioConvenio, :idCoordinador)";
             $stmt = $this->db->prepare($sql);
             $stmt->execute([
                 ':siglas' => $datos['siglas'],
                 ':nombre' => $datos['nombre'],
-                ':url_Convenio' => $datos['convenioUrl'],
+                ':urlConvenio' => $datos['convenioUrl'],
                 ':inicioConvenio' => $fechaMySql,
                 ':idCoordinador' => $datos['idCoordinador'] ?? null
             ]);
@@ -95,16 +95,16 @@ class ModEmpresas {
             $idEmpresa = $this->db->lastInsertId();
 
             // 2. Inserción del contacto principal de forma obligatoria
-            $this->insertarContacto($idEmpresa, $datos['contacto'], $datos['numeroContacto'], 'Principal');
+            $this->insertarContacto($idEmpresa, $datos['contacto'], $datos['numeroContacto'], $datos['correo'] ?? '', 'Principal');
 
             // 3. Inserción iterativa de los posibles contactos adicionales
             if (isset($datos['contactosAdicionales']) && is_array($datos['contactosAdicionales'])) {
                 foreach ($datos['contactosAdicionales'] as $add) {
-                    $this->insertarContacto($idEmpresa, $add['contacto'], $add['numeroContacto'], 'Adicional');
+                    $this->insertarContacto($idEmpresa, $add['contacto'], $add['numeroContacto'], $add['correo'] ?? '', 'Adicional');
                 }
             }
 
-            // 4. Inserción iterativa de los ciclos seleccionados en ciclo_empresa
+            // 4. Inserción iterativa de los Ciclo seleccionados en ciclo_empresa
             if (isset($datos['ciclos']) && is_array($datos['ciclos'])) {
                 foreach ($datos['ciclos'] as $siglaCiclo) {
                     $this->insertarCicloEmpresa($idEmpresa, trim($siglaCiclo));
@@ -146,14 +146,14 @@ class ModEmpresas {
                 $fechaPartes = explode('/', $datos['inicioConvenio']);
                 $fechaMySql = $fechaPartes[2] . '-' . $fechaPartes[1] . '-' . $fechaPartes[0] . ' 00:00:00';
 
-                $sql = "UPDATE Empresa SET siglas = :siglas, nombre = :nombre, url_Convenio = :url_Convenio, inicioConvenio = :inicioConvenio 
+                $sql = "UPDATE Empresa SET siglas = :siglas, nombre = :nombre, urlConvenio = :urlConvenio, inicioConvenio = :inicioConvenio 
                         WHERE idEmpresa = :id";
                 $stmt = $this->db->prepare($sql);
                 $stmt->execute([
                     ':id' => $id,
                     ':siglas' => $datos['siglas'],
                     ':nombre' => $datos['nombre'],
-                    ':url_Convenio' => $datos['convenioUrl'],
+                    ':urlConvenio' => $datos['convenioUrl'],
                     ':inicioConvenio' => $fechaMySql
                 ]);
 
@@ -162,17 +162,17 @@ class ModEmpresas {
                     $stmtDel = $this->db->prepare("DELETE FROM Contacto WHERE idEmpresa = :id");
                     $stmtDel->execute([':id' => $id]);
 
-                    $this->insertarContacto($id, $datos['contacto'], $datos['numeroContacto'], 'Principal');
+                    $this->insertarContacto($id, $datos['contacto'], $datos['numeroContacto'], $datos['correo'] ?? '', 'Principal');
 
                     if (isset($datos['contactosAdicionales']) && is_array($datos['contactosAdicionales'])) {
                         foreach ($datos['contactosAdicionales'] as $add) {
-                            $this->insertarContacto($id, $add['contacto'], $add['numeroContacto'], 'Adicional');
+                            $this->insertarContacto($id, $add['contacto'], $add['numeroContacto'], $add['correo'] ?? '', 'Adicional');
                         }
                     }
                 }
             }
 
-            // 3. Actualización de ciclos (esto siempre se intenta si vienen en el array)
+            // 3. Actualización de Ciclo (esto siempre se intenta si vienen en el array)
             if (isset($datos['ciclos']) && is_array($datos['ciclos'])) {
                 $stmtDelCiclos = $this->db->prepare("DELETE FROM Ciclo_Empresa WHERE idEmpresa = :id");
                 $stmtDelCiclos->execute([':id' => $id]);
@@ -227,7 +227,7 @@ class ModEmpresas {
         $where = "";
         // Si el usuario escribió en el cuadro de búsqueda
         if ($search) {
-            $where = " WHERE e.siglas LIKE :search OR e.nombre LIKE :search OR e.url_Convenio LIKE :search";
+            $where = " WHERE e.siglas LIKE :search OR e.nombre LIKE :search OR e.urlConvenio LIKE :search";
         }
 
         // Obtener el recuento total de elementos en la tabla ignorando filtros
@@ -250,7 +250,7 @@ class ModEmpresas {
             $columnsMap = [
                 0 => 'e.siglas',
                 1 => 'e.nombre',
-                3 => 'e.url_Convenio',
+                3 => 'e.urlConvenio',
                 4 => 'firmante',
                 5 => 'e.inicioConvenio',
                 6 => 'e.inicioConvenio' // Fin convenio deriva de inicioConvenio
@@ -268,10 +268,10 @@ class ModEmpresas {
         }
 
         // Query final maestra de extracción de datos
-        $sql = "SELECT e.idEmpresa as id, e.siglas, e.nombre, e.url_Convenio as convenioUrl, e.inicioConvenio,
+        $sql = "SELECT e.idEmpresa as id, e.siglas, e.nombre, e.urlConvenio as convenioUrl, e.inicioConvenio,
                        e.idCoordinador, CONCAT(u.nombre, ' ', u.apellidos) as firmante
                 FROM Empresa e 
-                LEFT JOIN Usuarios u ON e.idCoordinador = u.idUsuario
+                LEFT JOIN Usuario u ON e.idCoordinador = u.idUsuario
                 $where 
                 $orderBy 
                 $limit";
@@ -323,8 +323,8 @@ class ModEmpresas {
             $finDt->modify("+$aniosConvenio years");
             $empresa['finConvenio'] = $finDt->format('d/m/Y');
 
-            // Obtenemos los ciclos vinculados a esta empresa
-            $sqlCiclos = "SELECT c.siglas, ce.tutor FROM Ciclos c 
+            // Obtenemos los Ciclo vinculados a esta empresa
+            $sqlCiclos = "SELECT c.siglas, ce.tutor FROM Ciclo c 
                           INNER JOIN Ciclo_Empresa ce ON c.idCiclo = ce.idCiclo 
                           WHERE ce.idEmpresa = :id";
             $stmtCiclos = $this->db->prepare($sqlCiclos);
@@ -336,7 +336,7 @@ class ModEmpresas {
             $empresa['ciclos'] = count($ciclosRel) > 0 ? implode(', ', array_column($ciclosRel, 'siglas')) : 'No asignado';
 
             // Sacamos absolutamente todos los contactos asociados a esta empresa
-            $stmtC = $this->db->prepare("SELECT tfnoContacto, nombreContacto FROM Contacto WHERE idEmpresa = :id ORDER BY idContacto ASC");
+            $stmtC = $this->db->prepare("SELECT tfnoContacto, nombreContacto, correo FROM Contacto WHERE idEmpresa = :id ORDER BY idContacto ASC");
             $stmtC->execute([':id' => $empresa['id']]);
             $contactos = $stmtC->fetchAll(PDO::FETCH_ASSOC);
 
@@ -345,13 +345,15 @@ class ModEmpresas {
                 // El primer contacto siempre será asignado al bloque principal
                 $empresa['contacto'] = $contactos[0]['nombreContacto'];
                 $empresa['numeroContacto'] = $contactos[0]['tfnoContacto'];
+                $empresa['correo'] = $contactos[0]['correo'];
 
                 // Los siguientes contactos irán a la matriz (array) de contactos adicionales
                 $adicionales = [];
                 for ($i = 1; $i < count($contactos); $i++) {
                     $adicionales[] = [
                         'contacto' => $contactos[$i]['nombreContacto'],
-                        'numeroContacto' => $contactos[$i]['tfnoContacto']
+                        'numeroContacto' => $contactos[$i]['tfnoContacto'],
+                        'correo' => $contactos[$i]['correo']
                     ];
                 }
                 $empresa['contactosAdicionales'] = $adicionales;
@@ -359,6 +361,7 @@ class ModEmpresas {
                 // Previene que Angular falle por campos undefined si alguien editó manual en PhpMyAdmin
                 $empresa['contacto'] = '';
                 $empresa['numeroContacto'] = '';
+                $empresa['correo'] = '';
                 $empresa['contactosAdicionales'] = [];
             }
         }
@@ -375,14 +378,15 @@ class ModEmpresas {
      * @param string $titular Permite discriminar en BD si el contacto es Principal o Adicional.
      * @return void
      */
-    private function insertarContacto($idEmpresa, $nombre, $telefono, $titular) {
-        $sql = "INSERT INTO Contacto (idEmpresa, nombreContacto, tfnoContacto, titular) 
-                VALUES (:idEmpresa, :nombre, :telefono, :titular)";
+    private function insertarContacto($idEmpresa, $nombre, $telefono, $correo, $titular) {
+        $sql = "INSERT INTO Contacto (idEmpresa, nombreContacto, tfnoContacto, correo, titular) 
+                VALUES (:idEmpresa, :nombre, :telefono, :correo, :titular)";
         $stmt = $this->db->prepare($sql);
         $stmt->execute([
             ':idEmpresa' => $idEmpresa,
             ':nombre' => $nombre,
             ':telefono' => $telefono,
+            ':correo' => $correo,
             ':titular' => $titular
         ]);
     }
@@ -392,7 +396,7 @@ class ModEmpresas {
      */
     private function insertarCicloEmpresa($idEmpresa, $siglaCiclo, $tutor = null) {
         // Primero buscamos el ID del ciclo basándonos en la sigla
-        $stmtBusca = $this->db->prepare("SELECT idCiclo FROM Ciclos WHERE siglas = :siglas LIMIT 1");
+        $stmtBusca = $this->db->prepare("SELECT idCiclo FROM Ciclo WHERE siglas = :siglas LIMIT 1");
         $stmtBusca->execute([':siglas' => $siglaCiclo]);
         $ciclo = $stmtBusca->fetch(PDO::FETCH_ASSOC);
 

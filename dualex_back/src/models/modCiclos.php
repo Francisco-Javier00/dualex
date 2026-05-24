@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Modelo para la gestión de Ciclos Formativos.
+ * Modelo para la gestión de Ciclo Formativos.
  * Incluye lógica transaccional para operaciones en cascada.
  * 
  * @package Dualex\Models
@@ -14,17 +14,17 @@ class ModCiclos {
     }
 
     /**
-     * Recupera todos los ciclos formativos junto a sus coordinadores.
+     * Recupera todos los Ciclo formativos junto a sus coordinadores.
      * 
-     * @return array Array asociativo con el listado de ciclos.
+     * @return array Array asociativo con el listado de Ciclo.
      */
     public function listar() {
         $sql = "SELECT idCiclo as id, c.nombre, siglas, c.idCoordinador, 
-                       grado, CONCAT('1º ', siglas, ', 2º ', siglas) AS cursos,
+                       grado, CONCAT('1º ', siglas, ', 2º ', siglas) AS Curso,
                        u.nombre as nombreCoordinador, apellidos as apellidosCoordinador 
-                FROM Ciclos c
+                FROM Ciclo c
                 LEFT JOIN Coordinador co ON c.idCoordinador = co.idCoordinador
-                LEFT JOIN Usuarios u ON co.idCoordinador = u.idUsuario
+                LEFT JOIN Usuario u ON co.idCoordinador = u.idUsuario
                 ORDER BY c.nombre";
         $stmt = $this->db->prepare($sql);
         $stmt->execute();
@@ -33,13 +33,13 @@ class ModCiclos {
 
     /**
      * Busca un ciclo específico por su identificador único.
-     * Además, carga los cursos asociados (1º y 2º) dentro del resultado.
+     * Además, carga los Curso asociados (1º y 2º) dentro del resultado.
      * 
      * @param int $id Identificador del ciclo.
-     * @return array|false Datos del ciclo y sus cursos.
+     * @return array|false Datos del ciclo y sus Curso.
      */
     public function obtener($id) {
-        $sql = "SELECT idCiclo as id, nombre, siglas, idCoordinador FROM Ciclos WHERE idCiclo = :id";
+        $sql = "SELECT idCiclo as id, nombre, siglas, idCoordinador FROM Ciclo WHERE idCiclo = :id";
         $stmt = $this->db->prepare($sql);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         $stmt->execute();
@@ -53,13 +53,13 @@ class ModCiclos {
     }
 
     /**
-     * Obtiene los cursos que pertenecen a un ciclo formativo específico.
+     * Obtiene los Curso que pertenecen a un ciclo formativo específico.
      * 
      * @param int $idCiclo ID del ciclo.
-     * @return array Listado de cursos.
+     * @return array Listado de Curso.
      */
     private function obtenerCursos($idCiclo) {
-        $sql = "SELECT * FROM Cursos WHERE idCiclo = :idCiclo";
+        $sql = "SELECT * FROM Curso WHERE idCiclo = :idCiclo";
         $stmt = $this->db->prepare($sql);
         $stmt->bindParam(':idCiclo', $idCiclo, PDO::PARAM_INT);
         $stmt->execute();
@@ -79,7 +79,7 @@ class ModCiclos {
             $this->db->beginTransaction();
 
             // 1. Insertar el Ciclo
-            $sql = "INSERT INTO Ciclos (nombre, siglas, idCoordinador, grado) VALUES (:nombre, :siglas, :idCoordinador, :grado)";
+            $sql = "INSERT INTO Ciclo (nombre, siglas, idCoordinador, grado) VALUES (:nombre, :siglas, :idCoordinador, :grado)";
             $stmt = $this->db->prepare($sql);
             $stmt->execute([
                 ':nombre'        => $datos['nombre'],
@@ -98,7 +98,7 @@ class ModCiclos {
     }
 
     /**
-     * Actualiza un ciclo formativo y aplica el cambio de siglas en cascada a sus cursos.
+     * Actualiza un ciclo formativo y aplica el cambio de siglas en cascada a sus Curso.
      * 
      * @param int $id Identificador del ciclo.
      * @param array $datos Datos actualizados.
@@ -110,7 +110,7 @@ class ModCiclos {
             $this->db->beginTransaction();
 
             // 1. Actualizar el Ciclo
-            $sql = "UPDATE Ciclos SET nombre = :nombre, siglas = :siglas, idCoordinador = :idCoordinador, grado = :grado WHERE idCiclo = :id";
+            $sql = "UPDATE Ciclo SET nombre = :nombre, siglas = :siglas, idCoordinador = :idCoordinador, grado = :grado WHERE idCiclo = :id";
             $stmt = $this->db->prepare($sql);
             $stmt->execute([
                 ':id'            => $id,
@@ -120,9 +120,9 @@ class ModCiclos {
                 ':grado'         => $datos['grado']
             ]);
 
-            // 2. Actualizar los nombres de los cursos asociados (1º y 2º)
+            // 2. Actualizar los nombres de los Curso asociados (1º y 2º)
             $siglas = $datos['siglas'];
-            $sqlCursos = "UPDATE Cursos SET nombre = CASE 
+            $sqlCursos = "UPDATE Curso SET nombre = CASE 
                             WHEN nombre LIKE '1º %' THEN :nombre1
                             WHEN nombre LIKE '2º %' THEN :nombre2
                             ELSE nombre 
@@ -144,7 +144,7 @@ class ModCiclos {
     }
 
     /**
-     * Elimina un ciclo y todos sus cursos asociados de forma manual mediante transacción.
+     * Elimina un ciclo y todos sus Curso asociados de forma manual mediante transacción.
      * 
      * @param int $id ID del ciclo a borrar.
      * @return bool True si la operación se completó con éxito.
@@ -154,14 +154,14 @@ class ModCiclos {
         try {
             $this->db->beginTransaction();
 
-            // 1. Borrar los cursos asociados primero (ya que la DB no tiene ON DELETE CASCADE en esta relación)
-            $sqlCursos = "DELETE FROM Cursos WHERE idCiclo = :id";
+            // 1. Borrar los Curso asociados primero (ya que la DB no tiene ON DELETE CASCADE en esta relación)
+            $sqlCursos = "DELETE FROM Curso WHERE idCiclo = :id";
             $stmtCursos = $this->db->prepare($sqlCursos);
             $stmtCursos->bindParam(':id', $id, PDO::PARAM_INT);
             $stmtCursos->execute();
 
             // 2. Borrar el ciclo
-            $sqlCiclo = "DELETE FROM Ciclos WHERE idCiclo = :id";
+            $sqlCiclo = "DELETE FROM Ciclo WHERE idCiclo = :id";
             $stmtCiclo = $this->db->prepare($sqlCiclo);
             $stmtCiclo->bindParam(':id', $id, PDO::PARAM_INT);
             $stmtCiclo->execute();
@@ -190,9 +190,9 @@ class ModCiclos {
             $where = "WHERE c.nombre LIKE :search OR c.siglas LIKE :search";
         }
 
-        $total = $this->db->query("SELECT COUNT(*) FROM Ciclos")->fetchColumn();
+        $total = $this->db->query("SELECT COUNT(*) FROM Ciclo")->fetchColumn();
 
-        $stmtF = $this->db->prepare("SELECT COUNT(*) FROM Ciclos c $where");
+        $stmtF = $this->db->prepare("SELECT COUNT(*) FROM Ciclo c $where");
         if ($search) $stmtF->execute([':search' => "%$search%"]);
         else $stmtF->execute();
         $totalFiltrados = $stmtF->fetchColumn();
@@ -216,11 +216,11 @@ class ModCiclos {
         }
 
         $sql = "SELECT idCiclo as id, c.nombre, siglas, c.idCoordinador, 
-                       grado, CONCAT('1º ', siglas, ', 2º ', siglas) AS cursos,
+                       grado, CONCAT('1º ', siglas, ', 2º ', siglas) AS Curso,
                        u.nombre as nombreCoordinador, apellidos as apellidosCoordinador 
-                FROM Ciclos c
+                FROM Ciclo c
                 LEFT JOIN Coordinador co ON c.idCoordinador = co.idCoordinador
-                LEFT JOIN Usuarios u ON co.idCoordinador = u.idUsuario
+                LEFT JOIN Usuario u ON co.idCoordinador = u.idUsuario
                 $where 
                 $orderBy
                 LIMIT :start, :length";

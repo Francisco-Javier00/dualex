@@ -19,7 +19,8 @@ class ModConfiguracion {
      */
     public function obtenerConfiguracion() {
         $query = "SELECT dias_aviso_caducidad as diasAvisoCaducidad, 
-                         tiempo_finalizacion_convenio as tiempoFinalizacionConvenio 
+                         tiempo_finalizacion_convenio as tiempoFinalizacionConvenio,
+                         urlConvenio as urlConvenio
                   FROM " . $this->table_name . " LIMIT 1";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
@@ -36,12 +37,14 @@ class ModConfiguracion {
         // Al ser una tabla de configuración de una sola fila, hacemos el update directamente
         $query = "UPDATE " . $this->table_name . " 
                   SET dias_aviso_caducidad = :diasAvisoCaducidad, 
-                      tiempo_finalizacion_convenio = :tiempoFinalizacionConvenio";
+                      tiempo_finalizacion_convenio = :tiempoFinalizacionConvenio,
+                      urlConvenio = :urlConvenio";
         
         $stmt = $this->conn->prepare($query);
         
         $stmt->bindParam(":diasAvisoCaducidad", $datos['diasAvisoCaducidad']);
         $stmt->bindParam(":tiempoFinalizacionConvenio", $datos['tiempoFinalizacionConvenio']);
+        $stmt->bindParam(":urlConvenio", $datos['urlConvenio']);
 
         if($stmt->execute()) {
             return ["status" => "success", "message" => "Configuración actualizada."];

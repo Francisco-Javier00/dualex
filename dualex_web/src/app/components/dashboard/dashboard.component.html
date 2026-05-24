@@ -3,10 +3,22 @@
 
     <!-- === DASHBOARD COORDINADOR === -->
     @if (usuario?.rol === 'COORDINADOR') {
-    <header class="mb-5 d-flex justify-content-between align-items-end">
+    <header class="mb-4 d-flex justify-content-between align-items-end">
       <div>
         <h1 class="h3 fw-bold text-dark mb-1">PANEL DE GESTIÓN INTEGRAL</h1>
-        <p class="text-muted mb-0">Bienvenido, {{ usuario?.nombre }}. Selecciona una categoría para gestionar.</p>
+        <p class="text-muted mb-3">Bienvenido, {{ usuario?.nombre }}. Selecciona una categoría para gestionar.</p>
+        
+        @if (ciclosCoordinados.length > 0) {
+          <div class="d-flex align-items-center gap-2 text-muted">
+            <i class="fa-solid fa-layer-group text-primary"></i>
+            <span class="fw-semibold">Ciclos coordinados:</span>
+            @for (ciclo of ciclosCoordinados; track ciclo) {
+              <span class="badge rounded-pill bg-primary-subtle text-primary px-3 shadow-sm">
+                {{ ciclo }}
+              </span>
+            }
+          </div>
+        }
       </div>
     </header>
 

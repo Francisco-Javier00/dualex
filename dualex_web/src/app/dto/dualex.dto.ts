@@ -15,6 +15,7 @@ export interface PerfilUsuario {
   email: string;
   foto?: string;
   rol: string;
+  esGeneral?: boolean;
 }
 
 export interface JwtPayload {
@@ -28,6 +29,7 @@ export interface JwtPayload {
     dualex?: string;
     [key: string]: string | undefined;
   };
+  esGeneral?: boolean;
   exp?: number;
   iat?: number;
 }
@@ -138,6 +140,7 @@ export interface CursoDTO {
 export interface ContactoEmpresaDTO {
   contacto: string;
   numeroContacto: string;
+  correo: string;
 }
 
 export interface EmpresaDTO {
@@ -149,6 +152,7 @@ export interface EmpresaDTO {
   finConvenio: string;
   contacto: string;
   numeroContacto: string;
+  correo: string;
   ciclos?: string;
   contactosAdicionales?: ContactoEmpresaDTO[];
   ciclosInfo?: { siglas: string, tutor: string }[];
@@ -168,4 +172,5 @@ export interface ProfesorDTO {
 export interface ConfiguracionDTO {
   diasAvisoCaducidad: number;
   tiempoFinalizacionConvenio: number;
+  urlConvenio: string;
 }
