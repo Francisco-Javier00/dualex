@@ -140,4 +140,37 @@ class ConProfesores extends BaseController {
             $this->sendError("Error al eliminar el profesor: " . $e->getMessage(), 500);
         }
     }
+
+    /**
+     * Importa profesores de forma masiva desde un archivo Excel.
+     */
+    public function importarExcel() {
+        $this->checkRole(['COORDINADOR']);
+
+        if (!isset($_FILES['file']) || $_FILES['file']['error'] !== UPLOAD_ERR_OK) {
+            $this->sendError("No se ha subido ningún archivo o ha ocurrido un error al subirlo.", 400);
+        }
+
+        $fileTmpPath = $_FILES['file']['tmp_name'];
+        $fileName = $_FILES['file']['name'];
+        
+        $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+
+        if (!in_array($ext, ['xlsx', 'xls'])) {
+            $this->sendError("El archivo debe estar en formato Excel (.xlsx o .xls).", 400);
+        }
+
+        try {
+            $resultado = $this->modelo->importarExcel($fileTmpPath);
+
+            try {
+                $this->sendResponse($resultado);
+            } catch (Exception $e) {
+                $this->sendError($e->getMessage(), 400);
+            }
+
+        } catch (Exception $e) {
+            $this->sendError($e->getMessage(), 400);
+        }
+    }
 }

@@ -68,4 +68,16 @@ export class ProfesoresService {
   getProfesorByEmail(email: string): Observable<ProfesorDTO> {
     return this.http.get<ProfesorDTO>(`${this.API_URL}&m=obtener&correo=${email}`);
   }
+
+  /**
+   * Envía un archivo Excel al servidor para realizar la importación masiva de profesores.
+   * 
+   * @param file Archivo Excel (.xlsx o .xls) seleccionado.
+   * @returns Un `Observable` con el resultado de la importación (imported, errors).
+   */
+  importarProfesoresExcel(file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<any>(`${this.API_URL}&m=importarExcel`, formData);
+  }
 }
