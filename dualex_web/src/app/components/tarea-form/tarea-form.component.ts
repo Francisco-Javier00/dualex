@@ -89,6 +89,7 @@ export class TareaFormComponent implements OnInit {
   modulosTutor: any[] = [];             // Listado de módulos que imparte el profesor
   tareaBloqueada = false;               // Flag para saber si la tarea está bloqueada
   codigoTarea = '';                     // Código auto-generado de la tarea
+  adjuntos: File[] = [];                // Lista de archivos adjuntos a la tarea
 
   // Instancia del editor CKEditor
   public Editor = ClassicEditor;
@@ -484,5 +485,93 @@ export class TareaFormComponent implements OnInit {
     } else {
       this.router.navigate(['/tareas']);
     }
+  }
+
+  // ─── Gestión de Adjuntos ──────────────────────────────────────────────────
+
+  /**
+   * Se ejecuta cuando el usuario selecciona archivos con el input nativo.
+   */
+  onFilesSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files) {
+      this.agregarArchivos(Array.from(input.files));
+      // Resetear input para permitir re-seleccionar el mismo archivo
+      input.value = '';
+    }
+  }
+
+  /**
+   * Se ejecuta cuando el usuario arrastra y suelta archivos en la zona de drop.
+   */
+  onFileDrop(event: DragEvent): void {
+    event.preventDefault();
+    if (event.dataTransfer?.files) {
+      this.agregarArchivos(Array.from(event.dataTransfer.files));
+    }
+  }
+
+  /**
+   * Añade archivos a la lista de adjuntos, validando tamaño y evitando duplicados.
+   */
+  private agregarArchivos(archivos: File[]): void {
+    const MAX_SIZE_MB = 20;
+    archivos.forEach(archivo => {
+      const yaExiste = this.adjuntos.some(a => a.name === archivo.name && a.size === archivo.size);
+      if (yaExiste) return;
+      if (archivo.size > MAX_SIZE_MB * 1024 * 1024) {
+        this.alertService.advertencia(
+          'Archivo demasiado grande',
+          `"${archivo.name}" supera el límite de ${MAX_SIZE_MB} MB.`
+        );
+        return;
+      }
+      this.adjuntos.push(archivo);
+    });
+  }
+
+  /**
+   * Elimina un archivo adjunto por su índice.
+   */
+  eliminarAdjunto(index: number): void {
+    this.adjuntos.splice(index, 1);
+  }
+
+  /**
+   * Devuelve la clase CSS del icono según la extensión del archivo.
+   */
+  getAdjuntoIconClass(nombre: string): string {
+    const ext = nombre.split('.').pop()?.toLowerCase() ?? '';
+    if (['pdf'].includes(ext))                        return 'adjunto-icon--pdf';
+    if (['doc', 'docx'].includes(ext))               return 'adjunto-icon--word';
+    if (['xls', 'xlsx'].includes(ext))               return 'adjunto-icon--excel';
+    if (['ppt', 'pptx'].includes(ext))               return 'adjunto-icon--ppt';
+    if (['png', 'jpg', 'jpeg', 'gif'].includes(ext)) return 'adjunto-icon--img';
+    if (['zip', 'rar', '7z'].includes(ext))          return 'adjunto-icon--zip';
+    return 'adjunto-icon--generic';
+  }
+
+  /**
+   * Devuelve la clase del icono Font Awesome según la extensión del archivo.
+   */
+  getAdjuntoIcon(nombre: string): string {
+    const ext = nombre.split('.').pop()?.toLowerCase() ?? '';
+    if (['pdf'].includes(ext))                        return 'fa-solid fa-file-pdf';
+    if (['doc', 'docx'].includes(ext))               return 'fa-solid fa-file-word';
+    if (['xls', 'xlsx'].includes(ext))               return 'fa-solid fa-file-excel';
+    if (['ppt', 'pptx'].includes(ext))               return 'fa-solid fa-file-powerpoint';
+    if (['png', 'jpg', 'jpeg', 'gif'].includes(ext)) return 'fa-solid fa-file-image';
+    if (['zip', 'rar', '7z'].includes(ext))          return 'fa-solid fa-file-zipper';
+    if (['txt'].includes(ext))                        return 'fa-solid fa-file-lines';
+    return 'fa-solid fa-file';
+  }
+
+  /**
+   * Formatea el tamaño de un archivo en bytes a una representación legible.
+   */
+  formatFileSize(bytes: number): string {
+    if (bytes < 1024)        return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   }
 }

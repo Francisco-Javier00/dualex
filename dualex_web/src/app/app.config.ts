@@ -5,6 +5,8 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 
 import { routes } from './app.routes';
 import { authInterceptor } from './auth/interceptors/auth.interceptor';
+import { Location } from '@angular/common';
+import { CustomLocation } from './services/custom-location.service';
 
 // Parchear la API History a nivel global del navegador para mantener la URL siempre estática
 if (typeof window !== 'undefined' && window.history) {
@@ -24,7 +26,8 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes, withInMemoryScrolling({ scrollPositionRestoration: 'enabled' })),
 
     provideAnimationsAsync(),
-    provideHttpClient(withInterceptors([authInterceptor]))
+    provideHttpClient(withInterceptors([authInterceptor])),
+    { provide: Location, useClass: CustomLocation }
   ]
 };
 

@@ -99,6 +99,52 @@
       </div>
     </div>
 
+    <!-- Adjuntos -->
+    <div class="row g-3 mt-1">
+      <div class="col-lg-4 col-md-6">
+        <label class="form-label fw-bold text-muted small text-uppercase">Documentos adjuntos <span class="text-muted fw-normal">(opcional)</span></label>
+
+        <!-- Input oculto -->
+        <input #fileInput type="file" class="d-none" multiple
+          accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.png,.jpg,.jpeg,.gif,.zip"
+          (change)="onFilesSelected($event)">
+
+        <!-- Zona de drop (estilo Excel) -->
+        <div class="file-drop-zone border-dashed rounded-3 p-3 text-center bg-light cursor-pointer transition-all"
+          (click)="!tareaForm.disabled && fileInput.click()"
+          (dragover)="$event.preventDefault()"
+          (drop)="onFileDrop($event)"
+          id="btn-adjuntar-documento"
+          [class.disabled-zone]="tareaForm.disabled">
+
+          <!-- Estado vacío -->
+          <div *ngIf="adjuntos.length === 0" class="py-2">
+            <i class="fa-solid fa-cloud-arrow-up text-primary fs-4 mb-1"></i>
+            <p class="mb-0 small fw-semibold text-dark">Arrastra archivos o haz clic</p>
+            <p class="text-muted extra-small mb-0">PDF, Word, Excel, imágenes, ZIP &mdash; máx. 20 MB</p>
+          </div>
+
+          <!-- Lista de archivos -->
+          <div *ngIf="adjuntos.length > 0" class="d-flex flex-column gap-1 text-start">
+            <div *ngFor="let adj of adjuntos; let i = index"
+              class="adjunto-chip d-flex align-items-center gap-2 px-2 py-1 rounded-2 border animate-fade-in"
+              [ngClass]="getAdjuntoIconClass(adj.name)">
+              <i [class]="getAdjuntoIcon(adj.name)" style="font-size:0.8rem; flex-shrink:0;"></i>
+              <span class="extra-small fw-semibold text-truncate flex-grow-1" [title]="adj.name + ' · ' + formatFileSize(adj.size)">{{ adj.name }}</span>
+              <span class="extra-small text-muted" style="flex-shrink:0;">{{ formatFileSize(adj.size) }}</span>
+              <button type="button" class="btn btn-link p-0 lh-1 chip-remove ms-1"
+                (click)="$event.stopPropagation(); eliminarAdjunto(i)" [disabled]="tareaForm.disabled" title="Eliminar">
+                <i class="fa-solid fa-xmark" style="font-size:0.7rem;"></i>
+              </button>
+            </div>
+            <!-- Pie: añadir más -->
+            <p class="extra-small text-muted text-center mb-0 mt-1">Haz clic o arrastra para añadir más</p>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
     <hr class="my-4 opacity-25">
 
     <div class="row g-4">

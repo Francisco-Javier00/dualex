@@ -137,3 +137,55 @@
   align-items: center;
   justify-content: center;
 }
+
+/* ─── Adjuntos (estilo drop-zone) ───────────────────────────────────────── */
+
+.file-drop-zone {
+  border: 2px dashed #ced4da;
+  background-color: #f8f9fa;
+  transition: all 0.2s ease;
+}
+
+.file-drop-zone:hover:not(.disabled-zone) {
+  border-color: #0d6efd;
+  background-color: #f1f7ff;
+}
+
+.file-drop-zone.disabled-zone {
+  cursor: not-allowed;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.adjunto-chip {
+  font-size: 0.72rem;
+  background-color: #ffffff;
+  border-color: #dee2e6 !important;
+  cursor: default;
+  line-height: 1.4;
+}
+
+/* Color de fondo por tipo dentro del chip */
+.adjunto-chip.adjunto-icon--pdf   { background-color: #fff1f1; border-color: #f5c6c6 !important; color: #dc3545; }
+.adjunto-chip.adjunto-icon--word  { background-color: #eff6ff; border-color: #bfdbfe !important; color: #2563eb; }
+.adjunto-chip.adjunto-icon--excel { background-color: #f0fdf4; border-color: #bbf7d0 !important; color: #16a34a; }
+.adjunto-chip.adjunto-icon--ppt   { background-color: #fff7ed; border-color: #fed7aa !important; color: #ea580c; }
+.adjunto-chip.adjunto-icon--img   { background-color: #fdf4ff; border-color: #e9d5ff !important; color: #9333ea; }
+.adjunto-chip.adjunto-icon--zip   { background-color: #fefce8; border-color: #fde68a !important; color: #ca8a04; }
+.adjunto-chip.adjunto-icon--generic { background-color: #f1f5f9; border-color: #cbd5e1 !important; color: #64748b; }
+
+.chip-remove {
+  color: inherit !important;
+  opacity: 0.5;
+  line-height: 1;
+  transition: opacity 0.15s ease;
+}
+
+.chip-remove:hover {
+  opacity: 1;
+}
+
+.extra-small {
+  font-size: 0.72rem;
+}
+

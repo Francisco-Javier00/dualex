@@ -3,7 +3,8 @@
     "description": "Backend de Dualex (PHP REST API)",
     "type": "project",
     "require": {
-        "php": ">=7.4"
+        "php": ">=7.4",
+        "phpoffice/phpspreadsheet": "^1.28"
     },
     "require-dev": {
         "phpdocumentor/phpdocumentor": "^3.0"
