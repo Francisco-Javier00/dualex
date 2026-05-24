@@ -68,15 +68,7 @@ export class TareasComponent implements OnInit {
    * Utiliza variantes '-subtle' para un diseño más moderno y legible.
    */
   getCalificacionClases(calificacion: string): string {
-    switch(calificacion) {
-      case 'Bien': return 'bg-success-subtle border-success text-success';
-      case 'Superado': return 'bg-success-subtle border-success text-success';
-      case 'No Superado': return 'bg-danger-subtle border-danger text-danger';
-      case 'Notable': return 'bg-info-subtle border-info text-info';
-      case 'Excelente': return 'bg-primary-subtle border-primary text-primary';
-      case 'Sin Calificar': return 'bg-white border-secondary text-secondary';
-      default: return 'bg-light border-secondary text-dark';
-    }
+    return 'bg-white text-dark';
   }
 
   /**

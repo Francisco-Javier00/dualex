@@ -52,10 +52,9 @@
                 <span class="small fw-bold text-primary">{{ tarea.progreso.actual }}/{{ tarea.progreso.total }}</span>
               </div>
               <div class="progress rounded-pill shadow-inner" style="height: 6px;">
-                <div class="progress-bar progress-bar-striped progress-bar-animated rounded-pill" 
+                <div class="progress-bar progress-bar-striped progress-bar-animated rounded-pill bg-primary" 
                      role="progressbar" 
-                     [style.width.%]="(tarea.progreso.actual / tarea.progreso.total) * 100"
-                     [style.backgroundColor]="tarea.modulos.length > 0 ? tarea.modulos[0].color : '#3F51B5'">
+                     [style.width.%]="(tarea.progreso.actual / tarea.progreso.total) * 100">
                 </div>
               </div>
             </div>
@@ -77,13 +76,13 @@
 
               <!-- Buttons footer row -->
               <div class="d-flex justify-content-between align-items-center pt-2">
-                <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-3 py-1.5 fw-bold" 
+                <button type="button" class="btn btn-outline-primary btn-sm rounded-3 px-3 py-1.5 fw-bold" 
                         (click)="verTarea(tarea)">
                   <i class="fa-solid fa-eye me-1"></i> Ver Detalles
                 </button>
-                <button type="button" class="btn btn-link text-danger p-1 action-btn hover-scale-danger" 
+                <button type="button" class="btn btn-outline-danger btn-sm rounded-3 shadow-sm" 
                         (click)="eliminarTarea(tarea)" title="Eliminar Tarea">
-                  <i class="fa-solid fa-trash-can fs-5"></i>
+                  <i class="fa-solid fa-trash-can"></i>
                 </button>
               </div>
             </div>
