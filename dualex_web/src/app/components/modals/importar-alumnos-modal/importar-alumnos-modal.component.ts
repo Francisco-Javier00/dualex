@@ -6,7 +6,7 @@ interface CursoFormateado {
   id: number;
   gradoStr: string; // "1º" o "2º"
   cicloNombre: string; // e.g. "Desarrollo de Aplicaciones Web"
-  anoEscolar: string;
+  anio_escolar: string;
 }
 
 @Component({
@@ -40,7 +40,7 @@ export class ImportarAlumnosModalComponent implements OnChanges, OnDestroy {
           id: c.id,
           gradoStr: gradoStr,
           cicloNombre: c.ciclo || 'Ciclo Formativo',
-          anoEscolar: c.anoEscolar || c.anio_escolar || ''
+          anio_escolar: c.anio_escolar || ''
         };
       });
     }
