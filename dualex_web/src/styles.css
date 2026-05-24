@@ -437,6 +437,31 @@ footer a:hover {
   height: 100%;
 }
 
+/* Ajustes responsivos para evitar que los modales y su información se corten en pantallas pequeñas */
+.modal-overlay {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 1rem !important;
+  box-sizing: border-box !important;
+}
+
+.modal-content {
+  max-height: calc(100vh - 2rem) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  border-radius: 1.25rem !important;
+  overflow: hidden !important;
+}
+
+.modal-body {
+  flex: 1 1 auto !important;
+  overflow-y: auto !important;
+  min-height: 0 !important;
+  box-sizing: border-box !important;
+}
+
+
 /* ==========================================================================
    CKEditor 5 Global Styles
    ========================================================================== */
