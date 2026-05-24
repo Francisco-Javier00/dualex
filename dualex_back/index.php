@@ -31,6 +31,15 @@ require_once 'src/config/rutas.php';
 require_once 'src/core/conexionDB.php';
 require_once 'src/core/JWTHelper.php';
 require_once 'src/core/BaseController.php';
+// Cargamos las dependencias de Composer (PhpSpreadsheet, etc.)
+$autoloadPath = __DIR__ . '/vendor/autoload.php';
+if (!file_exists($autoloadPath)) {
+    http_response_code(500);
+    echo json_encode(["error" => "Dependencias de Composer no instaladas. Ejecuta 'composer install' en el servidor."]);
+    ob_end_flush();
+    exit;
+}
+require_once $autoloadPath;
 
 // Inicializamos la base de datos
 $db = (new ConexionDB())->getConnection();
