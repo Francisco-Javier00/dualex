@@ -44,7 +44,7 @@ export class CiclosComponent implements OnInit {
         { data: 'nombre' },
         { data: 'siglas' },
         { data: 'grado' },
-        { data: 'cursos' },
+        { data: 'Curso' },
         { data: null, defaultContent: 'Gestionar Módulos' },
         {
           data: null,

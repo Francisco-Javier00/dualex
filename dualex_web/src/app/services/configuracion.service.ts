@@ -25,11 +25,12 @@ export class ConfiguracionService {
     return this.http.get<ConfiguracionDTO>(`${this.API_URL}?c=Configuracion&m=obtenerConfiguracion`);
   }
 
+  esGeneral(): Observable<{ esGeneral: boolean }> {
+    return this.http.get<{ esGeneral: boolean }>(`${this.API_URL}?c=Configuracion&m=esGeneral`);
+  }
+
   /**
    * Actualiza y persiste los valores de configuración en la base de datos.
-   * 
-   * @param config Objeto `ConfiguracionDTO` con los nuevos valores a guardar.
-   * @returns Un `Observable` con la confirmación de la actualización por parte del servidor.
    */
   updateConfiguracion(config: ConfiguracionDTO): Observable<any> {
     return this.http.post(`${this.API_URL}?c=Configuracion&m=actualizarConfiguracion`, config);

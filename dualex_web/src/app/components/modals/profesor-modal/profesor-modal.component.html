@@ -72,11 +72,11 @@
                 <div class="input-group shadow-sm rounded-3 overflow-hidden border"
                      [class.is-invalid]="profesorForm.get('rol')?.touched && profesorForm.get('rol')?.invalid">
                   <span class="input-group-text bg-white border-0"><i class="fa-solid fa-shield-halved text-muted"></i></span>
-                  <select class="form-select border-0 px-3" formControlName="rol" (change)="onRolChange(profesorForm.get('rol')?.value)"
-                          [class.is-invalid]="profesorForm.get('rol')?.touched && profesorForm.get('rol')?.invalid">
-                    <option value="PROFESOR">Profesor</option>
-                    <option value="COORDINADOR">Coordinador</option>
-                  </select>
+                    <select class="form-select border-0 px-3" formControlName="rol" (change)="onRolChange(profesorForm.get('rol')?.value)"
+                            [class.is-invalid]="profesorForm.get('rol')?.touched && profesorForm.get('rol')?.invalid">
+                      <option value="PROFESOR">Profesor</option>
+                      <option value="COORDINADOR">Coordinador</option>
+                    </select>
                 </div>
               </div>
             </div>

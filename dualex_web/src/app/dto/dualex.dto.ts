@@ -15,6 +15,7 @@ export interface PerfilUsuario {
   email: string;
   foto?: string;
   rol: string;
+  esGeneral?: boolean;
 }
 
 export interface JwtPayload {
@@ -28,6 +29,7 @@ export interface JwtPayload {
     dualex?: string;
     [key: string]: string | undefined;
   };
+  esGeneral?: boolean;
   exp?: number;
   iat?: number;
 }

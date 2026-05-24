@@ -3,9 +3,23 @@ require_once MODELO . 'modConfiguracion.php';
 
 class ConConfiguracion {
     private $modelo;
+    private $db;
+    private $user;
 
-    public function __construct($db) {
+    public function __construct($db, $user = null) {
+        $this->db = $db;
+        $this->user = $user;
         $this->modelo = new ModConfiguracion($db);
+    }
+
+    public function esGeneral() {
+        if (!$this->user || !isset($this->user['id'])) {
+            return ["esGeneral" => false];
+        }
+        $stmt = $this->db->prepare("SELECT CAST(general AS UNSIGNED) as general FROM Coordinador WHERE idCoordinador = :id");
+        $stmt->execute([':id' => $this->user['id']]);
+        $res = $stmt->fetch(PDO::FETCH_ASSOC);
+        return ["esGeneral" => ($res && $res['general'] == 1)];
     }
 
     public function obtenerConfiguracion() {

@@ -54,7 +54,8 @@ export class AuthService {
           apellidos: payload.apellidos,
           email: payload.email,
           foto: payload.foto,
-          rol: rolInterno
+          rol: rolInterno,
+          esGeneral: payload.esGeneral ?? false
         };
 
         console.log('AuthService: Emitiendo perfil:', perfil);
@@ -114,6 +115,16 @@ export class AuthService {
       return rol;
     }
     return null;
+  }
+
+  /**
+   * Guarda si el coordinador es general en la sesión.
+   */
+  public setEsGeneral(valor: boolean): void {
+    const actual = this.sujetoPerfilUsuario.value;
+    if (actual) {
+      this.sujetoPerfilUsuario.next({ ...actual, esGeneral: valor });
+    }
   }
 
   /**

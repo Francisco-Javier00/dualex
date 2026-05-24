@@ -14,9 +14,11 @@
 
     <div class="d-flex align-items-center gap-3">
       @if (puedeEditar) {
+        @if (authService.currentUserValue?.esGeneral) {
         <button class="btn btn-outline-secondary rounded-circle shadow-sm me-2" type="button" title="Configuración" (click)="abrirConfiguracion()">
           <i class="fa-solid fa-gear"></i>
         </button>
+        }
         <button class="btn btn-primary px-4 shadow-sm" (click)="crearNuevaEntrada()">
           <i class="fa-solid fa-plus me-2"></i> Nueva Empresa
         </button>

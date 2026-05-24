@@ -4,6 +4,7 @@ import { RouterModule, Router } from '@angular/router';
 import { AuthService } from '../../auth/services/auth.service';
 import { DashboardService } from '../../services/dashboard.service';
 import { ProfesorDashboardService } from '../../services/profesor-dashboard.service';
+import { ProfesoresService } from '../../services/profesores.service';
 import { Categoria, ModuloProfesor, PerfilUsuario } from '../../dto/dualex.dto';
 import { Observable, Subscription } from 'rxjs';
 
@@ -17,12 +18,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
   private servicioDashboard = inject(DashboardService);
   private profesorDashboardService = inject(ProfesorDashboardService);
+  private profesoresService = inject(ProfesoresService);
   private router = inject(Router);
 
   usuario: PerfilUsuario | null = null;
   categorias$: Observable<Categoria[]> = this.servicioDashboard.categorias$;
   modulosProfesor: ModuloProfesor[] = [];
   cargandoModulos = false;
+  ciclosCoordinados: string[] = [];
 
   private suscripcionUsuario!: Subscription;
 
@@ -36,6 +39,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.usuario = perfil;
         if (perfil.rol === 'PROFESOR') {
           this.cargarModulosProfesor();
+        } else if (perfil.rol === 'COORDINADOR' && perfil.email) {
+          this.profesoresService.getProfesorByEmail(perfil.email).subscribe({
+            next: (profesor) => {
+              this.ciclosCoordinados = profesor.ciclos ? profesor.ciclos.split(',').map((c: string) => c.trim()).filter(Boolean) : [];
+            },
+            error: () => this.ciclosCoordinados = []
+          });
         }
       }
     });

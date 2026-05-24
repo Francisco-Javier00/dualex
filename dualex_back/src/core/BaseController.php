@@ -88,6 +88,20 @@ class BaseController {
         }
 
         $userRole = strtoupper($this->user['roles']['dualex']);
+        
+        // Verificar si es Coordinador General
+        $esGeneral = false;
+        if ($userRole === 'COORDINADOR') {
+            $stmt = $this->db->prepare("SELECT CAST(general AS UNSIGNED) as general FROM Coordinador WHERE idCoordinador = :id");
+            $stmt->execute([':id' => $this->user['id']]);
+            $res = $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($res && $res['general'] == 1) {
+                $esGeneral = true;
+            }
+        }
+
+        if ($esGeneral) return; // Coordinador General tiene acceso total
+
         $allowedRoles = array_map('strtoupper', (array)$roles);
 
         if (!in_array($userRole, $allowedRoles)) {

@@ -68,29 +68,30 @@ class ConProfesores extends BaseController {
     /**
      * Crea un nuevo profesor.
      */
+    public function esGeneral() {
+        if (!$this->user || !isset($this->user['id'])) {
+            return ["esGeneral" => false];
+        }
+        $stmt = $this->db->prepare("SELECT CAST(general AS UNSIGNED) as general FROM Coordinador WHERE idCoordinador = :id");
+        $stmt->execute([':id' => $this->user['id']]);
+        $res = $stmt->fetch(PDO::FETCH_ASSOC);
+        return ["esGeneral" => ($res && $res['general'] == 1)];
+    }
+
     public function crear() {
         $this->checkRole(['PROFESOR', 'COORDINADOR']);
         
         $json = file_get_contents('php://input');
         $datos = json_decode($json, true);
-
-        if (!$datos) $this->sendError("Datos inválidos", 400);
-
-        // Validación básica
-        if (empty($datos['nombre']) || empty($datos['apellidos']) || empty($datos['correo'])) {
-            $this->sendError("Faltan campos obligatorios (nombre, apellidos, correo)", 400);
-        }
-
-        // Validación de correo
-        if (!filter_var($datos['correo'], FILTER_VALIDATE_EMAIL)) {
-            $this->sendError("La dirección de correo electrónico no es válida.", 400);
+        
+        // Nueva validación: Solo el General puede crear coordinadores
+        if ($datos['rol'] === 'COORDINADOR' && !$this->esGeneral()['esGeneral']) {
+            $this->sendError("No tienes permisos para crear coordinadores.", 403);
         }
 
         try {
-            $nuevo = $this->modelo->crear($datos);
-            return $nuevo;
-        } catch (InvalidArgumentException $e) {
-            $this->sendError($e->getMessage(), 400);
+            $res = $this->modelo->crear($datos);
+            $this->sendResponse($res, 201);
         } catch (Exception $e) {
             $this->sendError($e);
         }
@@ -103,23 +104,21 @@ class ConProfesores extends BaseController {
         $this->checkRole(['PROFESOR', 'COORDINADOR']);
         
         $id = $_GET['id'] ?? null;
-        if (!$id) $this->sendError("ID no proporcionado", 400);
+        if (!$id) {
+            $this->sendError("ID no proporcionado.", 400);
+        }
 
         $json = file_get_contents('php://input');
         $datos = json_decode($json, true);
 
-        if (!$datos) $this->sendError("Datos inválidos", 400);
-
-        // Validación de correo
-        if (isset($datos['correo']) && !filter_var($datos['correo'], FILTER_VALIDATE_EMAIL)) {
-            $this->sendError("La dirección de correo electrónico no es válida.", 400);
+        // Nueva validación: Solo el General puede actualizar a Coordinador
+        if ($datos['rol'] === 'COORDINADOR' && !$this->esGeneral()['esGeneral']) {
+            $this->sendError("No tienes permisos para asignar el rol de Coordinador.", 403);
         }
-
+        
         try {
-            $actualizado = $this->modelo->actualizar($id, $datos);
-            return $actualizado;
-        } catch (InvalidArgumentException $e) {
-            $this->sendError($e->getMessage(), 400);
+            $res = $this->modelo->actualizar($id, $datos);
+            $this->sendResponse($res);
         } catch (Exception $e) {
             $this->sendError($e);
         }

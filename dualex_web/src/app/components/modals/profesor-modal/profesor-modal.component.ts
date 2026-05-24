@@ -1,11 +1,12 @@
 import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, inject, Renderer2 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { forkJoin } from 'rxjs';
+import { forkJoin, Subscription } from 'rxjs';
 import { CicloDTO, ModuloDTO } from '../../../dto/dualex.dto';
 import { CiclosService } from '../../../services/ciclos.service';
 import { ModulosService } from '../../../services/modulos.service';
 import { AlertService } from '../../../services/alert.service';
+import { AuthService } from '../../../auth/services/auth.service';
 
 @Component({
   selector: 'app-profesor-modal',
@@ -20,6 +21,7 @@ export class ProfesorModalComponent implements OnInit, OnDestroy {
   private modulosService = inject(ModulosService);
   private fb = inject(FormBuilder);
   private alertService = inject(AlertService);
+  public authService = inject(AuthService); // Cambiado a public para acceso en HTML
 
   private _profesor: any | null = null;
   @Input() modo: 'crear' | 'editar' = 'crear';
@@ -30,6 +32,7 @@ export class ProfesorModalComponent implements OnInit, OnDestroy {
   filtroCiclos = '';
   ciclosExpandidos: string[] = [];
   modulosSeleccionadosIds: number[] = [];
+  private perfilSubscription: Subscription | null = null;
 
   profesorForm: FormGroup = this.fb.group({
     id: [null],
@@ -66,10 +69,14 @@ export class ProfesorModalComponent implements OnInit, OnDestroy {
     this.toggleBodyScroll(true);
     this.cargarDatos();
     if (this.profesor) this.syncProfesor(this.profesor);
+    this.perfilSubscription = this.authService.perfilUsuario$.subscribe(() => {
+      this.actualizarEstadoDeshabilitadoRol();
+    });
   }
 
   ngOnDestroy(): void {
     this.toggleBodyScroll(false);
+    this.perfilSubscription?.unsubscribe();
   }
 
   private toggleBodyScroll(isVisible: boolean): void {
@@ -88,10 +95,10 @@ export class ProfesorModalComponent implements OnInit, OnDestroy {
       if (ciclos.length === 0) {
         this.modulosBD = [];
         this.modulosPorCiclo = {};
-        this.sincronizarIdsModulosSeleccionados();
-        this.refrescarEstadoVisual();
-        return;
-      }
+    this.sincronizarIdsModulosSeleccionados();
+    this.refrescarEstadoVisual();
+    this.actualizarEstadoDeshabilitadoRol();
+  }
 
       forkJoin(ciclos.map(ciclo => this.modulosService.getModulosPorCiclo(ciclo.siglas))).subscribe(modulosPorCiclo => {
         const indexById = new Map<number, ModuloDTO>();
@@ -233,6 +240,15 @@ export class ProfesorModalComponent implements OnInit, OnDestroy {
     this.ciclosExpandidos = [];
     this.modulosSeleccionadosIds = [];
     this.filtroCiclos = '';
+    this.actualizarEstadoDeshabilitadoRol();
+  }
+
+  private actualizarEstadoDeshabilitadoRol(): void {
+    if (!this.authService.currentUserValue?.esGeneral) {
+      this.profesorForm.get('rol')?.disable();
+    } else {
+      this.profesorForm.get('rol')?.enable();
+    }
   }
 
   onToggleCiclo(cicloSiglas: string, checked: boolean): void {

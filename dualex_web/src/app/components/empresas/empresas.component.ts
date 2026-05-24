@@ -24,7 +24,7 @@ export class EmpresasComponent implements OnInit {
   private empresasService = inject(EmpresasService);
   private configuracionService = inject(ConfiguracionService);
   private alertService = inject(AlertService);
-  private authService = inject(AuthService);
+  authService = inject(AuthService);
   private ciclosService = inject(CiclosService);
 
   @ViewChild(DatatableComponent) datatable?: DatatableComponent;
@@ -62,6 +62,12 @@ export class EmpresasComponent implements OnInit {
 
   ngOnInit(): void {
     this.puedeEditar = this.authService.currentUserValue?.rol === 'COORDINADOR';
+    if (this.puedeEditar) {
+      this.configuracionService.esGeneral().subscribe({
+        next: res => this.authService.setEsGeneral(res.esGeneral),
+        error: () => this.authService.setEsGeneral(false)
+      });
+    }
     this.cargarConfiguracion();
     this.cargarCiclos();
 
