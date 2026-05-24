@@ -308,10 +308,11 @@ class ModEmpresas {
         if (empty($empresas)) return [];
 
         // Hacemos una sub-consulta rápida para saber de cuántos años es el convenio en este servidor
-        $stmtConf = $this->db->prepare("SELECT tiempo_finalizacion_convenio FROM Configuracion LIMIT 1");
+        $stmtConf = $this->db->prepare("SELECT tiempo_finalizacion_convenio, dias_aviso_caducidad FROM Configuracion LIMIT 1");
         $stmtConf->execute();
         $conf = $stmtConf->fetch(PDO::FETCH_ASSOC);
         $aniosConvenio = $conf ? intval($conf['tiempo_finalizacion_convenio']) : 1;
+        $diasAviso = $conf ? intval($conf['dias_aviso_caducidad']) : 30;
 
         foreach ($empresas as &$empresa) {
             // Conversión inversa: De la base de datos (YYYY-MM-DD HH:MM:SS) a español (DD/MM/YYYY)
@@ -322,6 +323,14 @@ class ModEmpresas {
             $finDt = clone $inicioDt;
             $finDt->modify("+$aniosConvenio years");
             $empresa['finConvenio'] = $finDt->format('d/m/Y');
+
+            // Comprobamos si la fecha de fin está próxima a caducar según los días de aviso configurados
+            $hoy = new DateTime();
+            $diferencia = $hoy->diff($finDt);
+            $diasRestantes = (int)$diferencia->format('%r%a'); // Días con signo (negativo si ya pasó)
+            $empresa['proximoACaducar'] = $diasRestantes >= 0 && $diasRestantes <= $diasAviso;
+            $empresa['caducado'] = $diasRestantes < 0;
+            $empresa['diasRestantes'] = $diasRestantes;
 
             // Obtenemos los Ciclo vinculados a esta empresa
             $sqlCiclos = "SELECT c.siglas, ce.tutor FROM Ciclo c 

@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { Config } from 'datatables.net';
@@ -27,6 +27,7 @@ export class EmpresasComponent implements OnInit {
   private alertService = inject(AlertService);
   authService = inject(AuthService);
   private ciclosService = inject(CiclosService);
+  private location = inject(Location);
 
   @ViewChild(DatatableComponent) datatable?: DatatableComponent;
 
@@ -138,7 +139,17 @@ export class EmpresasComponent implements OnInit {
           render: (data: string) => data ? data : '<span class="text-muted italic">Sin asignar</span>'
         },
         { data: 'inicioConvenio', responsivePriority: 9 },
-        { data: 'finConvenio', responsivePriority: 10 },
+        { data: 'finConvenio', responsivePriority: 10, 
+          render: (data: string, type: string, row: any) => {
+            if (row?.caducado) {
+              return `<span class="text-danger fw-bold"><i class="fa-solid fa-circle-exclamation me-1"></i>${data}</span>`;
+            }
+            if (row?.proximoACaducar) {
+              return `<span class="text-danger">${data} <small class="text-muted">(${row.diasRestantes} días)</small></span>`;
+            }
+            return data;
+          }
+        },
         ...(this.puedeEditar ? [{
           data: null,
           className: 'text-center',
@@ -532,5 +543,9 @@ export class EmpresasComponent implements OnInit {
     const anioFinal = String(fecha.getFullYear());
 
     return `${diaFinal}/${mesFinal}/${anioFinal}`;
+  }
+
+  irAtras(): void {
+    this.location.back();
   }
 }

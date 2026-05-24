@@ -39,7 +39,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.usuario = perfil;
         if (perfil.rol === 'PROFESOR') {
           this.cargarModulosProfesor();
-        } else if (perfil.rol === 'COORDINADOR' && perfil.email) {
+        } else if ((perfil.rol === 'COORDINADOR' || perfil.rol === 'COORDINADOR_GENERAL') && perfil.email) {
           this.profesoresService.getProfesorByEmail(perfil.email).subscribe({
             next: (profesor) => {
               this.ciclosCoordinados = profesor.ciclos ? profesor.ciclos.split(',').map((c: string) => c.trim()).filter(Boolean) : [];

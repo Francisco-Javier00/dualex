@@ -101,5 +101,9 @@ export class AlumnosService {
     formData.append('idCurso', idCurso.toString());
     return this.http.post<any>(`${this.API_URL}&m=importarExcel`, formData);
   }
+
+  obtenerTodosDataTables(dataTablesParameters: any): Observable<any> {
+    return this.http.post<any>(`${this.API_URL}&m=listarTodosDataTables`, dataTablesParameters);
+  }
 }
 

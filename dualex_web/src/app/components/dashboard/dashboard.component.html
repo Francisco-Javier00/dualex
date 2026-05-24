@@ -2,7 +2,7 @@
   <div class="management-panel p-4 p-md-5">
 
     <!-- === DASHBOARD COORDINADOR === -->
-    @if (usuario?.rol === 'COORDINADOR') {
+    @if (usuario?.rol === 'COORDINADOR' || usuario?.rol === 'COORDINADOR_GENERAL') {
     <header class="mb-4 d-flex justify-content-between align-items-end">
       <div>
         <h1 class="h3 fw-bold text-dark mb-1">PANEL DE GESTIÓN INTEGRAL</h1>
@@ -20,6 +20,10 @@
           </div>
         }
       </div>
+      <a href="/mis-modulos" target="_blank" class="btn shadow-sm"
+         [ngClass]="(usuario?.rol === 'COORDINADOR' && usuario?.esGeneral) ? 'btn-coordinador-general' : 'btn-primary'">
+        <i class="fa-solid fa-chalkboard"></i> Mis Módulos
+      </a>
     </header>
 
     <div class="row g-4 justify-content-start">
@@ -32,8 +36,9 @@
           </div>
           <div class="card-body p-3 text-center">
             <button
-              class="btn btn-primary-light w-100 py-3 border-0 d-flex align-items-center justify-content-center gap-2 fs-5"
-              [routerLink]="categoria.ruta">
+              class="btn w-100 py-3 border-0 d-flex align-items-center justify-content-center gap-2 fs-5"
+              [routerLink]="categoria.ruta"
+              [ngClass]="(usuario?.rol === 'COORDINADOR' && usuario?.esGeneral && (categoria.titulo === 'Profesores' || categoria.titulo === 'Empresas')) ? 'btn-coordinador-general' : 'btn-primary-light'">
               {{ categoria.titulo }} <i class="fa-solid fa-arrow-right"></i>
             </button>
           </div>
@@ -55,6 +60,9 @@
       <div class="d-flex gap-2">
         <button class="btn btn-building shadow-sm" data-tooltip="Ver listado de empresas" routerLink="/empresas">
           <i class="fa-solid fa-building"></i>
+        </button>
+        <button class="btn btn-outline-success shadow-sm" data-tooltip="Ver tareas de todos los alumnos" routerLink="/tareas-todos" style="width:56px;height:56px;border-radius:14px;font-size:1.5rem;">
+          <i class="fa-solid fa-clipboard-list"></i>
         </button>
       </div>
     </header>

@@ -343,6 +343,66 @@ class ModAlumnos {
         ];
     }
 
+    public function listarTodosDataTables($params) {
+        $start = (int)($params['start'] ?? 0);
+        $length = (int)($params['length'] ?? 10);
+        $search = $params['search']['value'] ?? '';
+
+        $sql = "SELECT DISTINCT idUsuario as id, u.nombre, apellidos, correo as email,
+                       DNI as dni, NUSS as nuss, NIA as nia, telefono, a.idCurso,
+                       CAST(repetidor AS UNSIGNED) as repetidor,
+                       c.nombre as nombreCurso, idEmpresa
+                FROM Usuario u
+                INNER JOIN Alumno a ON u.idUsuario = a.idAlumno
+                LEFT JOIN Curso c ON a.idCurso = c.idCurso
+                LEFT JOIN Empresa_Alumno ea ON a.idAlumno = ea.idAlumno";
+
+        $where = "";
+        $binds = [];
+        if ($search) {
+            $where = " WHERE (u.nombre LIKE :search1 OR apellidos LIKE :search2 OR correo LIKE :search3)";
+            $binds[':search1'] = "%$search%";
+            $binds[':search2'] = "%$search%";
+            $binds[':search3'] = "%$search%";
+        }
+
+        $total = $this->db->query("SELECT COUNT(*) FROM Alumno")->fetchColumn();
+
+        if ($search) {
+            $stmtF = $this->db->prepare("SELECT COUNT(DISTINCT a.idAlumno) FROM Usuario u INNER JOIN Alumno a ON u.idUsuario = a.idAlumno LEFT JOIN Curso c ON a.idCurso = c.idCurso" . $where);
+            $stmtF->execute($binds);
+            $totalFiltrados = $stmtF->fetchColumn();
+        } else {
+            $totalFiltrados = $total;
+        }
+
+        $orderBy = " ORDER BY apellidos, u.nombre";
+        if (isset($params['order']) && count($params['order']) > 0) {
+            $orderColumnIndex = intval($params['order'][0]['column']);
+            $orderDir = $params['order'][0]['dir'] === 'asc' ? 'ASC' : 'DESC';
+            $columnsMap = [0 => 'u.nombre', 1 => 'apellidos', 2 => 'correo'];
+            if (isset($columnsMap[$orderColumnIndex])) {
+                $orderBy = " ORDER BY " . $columnsMap[$orderColumnIndex] . " " . $orderDir;
+            }
+        }
+
+        $sqlData = $sql . $where . $orderBy . " LIMIT :start, :length";
+        $stmtData = $this->db->prepare($sqlData);
+        foreach ($binds as $key => $val) {
+            $stmtData->bindValue($key, $val);
+        }
+        $stmtData->bindValue(':start', (int)$start, PDO::PARAM_INT);
+        $stmtData->bindValue(':length', (int)$length, PDO::PARAM_INT);
+        $stmtData->execute();
+
+        return [
+            "draw" => (int)($params['draw'] ?? 0),
+            "recordsTotal" => (int)$total,
+            "recordsFiltered" => (int)$totalFiltrados,
+            "data" => $stmtData->fetchAll(PDO::FETCH_ASSOC)
+        ];
+    }
+
     /**
      * Obtiene el listado de Alumno que están cursando un módulo específico.
      *

@@ -6,9 +6,9 @@
         <div class="card-body p-4 p-lg-5 position-relative">
           <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap">
             <div class="d-flex align-items-start gap-3">
-              <a [routerLink]="rutaInicio" class="btn back-btn mt-1" title="Volver">
+              <button type="button" class="btn back-btn mt-1" title="Volver" (click)="irAtras()">
                 <i class="fa-solid fa-arrow-left"></i>
-              </a>
+              </button>
               <div>
                 <p class="perfil-kicker mb-1">Mi perfil</p>
                 <h1 class="perfil-title mb-2">Hola, {{ perfil.nombre }}</h1>

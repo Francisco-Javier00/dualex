@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, ViewChild } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { DatatableComponent } from '../shared/datatable/datatable.component';
 import { ConfirmarBorradoModalComponent } from '../shared/modals/confirmar-borrado-modal/confirmar-borrado-modal.component';
@@ -19,6 +19,7 @@ import 'datatables.net-responsive-bs5';
 export class ActividadesComponent implements OnInit {
   private actividadesService = inject(ActividadesService);
   private alertService = inject(AlertService);
+  private location = inject(Location);
 
   @ViewChild(DatatableComponent) datatable!: DatatableComponent;
 
@@ -141,5 +142,9 @@ export class ActividadesComponent implements OnInit {
 
   private recargarTabla(): void {
     this.datatable.refrescar();
+  }
+
+  irAtras(): void {
+    this.location.back();
   }
 }

@@ -262,6 +262,10 @@ export class ProfesorModalComponent implements OnInit, OnDestroy {
     }
 
     if (checked) {
+      if (esCoordinador && this.nuevoProfesor.ciclos.length >= 1) {
+        this.alertService.advertencia('Límite alcanzado', 'Un coordinador solo puede gestionar un ciclo.');
+        return;
+      }
       if (!this.nuevoProfesor.ciclos.includes(cicloSiglas)) {
         this.nuevoProfesor.ciclos.push(cicloSiglas);
       }

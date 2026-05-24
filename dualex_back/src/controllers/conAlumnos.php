@@ -146,5 +146,12 @@ class ConAlumnos extends BaseController {
             $this->sendError($e->getMessage(), 400);
         }
     }
+
+    public function listarTodosDataTables() {
+        $json = file_get_contents('php://input');
+        $params = json_decode($json, true) ?? [];
+        $data = $this->modelo->listarTodosDataTables($params);
+        $this->sendResponse($data);
+    }
 }
 
