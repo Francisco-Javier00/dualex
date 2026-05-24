@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { DatatableComponent } from '../shared/datatable/datatable.component';
@@ -20,6 +20,7 @@ import { CicloModalComponent } from '../modals/ciclo-modal/ciclo-modal.component
 export class CiclosComponent implements OnInit {
   private ciclosService = inject(CiclosService);
   private alertService = inject(AlertService);
+  private location = inject(Location);
 
   ciclos: CicloDTO[] = [];
 
@@ -177,5 +178,9 @@ export class CiclosComponent implements OnInit {
 
   formatearCursos(siglas: string): string {
     return siglas ? `1º ${siglas.toUpperCase()}, 2º ${siglas.toUpperCase()}` : '';
+  }
+
+  irAtras(): void {
+    this.location.back();
   }
 }

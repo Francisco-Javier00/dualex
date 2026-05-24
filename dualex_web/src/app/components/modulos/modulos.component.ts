@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, inject, ViewChild } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { DatatableComponent } from '../shared/datatable/datatable.component';
 import { ConfirmarBorradoModalComponent } from '../shared/modals/confirmar-borrado-modal/confirmar-borrado-modal.component';
@@ -25,6 +25,7 @@ export class ModulosComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
   private profesoresService = inject(ProfesoresService);
   private cursosService = inject(CursosService);
+  private location = inject(Location);
 
   @ViewChild(DatatableComponent) datatable!: DatatableComponent;
 
@@ -249,5 +250,9 @@ export class ModulosComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.suscripcionUsuario?.unsubscribe();
+  }
+
+  irAtras(): void {
+    this.location.back();
   }
 }

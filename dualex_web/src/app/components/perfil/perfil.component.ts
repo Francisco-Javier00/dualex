@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { Subscription } from 'rxjs';
@@ -17,6 +17,7 @@ export class PerfilComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
   private alertService = inject(AlertService);
   private router = inject(Router);
+  private location = inject(Location);
   private suscripcion?: Subscription;
 
   perfil: PerfilUsuario | null = null;
@@ -59,5 +60,9 @@ export class PerfilComponent implements OnInit, OnDestroy {
     this.authService.cerrarSesion();
     this.alertService.informacion('Sesión cerrada', 'Has salido de la sesión local.');
     this.router.navigate(['/']);
+  }
+
+  irAtras(): void {
+    this.location.back();
   }
 }

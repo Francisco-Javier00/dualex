@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, inject, ViewChild } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { DatatableComponent } from '../shared/datatable/datatable.component';
 import { ConfirmarBorradoModalComponent } from '../shared/modals/confirmar-borrado-modal/confirmar-borrado-modal.component';
@@ -31,6 +31,7 @@ export class AlumnosComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private location = inject(Location);
 
   @ViewChild(DatatableComponent) datatable!: DatatableComponent;
 
@@ -55,12 +56,26 @@ export class AlumnosComponent implements OnInit, OnDestroy {
   rolUsuarioActual: string | null = null;
 
   get puedeGestionarAlumnos(): boolean {
-    return this.rolUsuarioActual === 'COORDINADOR';
+    // Desde "Mis Módulos" (con moduloId), ningún coordinador gestiona
+    if (this.moduloId) return false;
+    return this.rolUsuarioActual === 'COORDINADOR' && !this.authService.currentUserValue?.esGeneral;
+  }
+  
+  get esSoloLectura(): boolean {
+    // Desde "Mis Módulos" (con moduloId), todos son solo lectura
+    if (this.moduloId) return true;
+    // El coordinador normal NO es solo lectura
+    if (this.rolUsuarioActual === 'COORDINADOR' && !this.authService.currentUserValue?.esGeneral) {
+      return false;
+    }
+    // Profesor y Coordinador General son solo lectura
+    return this.rolUsuarioActual === 'PROFESOR' || (this.rolUsuarioActual === 'COORDINADOR' && !!this.authService.currentUserValue?.esGeneral);
   }
 
   get columnTitles(): string[] {
     const base = ['Nombre', 'Apellidos', 'Correo', 'Curso/Ciclo'];
-    if (this.rolUsuarioActual !== 'PROFESOR') {
+    // Solo mostrar columnas sensibles si NO es solo lectura
+    if (!this.esSoloLectura) {
       base.push('NIA', 'NUSS', 'DNI', 'Teléfono');
     }
     base.push('Acciones');
@@ -69,14 +84,21 @@ export class AlumnosComponent implements OnInit, OnDestroy {
 
   private construirColumnas(): any[] {
     const rol = this.rolUsuarioActual;
+    const esGeneral = this.authService.currentUserValue?.esGeneral;
     const puedeGestionar = this.puedeGestionarAlumnos;
+    
+    // Si es solo lectura (Profesor o Coordinador General), ocultamos datos sensibles
+    const ocultarSensibles = this.esSoloLectura;
+    
     const cols: any[] = [
       { data: 'nombre', width: '25%' },
       { data: 'apellidos', width: '25%' },
       { data: 'email', width: '25%' },
       { data: 'nombreCurso', defaultContent: '<span class="text-muted">Sin curso</span>', width: '15%' },
     ];
-    if (rol !== 'PROFESOR') {
+    
+    // Desde "Mis Módulos" o Profesor/Coord General: ocultar sensibles
+    if (!ocultarSensibles) {
       cols.push(
         { data: 'nia' },
         { data: 'nuss' },
@@ -91,7 +113,7 @@ export class AlumnosComponent implements OnInit, OnDestroy {
       width: '10%',
       render: () => `
         <div class="d-flex gap-2 justify-content-center">
-          ${rol === 'PROFESOR' ? `
+          ${(rol === 'PROFESOR' || (rol === 'COORDINADOR' && (esGeneral || this.moduloId))) ? `
             <button class="btn btn-sm btn-outline-success shadow-sm" data-action="tasks" title="Ver Tareas">
               <i class="fa-solid fa-clipboard-list"></i>
             </button>
@@ -324,6 +346,10 @@ export class AlumnosComponent implements OnInit, OnDestroy {
     } else if (event.action === 'tasks') {
       this.router.navigate(['/tareas', event.data.id]);
     }
+  }
+
+  irAtras() {
+    this.location.back();
   }
 
   onConfirmarBorrado(): void {

@@ -476,12 +476,14 @@ footer a:hover {
 }
 
 /* Tooltip personalizado (Estilo Bocadillo) */
-.btn-building {
+.btn-building,
+.btn-outline-success[data-tooltip] {
   position: relative;
 }
 
 /* El cuerpo del bocadillo */
-.btn-building::after {
+.btn-building::after,
+.btn-outline-success[data-tooltip]::after {
   content: attr(data-tooltip);
   position: absolute;
   top: 50%;
@@ -503,7 +505,8 @@ footer a:hover {
 }
 
 /* La flechita del bocadillo */
-.btn-building::before {
+.btn-building::before,
+.btn-outline-success[data-tooltip]::before {
   content: '';
   position: absolute;
   top: 50%;
@@ -520,7 +523,9 @@ footer a:hover {
 }
 
 .btn-building:hover::after,
-.btn-building:hover::before {
+.btn-building:hover::before,
+.btn-outline-success[data-tooltip]:hover::after,
+.btn-outline-success[data-tooltip]:hover::before {
   opacity: 1;
   visibility: visible;
   transform: translateY(-50%) translateX(0);
@@ -531,7 +536,7 @@ footer a:hover {
 
 /* Botón de acción especial para Coordinadores Generales (Tonos suaves concordantes) */
 .btn-coordinador-general {
-  background-color: #a88cb8; /* Púrpura suave / malva */
+  background-color: #a88cb8;
   color: white;
 }
 

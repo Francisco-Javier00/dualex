@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { Config } from 'datatables.net';
@@ -21,6 +21,7 @@ import { ProfesorDTO } from '../../dto/dualex.dto';
 export class ProfesoresComponent implements OnInit {
   private profesoresService = inject(ProfesoresService);
   private alertService = inject(AlertService);
+  private location = inject(Location);
 
   @ViewChild(DatatableComponent) datatable?: DatatableComponent;
 
@@ -228,5 +229,9 @@ export class ProfesoresComponent implements OnInit {
 
   private refrescarTabla(): void {
     this.datatable?.refrescar();
+  }
+
+  irAtras(): void {
+    this.location.back();
   }
 }
