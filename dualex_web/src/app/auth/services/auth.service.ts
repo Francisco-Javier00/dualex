@@ -48,16 +48,16 @@ export class AuthService {
           return;
         }
 
+
+
         const perfil: PerfilUsuario = {
           id: payload.id,
           nombre: payload.nombre,
           apellidos: payload.apellidos,
           email: payload.email,
-          foto: payload.foto,
           rol: rolInterno,
           esGeneral: payload.esGeneral ?? false
         };
-
         console.log('AuthService: Emitiendo perfil:', perfil);
         this.sujetoPerfilUsuario.next(perfil);
       } else {

@@ -40,8 +40,7 @@ export class AlumnoModalComponent implements OnInit, OnChanges, OnDestroy {
     telefono: ['', [Validators.required, Validators.maxLength(15)]],
     repetidor: [false],
     idCurso: [null, [Validators.required]],
-    idEmpresa: [null],
-    estado: ['Activo']
+    idEmpresa: [null]
   });
 
   // Validador de DNI / NIE español (Algoritmo oficial)
@@ -145,7 +144,6 @@ export class AlumnoModalComponent implements OnInit, OnChanges, OnDestroy {
       if (!this.visible) {
         this.alumnoForm.reset({
           repetidor: false,
-          estado: 'Activo',
           idCurso: null,
           idEmpresa: null
         });

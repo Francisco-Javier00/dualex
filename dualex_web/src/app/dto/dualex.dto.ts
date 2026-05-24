@@ -13,7 +13,6 @@ export interface PerfilUsuario {
   nombre: string;
   apellidos: string;
   email: string;
-  foto?: string;
   rol: string;
   esGeneral?: boolean;
 }
@@ -23,7 +22,6 @@ export interface JwtPayload {
   nombre: string;
   apellidos: string;
   email: string;
-  foto?: string;
   roles: {
     global?: string;
     dualex?: string;
@@ -67,7 +65,6 @@ export interface Tarea {
   actividadesSeleccionadas?: number[];
   evaluacionEmpresa?: string;
   comentarioEmpresa?: string;
-  moduloEvaluacion?: string;
   revisadoProfesor?: boolean;
   comentarioProfesor?: string;
   revisionesModulos?: ModuloRevision[];
@@ -101,7 +98,6 @@ export interface AlumnoDTO {
   repetidor: boolean;
   idCurso: number;
   idEmpresa?: number;
-  estado?: 'Activo' | 'Inactivo';
   nombreCurso?: string; // Para mostrar en tablas
 }
 
@@ -118,18 +114,11 @@ export interface CicloDTO {
   siglas: string;
   grado?: string;
   cursos?: string;
-  anoEscolar?: string;
-  colorFondo1?: string;
-  colorTexto1?: string;
-  colorFondo2?: string;
-  colorTexto2?: string;
 }
 
 export interface CursoDTO {
   id: number;
   nombre: string;
-  curso: number;
-  anoEscolar: string;
   anio_escolar?: string;
   ciclo: string;
   siglasCiclo?: string;

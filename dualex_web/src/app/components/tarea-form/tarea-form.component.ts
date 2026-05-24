@@ -222,7 +222,6 @@ export class TareaFormComponent implements OnInit {
       actividadesSeleccionadas: [[]],
       evaluacionEmpresa: ['Sin Calificar'],
       comentarioEmpresa: [''],
-      moduloEvaluacion: [''],
       revisionesModulos: this.fb.array([]), // Array dinámico de revisiones por módulo
       revisadoProfesor: [false],
       comentarioProfesor: ['']
