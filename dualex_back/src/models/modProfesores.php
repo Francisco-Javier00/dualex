@@ -568,7 +568,7 @@ class ModProfesores {
             $data = [];
             $i = 0;
 
-            foreach ($header as $key) {
+            foreach ($header as $key) { //saca el "número de la columna", es decir A, B,C... y la compara con los campos de la cabecera
                 $i++;
                 $data[$key] = trim($row[array_keys($row)[$i - 1]] ?? '');
             }
@@ -589,14 +589,14 @@ class ModProfesores {
                 continue;
             }
 
-            $profesorData = [
+            $profesorData = [ //añadimos fila con los datos del profesor
                 'nombre' => $nombre,
                 'apellidos' => $apellidos,
                 'correo' => $correo,
                 'rol' => 'PROFESOR',
-                'ciclos' => [],
-                'modulos' => [],
-                'modulosIds' => []
+                'ciclos' => [], //los ponemos vacios y más adelante se rellenan.
+                'modulos' => [], //los ponemos vacios y más adelante se rellenan.
+                'modulosIds' => [] //los ponemos vacios y más adelante se rellenan.
             ];
 
             // Validar
