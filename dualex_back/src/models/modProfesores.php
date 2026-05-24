@@ -164,6 +164,8 @@ class ModProfesores {
                 $sqlC = "INSERT INTO Coordinador (idCoordinador) VALUES (:id)";
                 $this->db->prepare($sqlC)->execute([':id' => $idUsuario]);
 
+                // Limitar a 1 ciclo
+                $ciclos = array_slice($ciclos, 0, 1);
                 $this->asignarCiclos($idUsuario, $ciclos);
             }
 
@@ -229,6 +231,8 @@ class ModProfesores {
                 if (!$esCoordinadorActual) {
                     $this->db->prepare("INSERT INTO Coordinador (idCoordinador) VALUES (:id)")->execute([':id' => $id]);
                 }
+                // Limitar a 1 ciclo
+                $ciclos = array_slice($ciclos, 0, 1);
                 $this->asignarCiclos($id, $ciclos);
             } else {
                 if ($esCoordinadorActual) {
