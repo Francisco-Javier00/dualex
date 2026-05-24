@@ -61,6 +61,40 @@ if ($authHeader && preg_match('/Bearer\s+(.*)$/i', $authHeader, $matches)) {
     $secret = $_ENV['JWT_SECRET'] ?? '';
     if ($secret) {
         $user = JWTHelper::validar($token, $secret);
+        
+        if ($user && isset($user['email'])) {
+            // Verificar si el usuario ya existe en la base de datos
+            $stmt = $db->prepare("SELECT idUsuario FROM Usuario WHERE correo = :correo");
+            $stmt->execute([':correo' => $user['email']]);
+            $dbUser = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$dbUser) {
+                // Por defecto, crearlo como profesor
+                try {
+                    $db->beginTransaction();
+
+                    $sqlU = "INSERT INTO Usuario (nombre, apellidos, correo, tipo) VALUES (:nombre, :apellidos, :correo, 'P')";
+                    $stmtU = $db->prepare($sqlU);
+                    $stmtU->execute([
+                        ':nombre'    => $user['nombre'] ?? '',
+                        ':apellidos' => $user['apellidos'] ?? '',
+                        ':correo'    => $user['email']
+                    ]);
+                    $idUsuario = $db->lastInsertId();
+
+                    $sqlP = "INSERT INTO Profesor (idProfesor) VALUES (:id)";
+                    $stmtP = $db->prepare($sqlP);
+                    $stmtP->execute([':id' => $idUsuario]);
+
+                    $db->commit();
+                    $user['id'] = $idUsuario;
+                } catch (Exception $e) {
+                    $db->rollBack();
+                }
+            } else {
+                $user['id'] = $dbUser['idUsuario'];
+            }
+        }
     }
 }
 

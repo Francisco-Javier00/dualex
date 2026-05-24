@@ -33,10 +33,10 @@ export class AlertService {
    * 
    * @param titulo Título de la notificación.
    * @param mensaje Cuerpo detallado del mensaje.
-   * @param autoCierre Define si la alerta se ocultará automáticamente.
+   * @param autoCierre Define si la alerta se ocultará automáticamente (por defecto false).
    * @param duracion Tiempo en milisegundos que la alerta permanecerá visible.
    */
-  advertencia(titulo: string, mensaje: string, autoCierre: boolean = true, duracion: number = 3000): void {
+  advertencia(titulo: string, mensaje: string, autoCierre: boolean = false, duracion: number = 3000): void {
     this.agregarAlerta('warning', titulo, mensaje, autoCierre, duracion);
   }
 
@@ -57,10 +57,10 @@ export class AlertService {
    * 
    * @param titulo Título del error.
    * @param mensaje Descripción detallada del error.
-   * @param autoCierre Define si la alerta se ocultará automáticamente.
+   * @param autoCierre Define si la alerta se ocultará automáticamente (por defecto false).
    * @param duracion Tiempo en milisegundos que la alerta permanecerá visible.
    */
-  error(titulo: string, mensaje: string, autoCierre: boolean = true, duracion: number = 3500): void {
+  error(titulo: string, mensaje: string, autoCierre: boolean = false, duracion: number = 3500): void {
     this.agregarAlerta('danger', titulo, mensaje, autoCierre, duracion);
   }
 
