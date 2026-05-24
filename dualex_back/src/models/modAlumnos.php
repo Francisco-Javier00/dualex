@@ -236,6 +236,8 @@ class ModAlumnos {
         $conditions = [];
         $binds = [];
         $joinClause = "";
+        $joinMac = false;
+        $joinMp = false;
 
         if ($search) {
             $conditions[] = "(u.nombre LIKE :search1 OR apellidos LIKE :search2 OR correo LIKE :search3 OR DNI LIKE :search4)";
@@ -245,11 +247,13 @@ class ModAlumnos {
             $binds[':search4'] = "%$search%";
         }
         
-        // 1. Filtrado por módulo específico
+        // Filtrado por modulo especifico
         if (!empty($idModulo) && $idModulo !== 'null') {
-            $joinClause .= " INNER JOIN Modulo_Alumno_Cursa mac ON a.idAlumno = mac.idAlumno ";
+            $joinMac = true;
+            $conditions[] = "mac.idModulo = :idModulo";
+            $binds[':idModulo'] = (int)$idModulo;
         } 
-        // 2. Si es COORDINADOR, aplicamos su filtro de ciclo SIEMPRE (es el más restrictivo para él)
+        // Si es COORDINADOR, aplicamos su filtro de ciclo SIEMPRE (es el mas restrictivo para el)
         if (strtoupper($rol) === 'COORDINADOR' && !empty($idUsuario)) {
             $joinClause .= " INNER JOIN Ciclo cic ON c.idCiclo = cic.idCiclo ";
             $conditions[] = "cic.idCoordinador = :idUsuario";
@@ -263,24 +267,31 @@ class ModAlumnos {
                 }
             }
         }
-        // 3. Si NO es coordinador pero hay una lista de Curso (caso Profesor con selección manual)
+        // Si NO es coordinador pero hay una lista de Curso (caso Profesor con seleccion manual)
         else if (!empty($idsCursos) && is_array($idsCursos)) {
             $idsValidados = array_filter(array_map('intval', $idsCursos));
             if (!empty($idsValidados)) {
                 $conditions[] = "a.idCurso IN (" . implode(',', $idsValidados) . ")";
             }
         }
-        // 4. Si es Profesor, ve los Alumno de los módulos que imparte
-        else if (empty($conditions) && strtoupper($rol) === 'PROFESOR' && !empty($idUsuario)) {
-            $joinClause .= " INNER JOIN Modulo_Alumno_Cursa mac ON a.idAlumno = mac.idAlumno ";
-            $joinClause .= " INNER JOIN Modulo_Profesor mp ON mac.idModulo = mp.idModulo ";
+        // Si es Profesor, ve los Alumnos de los modulos que imparte
+        else if (strtoupper($rol) === 'PROFESOR' && !empty($idUsuario)) {
+            $joinMac = true;
+            $joinMp = true;
             $conditions[] = "mp.idProfesor = :idUsuario";
             $binds[':idUsuario'] = (int)$idUsuario;
         }
 
+        // Construir los INNER JOINs segun las banderas para evitar duplicados
+        if ($joinMac) {
+            $joinClause .= " INNER JOIN Modulo_Alumno_Cursa mac ON a.idAlumno = mac.idAlumno ";
+        }
+        if ($joinMp) {
+            $joinClause .= " INNER JOIN Modulo_Profesor mp ON mac.idModulo = mp.idModulo ";
+        }
         $whereClause = !empty($conditions) ? " WHERE " . implode(" AND ", $conditions) : "";
 
-        // 2.5. Ordenación dinámica
+        // Ordenación dinámica
         $orderBy = " ORDER BY apellidos, u.nombre";
         if (isset($params['order']) && count($params['order']) > 0) {
             $orderColumnIndex = intval($params['order'][0]['column']);
