@@ -461,8 +461,8 @@ INSERT INTO Ciclo (nombre, siglas, grado, idCoordinador) VALUES
 ('Desarrollo de Aplicaciones Multiplataforma', 'DAM', 'superior', 3),
 ('Administracion de Sistemas Informaticos', 'ASIR', 'superior', 4),
 ('Sistemas Microinformaticos y Redes', 'SMR', 'medio', 5),
-('Marketing y Publicidad', 'MKP', 'superior', 1),
-('Comercio Internacional', 'CI', 'superior', 3);
+('Marketing y Publicidad', 'MKP', 'superior', NULL),
+('Comercio Internacional', 'CI', 'superior', NULL);
 
 -- =====================================================
 -- CURSO

@@ -6,10 +6,11 @@
         "php": ">=7.4",
         "phpoffice/phpspreadsheet": "^1.28"
     },
-    "require-dev": {
-        "phpdocumentor/phpdocumentor": "^3.0"
-    },
     "config": {
+        "platform": {
+            "php": "8.0.0"
+        },
+        "platform-check": false,
         "allow-plugins": {
             "phpstan/extension-installer": true
         }

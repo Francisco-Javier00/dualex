@@ -80,7 +80,9 @@ export class TareasTodosComponent implements OnInit {
         }
       },
       pageLength: 10,
-      lengthMenu: [5, 10, 25, 50]
+      lengthMenu: [5, 10, 25, 50],
+      responsive: true,
+      autoWidth: false
     };
   }
 

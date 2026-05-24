@@ -11,7 +11,7 @@
         @if (ciclosCoordinados.length > 0) {
           <div class="d-flex align-items-center gap-2 text-muted">
             <i class="fa-solid fa-layer-group text-primary"></i>
-            <span class="fw-semibold">Ciclos coordinados:</span>
+            <span class="fw-semibold">Ciclo coordinado:</span>
             @for (ciclo of ciclosCoordinados; track ciclo) {
               <span class="badge rounded-pill bg-primary-subtle text-primary px-3 shadow-sm">
                 {{ ciclo }}
@@ -20,7 +20,7 @@
           </div>
         }
       </div>
-      <a href="/mis-modulos" target="_blank" class="btn shadow-sm"
+      <a routerLink="/mis-modulos" class="btn shadow-sm"
          [ngClass]="(usuario?.rol === 'COORDINADOR' && usuario?.esGeneral) ? 'btn-coordinador-general' : 'btn-primary'">
         <i class="fa-solid fa-chalkboard"></i> Mis Módulos
       </a>

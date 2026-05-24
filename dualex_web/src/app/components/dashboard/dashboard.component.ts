@@ -42,7 +42,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         } else if ((perfil.rol === 'COORDINADOR' || perfil.rol === 'COORDINADOR_GENERAL') && perfil.email) {
           this.profesoresService.getProfesorByEmail(perfil.email).subscribe({
             next: (profesor) => {
-              this.ciclosCoordinados = profesor.ciclos ? profesor.ciclos.split(',').map((c: string) => c.trim()).filter(Boolean) : [];
+              this.ciclosCoordinados = profesor.ciclos ? profesor.ciclos.split(',').map((c: string) => c.trim()).filter(Boolean).slice(0, 1) : [];
             },
             error: () => this.ciclosCoordinados = []
           });

@@ -582,12 +582,12 @@ footer a:hover {
 
 /* Botón de acción especial para Coordinadores Generales (Tonos suaves concordantes) */
 .btn-coordinador-general {
-  background-color: #a88cb8;
+  background-color: #0d47a1;
   color: white;
 }
 
 .btn-coordinador-general:hover {
-  background-color: #9275a3;
+  background-color: #083173;
   color: white;
 }
 

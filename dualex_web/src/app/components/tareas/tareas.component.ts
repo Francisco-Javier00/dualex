@@ -1,5 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ConfirmarBorradoModalComponent } from '../shared/modals/confirmar-borrado-modal/confirmar-borrado-modal.component';
 import { TareasService } from '../../services/tareas.service';
@@ -25,6 +25,7 @@ export class TareasComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private tareasService = inject(TareasService);
   private authService = inject(AuthService);
+  private location = inject(Location);
   
   // ESTADO DEL COMPONENTE
   modalBorradoVisible = false;           // Controla el modal de confirmación
@@ -95,10 +96,10 @@ export class TareasComponent implements OnInit {
   }
 
   /**
-   * Navega de regreso a la lista de alumnos.
+   * Navega de regreso a la vista anterior.
    */
   volver(): void {
-    this.router.navigate(['/alumnos']);
+    this.location.back();
   }
 
   /**

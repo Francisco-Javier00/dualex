@@ -1,8 +1,13 @@
 <div class="container-fluid p-4">
   <header class="mb-4 d-flex justify-content-between align-items-start">
-    <div>
-      <h1 class="h3 fw-bold text-dark mb-1">Mis Módulos</h1>
-      <p class="text-muted mb-0">Gestión de módulos para {{ usuario?.nombre }}.</p>
+    <div class="d-flex align-items-start gap-3">
+      <button type="button" class="btn back-btn mt-1" routerLink="/dashboard" title="Volver al Dashboard">
+        <i class="fa-solid fa-arrow-left"></i>
+      </button>
+      <div>
+        <h1 class="h3 fw-bold text-dark mb-1">Mis Módulos</h1>
+        <p class="text-muted mb-0">Gestión de módulos para {{ usuario?.nombre }}.</p>
+      </div>
     </div>
     <div class="d-flex gap-2">
       <button class="btn btn-building shadow-sm" data-tooltip="Ver listado de empresas" routerLink="/empresas">

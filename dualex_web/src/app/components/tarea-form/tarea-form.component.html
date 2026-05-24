@@ -56,91 +56,94 @@
       </div>
     </div>
 
-    <!-- Segunda Fila: Actividades y Descripción -->
+    <!-- Segunda Fila: Actividades, Adjuntos y Descripción -->
     <div class="row g-4">
-      <!-- Actividades Relacionadas -->
-      <div class="col-lg-4">
-        <label class="form-label fw-bold text-muted small text-uppercase">Actividades Relacionadas</label>
-        <div class="card border-0 rounded-3 p-3"
-          style="min-height: 250px; background-color: #f1f4f8; border: 1px solid #e2e8f0 !important;">
-          <div class="d-flex justify-content-between align-items-center mb-4">
-            <div class="d-flex align-items-center gap-2">
-              <div class="bg-white p-2 rounded-3 shadow-sm d-flex align-items-center justify-content-center"
-                style="width: 35px; height: 35px;">
-                <i class="fa-solid fa-layer-group text-primary"></i>
+      <!-- Columna Izquierda: Actividades y Adjuntos -->
+      <div class="col-lg-4 d-flex flex-column gap-4">
+        
+        <!-- Actividades Relacionadas -->
+        <div>
+          <label class="form-label fw-bold text-muted small text-uppercase">Actividades Relacionadas</label>
+          <div class="card border-0 rounded-3 p-3"
+            style="min-height: 250px; background-color: #f1f4f8; border: 1px solid #e2e8f0 !important;">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <div class="d-flex align-items-center gap-2">
+                <div class="bg-white p-2 rounded-3 shadow-sm d-flex align-items-center justify-content-center"
+                  style="width: 35px; height: 35px;">
+                  <i class="fa-solid fa-layer-group text-primary"></i>
+                </div>
+                <span class="fw-bold small text-dark">Seleccionadas</span>
               </div>
-              <span class="fw-bold small text-dark">Seleccionadas</span>
+              <button *ngIf="puedoEditarActividades()" type="button" class="btn btn-primary btn-sm px-3 rounded-2 shadow-sm" style="height: 35px;"
+                (click)="abrirModalActividades()">
+                <i class="fa-solid fa-plus me-1"></i> Añadir
+              </button>
             </div>
-            <button *ngIf="puedoEditarActividades()" type="button" class="btn btn-primary btn-sm px-3 rounded-2 shadow-sm" style="height: 35px;"
-              (click)="abrirModalActividades()">
-              <i class="fa-solid fa-plus me-1"></i> Añadir
-            </button>
-          </div>
 
-          <div class="d-flex flex-column gap-2 overflow-auto" style="max-height: 250px;">
-            <div *ngFor="let act of getActividadesSeleccionadas()"
-              class="bg-white p-2 px-3 rounded-3 border d-flex justify-content-between align-items-center shadow-sm animate-fade-in">
-              <span class="small text-truncate me-2">{{ act.titulo }}</span>
-              <i *ngIf="puedoEditarActividades()" class="fa-solid fa-xmark text-muted pointer hover-danger" (click)="toggleActividad(act.id)"></i>
-            </div>
-            <div *ngIf="getActividadesSeleccionadas().length === 0" class="text-muted small italic py-5 text-center">
-              Ninguna seleccionada
+            <div class="d-flex flex-column gap-2 overflow-auto" style="max-height: 250px;">
+              <div *ngFor="let act of getActividadesSeleccionadas()"
+                class="bg-white p-2 px-3 rounded-3 border d-flex justify-content-between align-items-center shadow-sm animate-fade-in">
+                <span class="small text-truncate me-2">{{ act.titulo }}</span>
+                <i *ngIf="puedoEditarActividades()" class="fa-solid fa-xmark text-muted pointer hover-danger" (click)="toggleActividad(act.id)"></i>
+              </div>
+              <div *ngIf="getActividadesSeleccionadas().length === 0" class="text-muted small italic py-5 text-center">
+                Ninguna seleccionada
+              </div>
             </div>
           </div>
         </div>
+
+        <!-- Adjuntos -->
+        <div>
+          <label class="form-label fw-bold text-muted small text-uppercase">Documentos adjuntos <span class="text-muted fw-normal">(opcional)</span></label>
+
+          <!-- Input oculto -->
+          <input #fileInput type="file" class="d-none" multiple
+            accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.png,.jpg,.jpeg,.gif,.zip"
+            (change)="onFilesSelected($event)">
+
+          <!-- Zona de drop (estilo Excel) -->
+          <div class="file-drop-zone border-dashed rounded-3 p-3 text-center bg-light cursor-pointer transition-all"
+            (click)="!tareaForm.disabled && fileInput.click()"
+            (dragover)="$event.preventDefault()"
+            (drop)="onFileDrop($event)"
+            id="btn-adjuntar-documento"
+            [class.disabled-zone]="tareaForm.disabled">
+
+            <!-- Estado vacío -->
+            <div *ngIf="adjuntos.length === 0" class="py-2">
+              <i class="fa-solid fa-cloud-arrow-up text-primary fs-4 mb-1"></i>
+              <p class="mb-0 small fw-semibold text-dark">Arrastra archivos o haz clic</p>
+              <p class="text-muted extra-small mb-0">PDF, Word, Excel, imágenes, ZIP &mdash; máx. 20 MB</p>
+            </div>
+
+            <!-- Lista de archivos -->
+            <div *ngIf="adjuntos.length > 0" class="d-flex flex-column gap-1 text-start">
+              <div *ngFor="let adj of adjuntos; let i = index"
+                class="adjunto-chip d-flex align-items-center gap-2 px-2 py-1 rounded-2 border animate-fade-in"
+                [ngClass]="getAdjuntoIconClass(adj.name)">
+                <i [class]="getAdjuntoIcon(adj.name)" style="font-size:0.8rem; flex-shrink:0;"></i>
+                <span class="extra-small fw-semibold text-truncate flex-grow-1" [title]="adj.name + ' · ' + formatFileSize(adj.size)">{{ adj.name }}</span>
+                <span class="extra-small text-muted" style="flex-shrink:0;">{{ formatFileSize(adj.size) }}</span>
+                <button type="button" class="btn btn-link p-0 lh-1 chip-remove ms-1"
+                  (click)="$event.stopPropagation(); eliminarAdjunto(i)" [disabled]="tareaForm.disabled" title="Eliminar">
+                  <i class="fa-solid fa-xmark" style="font-size:0.7rem;"></i>
+                </button>
+              </div>
+              <!-- Pie: añadir más -->
+              <p class="extra-small text-muted text-center mb-0 mt-1">Haz clic o arrastra para añadir más</p>
+            </div>
+
+          </div>
+        </div>
+
       </div>
 
       <!-- Descripción Detallada -->
-      <div class="col-lg-8">
+      <div class="col-lg-8 d-flex flex-column">
         <label class="form-label fw-bold text-muted small text-uppercase">Descripción Detallada</label>
-        <div class="editor-container border rounded-3 overflow-hidden shadow-sm bg-white">
+        <div class="editor-container border rounded-3 overflow-hidden shadow-sm bg-white flex-grow-1">
           <ckeditor [editor]="Editor" [config]="config" formControlName="descripcion"></ckeditor>
-        </div>
-      </div>
-    </div>
-
-    <!-- Adjuntos -->
-    <div class="row g-3 mt-1">
-      <div class="col-lg-4 col-md-6">
-        <label class="form-label fw-bold text-muted small text-uppercase">Documentos adjuntos <span class="text-muted fw-normal">(opcional)</span></label>
-
-        <!-- Input oculto -->
-        <input #fileInput type="file" class="d-none" multiple
-          accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.png,.jpg,.jpeg,.gif,.zip"
-          (change)="onFilesSelected($event)">
-
-        <!-- Zona de drop (estilo Excel) -->
-        <div class="file-drop-zone border-dashed rounded-3 p-3 text-center bg-light cursor-pointer transition-all"
-          (click)="!tareaForm.disabled && fileInput.click()"
-          (dragover)="$event.preventDefault()"
-          (drop)="onFileDrop($event)"
-          id="btn-adjuntar-documento"
-          [class.disabled-zone]="tareaForm.disabled">
-
-          <!-- Estado vacío -->
-          <div *ngIf="adjuntos.length === 0" class="py-2">
-            <i class="fa-solid fa-cloud-arrow-up text-primary fs-4 mb-1"></i>
-            <p class="mb-0 small fw-semibold text-dark">Arrastra archivos o haz clic</p>
-            <p class="text-muted extra-small mb-0">PDF, Word, Excel, imágenes, ZIP &mdash; máx. 20 MB</p>
-          </div>
-
-          <!-- Lista de archivos -->
-          <div *ngIf="adjuntos.length > 0" class="d-flex flex-column gap-1 text-start">
-            <div *ngFor="let adj of adjuntos; let i = index"
-              class="adjunto-chip d-flex align-items-center gap-2 px-2 py-1 rounded-2 border animate-fade-in"
-              [ngClass]="getAdjuntoIconClass(adj.name)">
-              <i [class]="getAdjuntoIcon(adj.name)" style="font-size:0.8rem; flex-shrink:0;"></i>
-              <span class="extra-small fw-semibold text-truncate flex-grow-1" [title]="adj.name + ' · ' + formatFileSize(adj.size)">{{ adj.name }}</span>
-              <span class="extra-small text-muted" style="flex-shrink:0;">{{ formatFileSize(adj.size) }}</span>
-              <button type="button" class="btn btn-link p-0 lh-1 chip-remove ms-1"
-                (click)="$event.stopPropagation(); eliminarAdjunto(i)" [disabled]="tareaForm.disabled" title="Eliminar">
-                <i class="fa-solid fa-xmark" style="font-size:0.7rem;"></i>
-              </button>
-            </div>
-            <!-- Pie: añadir más -->
-            <p class="extra-small text-muted text-center mb-0 mt-1">Haz clic o arrastra para añadir más</p>
-          </div>
-
         </div>
       </div>
     </div>
