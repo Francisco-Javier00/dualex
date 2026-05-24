@@ -8,6 +8,7 @@ import { ActividadesService } from '../../services/actividades.service';
 import { AlertService } from '../../services/alert.service';
 import { ActividadDTO } from '../../dto/dualex.dto';
 import { Config } from 'datatables.net';
+import 'datatables.net-responsive-bs5';
 
 @Component({
   selector: 'app-actividades',
@@ -28,6 +29,8 @@ export class ActividadesComponent implements OnInit {
 
   ngOnInit(): void {
     this.dtOptions = {
+      order: [],
+      responsive: true,
       serverSide: true,
       processing: true,
       ajax: (dataTablesParameters: any, callback: any) => {
@@ -40,13 +43,23 @@ export class ActividadesComponent implements OnInit {
         });
       },
       columns: [
-        { data: 'titulo' },
-        { data: 'descripcion' },
-        { data: 'modulo' },
+        {
+          title: ' ',
+          className: 'dtr-control all',
+          orderable: false,
+          data: null,
+          defaultContent: '',
+          responsivePriority: 1
+        },
+        { data: 'titulo', className: 'text-truncate', responsivePriority: 2 },
+        { data: 'descripcion', className: 'text-truncate', responsivePriority: 4 },
+        { data: 'modulo', responsivePriority: 5 },
         {
           data: null,
+          className: 'text-center align-middle',
           orderable: false,
           searchable: false,
+          responsivePriority: 3,
           render: () => `
             <div class="d-flex gap-2 justify-content-center">
               <button class="btn btn-sm btn-outline-primary shadow-sm" data-action="edit" title="Editar">

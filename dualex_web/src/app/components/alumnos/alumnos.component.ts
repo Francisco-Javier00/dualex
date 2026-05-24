@@ -12,6 +12,7 @@ import { CursosService } from '../../services/cursos.service';
 import { AlumnoDTO, CursoDTO } from '../../dto/dualex.dto';
 import { AlertService } from '../../services/alert.service';
 import { Config } from 'datatables.net';
+import 'datatables.net-responsive-bs5';
 import { AuthService } from '../../auth/services/auth.service';
 import { Subscription } from 'rxjs';
 
@@ -59,9 +60,9 @@ export class AlumnosComponent implements OnInit, OnDestroy {
   }
 
   get columnTitles(): string[] {
-    const base = ['Nombre', 'Apellidos', 'Correo', 'Curso/Ciclo'];
+    const base = [' ', 'Nombre', 'Apellidos', 'Correo', 'Curso/Ciclo'];
     if (this.rolUsuarioActual !== 'PROFESOR') {
-      base.push('NIA', 'NUSS', 'DNI', 'Teléfono');
+      base.push('DNI', 'NUSS', 'NIA', 'Teléfono');
     }
     base.push('Acciones');
     return base;
@@ -71,24 +72,34 @@ export class AlumnosComponent implements OnInit, OnDestroy {
     const rol = this.rolUsuarioActual;
     const puedeGestionar = this.puedeGestionarAlumnos;
     const cols: any[] = [
-      { data: 'nombre', width: '25%' },
-      { data: 'apellidos', width: '25%' },
-      { data: 'email', width: '25%' },
-      { data: 'nombreCurso', defaultContent: '<span class="text-muted">Sin curso</span>', width: '15%' },
+      {
+        title: ' ',
+        className: 'dtr-control all',
+        orderable: false,
+        data: null,
+        defaultContent: '',
+        responsivePriority: 1
+      },
+      { data: 'nombre', width: '30%', responsivePriority: 2 },
+      { data: 'apellidos', width: '30%', responsivePriority: 3 },
+      { data: 'email', width: '20%', responsivePriority: 4 },
+      { data: 'nombreCurso', defaultContent: '<span class="text-muted">Sin curso</span>', width: '15%', responsivePriority: 5 },
     ];
     if (rol !== 'PROFESOR') {
       cols.push(
-        { data: 'nia' },
-        { data: 'nuss' },
-        { data: 'dni' },
-        { data: 'telefono' }
+        { data: 'dni', responsivePriority: 9 },
+        { data: 'nuss', responsivePriority: 8 },
+        { data: 'nia', responsivePriority: 7 },
+        { data: 'telefono', responsivePriority: 10 }
       );
     }
     cols.push({
       data: null,
+      className: 'text-center align-middle',
       orderable: false,
       searchable: false,
       width: '10%',
+      responsivePriority: 6,
       render: () => `
         <div class="d-flex gap-2 justify-content-center">
           ${rol === 'PROFESOR' ? `
@@ -200,6 +211,8 @@ export class AlumnosComponent implements OnInit, OnDestroy {
 
   inicializarTabla(): void {
     this.dtOptions = {
+      order: [],
+      responsive: true,
       serverSide: true,
       processing: true,
       ajax: (dataTablesParameters: any, callback: any) => {
@@ -239,7 +252,7 @@ export class AlumnosComponent implements OnInit, OnDestroy {
         zeroRecords: 'No se encontraron coincidencias',
         paginate: {
           first: 'Primero',
-          last: 'Ãšltimo',
+          last: 'Último',
           next: 'Siguiente',
           previous: 'Anterior'
         }
