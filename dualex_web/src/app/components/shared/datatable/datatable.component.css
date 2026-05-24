@@ -20,3 +20,52 @@
   background-color: #006293;
   border-color: #006293;
 }
+
+/* Evitar que las celdas de detalle responsive hereden el centrado de selectores como td:last-child */
+::ng-deep table.dataTable > tbody > tr.child td.child {
+  text-align: left !important;
+}
+
+/* Alinear todas las columnas a la izquierda por defecto (excepto las que tengan clase de centrado) */
+::ng-deep table.dataTable tbody td:not(.text-center):not(.dt-center),
+::ng-deep table.dataTable thead th:not(.text-center):not(.dt-center) {
+  text-align: left !important;
+}
+
+/* Controlar el ancho de la columna de control responsive (flecha de desplegar) */
+::ng-deep table.dataTable th:first-child,
+::ng-deep table.dataTable td:first-child {
+  width: 1% !important;
+  max-width: 32px !important;
+  min-width: 32px !important;
+  text-align: center !important;
+  padding-left: 10px !important;
+  padding-right: 0 !important;
+}
+
+/* Alinear y dar espacio a las etiquetas de los detalles al desplegar en responsive */
+::ng-deep table.dataTable > tbody > tr.child span.dtr-title {
+  display: inline-block !important;
+  min-width: 120px !important;
+  font-weight: 600 !important;
+  margin-right: 15px !important;
+}
+
+/* Forzar que los campos y botones en el detalle colapsado se alineen a la izquierda */
+::ng-deep table.dataTable > tbody > tr.child ul.dtr-details > li {
+  text-align: left !important;
+}
+
+::ng-deep table.dataTable > tbody > tr.child ul.dtr-details .d-flex {
+  justify-content: flex-start !important;
+}
+
+/* Evitar que las celdas truncadas empujen a otras columnas en móvil */
+::ng-deep table.dataTable td.text-truncate {
+  max-width: 150px !important;
+}
+@media (min-width: 768px) {
+  ::ng-deep table.dataTable td.text-truncate {
+    max-width: 300px !important;
+  }
+}

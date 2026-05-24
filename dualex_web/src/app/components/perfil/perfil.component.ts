@@ -34,10 +34,8 @@ export class PerfilComponent implements OnInit, OnDestroy {
   }
 
   get iniciales(): string {
-    if (!this.perfil) return 'DU';
-    const nombre = this.perfil.nombre?.trim().charAt(0) ?? 'D';
-    const apellido = this.perfil.apellidos?.trim().charAt(0) ?? 'U';
-    return `${nombre}${apellido}`.toUpperCase();
+    if (!this.perfil) return 'D';
+    return (this.perfil.nombre?.trim().charAt(0) ?? 'D').toUpperCase();
   }
 
   get rolEtiqueta(): string {

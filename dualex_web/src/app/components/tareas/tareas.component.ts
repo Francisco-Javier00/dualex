@@ -95,6 +95,13 @@ export class TareasComponent implements OnInit {
   }
 
   /**
+   * Navega de regreso a la lista de alumnos.
+   */
+  volver(): void {
+    this.router.navigate(['/alumnos']);
+  }
+
+  /**
    * Navegación al formulario de creación.
    */
   crearTarea(): void {

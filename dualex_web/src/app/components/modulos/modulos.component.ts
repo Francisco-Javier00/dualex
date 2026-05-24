@@ -8,6 +8,7 @@ import { ModulosService } from '../../services/modulos.service';
 import { AlertService } from '../../services/alert.service';
 import { ModuloDTO, CursoDTO } from '../../dto/dualex.dto';
 import { Config } from 'datatables.net';
+import 'datatables.net-responsive-bs5';
 import { AuthService } from '../../auth/services/auth.service';
 import { ProfesoresService } from '../../services/profesores.service';
 import { CursosService } from '../../services/cursos.service';
@@ -29,7 +30,7 @@ export class ModulosComponent implements OnInit, OnDestroy {
 
   @ViewChild(DatatableComponent) datatable!: DatatableComponent;
 
-  dtOptions: Config = {};
+  dtOptions: any = {};
   modalBorradoVisible = false;
   modalModuloVisible = false;
   moduloSeleccionado: ModuloDTO | null = null;
@@ -86,6 +87,8 @@ export class ModulosComponent implements OnInit, OnDestroy {
     }
 
     this.dtOptions = {
+      order: [],
+      responsive: true,
       serverSide: true,
       processing: true,
       ajax: (dataTablesParameters: any, callback: any) => {
@@ -104,9 +107,18 @@ export class ModulosComponent implements OnInit, OnDestroy {
         });
       },
       columns: [
+        {
+          title: ' ',
+          className: 'dtr-control all',
+          orderable: false,
+          data: null,
+          defaultContent: '',
+          responsivePriority: 1
+        },
         { 
           data: 'color',
           className: 'text-center',
+          responsivePriority: 2,
           render: (data: any) => `
             <div class="d-flex justify-content-center">
               <div class="rounded-circle shadow-sm" style="width: 18px; height: 18px; background-color: ${data || '#4e73df'}"></div>
@@ -115,17 +127,21 @@ export class ModulosComponent implements OnInit, OnDestroy {
         },
         { 
           data: 'nombre',
+          className: 'text-truncate',
+          responsivePriority: 3,
           render: (data: any) => `<span class="fw-medium text-dark">${data}</span>`
         },
-        { data: 'sigla', className: 'text-center text-muted' },
+        { data: 'sigla', className: 'text-center text-muted', responsivePriority: 4 },
         { 
           data: 'cicloCompleto',
           className: 'text-center text-muted',
+          responsivePriority: 6,
           render: (data: any) => data || 'Sin asignar'
         },
         { 
           data: 'cursoCompleto',
           className: 'text-center text-muted',
+          responsivePriority: 7,
           render: (data: any) => data || 'Sin asignar'
         },
         {
@@ -133,6 +149,7 @@ export class ModulosComponent implements OnInit, OnDestroy {
           orderable: false,
           searchable: false,
           className: 'text-center',
+          responsivePriority: 5,
           render: () => `
             <div class="d-flex gap-2 justify-content-center">
               <button class="btn btn-sm btn-outline-primary shadow-sm edit-btn" data-action="edit" title="Editar">

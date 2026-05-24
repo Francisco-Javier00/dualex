@@ -197,7 +197,8 @@ class ModTareas {
                 
                 $t['revisionesModulos'][] = [
                     'modulo' => $rev['modulo'],
-                    'revisado' => $isRevisada
+                    'revisado' => $isRevisada,
+                    'comentario' => $rev['observaciones'] ?? ''
                 ];
                 
                 if (!$isRevisada) {
@@ -286,22 +287,24 @@ class ModTareas {
         $revisionesMap = [];
         if (!empty($datos['revisionesModulos'])) {
             foreach ($datos['revisionesModulos'] as $rev) {
-                $revisionesMap[$rev['modulo']] = (bool)$rev['revisado'];
+                $revisionesMap[$rev['modulo']] = [
+                    'revisado' => (bool)$rev['revisado'],
+                    'comentario' => $rev['comentario'] ?? ''
+                ];
             }
         }
         
-        $comentarioProfesor = $datos['comentarioProfesor'] ?? '';
-        
         if (!empty($modules)) {
             foreach ($modules as $mod) {
-                $revisadaVal = (isset($revisionesMap[$mod['nombre']]) && $revisionesMap[$mod['nombre']]) ? 1 : 0;
+                $revisadaVal = (isset($revisionesMap[$mod['nombre']]) && $revisionesMap[$mod['nombre']]['revisado']) ? 1 : 0;
+                $observacionesVal = isset($revisionesMap[$mod['nombre']]) ? $revisionesMap[$mod['nombre']]['comentario'] : '';
                 $sqlRev = "INSERT INTO Modulo_Tarea_Revision (idModulo, idTarea, revisada, observaciones) 
                            VALUES (:idModulo, :idTarea, $revisadaVal, :observaciones)";
                 $stmtRev = $this->db->prepare($sqlRev);
                 $stmtRev->execute([
                     ':idModulo' => $mod['idModulo'],
                     ':idTarea' => $idTarea,
-                    ':observaciones' => $comentarioProfesor
+                    ':observaciones' => $observacionesVal
                 ]);
             }
         }
@@ -364,11 +367,12 @@ class ModTareas {
         $revisionesMap = [];
         if (!empty($datos['revisionesModulos'])) {
             foreach ($datos['revisionesModulos'] as $rev) {
-                $revisionesMap[$rev['modulo']] = (bool)$rev['revisado'];
+                $revisionesMap[$rev['modulo']] = [
+                    'revisado' => (bool)$rev['revisado'],
+                    'comentario' => $rev['comentario'] ?? ''
+                ];
             }
         }
-        
-        $comentarioProfesor = $datos['comentarioProfesor'] ?? '';
         
         $sqlDelRev = "DELETE FROM Modulo_Tarea_Revision WHERE idTarea = :idTarea";
         $stmtDelRev = $this->db->prepare($sqlDelRev);
@@ -376,14 +380,15 @@ class ModTareas {
         
         if (!empty($modules)) {
             foreach ($modules as $mod) {
-                $revisadaVal = (isset($revisionesMap[$mod['nombre']]) && $revisionesMap[$mod['nombre']]) ? 1 : 0;
+                $revisadaVal = (isset($revisionesMap[$mod['nombre']]) && $revisionesMap[$mod['nombre']]['revisado']) ? 1 : 0;
+                $observacionesVal = isset($revisionesMap[$mod['nombre']]) ? $revisionesMap[$mod['nombre']]['comentario'] : '';
                 $sqlRev = "INSERT INTO Modulo_Tarea_Revision (idModulo, idTarea, revisada, observaciones) 
                            VALUES (:idModulo, :idTarea, $revisadaVal, :observaciones)";
                 $stmtRev = $this->db->prepare($sqlRev);
                 $stmtRev->execute([
                     ':idModulo' => $mod['idModulo'],
                     ':idTarea' => $id,
-                    ':observaciones' => $comentarioProfesor
+                    ':observaciones' => $observacionesVal
                 ]);
             }
         }

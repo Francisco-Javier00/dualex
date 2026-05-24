@@ -6,6 +6,8 @@ import { ActividadDTO, CicloDTO, ModuloDTO } from '../../../dto/dualex.dto';
 import { AlertService } from '../../../services/alert.service';
 import { CiclosService } from '../../../services/ciclos.service';
 import { ModulosService } from '../../../services/modulos.service';
+import { AuthService } from '../../../auth/services/auth.service';
+import { ProfesoresService } from '../../../services/profesores.service';
 
 // Validador personalizado para asegurar que el array de idModulos no esté vacío
 export function arrayNotEmptyValidator(): ValidatorFn {
@@ -37,6 +39,8 @@ export class ActividadModalComponent implements OnChanges, OnDestroy, OnInit {
   private alertService = inject(AlertService);
   private ciclosService = inject(CiclosService);
   private modulosService = inject(ModulosService);
+  private authService = inject(AuthService);
+  private profesoresService = inject(ProfesoresService);
 
   @Input() visible = false;
   @Input() actividad: ActividadDTO | null = null;
@@ -50,17 +54,20 @@ export class ActividadModalComponent implements OnChanges, OnDestroy, OnInit {
   // Árbol jerárquico
   arbolCiclos: NodoCiclo[] = [];
   cargandoArbol = false;
+  esCoordinador = false;
 
   constructor() {
     this.actividadForm = this.fb.group({
       id: [null],
       titulo: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(60)]],
-      descripcion: ['', [Validators.maxLength(255)]],
+      descripcion: ['', [Validators.required, Validators.maxLength(255)]],
       idModulos: [[], [arrayNotEmptyValidator()]] // Array de IDs de módulos seleccionados
     });
   }
 
   ngOnInit(): void {
+    const user = this.authService.currentUserValue;
+    this.esCoordinador = user?.rol === 'COORDINADOR';
     this.cargarDatosArbol();
   }
 
@@ -69,31 +76,64 @@ export class ActividadModalComponent implements OnChanges, OnDestroy, OnInit {
    */
   cargarDatosArbol(): void {
     this.cargandoArbol = true;
-    forkJoin({
-      ciclos: this.ciclosService.getCiclos(),
-      modulos: this.modulosService.getModulos()
-    }).subscribe({
-      next: ({ ciclos, modulos }) => {
-        // Mapeamos los ciclos para estructurar el árbol
-        this.arbolCiclos = ciclos.map((c: CicloDTO) => ({
-          id: c.id || 0,
-          nombre: c.nombre,
-          siglas: c.siglas,
-          expanded: false,
-          modulos: modulos.filter((m: ModuloDTO) => m.ciclo === c.siglas)
-        }));
-        this.cargandoArbol = false;
-        
-        // Si ya hay una actividad de entrada cargada en modo edición, sincronizamos sus checkboxes
-        if (this.actividad) {
-          this.sincronizarCheckboxesEdicion();
+    const user = this.authService.currentUserValue;
+
+    if (user && user.rol === 'COORDINADOR') {
+      forkJoin({
+        ciclos: this.ciclosService.getCiclos(),
+        modulos: this.modulosService.getModulos(),
+        profesor: this.profesoresService.getProfesorByEmail(user.email)
+      }).subscribe({
+        next: ({ ciclos, modulos, profesor }) => {
+          const ciclosAsociados = profesor && profesor.ciclos
+            ? profesor.ciclos.split(',').map((s: string) => s.trim().toUpperCase())
+            : [];
+
+          const ciclosFiltrados = ciclos.filter(c => ciclosAsociados.includes(c.siglas.toUpperCase()));
+
+          this.arbolCiclos = ciclosFiltrados.map((c: CicloDTO) => ({
+            id: c.id || 0,
+            nombre: c.nombre,
+            siglas: c.siglas,
+            expanded: true, // Auto-expand coordinator's cycles
+            modulos: modulos.filter((m: ModuloDTO) => m.ciclo === c.siglas)
+          }));
+          this.cargandoArbol = false;
+          
+          if (this.actividad) {
+            this.sincronizarCheckboxesEdicion();
+          }
+        },
+        error: () => {
+          this.cargandoArbol = false;
+          this.alertService.error('Error del Servidor', 'No se pudieron recuperar las asignaturas y ciclos formativos.');
         }
-      },
-      error: () => {
-        this.cargandoArbol = false;
-        this.alertService.error('Error del Servidor', 'No se pudieron recuperar las asignaturas y ciclos formativos.');
-      }
-    });
+      });
+    } else {
+      forkJoin({
+        ciclos: this.ciclosService.getCiclos(),
+        modulos: this.modulosService.getModulos()
+      }).subscribe({
+        next: ({ ciclos, modulos }) => {
+          this.arbolCiclos = ciclos.map((c: CicloDTO) => ({
+            id: c.id || 0,
+            nombre: c.nombre,
+            siglas: c.siglas,
+            expanded: false,
+            modulos: modulos.filter((m: ModuloDTO) => m.ciclo === c.siglas)
+          }));
+          this.cargandoArbol = false;
+          
+          if (this.actividad) {
+            this.sincronizarCheckboxesEdicion();
+          }
+        },
+        error: () => {
+          this.cargandoArbol = false;
+          this.alertService.error('Error del Servidor', 'No se pudieron recuperar las asignaturas y ciclos formativos.');
+        }
+      });
+    }
   }
 
   ngOnChanges(changes: SimpleChanges): void {

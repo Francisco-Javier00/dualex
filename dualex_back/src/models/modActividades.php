@@ -33,8 +33,10 @@ class ModActividades {
             }
         }
 
-        // Validación de descripción opcional (máximo 255 caracteres)
-        if (isset($datos['descripcion']) && !empty(trim($datos['descripcion']))) {
+        // Validación de descripción obligatoria (máximo 255 caracteres)
+        if (!isset($datos['descripcion']) || empty(trim($datos['descripcion']))) {
+            $errores[] = "La descripción de la actividad es obligatoria.";
+        } else {
             if (mb_strlen(trim($datos['descripcion']), 'UTF-8') > 255) {
                 $errores[] = "La descripción no puede superar los 255 caracteres.";
             }

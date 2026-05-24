@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { DatatableComponent } from '../shared/datatable/datatable.component';
 import { ConfirmarBorradoModalComponent } from '../shared/modals/confirmar-borrado-modal/confirmar-borrado-modal.component';
 import { Config } from 'datatables.net';
+import 'datatables.net-responsive-bs5';
 import { CiclosService } from '../../services/ciclos.service';
 import { CicloDTO } from '../../dto/dualex.dto';
 import { AlertService } from '../../services/alert.service';
@@ -24,8 +25,8 @@ export class CiclosComponent implements OnInit {
 
   ciclos: CicloDTO[] = [];
 
-  dtOptions: Config = {};
-  columnTitles: string[] = ['Nombre', 'Siglas', 'Grado', 'Cursos', 'Módulos', 'Acciones'];
+  dtOptions: any = {};
+  columnTitles: string[] = [' ', 'Nombre', 'Siglas', 'Grado', 'Cursos', 'Módulos', 'Acciones'];
 
   isDeleteModalOpen = false;
   cicloToDelete: any = null;
@@ -40,17 +41,28 @@ export class CiclosComponent implements OnInit {
     this.cargarCiclos();
 
     this.dtOptions = {
+      order: [],
+      responsive: true,
       data: this.ciclos,
       columns: [
-        { data: 'nombre' },
-        { data: 'siglas' },
-        { data: 'grado' },
-        { data: 'Curso' },
-        { data: null, defaultContent: 'Gestionar Módulos' },
+        {
+          title: ' ',
+          className: 'dtr-control all',
+          orderable: false,
+          data: null,
+          defaultContent: '',
+          responsivePriority: 1
+        },
+        { data: 'nombre', className: 'text-truncate', responsivePriority: 2 },
+        { data: 'siglas', responsivePriority: 3 },
+        { data: 'grado', responsivePriority: 4 },
+        { data: 'Curso', responsivePriority: 6 },
+        { data: null, defaultContent: 'Gestionar Módulos', responsivePriority: 7 },
         {
           data: null,
           orderable: false,
           className: 'text-center',
+          responsivePriority: 5,
           render: () => `
             <div class="d-flex gap-2 justify-content-center align-items-center action-buttons w-100">
               <button class="btn btn-sm btn-outline-primary shadow-sm action-edit" data-action="edit" title="Editar">

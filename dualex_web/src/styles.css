@@ -437,6 +437,31 @@ footer a:hover {
   height: 100%;
 }
 
+/* Ajustes responsivos para evitar que los modales y su información se corten en pantallas pequeñas */
+.modal-overlay {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 1rem !important;
+  box-sizing: border-box !important;
+}
+
+.modal-content {
+  max-height: calc(100vh - 2rem) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  border-radius: 1.25rem !important;
+  overflow: hidden !important;
+}
+
+.modal-body {
+  flex: 1 1 auto !important;
+  overflow-y: auto !important;
+  min-height: 0 !important;
+  box-sizing: border-box !important;
+}
+
+
 /* ==========================================================================
    CKEditor 5 Global Styles
    ========================================================================== */
@@ -531,8 +556,29 @@ footer a:hover {
   transform: translateY(-50%) translateX(0);
 }
 
-.back-btn { width: 38px; height: 38px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; padding: 0; border: 1px solid #d1d5db; color: #374151; background-color: #ffffff !important; transition: all 0.2s ease; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); } 
-.back-btn:hover { background-color: #f8fafc !important; border-color: #94a3b8; color: #0f172a; } 
+.back-btn {
+  width: 38px !important;
+  height: 38px !important;
+  min-width: 38px !important;
+  min-height: 38px !important;
+  max-width: 38px !important;
+  max-height: 38px !important;
+  border-radius: 10px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  border: 1px solid #d1d5db !important;
+  color: #374151 !important;
+  background-color: #ffffff !important;
+  transition: all 0.2s ease !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+.back-btn:hover {
+  background-color: #f8fafc !important;
+  border-color: #94a3b8 !important;
+  color: #0f172a !important;
+} 
 
 /* Botón de acción especial para Coordinadores Generales (Tonos suaves concordantes) */
 .btn-coordinador-general {

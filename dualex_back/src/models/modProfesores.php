@@ -532,7 +532,7 @@ class ModProfesores {
         // Cargar Excel
         $spreadsheet = IOFactory::load($filePath);
         $sheet = $spreadsheet->getActiveSheet();
-
+        
         // Convertimos todo a array
         $rows = $sheet->toArray(null, true, true, true);
 

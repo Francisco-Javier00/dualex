@@ -72,10 +72,9 @@ export class PruebasSistemaComponent implements OnInit {
     const nuevoToken = await this.generarTokenDevReal(rol.toUpperCase());
     this.authService.setCookieNativa('dualex_jwt', nuevoToken);
 
-    // Redirigir a la página de inicio del rol correspondiente
-    // Usamos window.location.href para forzar la recarga total de la app con el nuevo token
-    const targetUrl = (rol.toUpperCase() === 'ALUMNO') ? '/tareas' : '/dashboard';
-    window.location.href = targetUrl;
+    // Redirigir a la raíz '/' para forzar la recarga total de la app con el nuevo token
+    // sin que aparezca la ruta de destino (/dashboard o /tareas) en la barra de direcciones.
+    window.location.href = '/';
   }
 
   /**
