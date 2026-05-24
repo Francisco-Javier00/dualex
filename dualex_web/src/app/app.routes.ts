@@ -9,6 +9,7 @@ import { CiclosComponent } from './components/ciclos/ciclos.component';
 import { TareasComponent } from './components/tareas/tareas.component';
 import { TareaFormComponent } from './components/tarea-form/tarea-form.component';
 import { PerfilComponent } from './components/perfil/perfil.component';
+import { MisModulosComponent } from './components/mis-modulos/mis-modulos.component';
 import { AboutComponent } from './components/about/about.component';
 import { DocsViewerComponent } from './components/docs-viewer/docs-viewer.component';
 
@@ -17,6 +18,7 @@ import { authGuard } from './auth/guards/auth.guard';
 export const routes: Routes = [
   { path: '', component: DashboardComponent },
   { path: 'dashboard', component: DashboardComponent },
+  { path: 'mis-modulos', component: MisModulosComponent, canActivate: [authGuard], data: { roles: ['COORDINADOR', 'PROFESOR'] } },
   { path: 'acerca-de', component: AboutComponent },
   { path: 'docs/:tipo', component: DocsViewerComponent, canActivate: [authGuard], data: { roles: ['COORDINADOR', 'PROFESOR', 'ALUMNO'] } },
   { path: 'profesores', component: ProfesoresComponent, canActivate: [authGuard], data: { roles: ['COORDINADOR'] } },

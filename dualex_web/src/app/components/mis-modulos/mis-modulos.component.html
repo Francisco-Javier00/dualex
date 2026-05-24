@@ -1,0 +1,43 @@
+<div class="container-fluid p-4">
+  <header class="mb-4">
+    <h1 class="h3 fw-bold text-dark mb-1">Mis Módulos</h1>
+    <p class="text-muted mb-0">Gestión de módulos para {{ usuario?.nombre }}.</p>
+  </header>
+
+  @if (cargando) {
+    <div class="text-center py-5">
+      <div class="spinner-border text-primary" role="status"></div>
+      <p class="text-muted mt-3">Cargando módulos...</p>
+    </div>
+  } @else {
+    <div class="row g-4">
+      @for (modulo of modulos; track modulo.idModulo) {
+      <div class="col-sm-6 col-lg-4 col-xl-3">
+        <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden modulo-card" style="cursor: pointer;"
+          [routerLink]="['/alumnos']" [queryParams]="{ moduloId: modulo.idModulo }">
+          <div class="modulo-header px-4 py-3 d-flex align-items-center gap-3" [style.background-color]="modulo.color">
+            <span class="badge bg-white fw-bold rounded-2" [style.color]="modulo.color"
+              style="font-size: 0.85rem; letter-spacing: 0.04em; padding: 6px 10px;">
+              {{ modulo.sigla }}
+            </span>
+            <span class="text-white fw-semibold" style="font-size: 0.95rem; line-height: 1.3;">
+              {{ modulo.nombre }}
+            </span>
+          </div>
+          <div class="card-body px-4 py-3">
+            <div class="d-flex justify-content-between text-muted" style="font-size: 0.85rem;">
+              <span><i class="fa-solid fa-users me-1"></i>{{ modulo.numAlumnos }} alumnos</span>
+              <span><i class="fa-solid fa-list-check me-1"></i>{{ modulo.numActividades || 0 }} actividades</span>
+            </div>
+          </div>
+          <div class="card-footer border-0 bg-transparent px-4 pb-3 pt-0">
+            <button class="btn btn-sm w-100 text-white" [style.background-color]="modulo.color" [routerLink]="['/alumnos']" [queryParams]="{ moduloId: modulo.idModulo }">
+              Ver módulo <i class="fa-solid fa-arrow-right ms-1"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      }
+    </div>
+  }
+</div>

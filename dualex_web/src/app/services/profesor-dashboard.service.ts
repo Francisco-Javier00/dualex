@@ -15,6 +15,10 @@ export class ProfesorDashboardService {
   private http = inject(HttpClient);
   private readonly API_URL = `${environment.apiUrl}/index.php?c=Modulos`;
 
+  obtenerModulosPorEmail(email: string): Observable<ModuloProfesor[]> {
+    return this.http.get<ModuloProfesor[]>(`${this.API_URL}&m=listarProfesor&emailProfesor=${email}`);
+  }
+
   /**
    * Recupera la lista de módulos en los que el profesor autenticado imparte clase.
    * El ID del profesor se deduce de la sesión activa en el backend.

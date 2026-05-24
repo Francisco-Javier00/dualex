@@ -2,7 +2,7 @@
   <div class="management-panel p-4 p-md-5">
 
     <!-- === DASHBOARD COORDINADOR === -->
-    @if (usuario?.rol === 'COORDINADOR') {
+    @if (usuario?.rol === 'COORDINADOR' || usuario?.rol === 'COORDINADOR_GENERAL') {
     <header class="mb-4 d-flex justify-content-between align-items-end">
       <div>
         <h1 class="h3 fw-bold text-dark mb-1">PANEL DE GESTIÓN INTEGRAL</h1>
@@ -20,6 +20,9 @@
           </div>
         }
       </div>
+      <a href="/mis-modulos" target="_blank" class="btn btn-primary shadow-sm">
+        <i class="fa-solid fa-chalkboard"></i> Mis Módulos
+      </a>
     </header>
 
     <div class="row g-4 justify-content-start">
@@ -53,6 +56,9 @@
 
       <!-- Botón Empresa (Blanco) -->
       <div class="d-flex gap-2">
+        <a href="/mis-modulos" target="_blank" class="btn btn-primary shadow-sm" data-tooltip="Ver mis módulos">
+          <i class="fa-solid fa-chalkboard"></i> Mis Módulos
+        </a>
         <button class="btn btn-building shadow-sm" data-tooltip="Ver listado de empresas" routerLink="/empresas">
           <i class="fa-solid fa-building"></i>
         </button>
