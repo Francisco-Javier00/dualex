@@ -783,3 +783,14 @@ INSERT INTO Configuracion (
     urlConvenio
 ) VALUES
 (30,4,'https://dualex.es/convenios');
+
+ALTER TABLE Coordinador
+ADD general BIT(1) NOT NULL DEFAULT 0;
+
+UPDATE Coordinador
+SET general = 1
+WHERE idCoordinador = (
+    SELECT idUsuario
+    FROM Usuario
+    WHERE correo = 'dev.coordinador_general@dualex.es'
+);

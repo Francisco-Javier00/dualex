@@ -40,6 +40,7 @@ export class EmpresaModalComponent implements OnInit, OnDestroy {
   // Patrones de validación
   urlPattern = /^https?:\/\/.*$/;
   telefonoPattern = /^[0-9+ \-]+$/;
+  emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
   constructor(private fb: FormBuilder) {
     this.empresaForm = this.fb.group({
@@ -50,6 +51,7 @@ export class EmpresaModalComponent implements OnInit, OnDestroy {
       finConvenio: [{ value: '', disabled: true }],
       contacto: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
       numeroContacto: ['', [Validators.required, Validators.pattern(this.telefonoPattern), Validators.minLength(9), Validators.maxLength(15)]],
+      correo: ['', [Validators.required, Validators.pattern(this.emailPattern), Validators.maxLength(100)]],
       contactosAdicionales: this.fb.array([])
     });
   }
@@ -108,11 +110,12 @@ export class EmpresaModalComponent implements OnInit, OnDestroy {
       convenioUrl: empresa.convenioUrl,
       inicioConvenio: this.formatearFechaParaInput(empresa.inicioConvenio),
       contacto: empresa.contacto,
-      numeroContacto: empresa.numeroContacto
+      numeroContacto: empresa.numeroContacto,
+      correo: empresa.correo
     });
 
     if (empresa.contactosAdicionales && Array.isArray(empresa.contactosAdicionales)) {
-      empresa.contactosAdicionales.forEach(c => this.addContacto(c.contacto, c.numeroContacto));
+      empresa.contactosAdicionales.forEach(c => this.addContacto(c.contacto, c.numeroContacto, c.correo));
     }
 
     // Cargamos la información detallada de los ciclos (sigla + tutor)
@@ -149,10 +152,11 @@ export class EmpresaModalComponent implements OnInit, OnDestroy {
     return !!this.ciclosSeleccionados.find(c => c.sigla === sigla);
   }
 
-  addContacto(nombre = '', telefono = ''): void {
+  addContacto(nombre = '', telefono = '', correo = ''): void {
     this.contactosAdicionales.push(this.fb.group({
       contacto: [nombre, [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
-      numeroContacto: [telefono, [Validators.required, Validators.pattern(this.telefonoPattern), Validators.minLength(9), Validators.maxLength(15)]]
+      numeroContacto: [telefono, [Validators.required, Validators.pattern(this.telefonoPattern), Validators.minLength(9), Validators.maxLength(15)]],
+      correo: [correo, [Validators.required, Validators.pattern(this.emailPattern), Validators.maxLength(100)]]
     }));
   }
 
@@ -236,6 +240,7 @@ export class EmpresaModalComponent implements OnInit, OnDestroy {
     if (control.errors['required']) return 'Este campo es obligatorio';
     if (control.errors['pattern']) {
       if (field === 'convenioUrl') return 'Introduce una URL válida (ej: https://google.com)';
+      if (field === 'correo' || field.includes('correo')) return 'Introduce un correo electrónico válido';
       if (field.includes('numeroContacto')) return 'Solo números, espacios, - o +';
     }
     if (control.errors['minlength']) return `Mínimo ${control.errors['minlength'].requiredLength} caracteres`;

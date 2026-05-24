@@ -163,11 +163,15 @@ class ConEmpresas extends BaseController {
         
         if (isset($datos['contacto']) && mb_strlen($datos['contacto']) > 50) return "El nombre del contacto principal supera los 50 caracteres permitidos.";
         if (isset($datos['numeroContacto']) && mb_strlen($datos['numeroContacto']) > 15) return "El teléfono del contacto principal supera los 15 caracteres permitidos.";
+        if (isset($datos['correo']) && mb_strlen($datos['correo']) > 100) return "El correo del contacto principal supera los 100 caracteres permitidos.";
+        if (!empty($datos['correo']) && !filter_var($datos['correo'], FILTER_VALIDATE_EMAIL)) return "El correo del contacto principal no es válido.";
         
         if (isset($datos['contactosAdicionales']) && is_array($datos['contactosAdicionales'])) {
             foreach ($datos['contactosAdicionales'] as $add) {
                 if (isset($add['contacto']) && mb_strlen($add['contacto']) > 50) return "El nombre de un contacto adicional supera los 50 caracteres permitidos.";
                 if (isset($add['numeroContacto']) && mb_strlen($add['numeroContacto']) > 15) return "El teléfono de un contacto adicional supera los 15 caracteres permitidos.";
+                if (isset($add['correo']) && mb_strlen($add['correo']) > 100) return "El correo de un contacto adicional supera los 100 caracteres permitidos.";
+                if (!empty($add['correo']) && !filter_var($add['correo'], FILTER_VALIDATE_EMAIL)) return "El correo de un contacto adicional no es válido.";
             }
         }
         if (isset($datos['convenioUrl']) && !filter_var($datos['convenioUrl'], FILTER_VALIDATE_URL)) {

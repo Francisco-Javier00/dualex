@@ -56,7 +56,8 @@ export class EmpresasComponent implements OnInit {
     inicioConvenio: '',
     finConvenio: '',
     contacto: '',
-    numeroContacto: ''
+    numeroContacto: '',
+    correo: ''
   };
 
   ngOnInit(): void {
@@ -278,9 +279,11 @@ export class EmpresasComponent implements OnInit {
       inicioConvenio: this.formatearFechaParaGuardar(this.nuevaEmpresa.inicioConvenio),
       contacto: this.nuevaEmpresa.contacto.trim(),
       numeroContacto: this.nuevaEmpresa.numeroContacto.trim(),
+      correo: this.nuevaEmpresa.correo ? this.nuevaEmpresa.correo.trim() : '',
       contactosAdicionales: this.contactosAdicionales.map(contacto => ({
         contacto: contacto.contacto.trim(),
-        numeroContacto: contacto.numeroContacto.trim()
+        numeroContacto: contacto.numeroContacto.trim(),
+        correo: contacto.correo ? contacto.correo.trim() : ''
       }))
     };
 
@@ -442,7 +445,7 @@ export class EmpresasComponent implements OnInit {
   agregarContactoAdicional(): void {
     this.contactosAdicionales = [
       ...this.contactosAdicionales,
-      { contacto: '', numeroContacto: '' }
+      { contacto: '', numeroContacto: '', correo: '' }
     ];
   }
 

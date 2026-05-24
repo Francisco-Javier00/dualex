@@ -63,6 +63,7 @@
                 <tr>
                   <th>Tipo</th>
                   <th>Nombre</th>
+                  <th>Correo</th>
                   <th>Número</th>
                 </tr>
               </thead>
@@ -70,12 +71,14 @@
                 <tr>
                   <td class="fw-semibold">Principal</td>
                   <td>{{ empresaSeleccionada.contacto }}</td>
+                  <td>{{ empresaSeleccionada.correo }}</td>
                   <td>{{ empresaSeleccionada.numeroContacto }}</td>
                 </tr>
                 @for (contactoExtra of empresaSeleccionada.contactosAdicionales ?? []; track $index) {
                   <tr>
                     <td class="fw-semibold">Adicional</td>
                     <td>{{ contactoExtra.contacto }}</td>
+                    <td>{{ contactoExtra.correo }}</td>
                     <td>{{ contactoExtra.numeroContacto }}</td>
                   </tr>
                 }
