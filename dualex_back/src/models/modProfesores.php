@@ -1,4 +1,9 @@
 <?php
+if (file_exists(__DIR__ . '/../../vendor/autoload.php')) {
+    require_once __DIR__ . '/../../vendor/autoload.php';
+}
+use PhpOffice\PhpSpreadsheet\IOFactory;
+
 /**
  * Modelo para la gestión de Profesores.
  * Este modelo maneja la persistencia de Usuario con tipo 'P' (Profesor),
@@ -472,5 +477,151 @@ class ModProfesores {
             $this->db->rollBack();
             throw $e;
         }
+    }
+
+    /**
+     * Realiza la validación de negocio de los datos de un profesor, incluyendo campos obligatorios,
+     * formato de correo y límites de caracteres.
+     *
+     * @param array $datos Datos del profesor a validar.
+     * @return string[] Array con los mensajes de error encontrados (vacío si es válido).
+     */
+    public function validar($datos) {
+        $errores = [];
+
+        // Campos obligatorios
+        $camposReq = ['nombre', 'apellidos', 'correo'];
+        foreach ($camposReq as $campo) {
+            if (!isset($datos[$campo]) || trim($datos[$campo]) === '') {
+                $errores[] = "El campo $campo es obligatorio.";
+            }
+        }
+
+        if (!empty($errores)) return $errores;
+
+        // Formato de Email
+        if (!filter_var($datos['correo'], FILTER_VALIDATE_EMAIL)) {
+            $errores[] = "El formato del correo electrónico no es válido.";
+        }
+
+        // Longitudes máximas
+        if (strlen($datos['nombre']) > 50) $errores[] = "El nombre es demasiado largo (máx 50).";
+        if (strlen($datos['apellidos']) > 100) $errores[] = "Los apellidos son demasiado largos (máx 100).";
+
+        return $errores;
+    }
+
+    /**
+     * Importa profesores de forma masiva desde un archivo .xlsx / .xls.
+     * Si un profesor ya existe (por correo), lo ignora.
+     * Cada inserción se realiza bajo una transacción (implementada en crear()).
+     *
+     * @param string $filePath Ruta al archivo temporal del excel.
+     * @throws Exception En caso de errores graves de formato o lectura.
+     * @return array Resumen del proceso (imported, errors).
+     */
+    public function importarExcel($filePath) {
+        if (!file_exists($filePath)) {
+            throw new Exception("Archivo no encontrado.");
+        }
+
+        // Cargar Excel
+        $spreadsheet = IOFactory::load($filePath);
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Convertimos todo a array
+        $rows = $sheet->toArray(null, true, true, true);
+
+        $imported = 0;
+        $errors = [];
+        $rowNumber = 1;
+
+        // Sacamos cabecera (primera fila)
+        if (!isset($rows[1]) || empty($rows[1])) {
+            throw new Exception("El archivo Excel está vacío o no contiene una fila de cabeceras.");
+        }
+
+        $header = array_map(function($h) {
+            return strtolower(trim($h ?? ''));
+        }, $rows[1]);
+
+        // Validar columnas requeridas en la cabecera
+        $tieneNombre = in_array('nombre', $header, true);
+        $tieneApellidos = in_array('apellidos', $header, true);
+        $tieneCorreo = in_array('correo', $header, true) || in_array('email', $header, true);
+
+        if (!$tieneNombre || !$tieneApellidos || !$tieneCorreo) {
+            $columnasFaltantes = [];
+            if (!$tieneNombre) $columnasFaltantes[] = "'nombre'";
+            if (!$tieneApellidos) $columnasFaltantes[] = "'apellidos'";
+            if (!$tieneCorreo) $columnasFaltantes[] = "'correo' o 'email'";
+            
+            throw new Exception("El archivo Excel no tiene el formato correcto. Faltan las siguientes columnas requeridas: " . implode(', ', $columnasFaltantes) . ".");
+        }
+
+        unset($rows[1]); // quitamos cabecera
+
+        foreach ($rows as $row) {
+            $rowNumber++;
+
+            // Normalizar claves con cabecera
+            $data = [];
+            $i = 0;
+
+            foreach ($header as $key) {
+                $i++;
+                $data[$key] = trim($row[array_keys($row)[$i - 1]] ?? '');
+            }
+
+            // Mapear campos
+            $nombre = $data['nombre'] ?? '';
+            $apellidos = $data['apellidos'] ?? '';
+            $correo = $data['correo'] ?? $data['email'] ?? '';
+
+            // Fila vacía → saltar
+            if ($nombre === '' && $apellidos === '' && $correo === '') {
+                continue;
+            }
+
+            // Validación básica
+            if ($nombre === '' || $apellidos === '' || $correo === '') {
+                $errors[] = "Fila $rowNumber: Faltan campos obligatorios (nombre, apellidos, correo/email).";
+                continue;
+            }
+
+            $profesorData = [
+                'nombre' => $nombre,
+                'apellidos' => $apellidos,
+                'correo' => $correo,
+                'rol' => 'PROFESOR',
+                'ciclos' => [],
+                'modulos' => [],
+                'modulosIds' => []
+            ];
+
+            // Validar
+            $validacionErrores = $this->validar($profesorData);
+            if (!empty($validacionErrores)) {
+                $errors[] = "Fila $rowNumber: " . implode(" ", $validacionErrores);
+                continue;
+            }
+
+            try {
+                $this->crear($profesorData);
+                $imported++;
+            } catch (Exception $e) {
+                $msg = $e->getMessage();
+                if (strpos($msg, '1062') !== false || $e->getCode() == 23000 || $e->getCode() == '23000') {
+                    $errors[] = "Fila $rowNumber: El correo electrónico '$correo' ya está registrado.";
+                } else {
+                    $errors[] = "Fila $rowNumber: " . $msg;
+                }
+            }
+        }
+
+        return [
+            'imported' => $imported,
+            'errors' => $errors
+        ];
     }
 }

@@ -6,6 +6,7 @@ import { Config } from 'datatables.net';
 import { DatatableComponent } from '../shared/datatable/datatable.component';
 import { ConfirmarBorradoModalComponent } from '../shared/modals/confirmar-borrado-modal/confirmar-borrado-modal.component';
 import { ProfesorModalComponent } from '../modals/profesor-modal/profesor-modal.component';
+import { ImportarProfesoresModalComponent } from '../modals/importar-profesores-modal/importar-profesores-modal.component';
 import { AlertService } from '../../services/alert.service';
 import { ProfesoresService } from '../../services/profesores.service';
 import { ProfesorDTO } from '../../dto/dualex.dto';
@@ -13,7 +14,7 @@ import { ProfesorDTO } from '../../dto/dualex.dto';
 @Component({
   selector: 'app-profesores',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, DatatableComponent, ConfirmarBorradoModalComponent, ProfesorModalComponent],
+  imports: [CommonModule, FormsModule, RouterModule, DatatableComponent, ConfirmarBorradoModalComponent, ProfesorModalComponent, ImportarProfesoresModalComponent],
   templateUrl: './profesores.component.html',
   styleUrl: './profesores.component.css'
 })
@@ -26,10 +27,11 @@ export class ProfesoresComponent implements OnInit {
   dtOptions: Config = {};
   modalBorradoVisible = false;
   modalCrearVisible = false;
+  modalImportarVisible = false;
+  importandoExcel = false;
   modoFormulario: 'crear' | 'editar' = 'crear';
   profesorEditandoId: number | null = null;
   profesorSeleccionado: ProfesorDTO | null = null;
-  archivoExcelSeleccionado: File | null = null;
 
   ngOnInit(): void {
     this.dtOptions = {
@@ -107,29 +109,53 @@ export class ProfesoresComponent implements OnInit {
     };
   }
 
-  subirExcel(): void {
-    const input = document.getElementById('profesores-excel-input') as HTMLInputElement | null;
-    input?.click();
+  importarExcel(): void {
+    this.modalImportarVisible = true;
   }
 
-  onExcelSeleccionado(event: Event): void {
-    const input = event.target as HTMLInputElement | null;
-    const archivo = input?.files?.[0] ?? null;
+  onCerrarImportar(): void {
+    this.modalImportarVisible = false;
+  }
 
-    if (!archivo) return;
+  onConfirmarImportar(file: File): void {
+    this.importandoExcel = true;
+    this.profesoresService.importarProfesoresExcel(file).subscribe({
+      next: (res) => {
+        this.importandoExcel = false;
+        this.modalImportarVisible = false;
 
-    const nombre = archivo.name.toLowerCase();
-    const esExcel = nombre.endsWith('.xls') || nombre.endsWith('.xlsx');
+        let msg = `Se han importado ${res.imported} profesores correctamente.`;
 
-    if (!esExcel) {
-      this.alertService.error('Formato no válido', 'Solo se permiten archivos Excel con extensión .xls o .xlsx.');
-      if (input) input.value = '';
-      return;
-    }
+        if (res.imported === 0) {
+          const errorDetails = res.errors && res.errors.length > 0 ? res.errors.slice(0, 5).join('\n') : 'El archivo no contiene registros procesables o todos están duplicados.';
+          this.alertService.error(
+            'No se importaron profesores',
+            `Se han detectado errores en todos los registros. No se importó ningún profesor.\n\nDetalles:\n${errorDetails}`
+          );
+        } else if (res.errors && res.errors.length > 0) {
+          const errorDetails = res.errors.slice(0, 5).join('\n');
+          const errorCount = res.errors.length;
+          this.alertService.advertencia(
+            'Importación con Observaciones',
+            `${msg} Sin embargo, se detectaron ${errorCount} errores en el proceso. Primeros errores:\n${errorDetails}`,
+            false,
+            8000
+          );
+          console.warn('Errores de importación:', res.errors);
+        } else {
+          this.alertService.exito('Importación Exitosa', msg);
+        }
 
-    this.archivoExcelSeleccionado = archivo;
-    this.alertService.exito('Archivo seleccionado', `Se ha seleccionado "${archivo.name}" correctamente.`);
-    if (input) input.value = '';
+        this.datatable?.refrescar();
+      },
+      error: (err) => {
+        this.importandoExcel = false;
+        this.alertService.error(
+          'Error al importar',
+          err.error?.message || err.error?.error || 'No se pudo procesar el archivo de profesores.'
+        );
+      }
+    });
   }
 
   crearNuevaEntrada(): void {
