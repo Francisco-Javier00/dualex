@@ -409,7 +409,6 @@ INSERT INTO Usuario (nombre, apellidos, correo, tipo) VALUES
 ('Daniel', 'Coordinador Ruiz', 'dev.coordinador@dualex.es', 'P'),
 ('Sergio', 'Profesor Martin', 'dev.profesor@dualex.es', 'P'),
 ('Laura', 'Coordinadora General', 'dev.coordinador_general@dualex.es', 'P'),
-<<<<<<< HEAD
 ('Juan', 'Martinez Lopez', 'juan@fundacionloyola.net', 'P'),
 ('Lucia', 'Sanchez Ruiz', 'lucia@fundacionloyola.net', 'P'),
 ('Carlos', 'Fernandez Gil', 'carlos@fundacionloyola.net', 'P'),
@@ -438,36 +437,6 @@ INSERT INTO Usuario (nombre, apellidos, correo, tipo) VALUES
 ('Aitana', 'Castro Moreno', 'aitana.guadalupe@alumnado.fundacionloyola.net', 'A'),
 ('Victor', 'Ramos Perez', 'victor.guadalupe@alumnado.fundacionloyola.net', 'A'),
 ('Lucia', 'Ortega Diaz', 'lucia.guadalupe@alumnado.fundacionloyola.net', 'A');
-=======
-('Juan', 'Martinez Lopez', 'juan.martinez@dualex.es', 'P'),
-('Lucia', 'Sanchez Ruiz', 'lucia.sanchez@dualex.es', 'P'),
-('Carlos', 'Fernandez Gil', 'carlos.fernandez@dualex.es', 'P'),
-('Marta', 'Lopez Perez', 'marta.lopez@dualex.es', 'P'),
-('Alberto', 'Ruiz Gomez', 'alberto.ruiz@dualex.es', 'P'),
-('Sofia', 'Navarro Diaz', 'sofia.navarro@dualex.es', 'P'),
-('Miguel', 'Torres Leon', 'miguel.torres@dualex.es', 'P'),
-
-('Alejandro', 'Alumno Demo', 'dev.alumno@dualex.es', 'A'),
-('Paula', 'Diaz Martin', 'paula.diaz@gmail.com', 'A'),
-('David', 'Moreno Lopez', 'david.moreno@gmail.com', 'A'),
-('Andrea', 'Jimenez Ruiz', 'andrea.jimenez@gmail.com', 'A'),
-('Sergio', 'Perez Castro', 'sergio.perez@gmail.com', 'A'),
-('Elena', 'Vega Torres', 'elena.vega@gmail.com', 'A'),
-('Mario', 'Suarez Ramos', 'mario.suarez@gmail.com', 'A'),
-('Claudia', 'Ortega Cano', 'claudia.ortega@gmail.com', 'A'),
-('Hugo', 'Molina Vera', 'hugo.molina@gmail.com', 'A'),
-('Irene', 'Cruz Santos', 'irene.cruz@gmail.com', 'A'),
-('Javier', 'Rubio Nieto', 'javier.rubio@gmail.com', 'A'),
-('Laura', 'Reyes Pardo', 'laura.reyes@gmail.com', 'A'),
-('Raul', 'Mendez Soler', 'raul.mendez@gmail.com', 'A'),
-('Cristina', 'Navarro Ruiz', 'cristina.navarro@gmail.com', 'A'),
-('Adrian', 'Torres Leon', 'adrian.torres@gmail.com', 'A'),
-('Nerea', 'Santos Vega', 'nerea.santos@gmail.com', 'A'),
-('Pablo', 'Garcia Ruiz', 'pablo.garcia@gmail.com', 'A'),
-('Aitana', 'Castro Moreno', 'aitana.castro@gmail.com', 'A'),
-('Victor', 'Ramos Perez', 'victor.ramos@gmail.com', 'A'),
-('Lucia', 'Ortega Diaz', 'lucia.ortega@gmail.com', 'A');
->>>>>>> origin/main
 
 -- =====================================================
 -- PROFESOR
@@ -813,7 +782,6 @@ INSERT INTO Configuracion (
     tiempo_finalizacion_convenio,
     urlConvenio
 ) VALUES
-<<<<<<< HEAD
 (30,4,'https://dualex.es/convenios');
 
 ALTER TABLE Coordinador
@@ -826,8 +794,3 @@ WHERE idCoordinador = (
     FROM Usuario
     WHERE correo = 'dev.coordinador_general@dualex.es'
 );
-=======
-(30,4,'https://dualex.es/convenios'),
-(15,3,'https://dualex.es/convenios/aviso15'),
-(60,5,'https://dualex.es/convenios/aviso60');
->>>>>>> origin/main

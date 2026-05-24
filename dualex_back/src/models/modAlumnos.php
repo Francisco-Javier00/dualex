@@ -1,5 +1,7 @@
 <?php
-require_once __DIR__ . '/../../vendor/autoload.php';
+if (file_exists(__DIR__ . '/../../vendor/autoload.php')) {
+    require_once __DIR__ . '/../../vendor/autoload.php';
+}
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 /**
@@ -228,7 +230,7 @@ class ModAlumnos {
                 FROM Usuario u
                 INNER JOIN Alumno a ON u.idUsuario = a.idAlumno 
                 LEFT JOIN Curso c ON a.idCurso = c.idCurso
-                LEFT JOIN Empresa_Alumno ea ON a.idAlumno = ea.idAlumno "
+                 LEFT JOIN Empresa_Alumno ea ON a.idAlumno = ea.idAlumno ";
 
         // Construcción de condiciones
         $conditions = [];
@@ -270,11 +272,7 @@ class ModAlumnos {
         }
         // 4. Si es Profesor, ve los Alumno de los módulos que imparte
         else if (empty($conditions) && strtoupper($rol) === 'PROFESOR' && !empty($idUsuario)) {
-<<<<<<< HEAD
             $joinClause .= " INNER JOIN Modulo_Alumno_Cursa mac ON a.idAlumno = mac.idAlumno ";
-=======
-            $joinClause .= " INNER JOIN Modulo_Alumno_Cursa mac ON a.idAlumnos = mac.idAlumnos ";
->>>>>>> origin/main
             $joinClause .= " INNER JOIN Modulo_Profesor mp ON mac.idModulo = mp.idModulo ";
             $conditions[] = "mp.idProfesor = :idUsuario";
             $binds[':idUsuario'] = (int)$idUsuario;
@@ -314,15 +312,9 @@ class ModAlumnos {
         $data = $stmtData->fetchAll(PDO::FETCH_ASSOC);
 
         // Consulta de conteo para DataTables
-<<<<<<< HEAD
         $sqlCount = "SELECT COUNT(DISTINCT a.idAlumno) FROM Usuario u 
                      INNER JOIN Alumno a ON u.idUsuario = a.idAlumno 
                      LEFT JOIN Curso c ON a.idCurso = c.idCurso " . $joinClause . $whereClause;
-=======
-        $sqlCount = "SELECT COUNT(DISTINCT a.idAlumnos) FROM Usuarios u 
-                     INNER JOIN Alumnos a ON u.idUsuario = a.idAlumnos 
-                     LEFT JOIN Cursos c ON a.idCurso = c.idCurso " . $joinClause . $whereClause;
->>>>>>> origin/main
         $stmtCount = $this->db->prepare($sqlCount);
         foreach ($binds as $key => $val) {
             $stmtCount->bindValue($key, $val, is_int($val) ? PDO::PARAM_INT : PDO::PARAM_STR);
