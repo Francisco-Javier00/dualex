@@ -25,7 +25,7 @@ export class ProfesoresComponent implements OnInit {
 
   @ViewChild(DatatableComponent) datatable?: DatatableComponent;
 
-  dtOptions: Config = {};
+  dtOptions: any = {};
   modalBorradoVisible = false;
   modalCrearVisible = false;
   modalImportarVisible = false;

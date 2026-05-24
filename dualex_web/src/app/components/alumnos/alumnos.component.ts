@@ -35,7 +35,7 @@ export class AlumnosComponent implements OnInit, OnDestroy {
 
   @ViewChild(DatatableComponent) datatable!: DatatableComponent;
 
-  dtOptions: Config = {};
+  dtOptions: any = {};
   modalBorradoVisible = false;
   modalAlumnoVisible = false;
   modalImportarVisible = false;

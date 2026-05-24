@@ -24,7 +24,7 @@ export class CiclosComponent implements OnInit {
 
   ciclos: CicloDTO[] = [];
 
-  dtOptions: Config = {};
+  dtOptions: any = {};
   columnTitles: string[] = [' ', 'Nombre', 'Siglas', 'Grado', 'Cursos', 'Módulos', 'Acciones'];
 
   isDeleteModalOpen = false;

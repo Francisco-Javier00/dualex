@@ -480,6 +480,10 @@ export class TareaFormComponent implements OnInit {
    * Navegación hacia atrás.
    */
   volver(): void {
-    this.location.back();
+    if (this.idAlumno) {
+      this.router.navigate(['/tareas', this.idAlumno]);
+    } else {
+      this.router.navigate(['/tareas']);
+    }
   }
 }

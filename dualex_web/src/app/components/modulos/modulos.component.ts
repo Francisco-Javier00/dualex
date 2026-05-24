@@ -29,7 +29,7 @@ export class ModulosComponent implements OnInit, OnDestroy {
 
   @ViewChild(DatatableComponent) datatable!: DatatableComponent;
 
-  dtOptions: Config = {};
+  dtOptions: any = {};
   modalBorradoVisible = false;
   modalModuloVisible = false;
   moduloSeleccionado: ModuloDTO | null = null;

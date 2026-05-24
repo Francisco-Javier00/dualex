@@ -1,10 +1,16 @@
 <div class="container-fluid py-4 mt-4 px-md-5 px-3 animate-fade-in">
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-      <h2 class="fw-bold text-dark mb-1">
-        <i class="fa-solid fa-list-check text-primary me-2"></i> Gestión de Tareas
-      </h2>
-      <p class="text-muted">Gestiona el progreso y las calificaciones del curso</p>
+    <div class="d-flex align-items-center gap-3">
+      <!-- Botón de Volver -->
+      <button *ngIf="alumnoId" type="button" class="btn back-btn mt-1" (click)="volver()" title="Volver a Alumnos">
+        <i class="fa-solid fa-arrow-left"></i>
+      </button>
+      <div>
+        <h2 class="fw-bold text-dark mb-1">
+          <i class="fa-solid fa-list-check text-primary me-2"></i> Gestión de Tareas
+        </h2>
+        <p class="text-muted">Gestiona el progreso y las calificaciones del curso</p>
+      </div>
     </div>
     <button *ngIf="!esProfesor" type="button" class="btn btn-primary rounded-3 px-4 py-2 shadow-sm" (click)="crearTarea()">
       <i class="fa-solid fa-plus me-2"></i> Nueva Tarea

@@ -32,7 +32,7 @@ export class EmpresasComponent implements OnInit {
 
   puedeEditar = false;
 
-  dtOptions: Config = {};
+  dtOptions: any = {};
   modalConfiguracionVisible = false;
   modalContactosVisible = false;
   modalBorradoVisible = false;

@@ -11,7 +11,7 @@ import { Config } from 'datatables.net';
   styleUrls: ['./datatable.component.css']
 })
 export class DatatableComponent implements AfterViewInit, OnDestroy {
-  @Input() dtOptions: Config = {};
+  @Input() dtOptions: any = {};
   @Input() columnTitles: string[] = [];
   @Input() tableId: string = 'shared-table-' + Math.floor(Math.random() * 10000);
   
