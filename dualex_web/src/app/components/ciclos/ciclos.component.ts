@@ -26,7 +26,7 @@ export class CiclosComponent implements OnInit {
   ciclos: CicloDTO[] = [];
 
   dtOptions: any = {};
-  columnTitles: string[] = [' ', 'Nombre', 'Siglas', 'Grado', 'Cursos', 'Módulos', 'Acciones'];
+  columnTitles: string[] = [' ', 'Nombre', 'Siglas', 'Grado', 'Cursos', 'Acciones'];
 
   isDeleteModalOpen = false;
   cicloToDelete: any = null;
@@ -57,7 +57,6 @@ export class CiclosComponent implements OnInit {
         { data: 'siglas', responsivePriority: 3 },
         { data: 'grado', responsivePriority: 4 },
         { data: 'Curso', responsivePriority: 6 },
-        { data: null, defaultContent: 'Gestionar Módulos', responsivePriority: 7 },
         {
           data: null,
           orderable: false,

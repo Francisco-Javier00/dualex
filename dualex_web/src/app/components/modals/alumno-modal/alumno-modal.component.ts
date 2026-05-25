@@ -36,7 +36,7 @@ export class AlumnoModalComponent implements OnInit, OnChanges, OnDestroy {
     email: ['', [Validators.required, Validators.pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/), Validators.maxLength(100)]],
     dni: ['', [Validators.required, this.dniValidator()]],
     nia: ['', [Validators.required, Validators.maxLength(10)]],
-    nuss: ['', [Validators.required, Validators.maxLength(12)]],
+    nuss: ['', [Validators.maxLength(12)]],
     telefono: ['', [Validators.required, Validators.maxLength(15)]],
     repetidor: [false],
     idCurso: [null, [Validators.required]],

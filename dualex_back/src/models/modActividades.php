@@ -28,8 +28,8 @@ class ModActividades {
             $errores[] = "El título de la actividad es obligatorio.";
         } else {
             $len = mb_strlen(trim($datos['titulo']), 'UTF-8');
-            if ($len < 5 || $len > 60) {
-                $errores[] = "El título debe tener entre 5 y 60 caracteres.";
+            if ($len < 5 || $len > 255) {
+                $errores[] = "El título debe tener entre 5 y 255 caracteres.";
             }
         }
 
@@ -57,7 +57,7 @@ class ModActividades {
      */
     public function listar() {
         $query = "SELECT a.idActividad as id, a.titulo, a.descripcion, 
-                         IFNULL(GROUP_CONCAT(m.nombre SEPARATOR ', '), 'Sin módulos') as modulo,
+                         IFNULL(GROUP_CONCAT(m.sigla SEPARATOR ', '), 'Sin módulos') as modulo,
                          IFNULL(GROUP_CONCAT(m.idModulo SEPARATOR ','), '') as idModulos
                   FROM " . $this->table_name . " a
                   LEFT JOIN Modulo_Actividad ma ON a.idActividad = ma.idActividad
@@ -74,7 +74,7 @@ class ModActividades {
      */
     public function obtener($id) {
         $query = "SELECT a.idActividad as id, a.titulo, a.descripcion, 
-                         IFNULL(GROUP_CONCAT(m.nombre SEPARATOR ', '), 'Sin módulos') as modulo,
+                         IFNULL(GROUP_CONCAT(m.sigla SEPARATOR ', '), 'Sin módulos') as modulo,
                          IFNULL(GROUP_CONCAT(m.idModulo SEPARATOR ','), '') as idModulos
                   FROM " . $this->table_name . " a
                   LEFT JOIN Modulo_Actividad ma ON a.idActividad = ma.idActividad
@@ -126,7 +126,7 @@ class ModActividades {
         $orderField = isset($columnsMap[$orderColumnIndex]) ? $columnsMap[$orderColumnIndex] : 'a.idActividad';
 
         $query = "SELECT a.idActividad as id, a.titulo, a.descripcion, 
-                         IFNULL(GROUP_CONCAT(m.nombre SEPARATOR ', '), 'Sin módulos') as modulo,
+                         IFNULL(GROUP_CONCAT(m.sigla SEPARATOR ', '), 'Sin módulos') as modulo,
                          IFNULL(GROUP_CONCAT(m.idModulo SEPARATOR ','), '') as idModulos
                   FROM " . $this->table_name . " a
                   LEFT JOIN Modulo_Actividad ma ON a.idActividad = ma.idActividad
@@ -156,7 +156,7 @@ class ModActividades {
                               FROM " . $this->table_name . " a
                               LEFT JOIN Modulo_Actividad ma ON a.idActividad = ma.idActividad
                               LEFT JOIN Modulo m ON ma.idModulo = m.idModulo
-                              WHERE a.titulo LIKE :search OR a.descripcion LIKE :search OR m.nombre LIKE :search";
+                              WHERE a.titulo LIKE :search OR a.descripcion LIKE :search OR m.nombre LIKE :search OR m.sigla LIKE :search";
             $stmtFiltered = $this->conn->prepare($queryFiltered);
             $stmtFiltered->bindValue(':search', '%' . $searchVal . '%', PDO::PARAM_STR);
             $stmtFiltered->execute();

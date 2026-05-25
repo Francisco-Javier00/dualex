@@ -98,10 +98,7 @@
                     maxlength="12"
                     [class.is-invalid]="alumnoForm.get('nuss')?.touched && alumnoForm.get('nuss')?.invalid">
                 </div>
-                <div class="text-danger small mt-1"
-                  *ngIf="alumnoForm.get('nuss')?.touched && alumnoForm.get('nuss')?.errors?.['required']">
-                  El NUSS es obligatorio
-                </div>
+
                 <div class="text-danger small mt-1"
                   *ngIf="alumnoForm.get('nuss')?.touched && alumnoForm.get('nuss')?.errors?.['maxlength']">
                   Máximo 12 dígitos
