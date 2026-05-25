@@ -95,12 +95,12 @@ class ModEmpresas {
             $idEmpresa = $this->db->lastInsertId();
 
             // 2. Inserción del contacto principal de forma obligatoria
-            $this->insertarContacto($idEmpresa, $datos['contacto'], $datos['numeroContacto'], $datos['correo'] ?? '', 'Principal');
+            $this->insertarContacto($idEmpresa, $datos['contacto'], $datos['numeroContacto'], $datos['correo'] ?? '', 'Principal', $datos['cargo'] ?? null);
 
             // 3. Inserción iterativa de los posibles contactos adicionales
             if (isset($datos['contactosAdicionales']) && is_array($datos['contactosAdicionales'])) {
                 foreach ($datos['contactosAdicionales'] as $add) {
-                    $this->insertarContacto($idEmpresa, $add['contacto'], $add['numeroContacto'], $add['correo'] ?? '', 'Adicional');
+                    $this->insertarContacto($idEmpresa, $add['contacto'], $add['numeroContacto'], $add['correo'] ?? '', 'Adicional', $add['cargo'] ?? null);
                 }
             }
 
@@ -162,11 +162,11 @@ class ModEmpresas {
                     $stmtDel = $this->db->prepare("DELETE FROM Contacto WHERE idEmpresa = :id");
                     $stmtDel->execute([':id' => $id]);
 
-                    $this->insertarContacto($id, $datos['contacto'], $datos['numeroContacto'], $datos['correo'] ?? '', 'Principal');
+                    $this->insertarContacto($id, $datos['contacto'], $datos['numeroContacto'], $datos['correo'] ?? '', 'Principal', $datos['cargo'] ?? null);
 
                     if (isset($datos['contactosAdicionales']) && is_array($datos['contactosAdicionales'])) {
                         foreach ($datos['contactosAdicionales'] as $add) {
-                            $this->insertarContacto($id, $add['contacto'], $add['numeroContacto'], $add['correo'] ?? '', 'Adicional');
+                            $this->insertarContacto($id, $add['contacto'], $add['numeroContacto'], $add['correo'] ?? '', 'Adicional', $add['cargo'] ?? null);
                         }
                     }
                 }
@@ -345,7 +345,7 @@ class ModEmpresas {
             $empresa['ciclos'] = count($ciclosRel) > 0 ? implode(', ', array_column($ciclosRel, 'siglas')) : 'No asignado';
 
             // Sacamos absolutamente todos los contactos asociados a esta empresa
-            $stmtC = $this->db->prepare("SELECT tfnoContacto, nombreContacto, correo FROM Contacto WHERE idEmpresa = :id ORDER BY idContacto ASC");
+            $stmtC = $this->db->prepare("SELECT tfnoContacto, nombreContacto, correo, cargo FROM Contacto WHERE idEmpresa = :id ORDER BY idContacto ASC");
             $stmtC->execute([':id' => $empresa['id']]);
             $contactos = $stmtC->fetchAll(PDO::FETCH_ASSOC);
 
@@ -355,6 +355,7 @@ class ModEmpresas {
                 $empresa['contacto'] = $contactos[0]['nombreContacto'];
                 $empresa['numeroContacto'] = $contactos[0]['tfnoContacto'];
                 $empresa['correo'] = $contactos[0]['correo'];
+                $empresa['cargo'] = $contactos[0]['cargo'] ?? '';
 
                 // Los siguientes contactos irán a la matriz (array) de contactos adicionales
                 $adicionales = [];
@@ -362,7 +363,8 @@ class ModEmpresas {
                     $adicionales[] = [
                         'contacto' => $contactos[$i]['nombreContacto'],
                         'numeroContacto' => $contactos[$i]['tfnoContacto'],
-                        'correo' => $contactos[$i]['correo']
+                        'correo' => $contactos[$i]['correo'],
+                        'cargo' => $contactos[$i]['cargo'] ?? ''
                     ];
                 }
                 $empresa['contactosAdicionales'] = $adicionales;
@@ -371,6 +373,7 @@ class ModEmpresas {
                 $empresa['contacto'] = '';
                 $empresa['numeroContacto'] = '';
                 $empresa['correo'] = '';
+                $empresa['cargo'] = '';
                 $empresa['contactosAdicionales'] = [];
             }
         }
@@ -387,16 +390,17 @@ class ModEmpresas {
      * @param string $titular Permite discriminar en BD si el contacto es Principal o Adicional.
      * @return void
      */
-    private function insertarContacto($idEmpresa, $nombre, $telefono, $correo, $titular) {
-        $sql = "INSERT INTO Contacto (idEmpresa, nombreContacto, tfnoContacto, correo, titular) 
-                VALUES (:idEmpresa, :nombre, :telefono, :correo, :titular)";
+    private function insertarContacto($idEmpresa, $nombre, $telefono, $correo, $titular, $cargo = null) {
+        $sql = "INSERT INTO Contacto (idEmpresa, nombreContacto, tfnoContacto, correo, titular, cargo) 
+                VALUES (:idEmpresa, :nombre, :telefono, :correo, :titular, :cargo)";
         $stmt = $this->db->prepare($sql);
         $stmt->execute([
             ':idEmpresa' => $idEmpresa,
             ':nombre' => $nombre,
             ':telefono' => $telefono,
             ':correo' => $correo,
-            ':titular' => $titular
+            ':titular' => $titular,
+            ':cargo' => $cargo
         ]);
     }
 

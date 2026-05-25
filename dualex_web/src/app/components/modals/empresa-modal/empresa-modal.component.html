@@ -99,7 +99,7 @@
 
             <!-- Contacto Principal -->
             <div class="col-md-6">
-              <label class="form-label small fw-bold text-uppercase opacity-75">Nombre Contacto Ppal.</label>
+              <label class="form-label small fw-bold text-uppercase opacity-75">Nombre del Contacto</label>
               <div class="input-group shadow-sm rounded-3 overflow-hidden border" [class.is-invalid]="isInvalid('contacto')">
                 <span class="input-group-text bg-white border-0"><i class="fa-solid fa-user-tie text-muted"></i></span>
                 <input type="text" formControlName="contacto" class="form-control border-0 px-3" 
@@ -112,7 +112,20 @@
             </div>
 
             <div class="col-md-6">
-              <label class="form-label small fw-bold text-uppercase opacity-75">Teléfono Ppal.</label>
+              <label class="form-label small fw-bold text-uppercase opacity-75">Cargo / Puesto</label>
+              <div class="input-group shadow-sm rounded-3 overflow-hidden border" [class.is-invalid]="isInvalid('cargo')">
+                <span class="input-group-text bg-white border-0"><i class="fa-solid fa-briefcase text-muted"></i></span>
+                <input type="text" formControlName="cargo" class="form-control border-0 px-3" 
+                       [class.is-invalid]="isInvalid('cargo')"
+                       placeholder="Ej: Tutor de Empresa, Recursos Humanos, etc.">
+              </div>
+              @if (isInvalid('cargo')) {
+                <div class="text-danger small mt-1 animate-fade-in">{{ getErrorMessage('cargo') }}</div>
+              }
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label small fw-bold text-uppercase opacity-75">Teléfono</label>
               <div class="input-group shadow-sm rounded-3 overflow-hidden border" [class.is-invalid]="isInvalid('numeroContacto')">
                 <span class="input-group-text bg-white border-0"><i class="fa-solid fa-phone text-muted"></i></span>
                 <input type="text" formControlName="numeroContacto" class="form-control border-0 px-3" 
@@ -124,8 +137,8 @@
               }
             </div>
 
-            <div class="col-12">
-              <label class="form-label small fw-bold text-uppercase opacity-75">Correo Ppal.</label>
+            <div class="col-md-6">
+              <label class="form-label small fw-bold text-uppercase opacity-75">Correo</label>
               <div class="input-group shadow-sm rounded-3 overflow-hidden border" [class.is-invalid]="isInvalid('correo')">
                 <span class="input-group-text bg-white border-0"><i class="fa-solid fa-envelope text-muted"></i></span>
                 <input type="email" formControlName="correo" class="form-control border-0 px-3" 
@@ -150,6 +163,15 @@
                              placeholder="Ej: Pedro Gómez">
                     </div>
                   </div>
+                  <div class="col-md-6">
+                    <label class="form-label small fw-bold text-uppercase opacity-75">Cargo / Puesto</label>
+                    <div class="input-group shadow-sm rounded-3 overflow-hidden border" [class.is-invalid]="group.get('cargo')?.invalid && (group.get('cargo')?.dirty || group.get('cargo')?.touched)">
+                      <span class="input-group-text bg-white border-0"><i class="fa-solid fa-briefcase text-muted"></i></span>
+                      <input type="text" formControlName="cargo" class="form-control border-0 px-3" 
+                             [class.is-invalid]="group.get('cargo')?.invalid && (group.get('cargo')?.dirty || group.get('cargo')?.touched)"
+                             placeholder="Ej: Tutor de Empresa, etc.">
+                    </div>
+                  </div>
                   <div class="col-md-5">
                     <label class="form-label small fw-bold text-uppercase opacity-75">Teléfono {{$index + 1}}</label>
                     <div class="input-group shadow-sm rounded-3 overflow-hidden border" [class.is-invalid]="group.get('numeroContacto')?.invalid && (group.get('numeroContacto')?.dirty || group.get('numeroContacto')?.touched)">
@@ -159,7 +181,7 @@
                              placeholder="Ej: 600111222">
                     </div>
                   </div>
-                  <div class="col-md-5">
+                  <div class="col-md-6">
                     <label class="form-label small fw-bold text-uppercase opacity-75">Correo {{$index + 1}}</label>
                     <div class="input-group shadow-sm rounded-3 overflow-hidden border" [class.is-invalid]="group.get('correo')?.invalid && (group.get('correo')?.dirty || group.get('correo')?.touched)">
                       <span class="input-group-text bg-white border-0"><i class="fa-solid fa-envelope text-muted"></i></span>

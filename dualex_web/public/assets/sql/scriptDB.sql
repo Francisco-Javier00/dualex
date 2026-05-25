@@ -75,7 +75,7 @@ CREATE TABLE Curso (
 CREATE TABLE Alumno (
     idAlumno SMALLINT UNSIGNED NOT NULL,
     dni CHAR(15) NOT NULL,
-    nuss CHAR(12) NOT NULL,
+    nuss CHAR(12) NULL,
     nia CHAR(10) NOT NULL,
     telefono CHAR(15) NOT NULL,
     repetidor BIT NOT NULL DEFAULT 0,
@@ -143,6 +143,7 @@ CREATE TABLE Contacto (
     nombreContacto VARCHAR(50) NOT NULL,
     titular VARCHAR(50) NOT NULL,
     correo VARCHAR(100) NOT NULL,
+    cargo VARCHAR(100) NULL,
     idEmpresa SMALLINT UNSIGNED NOT NULL,
 
     CONSTRAINT pk_contacto PRIMARY KEY (idContacto),
@@ -180,7 +181,7 @@ CREATE TABLE Modulo (
 
 CREATE TABLE Actividad (
     idActividad SMALLINT UNSIGNED AUTO_INCREMENT,
-    titulo VARCHAR(60) NOT NULL,
+    titulo VARCHAR(255) NOT NULL,
     descripcion VARCHAR(255) NOT NULL,
     idCoordinador SMALLINT UNSIGNED NULL,
 
@@ -794,3 +795,9 @@ WHERE idCoordinador = (
     FROM Usuario
     WHERE correo = 'dev.coordinador_general@dualex.es'
 );
+
+ALTER TABLE Alumno MODIFY COLUMN nuss CHAR(12) NULL;
+
+ALTER TABLE Contacto ADD COLUMN cargo VARCHAR(100) NULL;
+
+ALTER TABLE Actividad MODIFY COLUMN titulo VARCHAR(255) NOT NULL;

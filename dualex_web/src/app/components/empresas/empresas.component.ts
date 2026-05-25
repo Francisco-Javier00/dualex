@@ -58,6 +58,7 @@ export class EmpresasComponent implements OnInit {
     inicioConvenio: '',
     finConvenio: '',
     contacto: '',
+    cargo: '',
     numeroContacto: '',
     correo: ''
   };
@@ -145,7 +146,7 @@ export class EmpresasComponent implements OnInit {
               return `<span class="text-danger fw-bold"><i class="fa-solid fa-circle-exclamation me-1"></i>${data}</span>`;
             }
             if (row?.proximoACaducar) {
-              return `<span class="text-danger">${data} <small class="text-muted">(${row.diasRestantes} días)</small></span>`;
+              return `<span class="text-success fw-bold"><i class="fa-solid fa-clock me-1"></i>${data} <small class="text-muted">(${row.diasRestantes} días)</small></span>`;
             }
             return data;
           }
@@ -312,10 +313,12 @@ export class EmpresasComponent implements OnInit {
       convenioUrl: this.nuevaEmpresa.convenioUrl.trim(),
       inicioConvenio: this.formatearFechaParaGuardar(this.nuevaEmpresa.inicioConvenio),
       contacto: this.nuevaEmpresa.contacto.trim(),
+      cargo: this.nuevaEmpresa.cargo.trim(),
       numeroContacto: this.nuevaEmpresa.numeroContacto.trim(),
       correo: this.nuevaEmpresa.correo ? this.nuevaEmpresa.correo.trim() : '',
       contactosAdicionales: this.contactosAdicionales.map(contacto => ({
         contacto: contacto.contacto.trim(),
+        cargo: contacto.cargo ? contacto.cargo.trim() : '',
         numeroContacto: contacto.numeroContacto.trim(),
         correo: contacto.correo ? contacto.correo.trim() : ''
       }))
@@ -334,13 +337,13 @@ export class EmpresasComponent implements OnInit {
       this.alertService.error('Error de validación', 'La URL del convenio no puede superar los 100 caracteres.');
       return;
     }
-    if (payload.contacto.length > 50 || payload.numeroContacto.length > 15) {
-      this.alertService.error('Error de validación', 'El nombre del contacto (máx 50) o teléfono (máx 15) superan el límite permitido.');
+    if (payload.contacto.length > 50 || (payload.cargo && payload.cargo.length > 100) || payload.numeroContacto.length > 15) {
+      this.alertService.error('Error de validación', 'El nombre del contacto (máx 50), cargo (máx 100) o teléfono (máx 15) superan el límite permitido.');
       return;
     }
     for (const add of payload.contactosAdicionales) {
-      if (add.contacto.length > 50 || add.numeroContacto.length > 15) {
-        this.alertService.error('Error de validación', 'El nombre de un contacto adicional o su teléfono superan el límite permitido.');
+      if (add.contacto.length > 50 || (add.cargo && add.cargo.length > 100) || add.numeroContacto.length > 15) {
+        this.alertService.error('Error de validación', 'El nombre de un contacto adicional (máx 50), cargo (máx 100) o su teléfono (máx 15) superan el límite permitido.');
         return;
       }
     }

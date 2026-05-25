@@ -50,6 +50,7 @@ export class EmpresaModalComponent implements OnInit, OnDestroy {
       inicioConvenio: ['', Validators.required],
       finConvenio: [{ value: '', disabled: true }],
       contacto: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
+      cargo: ['', [Validators.required, Validators.maxLength(100)]],
       numeroContacto: ['', [Validators.required, Validators.pattern(this.telefonoPattern), Validators.minLength(9), Validators.maxLength(15)]],
       correo: ['', [Validators.required, Validators.pattern(this.emailPattern), Validators.maxLength(100)]],
       contactosAdicionales: this.fb.array([])
@@ -111,11 +112,12 @@ export class EmpresaModalComponent implements OnInit, OnDestroy {
       inicioConvenio: this.formatearFechaParaInput(empresa.inicioConvenio),
       contacto: empresa.contacto,
       numeroContacto: empresa.numeroContacto,
-      correo: empresa.correo
+      correo: empresa.correo,
+      cargo: empresa.cargo || ''
     });
 
     if (empresa.contactosAdicionales && Array.isArray(empresa.contactosAdicionales)) {
-      empresa.contactosAdicionales.forEach(c => this.addContacto(c.contacto, c.numeroContacto, c.correo));
+      empresa.contactosAdicionales.forEach(c => this.addContacto(c.contacto, c.numeroContacto, c.correo, c.cargo || ''));
     }
 
     // Cargamos la información detallada de los ciclos (sigla + tutor)
@@ -152,9 +154,10 @@ export class EmpresaModalComponent implements OnInit, OnDestroy {
     return !!this.ciclosSeleccionados.find(c => c.sigla === sigla);
   }
 
-  addContacto(nombre = '', telefono = '', correo = ''): void {
+  addContacto(nombre = '', telefono = '', correo = '', cargo = ''): void {
     this.contactosAdicionales.push(this.fb.group({
       contacto: [nombre, [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
+      cargo: [cargo, [Validators.required, Validators.maxLength(100)]],
       numeroContacto: [telefono, [Validators.required, Validators.pattern(this.telefonoPattern), Validators.minLength(9), Validators.maxLength(15)]],
       correo: [correo, [Validators.required, Validators.pattern(this.emailPattern), Validators.maxLength(100)]]
     }));

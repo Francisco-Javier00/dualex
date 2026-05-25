@@ -130,6 +130,7 @@ export interface ContactoEmpresaDTO {
   contacto: string;
   numeroContacto: string;
   correo: string;
+  cargo?: string;
 }
 
 export interface EmpresaDTO {
@@ -142,6 +143,7 @@ export interface EmpresaDTO {
   contacto: string;
   numeroContacto: string;
   correo: string;
+  cargo?: string;
   ciclos?: string;
   contactosAdicionales?: ContactoEmpresaDTO[];
   ciclosInfo?: { siglas: string, tutor: string }[];

@@ -95,7 +95,8 @@ class ModAlumnos {
             $stmtA = $this->db->prepare($sqlA);
             $stmtA->bindValue(':id', $idUsuario, PDO::PARAM_INT);
             $stmtA->bindValue(':dni', $datos['dni'], PDO::PARAM_STR);
-            $stmtA->bindValue(':nuss', $datos['nuss'], PDO::PARAM_STR);
+            $nussVal = (isset($datos['nuss']) && trim($datos['nuss']) !== '') ? trim($datos['nuss']) : null;
+            $stmtA->bindValue(':nuss', $nussVal, $nussVal === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
             $stmtA->bindValue(':nia', $datos['nia'], PDO::PARAM_STR);
             $stmtA->bindValue(':telefono', $datos['telefono'], PDO::PARAM_STR);
             $repetidor = (isset($datos['repetidor']) && $datos['repetidor']) ? chr(1) : chr(0);
@@ -148,7 +149,8 @@ class ModAlumnos {
             $stmtA = $this->db->prepare($sqlA);
             $stmtA->bindValue(':id', $id, PDO::PARAM_INT);
             $stmtA->bindValue(':dni', $datos['dni'], PDO::PARAM_STR);
-            $stmtA->bindValue(':nuss', $datos['nuss'], PDO::PARAM_STR);
+            $nussVal = (isset($datos['nuss']) && trim($datos['nuss']) !== '') ? trim($datos['nuss']) : null;
+            $stmtA->bindValue(':nuss', $nussVal, $nussVal === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
             $stmtA->bindValue(':nia', $datos['nia'], PDO::PARAM_STR);
             $stmtA->bindValue(':telefono', $datos['telefono'], PDO::PARAM_STR);
             $repetidor = (isset($datos['repetidor']) && $datos['repetidor']) ? chr(1) : chr(0);
@@ -433,7 +435,7 @@ class ModAlumnos {
         $errores = [];
 
         // Campos obligatorios
-        $camposReq = ['nombre', 'apellidos', 'email', 'dni', 'nia', 'nuss', 'telefono', 'idCurso'];
+        $camposReq = ['nombre', 'apellidos', 'email', 'dni', 'nia', 'telefono', 'idCurso'];
         foreach ($camposReq as $campo) {
             if (!isset($datos[$campo]) || trim($datos[$campo]) === '') {
                 $errores[] = "El campo $campo es obligatorio.";
@@ -472,7 +474,9 @@ class ModAlumnos {
         if (strlen($datos['nombre']) > 50) $errores[] = "El nombre es demasiado largo (máx 50).";
         if (strlen($datos['apellidos']) > 100) $errores[] = "Los apellidos son demasiado largos (máx 100).";
         if (strlen($datos['nia']) > 10) $errores[] = "El NIA no puede tener más de 10 dígitos.";
-        if (strlen($datos['nuss']) > 12) $errores[] = "El NUSS no puede tener más de 12 dígitos.";
+        if (isset($datos['nuss']) && trim($datos['nuss']) !== '' && strlen(trim($datos['nuss'])) > 12) {
+            $errores[] = "El NUSS no puede tener más de 12 dígitos.";
+        }
 
         return $errores;
     }
@@ -539,21 +543,21 @@ class ModAlumnos {
 
             // Validación básica (igual que CSV)
             if ($nombre === '' || $apellidos === '' || $email === '' ||
-                $dni === '' || $nuss === '' || $nia === '' || $telefono === '') {
+                $dni === '' || $nia === '' || $telefono === '') {
 
                 $errors[] = "Fila $rowNumber: Faltan campos obligatorios.";
                 continue;
             }
 
             // Repetidor
-            $repetidorVal = in_array(strtolower($repetidor), ['si','sí','1','true','yes']) ? 1 : 0;
+            $repetidorVal = in_array(strtolower($repetidor), ['si','sí','1','true','yes','s']) ? 1 : 0;
 
             $studentData = [
                 'nombre' => $nombre,
                 'apellidos' => $apellidos,
                 'email' => $email,
                 'dni' => $dni,
-                'nuss' => $nuss,
+                'nuss' => ($nuss === '') ? null : $nuss,
                 'nia' => $nia,
                 'telefono' => $telefono,
                 'repetidor' => $repetidorVal,

@@ -39,7 +39,7 @@ class BaseController {
                 $code = 400;
                 if (strpos($sqlMessage, 'uq_alumnos_dni') !== false) $message = "Este DNI ya está registrado en el sistema.";
                 else if (strpos($sqlMessage, 'uq_alumnos_nia') !== false) $message = "Este NIA ya está en uso por otro alumno.";
-                else if (strpos($sqlMessage, 'uq_alumnos_nuss') !== false) $message = "Este número de la Seguridad Social (NUSS) ya existe.";
+                else if (strpos($sqlMessage, 'uq_alumnos_nuss') !== false || strpos($sqlMessage, 'uq_alumno_nuss') !== false) $message = "Este número de la Seguridad Social (NUSS) ya existe.";
                 else if (strpos($sqlMessage, 'uq_empresa_siglas') !== false) $message = "Estas siglas de empresa ya están registradas.";
                 else if (strpos($sqlMessage, 'uq_ciclos_siglas') !== false) $message = "Las siglas de este ciclo formativo ya existen.";
                 else if (strpos($sqlMessage, 'uq_modulos_sigla') !== false) $message = "Ya existe un módulo con estas siglas.";

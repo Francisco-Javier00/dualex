@@ -36,7 +36,7 @@
                          [class.is-invalid]="actividadForm.get('titulo')?.invalid && actividadForm.get('titulo')?.touched">
                 </div>
                 <div class="text-danger small mt-1" *ngIf="actividadForm.get('titulo')?.invalid && actividadForm.get('titulo')?.touched">
-                  El título debe tener entre 5 y 60 caracteres.
+                  El título debe tener entre 5 y 255 caracteres.
                 </div>
               </div>
 

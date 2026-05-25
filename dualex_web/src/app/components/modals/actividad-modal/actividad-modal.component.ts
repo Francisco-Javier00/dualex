@@ -59,7 +59,7 @@ export class ActividadModalComponent implements OnChanges, OnDestroy, OnInit {
   constructor() {
     this.actividadForm = this.fb.group({
       id: [null],
-      titulo: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(60)]],
+      titulo: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(255)]],
       descripcion: ['', [Validators.required, Validators.maxLength(255)]],
       idModulos: [[], [arrayNotEmptyValidator()]] // Array de IDs de módulos seleccionados
     });
