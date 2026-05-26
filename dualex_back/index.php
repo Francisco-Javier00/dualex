@@ -78,22 +78,71 @@ if ($authHeader && preg_match('/Bearer\s+(.*)$/i', $authHeader, $matches)) {
             $dbUser = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if (!$dbUser) {
-                // Por defecto, crearlo como profesor
+                // Determinar tipo y rol del token
+                $rawRol = $user['roles']['dualex'] ?? '';
+                $rol = strtoupper(trim($rawRol));
+
                 try {
                     $db->beginTransaction();
 
-                    $sqlU = "INSERT INTO Usuario (nombre, apellidos, correo, tipo) VALUES (:nombre, :apellidos, :correo, 'P')";
+                    $tipo = ($rol === 'ALUMNO') ? 'A' : 'P';
+
+                    $sqlU = "INSERT INTO Usuario (nombre, apellidos, correo, tipo) VALUES (:nombre, :apellidos, :correo, :tipo)";
                     $stmtU = $db->prepare($sqlU);
                     $stmtU->execute([
                         ':nombre'    => $user['nombre'] ?? '',
                         ':apellidos' => $user['apellidos'] ?? '',
-                        ':correo'    => $user['email']
+                        ':correo'    => $user['email'],
+                        ':tipo'      => $tipo
                     ]);
                     $idUsuario = $db->lastInsertId();
 
-                    $sqlP = "INSERT INTO Profesor (idProfesor) VALUES (:id)";
-                    $stmtP = $db->prepare($sqlP);
-                    $stmtP->execute([':id' => $idUsuario]);
+                    if ($rol === 'ALUMNO') {
+                        // Alumno requiere campos NOT NULL en la tabla Alumno (dni, nia, telefono, idCurso)
+                        // Buscamos un idCurso existente como placeholder
+                        $stmtC = $db->query("SELECT idCurso FROM Curso LIMIT 1");
+                        $idCurso = $stmtC->fetchColumn();
+                        if (!$idCurso) {
+                            // Si no hay cursos, buscamos o creamos un ciclo
+                            $stmtCiclo = $db->query("SELECT idCiclo FROM Ciclo LIMIT 1");
+                            $idCiclo = $stmtCiclo->fetchColumn();
+                            if (!$idCiclo) {
+                                $db->exec("INSERT INTO Ciclo (nombre, siglas, grado) VALUES ('Ciclo Temporal', 'TEMP', 'medio')");
+                                $idCiclo = $db->lastInsertId();
+                            }
+                            $db->exec("INSERT INTO Curso (nombre, anio_escolar, idCiclo) VALUES ('Curso Temporal', '24-25', $idCiclo)");
+                            $idCurso = $db->lastInsertId();
+                        }
+
+                        // Generamos placeholders únicos para DNI y NIA
+                        $dniPlaceholder = 'TEMP_' . str_pad($idUsuario, 8, '0', STR_PAD_LEFT);
+                        $niaPlaceholder = 'TEMP_' . str_pad($idUsuario, 6, '0', STR_PAD_LEFT);
+                        $telefonoPlaceholder = '000000000';
+
+                        $sqlA = "INSERT INTO Alumno (idAlumno, dni, nia, telefono, idCurso) VALUES (:idAlumno, :dni, :nia, :telefono, :idCurso)";
+                        $stmtA = $db->prepare($sqlA);
+                        $stmtA->execute([
+                            ':idAlumno' => $idUsuario,
+                            ':dni'      => $dniPlaceholder,
+                            ':nia'      => $niaPlaceholder,
+                            ':telefono' => $telefonoPlaceholder,
+                            ':idCurso'  => $idCurso
+                        ]);
+                    } else if ($rol === 'COORDINADOR') {
+                        // Un Coordinador requiere ser Profesor primero
+                        $sqlP = "INSERT INTO Profesor (idProfesor) VALUES (:id)";
+                        $stmtP = $db->prepare($sqlP);
+                        $stmtP->execute([':id' => $idUsuario]);
+
+                        $sqlC = "INSERT INTO Coordinador (idCoordinador) VALUES (:id)";
+                        $stmtC = $db->prepare($sqlC);
+                        $stmtC->execute([':id' => $idUsuario]);
+                    } else {
+                        // Profesor por defecto o rol PROFESOR
+                        $sqlP = "INSERT INTO Profesor (idProfesor) VALUES (:id)";
+                        $stmtP = $db->prepare($sqlP);
+                        $stmtP->execute([':id' => $idUsuario]);
+                    }
 
                     $db->commit();
                     $user['id'] = $idUsuario;
