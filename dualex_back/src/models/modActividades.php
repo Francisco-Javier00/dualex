@@ -109,8 +109,10 @@ class ModActividades {
         $whereClause = "";
         $binds = [];
         if ($searchVal !== '') {
-            $whereClause = " HAVING (a.titulo LIKE :search OR a.descripcion LIKE :search OR modulo LIKE :search)";
-            $binds[':search'] = '%' . $searchVal . '%';
+            $whereClause = " HAVING (a.titulo LIKE :search1 OR a.descripcion LIKE :search2 OR modulo LIKE :search3)";
+            $binds[':search1'] = '%' . $searchVal . '%';
+            $binds[':search2'] = '%' . $searchVal . '%';
+            $binds[':search3'] = '%' . $searchVal . '%';
         }
 
         // 3. Cláusula de ordenación dinámica
@@ -156,9 +158,12 @@ class ModActividades {
                               FROM " . $this->table_name . " a
                               LEFT JOIN Modulo_Actividad ma ON a.idActividad = ma.idActividad
                               LEFT JOIN Modulo m ON ma.idModulo = m.idModulo
-                              WHERE a.titulo LIKE :search OR a.descripcion LIKE :search OR m.nombre LIKE :search OR m.sigla LIKE :search";
+                              WHERE a.titulo LIKE :search1 OR a.descripcion LIKE :search2 OR m.nombre LIKE :search3 OR m.sigla LIKE :search4";
             $stmtFiltered = $this->conn->prepare($queryFiltered);
-            $stmtFiltered->bindValue(':search', '%' . $searchVal . '%', PDO::PARAM_STR);
+            $stmtFiltered->bindValue(':search1', '%' . $searchVal . '%', PDO::PARAM_STR);
+            $stmtFiltered->bindValue(':search2', '%' . $searchVal . '%', PDO::PARAM_STR);
+            $stmtFiltered->bindValue(':search3', '%' . $searchVal . '%', PDO::PARAM_STR);
+            $stmtFiltered->bindValue(':search4', '%' . $searchVal . '%', PDO::PARAM_STR);
             $stmtFiltered->execute();
             $filteredRecords = (int)$stmtFiltered->fetch(PDO::FETCH_ASSOC)['total'];
         }

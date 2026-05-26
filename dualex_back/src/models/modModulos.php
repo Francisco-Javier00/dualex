@@ -263,10 +263,12 @@ class ModModulos {
         $binds = [];
 
         if ($search) {
-            $conditions[] = "(m.nombre LIKE :search1 OR m.sigla LIKE :search2 OR c.nombre LIKE :search3)";
+            $conditions[] = "(m.nombre LIKE :search1 OR m.sigla LIKE :search2 OR c.nombre LIKE :search3 OR c.siglas LIKE :search4 OR cur.nombre LIKE :search5)";
             $binds[':search1'] = "%$search%";
             $binds[':search2'] = "%$search%";
             $binds[':search3'] = "%$search%";
+            $binds[':search4'] = "%$search%";
+            $binds[':search5'] = "%$search%";
         }
 
         if ($idCoordinador) {

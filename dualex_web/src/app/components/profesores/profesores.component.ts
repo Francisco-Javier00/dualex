@@ -61,12 +61,13 @@ export class ProfesoresComponent implements OnInit {
           defaultContent: '',
           responsivePriority: 1
         },
-        { data: 'nombre', responsivePriority: 2 },
-        { data: 'apellidos', responsivePriority: 3 },
-        { data: 'correo', responsivePriority: 4 },
-        { data: 'rol', responsivePriority: 5 },
+        { data: 'nombre', width: '15%', responsivePriority: 2 },
+        { data: 'apellidos', width: '18%', responsivePriority: 3 },
+        { data: 'correo', width: '22%', responsivePriority: 4 },
+        { data: 'rol', className: 'text-nowrap', width: '10%', responsivePriority: 5 },
         {
           data: 'modulos',
+          width: '15%',
           responsivePriority: 7,
           render: (data: any, type: any, row: any) => {
             if (data && data.trim() !== '') return data;
@@ -77,6 +78,7 @@ export class ProfesoresComponent implements OnInit {
         },
         {
           data: 'ciclos',
+          width: '12%',
           responsivePriority: 8,
           render: (data: any, type: any, row: any) => {
             if (data && data.trim() !== '') return data;
@@ -90,6 +92,7 @@ export class ProfesoresComponent implements OnInit {
           className: 'text-center align-middle',
           orderable: false,
           searchable: false,
+          width: '8%',
           responsivePriority: 6,
           render: () => `
             <div class="d-flex justify-content-center gap-2 action-buttons">

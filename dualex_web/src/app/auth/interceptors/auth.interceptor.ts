@@ -1,10 +1,6 @@
 import { inject } from '@angular/core';
 import { HttpInterceptorFn } from '@angular/common/http';
-import { AuthService } from '../services/auth.service';
-
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  const authService = inject(AuthService);
-  
   // Como usamos lectura nativa en AuthService, podemos exponer un método para obtener el token crudo
   // o simplemente leerlo de nuevo. Para simplificar, leemos la cookie directamente aquí.
   const getCookieNativa = (nombre: string): string | null => {

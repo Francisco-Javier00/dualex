@@ -44,10 +44,10 @@ export class TareasTodosComponent implements OnInit {
         });
       },
       columns: [
-        { data: 'nombre', width: '20%' },
+        { data: 'nombre', width: '15%' },
         { data: 'apellidos', width: '20%' },
-        { data: 'email', width: '25%' },
-        { data: 'nombreCurso', defaultContent: '<span class="text-muted">Sin curso</span>', width: '25%' },
+        { data: 'email', width: '30%' },
+        { data: 'nombreCurso', className: 'text-nowrap', defaultContent: '<span class="text-muted">Sin curso</span>', width: '25%' },
         {
           data: null,
           orderable: false,

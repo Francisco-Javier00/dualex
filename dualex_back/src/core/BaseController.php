@@ -37,23 +37,33 @@ class BaseController {
             // Error 1062 es "Duplicate Entry" en MySQL
             if (strpos($sqlMessage, '1062') !== false || $error->getCode() == 23000) {
                 $code = 400;
-                if (strpos($sqlMessage, 'uq_alumnos_dni') !== false) $message = "Este DNI ya está registrado en el sistema.";
-                else if (strpos($sqlMessage, 'uq_alumnos_nia') !== false) $message = "Este NIA ya está en uso por otro alumno.";
-                else if (strpos($sqlMessage, 'uq_alumnos_nuss') !== false || strpos($sqlMessage, 'uq_alumno_nuss') !== false) $message = "Este número de la Seguridad Social (NUSS) ya existe.";
-                else if (strpos($sqlMessage, 'uq_empresa_siglas') !== false) $message = "Estas siglas de empresa ya están registradas.";
-                else if (strpos($sqlMessage, 'uq_ciclos_siglas') !== false) $message = "Las siglas de este ciclo formativo ya existen.";
-                else if (strpos($sqlMessage, 'uq_modulos_sigla') !== false) $message = "Ya existe un módulo con estas siglas.";
-                else if (strpos($sqlMessage, 'uq_cursos_nombre') !== false) $message = "Ya existe un curso con este nombre.";
-                else if (strpos($sqlMessage, 'correo') !== false) $message = "Esta dirección de correo electrónico ya está registrada.";
-                else $message = "Ya existe un registro con estos datos únicos.";
+                if (strpos($sqlMessage, 'uq_alumno_dni') !== false || strpos($sqlMessage, 'dni') !== false) {
+                    $message = "Este DNI ya está registrado en el sistema.";
+                } else if (strpos($sqlMessage, 'uq_alumno_nia') !== false || strpos($sqlMessage, 'nia') !== false) {
+                    $message = "Este NIA ya está en uso por otro alumno.";
+                } else if (strpos($sqlMessage, 'uq_alumno_nuss') !== false || strpos($sqlMessage, 'nuss') !== false) {
+                    $message = "Este número de la Seguridad Social (NUSS) ya existe.";
+                } else if (strpos($sqlMessage, 'uq_empresa_siglas') !== false || strpos($sqlMessage, 'siglas') !== false) {
+                    $message = "Estas siglas de empresa ya están registradas.";
+                } else if (strpos($sqlMessage, 'uq_ciclos_siglas') !== false || strpos($sqlMessage, 'sigla') !== false) {
+                    $message = "Las siglas de este ciclo formativo ya existen.";
+                } else if (strpos($sqlMessage, 'uq_modulos_sigla') !== false) {
+                    $message = "Ya existe un módulo con estas siglas.";
+                } else if (strpos($sqlMessage, 'uq_cursos_nombre') !== false) {
+                    $message = "Ya existe un curso con este nombre.";
+                } else if (strpos($sqlMessage, 'correo') !== false || strpos($sqlMessage, 'uq_usuario_correo') !== false || strpos($sqlMessage, 'uq_contacto_correo') !== false) {
+                    $message = "Esta dirección de correo electrónico ya está registrada.";
+                } else {
+                    $message = "Ya existe un registro con estos datos únicos.";
+                }
             } 
-            // Error 1451: No se puede borrar/actualizar padre (Integridad referencial)
-            else if (strpos($sqlMessage, '1451') !== false) {
+            // Error 1451 o 1217: No se puede borrar/actualizar padre (Integridad referencial)
+            else if (strpos($sqlMessage, '1451') !== false || strpos($sqlMessage, '1217') !== false) {
                 $code = 400;
                 $message = "No se puede eliminar este registro porque tiene otros datos vinculados (alumnos, módulos, etc.). Borra primero los registros relacionados.";
             }
-            // Error 1452: No se puede añadir/actualizar hijo (No existe el ID foráneo)
-            else if (strpos($sqlMessage, '1452') !== false) {
+            // Error 1452 o 1216: No se puede añadir/actualizar hijo (No existe el ID foráneo)
+            else if (strpos($sqlMessage, '1452') !== false || strpos($sqlMessage, '1216') !== false) {
                 $code = 400;
                 $message = "El registro seleccionado (curso, empresa, etc.) no es válido o ha dejado de existir.";
             }
@@ -62,10 +72,10 @@ class BaseController {
                 $code = 400;
                 $message = "Uno de los campos introducidos es demasiado largo. Por favor, acorta el texto.";
             }
-            // Error 1048: La columna no puede ser nula (campo obligatorio)
-            else if (strpos($sqlMessage, '1048') !== false) {
+            // Error 1048 o 1364: La columna no puede ser nula / campo obligatorio sin default
+            else if (strpos($sqlMessage, '1048') !== false || strpos($sqlMessage, '1364') !== false) {
                 $code = 400;
-                $message = "Hay campos obligatorios que están vacíos. Por favor, rellena todos los datos.";
+                $message = "Hay campos obligatorios que están vacíos o no se han proporcionado. Por favor, rellena todos los datos.";
             }
             else {
                 $message = "Error en la base de datos: " . $sqlMessage;
@@ -106,6 +116,58 @@ class BaseController {
 
         if (!in_array($userRole, $allowedRoles)) {
             $this->sendError("No tienes permisos para realizar esta acción", 403);
+        }
+    }
+
+    /**
+     * Obtiene el perfil del usuario actual directamente desde la base de datos local.
+     */
+    public function obtenerPerfilLocal() {
+        $this->checkRole(['ALUMNO', 'PROFESOR', 'COORDINADOR']);
+        try {
+            $id = $this->user['id'];
+            
+            // Buscar en la tabla Usuario
+            $stmt = $this->db->prepare("SELECT idUsuario as id, nombre, apellidos, correo as email, tipo FROM Usuario WHERE idUsuario = :id");
+            $stmt->execute([':id' => $id]);
+            $dbUser = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if (!$dbUser) {
+                $this->sendError("Usuario no encontrado en la base de datos local.", 404);
+            }
+            
+            // Resolver rol
+            $rol = 'ALUMNO';
+            if ($dbUser['tipo'] === 'P') {
+                $stmtC = $this->db->prepare("SELECT 1 FROM Coordinador WHERE idCoordinador = :id");
+                $stmtC->execute([':id' => $id]);
+                if ($stmtC->fetch()) {
+                    $rol = 'COORDINADOR';
+                } else {
+                    $rol = 'PROFESOR';
+                }
+            }
+            
+            $dbUser['rol'] = $rol;
+            
+            // Coordinador General
+            $dbUser['esGeneral'] = false;
+            if ($rol === 'COORDINADOR') {
+                $stmtG = $this->db->prepare("SELECT general FROM Coordinador WHERE idCoordinador = :id");
+                $stmtG->execute([':id' => $id]);
+                $res = $stmtG->fetch(PDO::FETCH_ASSOC);
+                if ($res && $res['general'] == 1) {
+                    $dbUser['esGeneral'] = true;
+                }
+            }
+            
+            // Convertir tipos para coincidir con la interfaz PerfilUsuario
+            $dbUser['id'] = (int)$dbUser['id'];
+            $dbUser['esGeneral'] = (bool)$dbUser['esGeneral'];
+            
+            $this->sendResponse($dbUser);
+        } catch (Exception $e) {
+            $this->sendError($e);
         }
     }
 }

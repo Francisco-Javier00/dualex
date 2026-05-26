@@ -239,11 +239,15 @@ class ModAlumnos {
         $joinMp = false;
 
         if ($search) {
-            $conditions[] = "(u.nombre LIKE :search1 OR apellidos LIKE :search2 OR correo LIKE :search3 OR DNI LIKE :search4)";
+            $conditions[] = "(u.nombre LIKE :search1 OR apellidos LIKE :search2 OR correo LIKE :search3 OR DNI LIKE :search4 OR NUSS LIKE :search5 OR NIA LIKE :search6 OR telefono LIKE :search7 OR c.nombre LIKE :search8)";
             $binds[':search1'] = "%$search%";
             $binds[':search2'] = "%$search%";
             $binds[':search3'] = "%$search%";
             $binds[':search4'] = "%$search%";
+            $binds[':search5'] = "%$search%";
+            $binds[':search6'] = "%$search%";
+            $binds[':search7'] = "%$search%";
+            $binds[':search8'] = "%$search%";
         }
         
         // Filtrado por modulo especifico
@@ -359,10 +363,15 @@ class ModAlumnos {
         $where = "";
         $binds = [];
         if ($search) {
-            $where = " WHERE (u.nombre LIKE :search1 OR apellidos LIKE :search2 OR correo LIKE :search3)";
+            $where = " WHERE (u.nombre LIKE :search1 OR apellidos LIKE :search2 OR correo LIKE :search3 OR DNI LIKE :search4 OR NUSS LIKE :search5 OR NIA LIKE :search6 OR telefono LIKE :search7 OR c.nombre LIKE :search8)";
             $binds[':search1'] = "%$search%";
             $binds[':search2'] = "%$search%";
             $binds[':search3'] = "%$search%";
+            $binds[':search4'] = "%$search%";
+            $binds[':search5'] = "%$search%";
+            $binds[':search6'] = "%$search%";
+            $binds[':search7'] = "%$search%";
+            $binds[':search8'] = "%$search%";
         }
 
         $total = $this->db->query("SELECT COUNT(*) FROM Alumno")->fetchColumn();

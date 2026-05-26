@@ -1,5 +1,6 @@
-import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
+import { Injectable, Inject, PLATFORM_ID, inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject } from 'rxjs';
 import { PerfilUsuario, JwtPayload } from '../../dto/dualex.dto';
 import { environment } from '../../../environments/environment';
@@ -9,6 +10,7 @@ import { environment } from '../../../environments/environment';
 })
 export class AuthService {
   private readonly COOKIE_NAME = 'dualex_jwt';
+  private http = inject(HttpClient);
 
   // La sesión se mantiene en memoria para que el header, el perfil y las vistas
   // compartan el mismo usuario sin depender de llamadas repetidas al backend.
@@ -60,6 +62,9 @@ export class AuthService {
         };
         console.log('AuthService: Emitiendo perfil:', perfil);
         this.sujetoPerfilUsuario.next(perfil);
+
+        // Cargar datos locales de la base de datos para corregir cualquier discrepancia
+        this.cargarPerfilDesdeBD();
       } else {
         console.error('AuthService: No se pudo decodificar el payload del token.');
         this.sujetoPerfilUsuario.next(null);
@@ -68,6 +73,33 @@ export class AuthService {
       console.log('AuthService: No hay sesión activa.');
       this.sujetoPerfilUsuario.next(null);
     }
+  }
+
+  /**
+   * Carga los datos del perfil desde la base de datos local y actualiza el observable.
+   */
+  public cargarPerfilDesdeBD(): void {
+    const perfilActual = this.sujetoPerfilUsuario.value;
+    if (!perfilActual) return;
+    const controller = perfilActual.rol === 'ALUMNO' ? 'Alumnos' : 'Profesores';
+    this.http.get<PerfilUsuario>(`${environment.apiUrl}/index.php?c=${controller}&m=obtenerPerfilLocal`).subscribe({
+      next: (perfilLocal) => {
+        console.log('AuthService: Perfil local cargado desde la BD:', perfilLocal);
+        const actual = this.sujetoPerfilUsuario.value;
+        if (actual && perfilLocal) {
+          this.sujetoPerfilUsuario.next({
+            ...actual,
+            nombre: perfilLocal.nombre,
+            apellidos: perfilLocal.apellidos,
+            email: perfilLocal.email,
+            esGeneral: perfilLocal.esGeneral
+          });
+        }
+      },
+      error: (err) => {
+        console.error('AuthService: Error al cargar el perfil local desde la BD', err);
+      }
+    });
   }
 
   /**
