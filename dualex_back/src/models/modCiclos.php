@@ -186,15 +186,22 @@ class ModCiclos {
         $search = $params['search']['value'] ?? '';
 
         $where = "";
+        $binds = [];
         if ($search) {
-            $where = "WHERE c.nombre LIKE :search OR c.siglas LIKE :search";
+            $where = "WHERE c.nombre LIKE :search1 OR c.siglas LIKE :search2 OR c.grado LIKE :search3 OR CONCAT('1º ', c.siglas, ', 2º ', c.siglas) LIKE :search4";
+            $binds[':search1'] = "%$search%";
+            $binds[':search2'] = "%$search%";
+            $binds[':search3'] = "%$search%";
+            $binds[':search4'] = "%$search%";
         }
 
         $total = $this->db->query("SELECT COUNT(*) FROM Ciclo")->fetchColumn();
 
         $stmtF = $this->db->prepare("SELECT COUNT(*) FROM Ciclo c $where");
-        if ($search) $stmtF->execute([':search' => "%$search%"]);
-        else $stmtF->execute();
+        foreach ($binds as $key => $val) {
+            $stmtF->bindValue($key, $val);
+        }
+        $stmtF->execute();
         $totalFiltrados = $stmtF->fetchColumn();
 
         // 2.5. Ordenación dinámica
@@ -226,7 +233,9 @@ class ModCiclos {
                 LIMIT :start, :length";
         
         $stmt = $this->db->prepare($sql);
-        if ($search) $stmt->bindValue(':search', "%$search%");
+        foreach ($binds as $key => $val) {
+            $stmt->bindValue($key, $val);
+        }
         $stmt->bindValue(':start', (int)$start, PDO::PARAM_INT);
         $stmt->bindValue(':length', (int)$length, PDO::PARAM_INT);
         $stmt->execute();

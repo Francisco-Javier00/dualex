@@ -55,11 +55,34 @@ class ModProfesores {
         $where = "";
         $binds = [];
         if ($search) {
-            $where = " AND (nombre LIKE :s OR apellidos LIKE :s OR correo LIKE :s)";
-            $binds[':s'] = "%$search%";
+            $where = " AND (
+                nombre LIKE :search1 OR 
+                apellidos LIKE :search2 OR 
+                correo LIKE :search3 OR
+                (CASE WHEN c.idCoordinador IS NOT NULL THEN 'COORDINADOR' ELSE 'PROFESOR' END) LIKE :search4 OR
+                EXISTS (
+                    SELECT 1 FROM Modulo m 
+                    INNER JOIN Modulo_Profesor mp ON m.idModulo = mp.idModulo 
+                    WHERE mp.idProfesor = u.idUsuario AND m.sigla LIKE :search5
+                ) OR
+                EXISTS (
+                    SELECT 1 FROM Ciclo ci 
+                    WHERE ci.idCoordinador = u.idUsuario AND ci.siglas LIKE :search6
+                )
+            )";
+            $binds[':search1'] = "%$search%";
+            $binds[':search2'] = "%$search%";
+            $binds[':search3'] = "%$search%";
+            $binds[':search4'] = "%$search%";
+            $binds[':search5'] = "%$search%";
+            $binds[':search6'] = "%$search%";
         }
 
-        $sqlFilter = "SELECT COUNT(*) as total FROM Usuario u WHERE tipo = 'P'" . $where;
+        $sqlFilter = "SELECT COUNT(*) as total 
+                      FROM Usuario u 
+                      JOIN Profesor p ON u.idUsuario = p.idProfesor
+                      LEFT JOIN Coordinador c ON p.idProfesor = c.idCoordinador
+                      WHERE tipo = 'P'" . $where;
         $stmtFilter = $this->db->prepare($sqlFilter);
         foreach ($binds as $key => $val) $stmtFilter->bindValue($key, $val);
         $stmtFilter->execute();

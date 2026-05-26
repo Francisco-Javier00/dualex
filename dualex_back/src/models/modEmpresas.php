@@ -225,19 +225,39 @@ class ModEmpresas {
         $search = $params['search']['value'] ?? '';
 
         $where = "";
+        $binds = [];
         // Si el usuario escribió en el cuadro de búsqueda
         if ($search) {
-            $where = " WHERE e.siglas LIKE :search OR e.nombre LIKE :search OR e.urlConvenio LIKE :search";
+            $where = " WHERE e.siglas LIKE :search1 
+                       OR e.nombre LIKE :search2 
+                       OR e.urlConvenio LIKE :search3 
+                       OR CONCAT(u.nombre, ' ', u.apellidos) LIKE :search4 
+                       OR DATE_FORMAT(e.inicioConvenio, '%d/%m/%Y') LIKE :search5
+                       OR EXISTS (
+                           SELECT 1 FROM Ciclo_Empresa ce 
+                           INNER JOIN Ciclo c ON ce.idCiclo = c.idCiclo 
+                           WHERE ce.idEmpresa = e.idEmpresa AND c.siglas LIKE :search6
+                       )";
+            $binds[':search1'] = "%$search%";
+            $binds[':search2'] = "%$search%";
+            $binds[':search3'] = "%$search%";
+            $binds[':search4'] = "%$search%";
+            $binds[':search5'] = "%$search%";
+            $binds[':search6'] = "%$search%";
         }
 
         // Obtener el recuento total de elementos en la tabla ignorando filtros
         $total = $this->db->query("SELECT COUNT(*) FROM Empresa")->fetchColumn();
 
         // Obtener el recuento aplicando la cláusula LIKE para que la paginación no se rompa al buscar
-        $sqlFiltrados = "SELECT COUNT(*) FROM Empresa e $where";
+        $sqlFiltrados = "SELECT COUNT(*) FROM Empresa e 
+                        LEFT JOIN Usuario u ON e.idCoordinador = u.idUsuario 
+                        $where";
         $stmtF = $this->db->prepare($sqlFiltrados);
-        if ($search) $stmtF->execute([':search' => "%$search%"]);
-        else $stmtF->execute();
+        foreach ($binds as $key => $val) {
+            $stmtF->bindValue($key, $val);
+        }
+        $stmtF->execute();
         $totalFiltrados = $stmtF->fetchColumn();
 
         // Procesamiento del orden seleccionado en las cabeceras de la tabla
@@ -277,7 +297,9 @@ class ModEmpresas {
                 $limit";
         
         $stmt = $this->db->prepare($sql);
-        if ($search) $stmt->bindValue(':search', "%$search%");
+        foreach ($binds as $key => $val) {
+            $stmt->bindValue($key, $val);
+        }
         if ($length != -1) {
             $stmt->bindValue(':start', (int)$start, PDO::PARAM_INT);
             $stmt->bindValue(':length', (int)$length, PDO::PARAM_INT);
