@@ -36,8 +36,8 @@ export class AlertService {
    * @param autoCierre Define si la alerta se ocultará automáticamente (por defecto false).
    * @param duracion Tiempo en milisegundos que la alerta permanecerá visible.
    */
-  advertencia(titulo: string, mensaje: string, autoCierre: boolean = false, duracion: number = 3000): void {
-    this.agregarAlerta('warning', titulo, mensaje, autoCierre, duracion);
+  advertencia(titulo: string, mensaje: string, autoCierre: boolean = true, duracion: number = 3000): void {
+    this.agregarAlerta('warning', titulo, this.obtenerMensajeAmigable(mensaje), autoCierre, duracion);
   }
 
   /**
@@ -60,8 +60,8 @@ export class AlertService {
    * @param autoCierre Define si la alerta se ocultará automáticamente (por defecto false).
    * @param duracion Tiempo en milisegundos que la alerta permanecerá visible.
    */
-  error(titulo: string, mensaje: string, autoCierre: boolean = false, duracion: number = 3500): void {
-    this.agregarAlerta('danger', titulo, mensaje, autoCierre, duracion);
+  error(titulo: string, mensaje: string, autoCierre: boolean = true, duracion: number = 3500): void {
+    this.agregarAlerta('danger', titulo, this.obtenerMensajeAmigable(mensaje), autoCierre, duracion);
   }
 
   /**
@@ -121,5 +121,55 @@ export class AlertService {
    */
   private generarId(): string {
     return 'alerta_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
+  }
+
+  /**
+   * Transforma mensajes de error técnicos o de base de datos en mensajes amigables y legibles para el usuario.
+   */
+  private obtenerMensajeAmigable(mensaje: string | any): string {
+    if (!mensaje) {
+      return 'Ha ocurrido un error inesperado.';
+    }
+
+    let msg = '';
+    if (typeof mensaje === 'string') {
+      msg = mensaje;
+    } else if (typeof mensaje === 'object') {
+      msg = mensaje.message || mensaje.error || JSON.stringify(mensaje);
+    } else {
+      msg = String(mensaje);
+    }
+
+    const msgLower = msg.toLowerCase();
+
+    // Trazas técnicas crudas de base de datos que se hayan escapado del backend
+    if (
+      msgLower.includes('sqlstate') ||
+      msgLower.includes('pdoexception') ||
+      msgLower.includes('mysql') ||
+      msgLower.includes('duplicate entry') ||
+      msgLower.includes('foreign key constraint') ||
+      msgLower.includes('1062') ||
+      msgLower.includes('1451') ||
+      msgLower.includes('1452') ||
+      msgLower.includes('1216') ||
+      msgLower.includes('1217') ||
+      msgLower.includes('1364') ||
+      msgLower.includes('1048')
+    ) {
+      return 'Ha ocurrido un problema interno en el servidor de base de datos. Por favor, inténtelo de nuevo más tarde.';
+    }
+
+    // Fallos críticos de red o servidor no respondidos por la API (backend apagado, CORS, etc.)
+    if (
+      msgLower.includes('http failure') ||
+      msgLower.includes('connection refused') ||
+      msgLower.includes('unknown error')
+    ) {
+      return 'No se ha podido establecer conexión con el servidor. Compruebe su conexión a internet.';
+    }
+
+    // Dejamos pasar cualquier mensaje limpio que ya haya sido procesado/traducido por el backend
+    return msg;
   }
 }
