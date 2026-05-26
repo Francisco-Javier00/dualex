@@ -108,4 +108,56 @@ class BaseController {
             $this->sendError("No tienes permisos para realizar esta acción", 403);
         }
     }
+
+    /**
+     * Obtiene el perfil del usuario actual directamente desde la base de datos local.
+     */
+    public function obtenerPerfilLocal() {
+        $this->checkRole(['ALUMNO', 'PROFESOR', 'COORDINADOR']);
+        try {
+            $id = $this->user['id'];
+            
+            // Buscar en la tabla Usuario
+            $stmt = $this->db->prepare("SELECT idUsuario as id, nombre, apellidos, correo as email, tipo FROM Usuario WHERE idUsuario = :id");
+            $stmt->execute([':id' => $id]);
+            $dbUser = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if (!$dbUser) {
+                $this->sendError("Usuario no encontrado en la base de datos local.", 404);
+            }
+            
+            // Resolver rol
+            $rol = 'ALUMNO';
+            if ($dbUser['tipo'] === 'P') {
+                $stmtC = $this->db->prepare("SELECT 1 FROM Coordinador WHERE idCoordinador = :id");
+                $stmtC->execute([':id' => $id]);
+                if ($stmtC->fetch()) {
+                    $rol = 'COORDINADOR';
+                } else {
+                    $rol = 'PROFESOR';
+                }
+            }
+            
+            $dbUser['rol'] = $rol;
+            
+            // Coordinador General
+            $dbUser['esGeneral'] = false;
+            if ($rol === 'COORDINADOR') {
+                $stmtG = $this->db->prepare("SELECT general FROM Coordinador WHERE idCoordinador = :id");
+                $stmtG->execute([':id' => $id]);
+                $res = $stmtG->fetch(PDO::FETCH_ASSOC);
+                if ($res && $res['general'] == 1) {
+                    $dbUser['esGeneral'] = true;
+                }
+            }
+            
+            // Convertir tipos para coincidir con la interfaz PerfilUsuario
+            $dbUser['id'] = (int)$dbUser['id'];
+            $dbUser['esGeneral'] = (bool)$dbUser['esGeneral'];
+            
+            $this->sendResponse($dbUser);
+        } catch (Exception $e) {
+            $this->sendError($e);
+        }
+    }
 }
