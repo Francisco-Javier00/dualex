@@ -128,19 +128,22 @@ export class ModulosComponent implements OnInit, OnDestroy {
         { 
           data: 'nombre',
           className: 'text-truncate',
+          width: '55%',
           responsivePriority: 3,
           render: (data: any) => `<span class="fw-medium text-dark">${data}</span>`
         },
-        { data: 'sigla', className: 'text-center text-muted', responsivePriority: 4 },
+        { data: 'sigla', className: 'text-center text-muted text-nowrap', width: '10%', responsivePriority: 4 },
         { 
           data: 'cicloCompleto',
-          className: 'text-center text-muted',
+          className: 'text-center text-muted text-nowrap',
+          width: '14%',
           responsivePriority: 6,
           render: (data: any) => data || 'Sin asignar'
         },
         { 
           data: 'cursoCompleto',
-          className: 'text-center text-muted',
+          className: 'text-center text-muted text-nowrap',
+          width: '13%',
           responsivePriority: 7,
           render: (data: any) => data || 'Sin asignar'
         },
@@ -149,6 +152,7 @@ export class ModulosComponent implements OnInit, OnDestroy {
           orderable: false,
           searchable: false,
           className: 'text-center',
+          width: '8%',
           responsivePriority: 5,
           render: () => `
             <div class="d-flex gap-2 justify-content-center">

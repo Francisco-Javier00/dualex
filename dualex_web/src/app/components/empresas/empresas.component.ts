@@ -103,10 +103,11 @@ export class EmpresasComponent implements OnInit {
           defaultContent: '',
           responsivePriority: 1
         },
-        { data: 'siglas', responsivePriority: 2 },
+        { data: 'siglas', className: 'text-nowrap', width: '8%', responsivePriority: 2 },
         {
           data: 'nombre',
           className: 'text-truncate',
+          width: '25%',
           responsivePriority: 3,
           render: (data: string) => `
             <button
@@ -120,11 +121,13 @@ export class EmpresasComponent implements OnInit {
         },
         {
           data: 'ciclos',
+          width: '10%',
           responsivePriority: 4,
           render: (data: string) => data ? data : '<span class="text-muted italic">No asignado</span>'
         },
         {
           data: 'convenioUrl',
+          width: '12%',
           responsivePriority: 7,
           render: (data: string) => {
             return `
@@ -136,11 +139,12 @@ export class EmpresasComponent implements OnInit {
         },
         {
           data: 'firmante',
+          width: '15%',
           responsivePriority: 8,
           render: (data: string) => data ? data : '<span class="text-muted italic">Sin asignar</span>'
         },
-        { data: 'inicioConvenio', responsivePriority: 9 },
-        { data: 'finConvenio', responsivePriority: 10, 
+        { data: 'inicioConvenio', className: 'text-nowrap', width: '9%', responsivePriority: 9 },
+        { data: 'finConvenio', className: 'text-nowrap', width: '9%', responsivePriority: 10, 
           render: (data: string, type: string, row: any) => {
             if (row?.caducado) {
               return `<span class="text-danger fw-bold"><i class="fa-solid fa-circle-exclamation me-1"></i>${data}</span>`;
@@ -156,6 +160,7 @@ export class EmpresasComponent implements OnInit {
           className: 'text-center',
           orderable: false,
           searchable: false,
+          width: '12%',
           responsivePriority: 5,
           render: () => `
             <div class="d-flex justify-content-center align-items-center gap-2 action-buttons w-100">

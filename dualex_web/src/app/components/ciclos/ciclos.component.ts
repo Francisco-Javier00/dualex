@@ -53,14 +53,15 @@ export class CiclosComponent implements OnInit {
           defaultContent: '',
           responsivePriority: 1
         },
-        { data: 'nombre', className: 'text-truncate', responsivePriority: 2 },
-        { data: 'siglas', responsivePriority: 3 },
-        { data: 'grado', responsivePriority: 4 },
-        { data: 'Curso', responsivePriority: 6 },
+        { data: 'nombre', className: 'text-truncate', width: '55%', responsivePriority: 2 },
+        { data: 'siglas', className: 'text-nowrap', width: '10%', responsivePriority: 3 },
+        { data: 'grado', className: 'text-nowrap', width: '10%', responsivePriority: 4 },
+        { data: 'Curso', className: 'text-nowrap', width: '15%', responsivePriority: 6 },
         {
           data: null,
           orderable: false,
           className: 'text-center',
+          width: '10%',
           responsivePriority: 5,
           render: () => `
             <div class="d-flex gap-2 justify-content-center align-items-center action-buttons w-100">

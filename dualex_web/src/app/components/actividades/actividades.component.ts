@@ -52,14 +52,15 @@ export class ActividadesComponent implements OnInit {
           defaultContent: '',
           responsivePriority: 1
         },
-        { data: 'titulo', className: 'text-truncate', responsivePriority: 2 },
-        { data: 'descripcion', className: 'text-truncate', responsivePriority: 4 },
-        { data: 'modulo', responsivePriority: 5 },
+        { data: 'titulo', className: 'text-truncate', width: '35%', responsivePriority: 2 },
+        { data: 'descripcion', className: 'text-truncate', width: '45%', responsivePriority: 4 },
+        { data: 'modulo', className: 'text-nowrap', width: '12%', responsivePriority: 5 },
         {
           data: null,
           className: 'text-center align-middle',
           orderable: false,
           searchable: false,
+          width: '8%',
           responsivePriority: 3,
           render: () => `
             <div class="d-flex gap-2 justify-content-center">

@@ -1,4 +1,21 @@
 /* Ocultar elementos predeterminados feos de DataTables y ajustarlos al diseño de Bootstrap */
+::ng-deep table.dataTable {
+  font-size: 0.92rem !important;
+}
+
+/* Forzar relleno (padding) y alineación vertical consistente en cabeceras y celdas */
+::ng-deep table.dataTable thead th {
+  padding-top: 0.75rem !important;
+  padding-bottom: 0.75rem !important;
+  vertical-align: middle !important;
+}
+
+::ng-deep table.dataTable tbody td {
+  padding-top: 0.75rem !important;
+  padding-bottom: 0.75rem !important;
+  vertical-align: middle !important;
+}
+
 ::ng-deep .dataTables_wrapper .dataTables_length select {
   border-radius: 4px;
   border: 1px solid #dee2e6;
@@ -22,7 +39,7 @@
 }
 
 /* Evitar que las celdas de detalle responsive hereden el centrado de selectores como td:last-child */
-::ng-deep table.dataTable > tbody > tr.child td.child {
+::ng-deep table.dataTable>tbody>tr.child td.child {
   text-align: left !important;
 }
 
@@ -30,6 +47,11 @@
 ::ng-deep table.dataTable tbody td:not(.text-center):not(.dt-center),
 ::ng-deep table.dataTable thead th:not(.text-center):not(.dt-center) {
   text-align: left !important;
+}
+
+/* Permitir el salto de línea y ajustar palabras largas (como correos o URLs) en las celdas no truncadas */
+::ng-deep table.dataTable tbody td:not(.text-truncate):not(.text-nowrap) {
+  overflow-wrap: break-word;
 }
 
 /* Controlar el ancho de la columna de control responsive (flecha de desplegar) */
@@ -44,7 +66,7 @@
 }
 
 /* Alinear y dar espacio a las etiquetas de los detalles al desplegar en responsive */
-::ng-deep table.dataTable > tbody > tr.child span.dtr-title {
+::ng-deep table.dataTable>tbody>tr.child span.dtr-title {
   display: inline-block !important;
   min-width: 120px !important;
   font-weight: 600 !important;
@@ -52,11 +74,11 @@
 }
 
 /* Forzar que los campos y botones en el detalle colapsado se alineen a la izquierda */
-::ng-deep table.dataTable > tbody > tr.child ul.dtr-details > li {
+::ng-deep table.dataTable>tbody>tr.child ul.dtr-details>li {
   text-align: left !important;
 }
 
-::ng-deep table.dataTable > tbody > tr.child ul.dtr-details .d-flex {
+::ng-deep table.dataTable>tbody>tr.child ul.dtr-details .d-flex {
   justify-content: flex-start !important;
 }
 
@@ -64,6 +86,7 @@
 ::ng-deep table.dataTable td.text-truncate {
   max-width: 150px !important;
 }
+
 @media (min-width: 768px) {
   ::ng-deep table.dataTable td.text-truncate {
     max-width: 300px !important;

@@ -47,7 +47,7 @@ export class TareasTodosComponent implements OnInit {
         { data: 'nombre', width: '15%' },
         { data: 'apellidos', width: '20%' },
         { data: 'email', width: '30%' },
-        { data: 'nombreCurso', defaultContent: '<span class="text-muted">Sin curso</span>', width: '25%' },
+        { data: 'nombreCurso', className: 'text-nowrap', defaultContent: '<span class="text-muted">Sin curso</span>', width: '25%' },
         {
           data: null,
           orderable: false,

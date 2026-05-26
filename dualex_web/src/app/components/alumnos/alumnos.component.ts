@@ -59,18 +59,14 @@ export class AlumnosComponent implements OnInit, OnDestroy {
   get puedeGestionarAlumnos(): boolean {
     // Desde "Mis Módulos" (con moduloId), ningún coordinador gestiona
     if (this.moduloId) return false;
-    return this.rolUsuarioActual === 'COORDINADOR' && !this.authService.currentUserValue?.esGeneral;
+    return this.rolUsuarioActual === 'COORDINADOR';
   }
   
   get esSoloLectura(): boolean {
     // Desde "Mis Módulos" (con moduloId), todos son solo lectura
     if (this.moduloId) return true;
-    // El coordinador normal NO es solo lectura
-    if (this.rolUsuarioActual === 'COORDINADOR' && !this.authService.currentUserValue?.esGeneral) {
-      return false;
-    }
-    // Profesor y Coordinador General son solo lectura
-    return this.rolUsuarioActual === 'PROFESOR' || (this.rolUsuarioActual === 'COORDINADOR' && !!this.authService.currentUserValue?.esGeneral);
+    // Los coordinadores (general y local) no son solo lectura en gestión
+    return this.rolUsuarioActual !== 'COORDINADOR';
   }
 
   get columnTitles(): string[] {
@@ -84,10 +80,9 @@ export class AlumnosComponent implements OnInit, OnDestroy {
 
   private construirColumnas(): any[] {
     const rol = this.rolUsuarioActual;
-    const esGeneral = this.authService.currentUserValue?.esGeneral;
     const puedeGestionar = this.puedeGestionarAlumnos;
     
-    // Si es solo lectura (Profesor o Coordinador General), ocultamos datos sensibles
+    // Si es solo lectura (Profesor), ocultamos datos sensibles
     const ocultarSensibles = this.esSoloLectura;
     
     const cols: any[] = [
@@ -99,19 +94,19 @@ export class AlumnosComponent implements OnInit, OnDestroy {
         defaultContent: '',
         responsivePriority: 1
       },
-      { data: 'nombre', width: '12%', responsivePriority: 2 },
-      { data: 'apellidos', width: '18%', responsivePriority: 3 },
-      { data: 'email', width: '22%', responsivePriority: 4 },
-      { data: 'nombreCurso', defaultContent: '<span class="text-muted">Sin curso</span>', width: '12%', responsivePriority: 5 },
+      { data: 'nombre', width: ocultarSensibles ? '20%' : '12%', responsivePriority: 2 },
+      { data: 'apellidos', width: ocultarSensibles ? '30%' : '16%', responsivePriority: 3 },
+      { data: 'email', width: ocultarSensibles ? '34%' : '20%', responsivePriority: 4 },
+      { data: 'nombreCurso', className: 'text-nowrap', defaultContent: '<span class="text-muted">Sin curso</span>', width: '10%', responsivePriority: 5 },
     ];
     
-    // Desde "Mis Módulos" o Profesor/Coord General: ocultar sensibles
+    // Desde "Mis Módulos" o Profesor: ocultar sensibles
     if (!ocultarSensibles) {
       cols.push(
-        { data: 'dni', width: '10%', responsivePriority: 9 },
-        { data: 'nuss', width: '10%', responsivePriority: 8 },
-        { data: 'nia', width: '10%', responsivePriority: 7 },
-        { data: 'telefono', width: '10%', responsivePriority: 10 }
+        { data: 'dni', className: 'text-nowrap', width: '9%', responsivePriority: 9 },
+        { data: 'nuss', className: 'text-nowrap', width: '9%', responsivePriority: 8 },
+        { data: 'nia', className: 'text-nowrap', width: '9%', responsivePriority: 7 },
+        { data: 'telefono', className: 'text-nowrap', width: '9%', responsivePriority: 10 }
       );
     }
     cols.push({
@@ -119,11 +114,11 @@ export class AlumnosComponent implements OnInit, OnDestroy {
       className: 'text-center align-middle',
       orderable: false,
       searchable: false,
-      width: '8%',
+      width: '6%',
       responsivePriority: 6,
       render: () => `
         <div class="d-flex gap-2 justify-content-center">
-          ${(rol === 'PROFESOR' || (rol === 'COORDINADOR' && (esGeneral || this.moduloId))) ? `
+          ${(rol === 'PROFESOR' || this.moduloId) ? `
             <button class="btn btn-sm btn-outline-success shadow-sm" data-action="tasks" title="Ver Tareas">
               <i class="fa-solid fa-clipboard-list"></i>
             </button>
