@@ -74,9 +74,9 @@ export class AlumnosComponent implements OnInit, OnDestroy {
   }
 
   get columnTitles(): string[] {
-    const base = ['Nombre', 'Apellidos', 'Correo', 'Curso/Ciclo'];
+    const base = [' ', 'Nombre', 'Apellidos', 'Correo', 'Curso/Ciclo'];
     if (!this.esSoloLectura) {
-      base.push('NIA', 'NUSS', 'DNI', 'Teléfono');
+      base.push('DNI', 'NUSS', 'NIA', 'Teléfono');
     }
     base.push('Acciones');
     return base;
@@ -99,19 +99,19 @@ export class AlumnosComponent implements OnInit, OnDestroy {
         defaultContent: '',
         responsivePriority: 1
       },
-      { data: 'nombre', width: '30%', responsivePriority: 2 },
-      { data: 'apellidos', width: '30%', responsivePriority: 3 },
-      { data: 'email', width: '20%', responsivePriority: 4 },
-      { data: 'nombreCurso', defaultContent: '<span class="text-muted">Sin curso</span>', width: '15%', responsivePriority: 5 },
+      { data: 'nombre', width: '12%', responsivePriority: 2 },
+      { data: 'apellidos', width: '18%', responsivePriority: 3 },
+      { data: 'email', width: '22%', responsivePriority: 4 },
+      { data: 'nombreCurso', defaultContent: '<span class="text-muted">Sin curso</span>', width: '12%', responsivePriority: 5 },
     ];
     
     // Desde "Mis Módulos" o Profesor/Coord General: ocultar sensibles
     if (!ocultarSensibles) {
       cols.push(
-        { data: 'dni', responsivePriority: 9 },
-        { data: 'nuss', responsivePriority: 8 },
-        { data: 'nia', responsivePriority: 7 },
-        { data: 'telefono', responsivePriority: 10 }
+        { data: 'dni', width: '10%', responsivePriority: 9 },
+        { data: 'nuss', width: '10%', responsivePriority: 8 },
+        { data: 'nia', width: '10%', responsivePriority: 7 },
+        { data: 'telefono', width: '10%', responsivePriority: 10 }
       );
     }
     cols.push({
@@ -119,7 +119,7 @@ export class AlumnosComponent implements OnInit, OnDestroy {
       className: 'text-center align-middle',
       orderable: false,
       searchable: false,
-      width: '10%',
+      width: '8%',
       responsivePriority: 6,
       render: () => `
         <div class="d-flex gap-2 justify-content-center">
