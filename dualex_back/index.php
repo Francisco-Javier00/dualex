@@ -76,16 +76,25 @@ if ($authHeader && preg_match('/Bearer\s+(.*)$/i', $authHeader, $matches)) {
     if ($secret) {
         $user = JWTHelper::validar($token, $secret);
         
-        if ($user && isset($user['email'])) {
-            // Verificar si el usuario ya existe en la base de datos
+        if ($user && isset($user['data']['email'])) {
+            // Verificar si el usuario ya existe en la base de datos local
             $stmt = $db->prepare("SELECT idUsuario FROM Usuario WHERE correo = :correo");
-            $stmt->execute([':correo' => $user['email']]);
+            $stmt->execute([':correo' => $user['data']['email']]);
             $dbUser = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if (!$dbUser) {
                 // Determinar tipo y rol del token
-                $rawRol = $user['roles']['dualex'] ?? '';
-                $rol = strtoupper(trim($rawRol));
+                $roles = $user['data']['roles'] ?? [];
+                $rolesUpper = array_map('strtoupper', $roles);
+                
+                $rol = 'ALUMNO'; // Por defecto
+                if (in_array('COORDINADOR_DUALEX', $rolesUpper)) {
+                    $rol = 'COORDINADOR';
+                } else if (in_array('PROFESOR_DUALEX', $rolesUpper)) {
+                    $rol = 'PROFESOR';
+                } else if (in_array('ALUMNO_DUALEX', $rolesUpper)) {
+                    $rol = 'ALUMNO';
+                }
 
                 try {
                     $db->beginTransaction();
@@ -95,9 +104,9 @@ if ($authHeader && preg_match('/Bearer\s+(.*)$/i', $authHeader, $matches)) {
                     $sqlU = "INSERT INTO Usuario (nombre, apellidos, correo, tipo) VALUES (:nombre, :apellidos, :correo, :tipo)";
                     $stmtU = $db->prepare($sqlU);
                     $stmtU->execute([
-                        ':nombre'    => $user['nombre'] ?? '',
-                        ':apellidos' => $user['apellidos'] ?? '',
-                        ':correo'    => $user['email'],
+                        ':nombre'    => $user['data']['nombre'] ?? '',
+                        ':apellidos' => $user['data']['apellidos'] ?? '',
+                        ':correo'    => $user['data']['email'],
                         ':tipo'      => $tipo
                     ]);
                     $idUsuario = $db->lastInsertId();
