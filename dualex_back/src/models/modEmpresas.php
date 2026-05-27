@@ -222,7 +222,7 @@ class ModEmpresas {
     public function obtenerDataTables($params) {
         $start = $params['start'] ?? 0;
         $length = $params['length'] ?? 10;
-        $search = isset($params['search']['value']) ? $params['search']['value'] : '';
+        $search = $params['search']['value'] ?? '';
 
         $where = "";
         $binds = [];
@@ -338,15 +338,7 @@ class ModEmpresas {
 
         foreach ($empresas as &$empresa) {
             // Conversión inversa: De la base de datos (YYYY-MM-DD HH:MM:SS) a español (DD/MM/YYYY)
-            try {
-                if (empty($empresa['inicioConvenio']) || strpos($empresa['inicioConvenio'], '0000') !== false) {
-                    $inicioDt = new DateTime(); // fallback a hoy
-                } else {
-                    $inicioDt = new DateTime($empresa['inicioConvenio']);
-                }
-            } catch (Exception $e) {
-                $inicioDt = new DateTime(); // fallback a hoy
-            }
+            $inicioDt = new DateTime($empresa['inicioConvenio']);
             $empresa['inicioConvenio'] = $inicioDt->format('d/m/Y');
             
             // Calculamos la caducidad inyectando los años definidos en BD
