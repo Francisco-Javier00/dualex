@@ -105,7 +105,8 @@ class ModModulos {
      */
     public function obtenerModulosProfesor($emailProfesor) {
         $sql = "SELECT m.idModulo, m.nombre, m.sigla, m.color,
-                       (SELECT COUNT(*) FROM Modulo_Alumno_Cursa mac WHERE mac.idModulo = m.idModulo) as numAlumnos
+                       (SELECT COUNT(DISTINCT mac.idAlumno) FROM Modulo_Alumno_Cursa mac WHERE mac.idModulo = m.idModulo) as numAlumnos,
+                       (SELECT COUNT(DISTINCT ma.idActividad) FROM Modulo_Actividad ma WHERE ma.idModulo = m.idModulo) as numActividades
                 FROM Modulo m
                 JOIN Modulo_Profesor mp ON m.idModulo = mp.idModulo
                 JOIN Profesor p ON mp.idProfesor = p.idProfesor

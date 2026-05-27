@@ -53,9 +53,9 @@ export class TareasTodosComponent implements OnInit {
           orderable: false,
           searchable: false,
           width: '10%',
-          render: (data: any, type: string, row: any) => `
+          render: (_data: any, _type: string, row: any) => `
             <div class="d-flex gap-2 justify-content-center">
-              <button class="btn btn-sm btn-outline-success shadow-sm" data-action="tasks" title="Ver Tareas">
+              <button class="btn btn-sm ${Number(row?.numTareas || 0) > 0 ? 'btn-outline-success' : 'btn-outline-primary'} shadow-sm" data-action="tasks" title="Ver Tareas">
                 <i class="fa-solid fa-clipboard-list"></i>
               </button>
             </div>

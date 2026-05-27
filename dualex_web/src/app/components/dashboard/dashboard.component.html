@@ -26,9 +26,10 @@
       </a>
     </header>
 
-    <div class="row g-4 justify-content-start">
+    <div class="category-grid">
       @for (categoria of categorias$ | async; track categoria.titulo) {
-      <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3">
+      @if (categoria.titulo !== 'Ciclos' || usuario?.esGeneral) {
+      <div class="category-grid__item">
         <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden category-card">
           <div class="card-img-container bg-light d-flex align-items-center justify-content-center"
             style="height: 220px;">
@@ -38,12 +39,13 @@
             <button
               class="btn w-100 py-3 border-0 d-flex align-items-center justify-content-center gap-2 fs-5"
               [routerLink]="categoria.ruta"
-              [ngClass]="(usuario?.rol === 'COORDINADOR' && usuario?.esGeneral && (categoria.titulo === 'Profesores' || categoria.titulo === 'Empresas')) ? 'btn-coordinador-general' : 'btn-primary-light'">
+              [ngClass]="(usuario?.rol === 'COORDINADOR' && usuario?.esGeneral && (categoria.titulo === 'Profesores' || categoria.titulo === 'Empresas' || categoria.titulo === 'Ciclos')) ? 'btn-coordinador-general' : 'btn-primary-light'">
               {{ categoria.titulo }} <i class="fa-solid fa-arrow-right"></i>
             </button>
           </div>
         </div>
       </div>
+      }
       }
     </div>
     }
@@ -92,7 +94,7 @@
           <div class="card-body px-4 py-3">
             <div class="d-flex justify-content-between text-muted" style="font-size: 0.85rem;">
               <span><i class="fa-solid fa-users me-1"></i>{{ modulo.numAlumnos }} alumnos</span>
-              <span><i class="fa-solid fa-list-check me-1"></i>{{ modulo.numActividades || 0 }} actividades</span>
+              <span><i class="fa-solid fa-list-check me-1"></i>{{ modulo.numActividades || 0 }} tareas</span>
             </div>
           </div>
           <!-- Pie con botón -->

@@ -65,6 +65,11 @@ if (!$authHeader && function_exists('getallheaders')) {
     $authHeader = $headers['Authorization'] ?? $headers['authorization'] ?? null;
 }
 
+// Fallback para descargar PDFs en pestañas nuevas (target="_blank") sin cabecera de Authorization
+if (!$authHeader && isset($_GET['token'])) {
+    $authHeader = 'Bearer ' . $_GET['token'];
+}
+
 if ($authHeader && preg_match('/Bearer\s+(.*)$/i', $authHeader, $matches)) {
     $token = $matches[1];
     $secret = $_ENV['JWT_SECRET'] ?? '';

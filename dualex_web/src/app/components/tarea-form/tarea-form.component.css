@@ -213,3 +213,31 @@
   font-size: 0.72rem;
 }
 
+.tarea-next-modal__backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 1055;
+}
+
+.tarea-next-modal__top {
+  background:
+    radial-gradient(circle at top left, rgba(13, 110, 253, 0.14), transparent 45%),
+    linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
+}
+
+.tarea-next-modal__icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #0d6efd 0%, #4ea1ff 100%);
+  color: #ffffff;
+  box-shadow: 0 12px 24px rgba(13, 110, 253, 0.2);
+  font-size: 1.2rem;
+}
+
