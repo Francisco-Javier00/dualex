@@ -1,4 +1,4 @@
-﻿import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { FormBuilder, FormGroup, FormArray, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -78,7 +78,7 @@ export class TareaFormComponent implements OnInit {
   private authService = inject(AuthService);
 
   get jwtToken(): string | null {
-    return this.authService.getCookieNativa('dualex_jwt');
+    return this.authService.getCookieNativa('auth_token');
   }
 
   // Variables de Estado

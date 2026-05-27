@@ -160,7 +160,7 @@ export class ProfesoresComponent implements OnInit {
             false,
             8000
           );
-          console.warn('Errores de importación:', res.errors);
+
         } else {
           this.alertService.exito('Importación Exitosa', msg);
         }
