@@ -70,11 +70,13 @@ export interface Tarea {
   revisionesModulos?: ModuloRevision[];
   idAlumno?: number;
   codigo_auto?: string;
+  documento?: string;
 }
 
 export interface ModuloRevision {
   modulo: string;
   revisado: boolean;
+  comentario?: string;
 }
 
 export interface ActividadDTO {
@@ -99,6 +101,7 @@ export interface AlumnoDTO {
   idCurso: number;
   idEmpresa?: number;
   nombreCurso?: string; // Para mostrar en tablas
+  numTareas?: number;
 }
 
 export interface ModuloDTO {

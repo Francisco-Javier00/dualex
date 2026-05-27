@@ -1,13 +1,13 @@
-import { Component, OnInit, inject } from '@angular/core';
+﻿import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { FormBuilder, FormGroup, FormArray, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
 
 /**
- * IMPORTACIÓN DE COMPONENTES DE CKEDITOR 5
+ * IMPORTACIÃ“N DE COMPONENTES DE CKEDITOR 5
  * Se cargan todos los plugins necesarios para habilitar funciones avanzadas como
- * tablas, imágenes (Base64), redimensionamiento, alineación, etc.
+ * tablas, imÃ¡genes (Base64), redimensionamiento, alineaciÃ³n, etc.
  */
 import {
   ClassicEditor,
@@ -40,7 +40,7 @@ import {
   Base64UploadAdapter
 } from 'ckeditor5';
 
-// Traducciones al español para CKEditor
+// Traducciones al espaÃ±ol para CKEditor
 import translations from 'ckeditor5/translations/es.js';
 
 // Servicios y DTOs
@@ -56,7 +56,7 @@ import { SeleccionActividadesModalComponent } from '../shared/modals/seleccion-a
 
 /**
  * TareaFormComponent
- * Componente dinámico que sirve tanto para CREAR como para EDITAR tareas del cuaderno del alumno.
+ * Componente dinÃ¡mico que sirve tanto para CREAR como para EDITAR tareas del cuaderno del alumno.
  * Utiliza un formulario reactivo para la persistencia de datos complejos.
  */
 @Component({
@@ -67,36 +67,45 @@ import { SeleccionActividadesModalComponent } from '../shared/modals/seleccion-a
   styleUrls: ['./tarea-form.component.css']
 })
 export class TareaFormComponent implements OnInit {
-  // Inyección de servicios utilizando la sintaxis 'inject' (Angular 16+)
+  // InyecciÃ³n de servicios utilizando la sintaxis 'inject' (Angular 16+)
   private fb = inject(FormBuilder);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
-  private tareasService = inject(TareasService);
+  public tareasService = inject(TareasService);
   private modulosService = inject(ModulosService);
   public location = inject(Location);
   private alertService = inject(AlertService);
   private authService = inject(AuthService);
 
+  get jwtToken(): string | null {
+    return this.authService.getCookieNativa('dualex_jwt');
+  }
+
   // Variables de Estado
-  tareaForm!: FormGroup;               // Objeto raíz del formulario reactivo
+  tareaForm!: FormGroup;               // Objeto raÃ­z del formulario reactivo
   esEdicion = false;                    // Flag para diferenciar entre Crear y Editar
   idTarea: number | null = null;        // Almacena el ID si estamos editando
   idAlumno: number | null = null;       // Almacena el ID del alumno si lo estamos especificando
-  actividades: ActividadDTO[] = [];     // Catálogo maestro de actividades recuperado del servicio
-  modalActividadesVisible = false;      // Controla la visibilidad del modal de selección
+  actividades: ActividadDTO[] = [];     // CatÃ¡logo maestro de actividades recuperado del servicio
+  modalActividadesVisible = false;      // Controla la visibilidad del modal de selecciÃ³n
   esAlumno = false;                     // Flag para identificar si es un alumno
   esProfesor = false;                   // Flag para identificar si es un profesor/coordinador
-  modulosTutor: any[] = [];             // Listado de módulos que imparte el profesor
-  tareaBloqueada = false;               // Flag para saber si la tarea está bloqueada
-  codigoTarea = '';                     // Código auto-generado de la tarea
-  adjuntos: File[] = [];                // Lista de archivos adjuntos a la tarea
+  modulosTutor: any[] = [];             // Listado de mÃ³dulos que imparte el profesor
+  tareaBloqueada = false;               // Flag para saber si la tarea estÃ¡ bloqueada
+  codigoTarea = '';                     // CÃ³digo auto-generado de la tarea
+  documentoFile: File | null = null;    // PDF nuevo seleccionado por el alumno
+  documentoActual: string | null = null; // Nombre del PDF ya guardado
+  modalSiguienteTareaVisible = false;
+  siguienteTareaPendienteId: number | null = null;
+  noHayMasTareas = false;
 
   // Instancia del editor CKEditor
+
   public Editor = ClassicEditor;
 
   /**
-   * CONFIGURACIÓN DE CKEDITOR 5
-   * Define la barra de herramientas, plugins y comportamientos de imágenes/tablas.
+   * CONFIGURACIÃ“N DE CKEDITOR 5
+   * Define la barra de herramientas, plugins y comportamientos de imÃ¡genes/tablas.
    */
   public config = {
     licenseKey: 'GPL',
@@ -107,7 +116,7 @@ export class TareaFormComponent implements OnInit {
       Image, ImageToolbar, ImageCaption, ImageStyle, ImageUpload, ImageResize,
       MediaEmbed, Table, TableToolbar, TableColumnResize, Heading, Indent, BlockQuote, Autoformat,
       Underline, Strikethrough, Font, Alignment, Highlight, RemoveFormat,
-      Base64UploadAdapter // Permite subir imágenes directamente como cadenas Base64
+      Base64UploadAdapter // Permite subir imÃ¡genes directamente como cadenas Base64
     ],
     toolbar: [
       'undo', 'redo', '|',
@@ -132,7 +141,7 @@ export class TareaFormComponent implements OnInit {
     }
   };
 
-  // Opciones para el selector de evaluación de la empresa (según normativa Dualex)
+  // Opciones para el selector de evaluaciÃ³n de la empresa (segÃºn normativa Dualex)
   evaluacionEmpresaOptions = [
     'Sin Calificar',
     'Superado',
@@ -143,14 +152,14 @@ export class TareaFormComponent implements OnInit {
   ];
 
   /**
-   * INICIALIZACIÓN DEL COMPONENTE
+   * INICIALIZACIÃ“N DEL COMPONENTE
    */
   ngOnInit(): void {
     const user = this.authService.currentUserValue;
     this.esAlumno = user?.rol === 'ALUMNO';
     this.esProfesor = user?.rol === 'PROFESOR' || user?.rol === 'COORDINADOR';
     this.crearFormulario();
-    this.cargarActividades(); // Cargamos el catálogo para mapear IDs a Títulos
+    this.cargarActividades(); // Cargamos el catÃ¡logo para mapear IDs a TÃ­tulos
 
     if (this.esProfesor && user?.email) {
       this.modulosService.getModulosProfesor(user.email).subscribe(mods => {
@@ -167,7 +176,7 @@ export class TareaFormComponent implements OnInit {
       }
     });
 
-    // Detectamos si la URL contiene un ID para activar el modo edición
+    // Detectamos si la URL contiene un ID para activar el modo ediciÃ³n
     this.route.paramMap.subscribe(params => {
       const id = params.get('id');
       if (id && id !== 'nueva') {
@@ -179,16 +188,24 @@ export class TareaFormComponent implements OnInit {
   }
 
   /**
-   * Recupera el catálogo de actividades desde el servicio.
+   * Recupera el catÃ¡logo de actividades desde el servicio.
    */
   cargarActividades(): void {
     this.tareasService.getActividades().subscribe(data => {
-      this.actividades = data;
+      // Normalizar IDs por si el backend los devuelve como string
+      this.actividades = (data || []).map((a: any) => ({
+        ...a,
+        id: typeof a?.id === 'number' ? a.id : Number(a?.id)
+      }));
+      const ids = this.getActividadesSeleccionadasIds();
+      if (ids.length > 0) {
+        this.actualizarRevisionesModulos(ids);
+      }
     });
   }
 
   /**
-   * Recupera los datos de una tarea específica y los carga en el formulario.
+   * Recupera los datos de una tarea especÃ­fica y los carga en el formulario.
    */
   cargarDatosTarea(id: number): void {
     this.tareasService.getTareaById(id).subscribe(tarea => {
@@ -199,16 +216,26 @@ export class TareaFormComponent implements OnInit {
         if (tarea.codigo_auto) {
           this.codigoTarea = tarea.codigo_auto;
         }
+        this.documentoActual = tarea.documento ?? null;
+        this.documentoFile = null;
         // Mapeamos los datos del objeto al formulario reactivo
-        this.tareaForm.patchValue(tarea);
-        // Regeneramos el listado de módulos revisables según las actividades cargadas
-        if (tarea.actividadesSeleccionadas) {
-          this.actualizarRevisionesModulos(tarea.actividadesSeleccionadas, tarea.revisionesModulos);
+        const actividadesNorm = this.normalizarIds(tarea.actividadesSeleccionadas);
+        this.tareaForm.patchValue({ ...tarea, actividadesSeleccionadas: actividadesNorm });
+        // Regeneramos el listado de mÃ³dulos revisables segÃºn las actividades cargadas
+        if (actividadesNorm.length > 0) {
+          this.actualizarRevisionesModulos(actividadesNorm, tarea.revisionesModulos);
         }
-        // Aplicamos la lógica de bloqueo y permisos
+        // Aplicamos la lÃ³gica de bloqueo y permisos
         this.aplicarBloqueos(tarea);
       }
     });
+  }
+
+  private normalizarIds(ids: unknown): number[] {
+    const arr = Array.isArray(ids) ? ids : [];
+    return arr
+      .map((v) => (typeof v === 'number' ? v : Number(v)))
+      .filter((n) => Number.isFinite(n));
   }
 
   /**
@@ -223,7 +250,7 @@ export class TareaFormComponent implements OnInit {
       actividadesSeleccionadas: [[]],
       evaluacionEmpresa: ['Sin Calificar'],
       comentarioEmpresa: [''],
-      revisionesModulos: this.fb.array([]), // Array dinámico de revisiones por módulo
+      revisionesModulos: this.fb.array([]), // Array dinÃ¡mico de revisiones por mÃ³dulo
       revisadoProfesor: [false],
       comentarioProfesor: ['']
     });
@@ -231,25 +258,42 @@ export class TareaFormComponent implements OnInit {
     if (this.esAlumno) {
       this.tareaForm.get('comentarioProfesor')?.disable();
     }
+
+    if (this.esProfesor) {
+      this.aplicarPermisosProfesor();
+    }
+  }
+
+  private aplicarPermisosProfesor(): void {
+    if (!this.esProfesor) return;
+
+    this.tareaForm.get('titulo')?.disable({ emitEvent: false });
+    this.tareaForm.get('fechaIni')?.disable({ emitEvent: false });
+    this.tareaForm.get('fechaFin')?.disable({ emitEvent: false });
+    this.tareaForm.get('descripcion')?.disable({ emitEvent: false });
+    this.tareaForm.get('evaluacionEmpresa')?.disable({ emitEvent: false });
+    this.tareaForm.get('comentarioEmpresa')?.disable({ emitEvent: false });
+    this.tareaForm.get('comentarioProfesor')?.disable({ emitEvent: false });
   }
 
   /**
-   * Gestión del Modal de Actividades
+   * GestiÃ³n del Modal de Actividades
    */
   abrirModalActividades(): void {
     this.modalActividadesVisible = true;
   }
 
   /**
-   * Se ejecuta cuando el modal de selección emite una nueva lista de IDs.
+   * Se ejecuta cuando el modal de selecciÃ³n emite una nueva lista de IDs.
    */
   onSeleccionChange(ids: number[]): void {
-    this.tareaForm.get('actividadesSeleccionadas')?.setValue(ids);
-    this.actualizarRevisionesModulos(ids);
+    const normalizadas = this.normalizarIds(ids);
+    this.tareaForm.get('actividadesSeleccionadas')?.setValue(normalizadas);
+    this.actualizarRevisionesModulos(normalizadas);
   }
 
   /**
-   * Comprueba si un módulo (por nombre o siglas) pertenece al profesor actual.
+   * Comprueba si un mÃ³dulo (por nombre o siglas) pertenece al profesor actual.
    */
   perteneceAlTutor(nombreModulo: string): boolean {
     if (!this.esProfesor) return true;
@@ -260,7 +304,7 @@ export class TareaFormComponent implements OnInit {
   }
 
   /**
-   * Recorre la lista de controles de revisión y deshabilita los que no pertenecen al tutor.
+   * Recorre la lista de controles de revisiÃ³n y deshabilita los que no pertenecen al tutor.
    */
   actualizarControlesPorTutor(): void {
     if (!this.esProfesor) return;
@@ -277,9 +321,9 @@ export class TareaFormComponent implements OnInit {
   }
 
   /**
-   * Comprueba si la tarea debe bloquearse según las reglas del negocio:
-   * - Si está totalmente revisada (todas las revisiones de módulos están en 'true')
-   * - O si se ha superado la fecha límite (fechaFin).
+   * Comprueba si la tarea debe bloquearse segÃºn las reglas del negocio:
+   * - Si estÃ¡ totalmente revisada (todas las revisiones de mÃ³dulos estÃ¡n en 'true')
+   * - O si se ha superado la fecha lÃ­mite (fechaFin).
    */
   checkBloqueada(tarea: Tarea): boolean {
     if (!tarea) return false;
@@ -299,7 +343,7 @@ export class TareaFormComponent implements OnInit {
   }
 
   /**
-   * Comprueba si el usuario actual tiene permisos para modificar la sección
+   * Comprueba si el usuario actual tiene permisos para modificar la secciÃ³n
    * de actividades relacionadas.
    */
   puedoEditarActividades(): boolean {
@@ -310,60 +354,53 @@ export class TareaFormComponent implements OnInit {
   }
 
   /**
-   * Aplica la lógica de bloqueo sobre los controles del formulario según el rol y estado.
+   * Aplica la lÃ³gica de bloqueo sobre los controles del formulario segÃºn el rol y estado.
    */
   aplicarBloqueos(tarea: Tarea): void {
     this.tareaBloqueada = this.checkBloqueada(tarea);
 
-    if (this.tareaBloqueada) {
-      if (this.esAlumno) {
-        // Alumno: bloqueado absoluto
+    if (this.esAlumno) {
+      if (this.tareaBloqueada) {
         this.tareaForm.disable();
-      } else if (this.esProfesor) {
-        // Profesor: bloquea campos generales y de empresa, permitiendo solo su evaluación y actividades
-        this.tareaForm.get('titulo')?.disable();
-        this.tareaForm.get('fechaIni')?.disable();
-        this.tareaForm.get('fechaFin')?.disable();
-        this.tareaForm.get('descripcion')?.disable();
-        this.tareaForm.get('evaluacionEmpresa')?.disable();
-        this.tareaForm.get('comentarioEmpresa')?.disable();
-
-        // Habilita comentarios y módulos de su competencia
-        this.tareaForm.get('comentarioProfesor')?.enable();
-        this.actualizarControlesPorTutor();
-      }
-    } else {
-      // Tarea no bloqueada: comportamiento estándar
-      if (this.esAlumno) {
-        this.tareaForm.get('comentarioProfesor')?.disable();
-        this.revisionesModulosArray.disable();
       } else {
         this.tareaForm.enable();
-        this.actualizarControlesPorTutor();
+        this.tareaForm.get('comentarioProfesor')?.disable();
+        this.revisionesModulosArray.disable();
       }
+      return;
     }
+
+    if (this.esProfesor) {
+      this.tareaForm.enable({ emitEvent: false });
+      this.aplicarPermisosProfesor();
+      this.actualizarControlesPorTutor();
+      return;
+    }
+
+    this.tareaForm.enable();
   }
 
   /**
-   * Lógica de Módulos Dinámicos:
-   * Calcula los módulos únicos presentes en las actividades seleccionadas y crea 
-   * un control de revisión (checkbox) para cada uno de ellos.
+   * LÃ³gica de MÃ³dulos DinÃ¡micos:
+   * Calcula los mÃ³dulos Ãºnicos presentes en las actividades seleccionadas y crea 
+   * un control de revisiÃ³n (checkbox) para cada uno de ellos.
    */
   private actualizarRevisionesModulos(ids: number[], revisionesCargadas?: any[]): void {
-    if (!ids || ids.length === 0) {
+    const idsNormalizadas = this.normalizarIds(ids);
+    if (!idsNormalizadas || idsNormalizadas.length === 0) {
       this.revisionesModulosArray.clear();
       return;
     }
 
-    // Identificamos los nombres de los módulos únicos implicados
+    // Identificamos los nombres de los mÃ³dulos Ãºnicos implicados
     const modulosSeleccionados: string[] = [];
     this.actividades
-      .filter(a => ids.includes(a.id))
+      .filter(a => idsNormalizadas.includes(a.id))
       .forEach(a => {
         if (a.modulo) {
           a.modulo.split(',').forEach(m => {
             const trimmed = m.trim();
-            if (trimmed && trimmed !== 'Sin módulos') {
+            if (trimmed && trimmed !== 'Sin mÃ³dulos') {
               modulosSeleccionados.push(trimmed);
             }
           });
@@ -372,7 +409,7 @@ export class TareaFormComponent implements OnInit {
 
     const modulosUnicos = [...new Set(modulosSeleccionados)];
 
-    // Mantenemos el estado de los checkboxes y comentarios actuales para no resetearlos al añadir/quitar actividades
+    // Mantenemos el estado de los checkboxes y comentarios actuales para no resetearlos al aÃ±adir/quitar actividades
     const estadosActuales = new Map<string, boolean>();
     const comentariosActuales = new Map<string, string>();
 
@@ -384,14 +421,14 @@ export class TareaFormComponent implements OnInit {
       });
     }
 
-    // También mantenemos el estado de los checkboxes y comentarios en pantalla si ya existen controles en el FormArray
+    // TambiÃ©n mantenemos el estado de los checkboxes y comentarios en pantalla si ya existen controles en el FormArray
     this.revisionesModulosArray.controls.forEach(ctrl => {
       const val = ctrl.value;
       estadosActuales.set(val.modulo, val.revisado);
       comentariosActuales.set(val.modulo, val.comentario || '');
     });
 
-    // Reconstruimos el FormArray con los módulos únicos detectados
+    // Reconstruimos el FormArray con los mÃ³dulos Ãºnicos detectados
     this.revisionesModulosArray.clear();
     modulosUnicos.forEach(mod => {
       const grupo = this.fb.group({
@@ -418,25 +455,29 @@ export class TareaFormComponent implements OnInit {
   }
 
   /**
-   * Getter para acceder fácilmente al FormArray de revisiones desde el HTML.
+   * Getter para acceder fÃ¡cilmente al FormArray de revisiones desde el HTML.
    */
   get revisionesModulosArray(): FormArray {
     return this.tareaForm.get('revisionesModulos') as FormArray;
+  }
+
+  getActividadesSeleccionadasIds(): number[] {
+    return this.normalizarIds(this.tareaForm.get('actividadesSeleccionadas')?.value);
   }
 
   /**
    * Devuelve los objetos ActividadDTO completos de las seleccionadas en el formulario.
    */
   getActividadesSeleccionadas(): ActividadDTO[] {
-    const ids = this.tareaForm.get('actividadesSeleccionadas')?.value as number[];
-    return this.actividades.filter(a => ids?.includes(a.id));
+    const ids = this.getActividadesSeleccionadasIds();
+    return this.actividades.filter(a => ids.includes(a.id));
   }
 
   /**
-   * Permite añadir o quitar una actividad individualmente desde los badges de la UI.
+   * Permite aÃ±adir o quitar una actividad individualmente desde los badges de la UI.
    */
   toggleActividad(id: number): void {
-    const seleccionadas = this.tareaForm.get('actividadesSeleccionadas')?.value as number[];
+    const seleccionadas = this.getActividadesSeleccionadasIds();
     const index = seleccionadas.indexOf(id);
     if (index > -1) {
       seleccionadas.splice(index, 1);
@@ -453,6 +494,10 @@ export class TareaFormComponent implements OnInit {
    * Llama al servicio para Crear o Actualizar la tarea actual.
    */
   guardar(): void {
+    // Validación específica de profesor: si marca un módulo como revisado,
+    // el comentario asociado no puede ir vacío y debe tener mínimo 10 caracteres.
+    this.validarComentariosProfesor();
+
     if (this.tareaForm.valid) {
       const datos = {
         ...this.tareaForm.getRawValue(),
@@ -461,29 +506,149 @@ export class TareaFormComponent implements OnInit {
       };
 
       if (this.esEdicion) {
-        this.tareasService.updateTarea(datos).subscribe(() => {
-          this.alertService.exito('Tarea actualizada', 'La tarea se ha guardado correctamente.');
-          this.volver();
+        this.tareasService.updateTarea(datos).subscribe({
+          next: () => {
+            if (this.documentoFile && this.idTarea) {
+              this.tareasService.subirDocumento(this.idTarea, this.documentoFile).subscribe({
+                next: () => {
+                  this.gestionarPostGuardado();
+                },
+                error: (err) => {
+                  const msg = err?.error?.message || err?.message || 'No se pudo subir el documento.';
+                  this.alertService.error('Error al subir el documento', msg);
+                }
+              });
+            } else {
+              this.gestionarPostGuardado();
+            }
+          },
+          error: (err) => {
+            const msg = err?.error?.message || err?.message || 'No se pudo guardar la tarea.';
+            this.alertService.error('Error al guardar', msg);
+          }
         });
       } else {
-        this.tareasService.createTarea(datos).subscribe(() => {
-          this.alertService.exito('Tarea registrada', 'La tarea se ha creado correctamente.');
-          this.volver();
+        this.tareasService.createTarea(datos).subscribe({
+          next: (res: any) => {
+            const nuevoId = res.id || res.idTarea; // Depending on backend response
+            if (this.documentoFile && nuevoId) {
+              this.tareasService.subirDocumento(nuevoId, this.documentoFile).subscribe({
+                next: () => {
+                  this.alertService.exito('Tarea registrada', 'La tarea se ha creado correctamente.');
+                  this.volver();
+                },
+                error: (err) => {
+                  const msg = err?.error?.message || err?.message || 'No se pudo subir el documento.';
+                  this.alertService.error('Error al subir el documento', msg);
+                }
+              });
+            } else {
+              this.alertService.exito('Tarea registrada', 'La tarea se ha creado correctamente.');
+              this.volver();
+            }
+          },
+          error: (err) => {
+            const msg = err?.error?.message || err?.message || 'No se pudo crear la tarea.';
+            this.alertService.error('Error al guardar', msg);
+          }
         });
       }
     } else {
-      this.alertService.advertencia('Formulario no válido', 'Por favor, completa los campos obligatorios antes de continuar.');
+      this.tareaForm.markAllAsTouched();
+      this.alertService.advertencia('Formulario no vÃ¡lido', 'Por favor, completa los campos obligatorios antes de continuar.');
+    }
+  }
+
+  private gestionarPostGuardado(): void {
+    this.alertService.exito('Tarea actualizada', 'La tarea se ha guardado correctamente.');
+
+    if (!this.esProfesor || !this.idAlumno || !this.idTarea) {
+      this.volver();
+      return;
+    }
+
+    this.tareasService.getTareasByAlumno(this.idAlumno).subscribe({
+      next: (tareas) => {
+        const siguiente = [...(tareas || [])]
+          .filter((tarea) => tarea.id !== this.idTarea)
+          .filter((tarea) => (tarea.progreso?.actual ?? 0) < (tarea.progreso?.total ?? 1))
+          .sort((a, b) => {
+            const fechaA = a.fechaFin ? new Date(a.fechaFin).getTime() : Number.MAX_SAFE_INTEGER;
+            const fechaB = b.fechaFin ? new Date(b.fechaFin).getTime() : Number.MAX_SAFE_INTEGER;
+            if (fechaA !== fechaB) return fechaA - fechaB;
+            return a.id - b.id;
+          })[0];
+
+        if (!siguiente) {
+          this.siguienteTareaPendienteId = null;
+          this.modalSiguienteTareaVisible = true;
+          return;
+        }
+
+        this.siguienteTareaPendienteId = siguiente.id;
+        this.modalSiguienteTareaVisible = true;
+      },
+
+      error: () => {
+        this.volver();
+      }
+    });
+  }
+
+  irASiguienteTareaPendiente(): void {
+    if (!this.siguienteTareaPendienteId || !this.idAlumno) {
+      this.cerrarModalSiguienteTarea();
+      this.volver();
+      return;
+    }
+
+    const siguienteId = this.siguienteTareaPendienteId;
+    this.cerrarModalSiguienteTarea();
+    this.router.navigate(['/tarea', siguienteId], { queryParams: { alumnoId: this.idAlumno }, replaceUrl: true });
+  }
+
+  cerrarModalSiguienteTarea(): void {
+    this.modalSiguienteTareaVisible = false;
+    this.siguienteTareaPendienteId = null;
+  }
+
+  cancelarPasoASiguienteTarea(): void {
+    this.cerrarModalSiguienteTarea();
+    this.volver();
+  }
+
+  private validarComentariosProfesor(): void {
+    if (!this.esProfesor) return;
+
+    this.revisionesModulosArray.controls.forEach(ctrl => {
+      // Respetar controles deshabilitados (p.ej. módulos que no son del tutor)
+      if (ctrl.disabled) return;
+
+      const comentarioCtrl = ctrl.get('comentario');
+      if (!comentarioCtrl) return;
+
+      comentarioCtrl.setValidators([Validators.required, Validators.minLength(10)]);
+
+      comentarioCtrl.updateValueAndValidity({ emitEvent: false });
+    });
+
+    // Forzar feedback visual si el usuario intenta guardar sin cumplir validación
+    if (this.tareaForm.invalid) {
+      this.tareaForm.markAllAsTouched();
+      this.revisionesModulosArray.controls.forEach(ctrl => {
+        ctrl.get('comentario')?.markAsDirty();
+      });
     }
   }
 
   /**
-   * Navegación hacia atrás.
+   * NavegaciÃ³n hacia atrÃ¡s.
    */
   volver(): void {
     this.location.back();
   }
 
-  // ─── Gestión de Adjuntos ──────────────────────────────────────────────────
+  // â”€â”€â”€ GestiÃ³n de Adjuntos â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   /**
    * Se ejecuta cuando el usuario selecciona archivos con el input nativo.
@@ -491,7 +656,7 @@ export class TareaFormComponent implements OnInit {
   onFilesSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files) {
-      this.agregarArchivos(Array.from(input.files));
+      this.asignarDocumento(input.files[0] ?? null);
       // Resetear input para permitir re-seleccionar el mismo archivo
       input.value = '';
     }
@@ -503,38 +668,54 @@ export class TareaFormComponent implements OnInit {
   onFileDrop(event: DragEvent): void {
     event.preventDefault();
     if (event.dataTransfer?.files) {
-      this.agregarArchivos(Array.from(event.dataTransfer.files));
+      this.asignarDocumento(event.dataTransfer.files[0] ?? null);
     }
   }
 
   /**
-   * Añade archivos a la lista de adjuntos, validando tamaño y evitando duplicados.
+   * Valida y asigna el PDF seleccionado por el alumno.
    */
-  private agregarArchivos(archivos: File[]): void {
+  private asignarDocumento(archivo: File | null): void {
     const MAX_SIZE_MB = 20;
-    archivos.forEach(archivo => {
-      const yaExiste = this.adjuntos.some(a => a.name === archivo.name && a.size === archivo.size);
-      if (yaExiste) return;
-      if (archivo.size > MAX_SIZE_MB * 1024 * 1024) {
-        this.alertService.advertencia(
-          'Archivo demasiado grande',
-          `"${archivo.name}" supera el límite de ${MAX_SIZE_MB} MB.`
-        );
-        return;
-      }
-      this.adjuntos.push(archivo);
-    });
+    if (!archivo) {
+      return;
+    }
+
+    const extension = archivo.name.split('.').pop()?.toLowerCase() ?? '';
+    const mimeValido = archivo.type === 'application/pdf' || archivo.type === '';
+
+    if (extension !== 'pdf' || !mimeValido) {
+      this.alertService.advertencia(
+        'Formato no permitido',
+        'Solo se permite subir un archivo PDF.'
+      );
+      return;
+    }
+
+    if (archivo.size > MAX_SIZE_MB * 1024 * 1024) {
+      this.alertService.advertencia(
+        'Archivo demasiado grande',
+        ('"' + archivo.name + '" supera el limite de ' + MAX_SIZE_MB + ' MB.')
+      );
+      return;
+    }
+
+    this.documentoFile = archivo;
   }
 
   /**
-   * Elimina un archivo adjunto por su índice.
+   * Elimina el PDF nuevo seleccionado.
    */
-  eliminarAdjunto(index: number): void {
-    this.adjuntos.splice(index, 1);
+  eliminarAdjunto(): void {
+    this.documentoFile = null;
   }
 
   /**
-   * Devuelve la clase CSS del icono según la extensión del archivo.
+   * (Nota) El "Abrir" del PDF en este formulario se ha eliminado a petición.
+   * La visualización del PDF se mantiene en "Gestión de Tareas".
+   */
+  /**
+   * Devuelve la clase CSS del icono segÃºn la extensiÃ³n del archivo.
    */
   getAdjuntoIconClass(nombre: string): string {
     const ext = nombre.split('.').pop()?.toLowerCase() ?? '';
@@ -548,7 +729,7 @@ export class TareaFormComponent implements OnInit {
   }
 
   /**
-   * Devuelve la clase del icono Font Awesome según la extensión del archivo.
+   * Devuelve la clase del icono Font Awesome segÃºn la extensiÃ³n del archivo.
    */
   getAdjuntoIcon(nombre: string): string {
     const ext = nombre.split('.').pop()?.toLowerCase() ?? '';
@@ -563,7 +744,7 @@ export class TareaFormComponent implements OnInit {
   }
 
   /**
-   * Formatea el tamaño de un archivo en bytes a una representación legible.
+   * Formatea el tamaÃ±o de un archivo en bytes a una representaciÃ³n legible.
    */
   formatFileSize(bytes: number): string {
     if (bytes < 1024)        return `${bytes} B`;
@@ -571,3 +752,4 @@ export class TareaFormComponent implements OnInit {
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   }
 }
+

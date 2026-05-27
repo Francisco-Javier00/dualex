@@ -35,6 +35,19 @@ export class SeleccionActividadesModalComponent implements OnInit, OnDestroy, On
   busqueda = '';                        // Texto del buscador
   actividadesFiltradas: ActividadDTO[] = []; // Lista reducida tras aplicar el filtro
   seleccionadasSet = new Set<number>();      // Set optimizado para búsquedas rápidas (O(1))
+  seleccionadasLocal: number[] = [];         // Copia local (no mutar @Input)
+
+  private normalizarId(id: unknown): number {
+    const n = typeof id === 'number' ? id : Number(id);
+    return Number.isFinite(n) ? n : NaN;
+  }
+
+  private normalizarIds(ids: unknown): number[] {
+    const arr = Array.isArray(ids) ? ids : [];
+    return arr
+      .map((v) => this.normalizarId(v))
+      .filter((n) => Number.isFinite(n));
+  }
 
   /**
    * Inicialización del componente
@@ -48,8 +61,10 @@ export class SeleccionActividadesModalComponent implements OnInit, OnDestroy, On
    * Se ejecuta cada vez que el padre cambia alguna propiedad de entrada.
    */
   ngOnChanges(): void {
+    // Mantener una copia local para evitar mutar el @Input (y problemas con getters que devuelven arrays nuevos)
+    this.seleccionadasLocal = this.normalizarIds(this.seleccionadas);
     // Actualizamos el Set de IDs para búsquedas eficientes en el HTML
-    this.seleccionadasSet = new Set(this.seleccionadas || []);
+    this.seleccionadasSet = new Set(this.seleccionadasLocal);
     
     if (this.visible) {
       this.filtrar();          
@@ -88,8 +103,10 @@ export class SeleccionActividadesModalComponent implements OnInit, OnDestroy, On
     this.cdr.markForCheck();
   }
 
-  estaSeleccionada(id: number): boolean {
-    return this.seleccionadasSet.has(id);
+  estaSeleccionada(id: unknown): boolean {
+    const n = this.normalizarId(id);
+    if (!Number.isFinite(n)) return false;
+    return this.seleccionadasSet.has(n);
   }
 
   /**
@@ -104,19 +121,20 @@ export class SeleccionActividadesModalComponent implements OnInit, OnDestroy, On
    * Si la actividad ya estaba seleccionada, la quita. Si no, la añade.
    * Emite el nuevo array de IDs al componente padre.
    */
-  toggle(id: number): void {
-    if (!this.seleccionadas) this.seleccionadas = [];
-    
-    const index = this.seleccionadas.indexOf(id);
+  toggle(id: unknown): void {
+    const n = this.normalizarId(id);
+    if (!Number.isFinite(n)) return;
+
+    const index = this.seleccionadasLocal.indexOf(n);
     if (index > -1) {
-      this.seleccionadas.splice(index, 1); // Quitar
+      this.seleccionadasLocal.splice(index, 1); // Quitar
     } else {
-      this.seleccionadas.push(id);         // Añadir
+      this.seleccionadasLocal.push(n);         // Añadir
     }
     
-    this.seleccionadasSet = new Set(this.seleccionadas);
+    this.seleccionadasSet = new Set(this.seleccionadasLocal);
     // Emitimos una copia del array para que Angular detecte el cambio de referencia
-    this.seleccionChange.emit([...this.seleccionadas]);
+    this.seleccionChange.emit([...this.seleccionadasLocal]);
     this.cdr.markForCheck();
   }
 

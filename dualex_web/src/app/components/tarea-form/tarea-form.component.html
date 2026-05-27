@@ -1,4 +1,4 @@
-<div class="container-fluid py-4 mt-4 px-md-5 px-3" [formGroup]="tareaForm">
+﻿<div class="container-fluid py-4 mt-4 px-md-5 px-3" [formGroup]="tareaForm">
   <!-- Cabecera de Acción -->
   <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
     <div class="d-flex align-items-start gap-3">
@@ -17,7 +17,7 @@
       </div>
     </div>
     <div class="d-flex gap-2">
-      <button type="button" class="btn btn-primary rounded-3 px-4 py-2 shadow-sm" (click)="guardar()" [disabled]="tareaForm.invalid">
+      <button type="button" class="btn btn-primary rounded-3 px-4 py-2 shadow-sm" (click)="guardar()" [disabled]="tareaForm.disabled">
         <i class="fa-solid fa-save me-2"></i> Guardar Tarea
       </button>
     </div>
@@ -58,9 +58,7 @@
 
     <!-- Segunda Fila: Actividades, Adjuntos y Descripción -->
     <div class="row g-4">
-      <!-- Columna Izquierda: Actividades y Adjuntos -->
       <div class="col-lg-4 d-flex flex-column gap-4">
-        
         <!-- Actividades Relacionadas -->
         <div>
           <label class="form-label fw-bold text-muted small text-uppercase">Actividades Relacionadas</label>
@@ -79,7 +77,6 @@
                 <i class="fa-solid fa-plus me-1"></i> Añadir
               </button>
             </div>
-
             <div class="d-flex flex-column gap-2 overflow-auto" style="max-height: 250px;">
               <div *ngFor="let act of getActividadesSeleccionadas()"
                 class="bg-white p-2 px-3 rounded-3 border d-flex justify-content-between align-items-center shadow-sm animate-fade-in">
@@ -96,50 +93,76 @@
         <!-- Adjuntos -->
         <div>
           <label class="form-label fw-bold text-muted small text-uppercase">Documentos adjuntos <span class="text-muted fw-normal">(opcional)</span></label>
-
-          <!-- Input oculto -->
-          <input #fileInput type="file" class="d-none" multiple
-            accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.png,.jpg,.jpeg,.gif,.zip"
-            (change)="onFilesSelected($event)">
-
-          <!-- Zona de drop (estilo Excel) -->
-          <div class="file-drop-zone border-dashed rounded-3 p-3 text-center bg-light cursor-pointer transition-all"
-            (click)="!tareaForm.disabled && fileInput.click()"
-            (dragover)="$event.preventDefault()"
-            (drop)="onFileDrop($event)"
-            id="btn-adjuntar-documento"
-            [class.disabled-zone]="tareaForm.disabled">
-
-            <!-- Estado vacío -->
-            <div *ngIf="adjuntos.length === 0" class="py-2">
-              <i class="fa-solid fa-cloud-arrow-up text-primary fs-4 mb-1"></i>
-              <p class="mb-0 small fw-semibold text-dark">Arrastra archivos o haz clic</p>
-              <p class="text-muted extra-small mb-0">PDF, Word, Excel, imágenes, ZIP &mdash; máx. 20 MB</p>
+          
+          <!-- Si es profesor, solo mostramos el botón de ver PDF si hay uno, limpio y sin zonas de arrastre -->
+          <div *ngIf="esProfesor">
+            <div *ngIf="documentoActual || documentoFile; else noDocProfesor">
+              <a [href]="tareasService.getDocumentoUrl(idTarea!) + '&token=' + jwtToken" 
+                 target="_blank" 
+                 class="btn btn-primary w-100 py-2 shadow-sm d-flex align-items-center justify-content-center gap-2">
+                <i class="fa-solid fa-file-pdf fs-5"></i> Ver PDF
+              </a>
+              <p class="text-muted text-center extra-small mt-2 mb-0">Documento actual: {{ documentoActual || documentoFile?.name }}</p>
             </div>
-
-            <!-- Lista de archivos -->
-            <div *ngIf="adjuntos.length > 0" class="d-flex flex-column gap-1 text-start">
-              <div *ngFor="let adj of adjuntos; let i = index"
-                class="adjunto-chip d-flex align-items-center gap-2 px-2 py-1 rounded-2 border animate-fade-in"
-                [ngClass]="getAdjuntoIconClass(adj.name)">
-                <i [class]="getAdjuntoIcon(adj.name)" style="font-size:0.8rem; flex-shrink:0;"></i>
-                <span class="extra-small fw-semibold text-truncate flex-grow-1" [title]="adj.name + ' · ' + formatFileSize(adj.size)">{{ adj.name }}</span>
-                <span class="extra-small text-muted" style="flex-shrink:0;">{{ formatFileSize(adj.size) }}</span>
-                <button type="button" class="btn btn-link p-0 lh-1 chip-remove ms-1"
-                  (click)="$event.stopPropagation(); eliminarAdjunto(i)" [disabled]="tareaForm.disabled" title="Eliminar">
-                  <i class="fa-solid fa-xmark" style="font-size:0.7rem;"></i>
-                </button>
+            <ng-template #noDocProfesor>
+              <div class="bg-light p-3 border rounded-3 text-center text-muted small italic">
+                El alumno no ha adjuntado ningún PDF.
               </div>
-              <!-- Pie: añadir más -->
-              <p class="extra-small text-muted text-center mb-0 mt-1">Haz clic o arrastra para añadir más</p>
-            </div>
+            </ng-template>
+          </div>
 
+          <!-- Si es alumno, mantenemos la zona de drop y el flujo normal -->
+          <div *ngIf="!esProfesor">
+            <input #fileInput type="file" class="d-none"
+              accept=".pdf"
+              (change)="onFilesSelected($event)">
+            <div class="file-drop-zone border-dashed rounded-3 p-3 text-center bg-light cursor-pointer transition-all"
+              (click)="!tareaForm.disabled && fileInput.click()"
+              (dragover)="$event.preventDefault()"
+              (drop)="onFileDrop($event)"
+              id="btn-adjuntar-documento"
+              [class.disabled-zone]="tareaForm.disabled">
+              
+              <div *ngIf="!documentoFile && !documentoActual" class="py-2">
+                <i class="fa-solid fa-cloud-arrow-up text-primary fs-4 mb-1"></i>
+                <p class="mb-0 small fw-semibold text-dark">Arrastra el PDF o haz clic</p>
+                <p class="text-muted extra-small mb-0">Solo PDF &mdash; máx. 20 MB</p>
+              </div>
+
+              <div *ngIf="documentoActual || documentoFile" class="d-flex flex-column gap-2 text-start">
+                <div *ngIf="documentoActual"
+                  class="adjunto-chip d-flex align-items-center gap-2 px-2 py-1 rounded-2 border animate-fade-in adjunto-icon--pdf">
+                  <i class="fa-solid fa-file-pdf" style="font-size:0.8rem; flex-shrink:0;"></i>
+                  <span class="extra-small fw-semibold text-truncate flex-grow-1" [title]="documentoActual">{{ documentoActual }}</span>
+                  <a [href]="tareasService.getDocumentoUrl(idTarea!) + '&token=' + jwtToken" 
+                     target="_blank" 
+                     class="btn btn-xs btn-primary py-1 px-2 text-white shadow-sm"
+                     (click)="$event.stopPropagation()"
+                     title="Ver PDF en pestaña nueva">
+                    Ver PDF
+                  </a>
+                </div>
+
+                <div *ngIf="documentoFile"
+                  class="adjunto-chip d-flex align-items-center gap-2 px-2 py-1 rounded-2 border animate-fade-in adjunto-icon--pdf">
+                  <i class="fa-solid fa-file-pdf" style="font-size:0.8rem; flex-shrink:0;"></i>
+                  <span class="extra-small fw-semibold text-truncate flex-grow-1" [title]="documentoFile.name">{{ documentoFile.name }}</span>
+                  <span class="extra-small text-muted" style="flex-shrink:0;">{{ formatFileSize(documentoFile.size) }}</span>
+                  <button type="button" class="btn btn-link p-0 lh-1 chip-remove ms-1"
+                    (click)="$event.stopPropagation(); eliminarAdjunto()" [disabled]="tareaForm.disabled" title="Eliminar">
+                    <i class="fa-solid fa-xmark" style="font-size:0.7rem;"></i>
+                  </button>
+                </div>
+
+                <p class="extra-small text-muted text-center mb-0 mt-1">
+                  {{ documentoActual ? 'Puedes sustituir el PDF seleccionando otro.' : 'El PDF es opcional.' }}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
-
       </div>
-
-      <!-- Descripción Detallada -->
+<!-- Descripción Detallada -->
       <div class="col-lg-8 d-flex flex-column">
         <label class="form-label fw-bold text-muted small text-uppercase">Descripción Detallada</label>
         <div class="editor-container border rounded-3 overflow-hidden shadow-sm bg-white flex-grow-1">
@@ -150,11 +173,10 @@
 
     <hr class="my-4 opacity-25">
 
-    <div class="row g-4">
-      <!-- Columna Izquierda: Evaluación Empresa -->
-      <div class="col-lg-6">
+    <div class="d-flex flex-column gap-4">
+      <!-- Evaluación Empresa (ancho completo) -->
+      <div class="col-12">
         <h5 class="fw-bold mb-3"><i class="fa-solid fa-building text-secondary me-2"></i>Evaluación Empresa</h5>
-        
         <div class="bg-white p-3 rounded-4 border shadow-sm d-flex flex-column gap-3">
           <div>
             <label class="form-label small fw-bold text-uppercase opacity-75">Calificación</label>
@@ -165,7 +187,6 @@
               </select>
             </div>
           </div>
-          
           <div>
             <label class="form-label fw-bold text-muted small text-uppercase">Comentario Empresa</label>
             <textarea formControlName="comentarioEmpresa" class="form-control border shadow-sm rounded-3 px-3 py-2" rows="3" placeholder="Escribe las observaciones de la empresa..."></textarea>
@@ -173,18 +194,16 @@
         </div>
       </div>
 
-      <!-- Columna Derecha: Evaluación Profesor -->
-      <div class="col-lg-6">
+      <!-- Evaluación Profesor (abajo) -->
+      <div class="col-12">
         <h5 class="fw-bold mb-3"><i class="fa-solid fa-chalkboard-user text-secondary me-2"></i>Evaluación Profesor</h5>
-
-        <!-- Lista de Módulos a evaluar con sus comentarios específicos, uno debajo de otro -->
+        
         <div class="d-flex flex-column gap-3" formArrayName="revisionesModulos" *ngIf="revisionesModulosArray.controls.length > 0; else noModulos">
           <div *ngFor="let mod of revisionesModulosArray.controls; let i=index" [formGroupName]="i" class="w-100">
             <div class="bg-light-subtle p-3 rounded-3 border shadow-sm flex-column d-flex gap-2">
-              
               <div class="d-flex justify-content-between align-items-center">
                 <span class="small fw-bold text-dark" style="font-size: 0.9rem;">
-                  <i class="fa-solid fa-book text-secondary me-1"></i> {{ mod.value.modulo }}
+                  <i class="fa-solid fa-book text-secondary me-1"></i> {{ mod.get('modulo')?.value }}
                 </span>
                 <div class="form-check form-switch mb-0 d-flex align-items-center gap-2">
                   <input class="form-check-input" type="checkbox" formControlName="revisado" [id]="'mod-check-' + i" style="width: 2em; height: 1em; margin-top: 0.15em;">
@@ -193,31 +212,81 @@
                   </label>
                 </div>
               </div>
-
-              <!-- Cuadro de Comentario para este módulo (más pequeño) -->
               <div class="mt-1">
-                <textarea 
-                  formControlName="comentario" 
-                  class="form-control form-control-sm border shadow-xs rounded-2" 
-                  rows="2" 
-                  placeholder="Escribe una observación para este módulo..."></textarea>
+                <textarea formControlName="comentario" class="form-control form-control-sm border shadow-xs rounded-2" rows="2" placeholder="Escribe una observación para este módulo..."
+                  [class.is-invalid]="mod.get('comentario')?.invalid && (mod.get('comentario')?.dirty || mod.get('comentario')?.touched)"></textarea>
+                <div class="text-danger extra-small mt-1" *ngIf="mod.get('comentario')?.errors?.['required'] && (mod.get('comentario')?.dirty || mod.get('comentario')?.touched)">
+                  Este campo no puede estar vacío.
+                </div>
+                <div class="text-danger extra-small mt-1" *ngIf="mod.get('comentario')?.errors?.['minlength'] && (mod.get('comentario')?.dirty || mod.get('comentario')?.touched)">
+                  Mínimo 10 caracteres ({{ mod.get('comentario')?.value?.length || 0 }}/10)
+                </div>
               </div>
             </div>
           </div>
         </div>
-
         <ng-template #noModulos>
-          <div
-            class="bg-light-subtle p-4 rounded-3 border border-dashed text-center d-flex align-items-center justify-content-center"
-            style="min-height: 80px;">
+          <div class="bg-light-subtle p-4 rounded-3 border border-dashed text-center d-flex align-items-center justify-content-center" style="min-height: 80px;">
             <span class="text-muted small italic">No hay módulos vinculados a esta tarea.</span>
           </div>
         </ng-template>
+
       </div>
     </div>
+  </div>
+  
+  <!-- Botón Guardar adicional al final -->
+  <div class="d-flex justify-content-end mb-4">
+    <button type="button" class="btn btn-primary rounded-3 px-5 py-2 shadow-sm" (click)="guardar()" [disabled]="tareaForm.disabled">
+      <i class="fa-solid fa-save me-2"></i> Guardar Tarea
+    </button>
   </div>
 </div>
 <!-- Modal -->
 <app-seleccion-actividades-modal [(visible)]="modalActividadesVisible" [todasLasActividades]="actividades"
-  [seleccionadas]="tareaForm.get('actividadesSeleccionadas')?.value" (seleccionChange)="onSeleccionChange($event)">
+  [seleccionadas]="getActividadesSeleccionadasIds()" (seleccionChange)="onSeleccionChange($event)">
 </app-seleccion-actividades-modal>
+
+@if (modalSiguienteTareaVisible) {
+  <div class="modal d-block tarea-next-modal" tabindex="-1" role="dialog" aria-modal="true">
+    <div class="tarea-next-modal__backdrop" (click)="$event.stopPropagation()"></div>
+
+    <div class="modal-dialog modal-dialog-centered" role="document" style="z-index: 1056; position: relative; max-width: 460px;">
+      <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+        <div class="tarea-next-modal__top px-4 py-4">
+          <div class="d-flex align-items-center justify-content-between gap-3">
+            <div class="d-flex align-items-center gap-3">
+              <div class="tarea-next-modal__icon">
+                <i class="fa-solid fa-file-circle-check"></i>
+              </div>
+              <div>
+                <h5 class="mb-1 fw-bold text-dark">{{ siguienteTareaPendienteId ? 'Tarea guardada' : 'Todas las tareas corregidas' }}</h5>
+                <p class="mb-0 text-muted small">{{ siguienteTareaPendienteId ? 'Queda otra tarea pendiente para este alumno.' : 'Ya no hay más tareas pendientes para este alumno.' }}</p>
+              </div>
+            </div>
+            <button type="button" class="btn-close btn-close-sm" (click)="cancelarPasoASiguienteTarea()" aria-label="Cerrar"></button>
+          </div>
+        </div>
+
+        <div class="modal-body px-4 py-3">
+          <p class="mb-0 text-secondary" style="line-height: 1.6;">
+            {{ siguienteTareaPendienteId ? '¿Deseas pasar ahora a la siguiente tarea para corregirla?' : 'Se han revisado todas las tareas disponibles de este alumno.' }}
+          </p>
+        </div>
+
+        <div class="modal-footer border-0 px-4 pb-4 pt-2 d-flex gap-2 justify-content-end">
+          <button type="button" class="btn btn-outline-secondary rounded-3 px-3" (click)="cancelarPasoASiguienteTarea()">
+            {{ siguienteTareaPendienteId ? 'No, volver' : 'Cerrar' }}
+          </button>
+          @if (siguienteTareaPendienteId) {
+            <button type="button" class="btn btn-primary rounded-3 px-3 shadow-sm" (click)="irASiguienteTareaPendiente()">
+              Sí, seguir corrigiendo
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+

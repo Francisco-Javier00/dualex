@@ -225,7 +225,8 @@ class ModAlumnos {
         $sql = "SELECT DISTINCT idUsuario as id, u.nombre, apellidos, correo as email, 
                        DNI as dni, NUSS as nuss, NIA as nia, telefono, a.idCurso,
                        CAST(repetidor AS UNSIGNED) as repetidor,
-                       c.nombre as nombreCurso, idEmpresa
+                       c.nombre as nombreCurso, idEmpresa,
+                       (SELECT COUNT(*) FROM Tarea t WHERE t.idAlumno = a.idAlumno) as numTareas
                 FROM Usuario u
                 INNER JOIN Alumno a ON u.idUsuario = a.idAlumno 
                 LEFT JOIN Curso c ON a.idCurso = c.idCurso
@@ -354,7 +355,8 @@ class ModAlumnos {
         $sql = "SELECT DISTINCT idUsuario as id, u.nombre, apellidos, correo as email,
                        DNI as dni, NUSS as nuss, NIA as nia, telefono, a.idCurso,
                        CAST(repetidor AS UNSIGNED) as repetidor,
-                       c.nombre as nombreCurso, idEmpresa
+                       c.nombre as nombreCurso, idEmpresa,
+                       (SELECT COUNT(*) FROM Tarea t WHERE t.idAlumno = a.idAlumno) as numTareas
                 FROM Usuario u
                 INNER JOIN Alumno a ON u.idUsuario = a.idAlumno
                 LEFT JOIN Curso c ON a.idCurso = c.idCurso

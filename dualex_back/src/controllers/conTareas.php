@@ -117,6 +117,63 @@ class ConTareas extends BaseController {
         }
     }
 
+    public function subirDocumento() {
+        $this->checkRole(['ALUMNO']);
+        $idTarea = $_GET['id'] ?? null;
+        if (!$idTarea) {
+            $this->sendError("ID de tarea no proporcionado.", 400);
+        }
+        if (!isset($_FILES['documento'])) {
+            $this->sendError("No se ha enviado ningún archivo.", 400);
+        }
+
+        $archivo = $_FILES['documento'];
+        
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mimeType = finfo_file($finfo, $archivo['tmp_name']);
+        finfo_close($finfo);
+
+        if ($mimeType !== 'application/pdf') {
+            $this->sendError("Solo se permiten archivos PDF.", 400);
+        }
+        if ($archivo['error'] !== UPLOAD_ERR_OK) {
+            $this->sendError("Error al subir el archivo.", 400);
+        }
+
+        try {
+            $nombreArchivo = $this->modelo->subirDocumento($idTarea, $archivo);
+            if (!$nombreArchivo) {
+                $this->sendError("Error al guardar el archivo.", 500);
+            }
+            $this->sendResponse(['documento' => $nombreArchivo]);
+        } catch (Exception $e) {
+            $this->sendError($e);
+        }
+    }
+
+    public function descargarDocumento() {
+        $this->checkRole(['ALUMNO', 'PROFESOR', 'COORDINADOR']);
+        $idTarea = $_GET['id'] ?? null;
+        if (!$idTarea) {
+            $this->sendError("ID de tarea no proporcionado.", 400);
+        }
+
+        try {
+            $ruta = $this->modelo->obtenerRutaDocumento($idTarea);
+            if (!$ruta) {
+                $this->sendError("Documento no encontrado.", 404);
+            }
+
+            header('Content-Type: application/pdf');
+            header('Content-Disposition: inline; filename="' . basename($ruta) . '"');
+            header('Content-Length: ' . filesize($ruta));
+            readfile($ruta);
+            exit;
+        } catch (Exception $e) {
+            $this->sendError($e);
+        }
+    }
+
     public function eliminar() {
         $this->checkRole(['ALUMNO', 'PROFESOR', 'COORDINADOR']);
         $id = $_GET['id'] ?? null;

@@ -87,7 +87,7 @@ class ModTareas {
      * @return array Vector con las Tarea y sus autores.
      */
     public function listar() {
-        $sql = "SELECT t.idTarea as id, t.codigo_auto, t.titulo, t.fecha_inicio as fechaIni, t.fecha_fin as fechaFin, t.fecha_fin as fechaLimite, t.descripcion, t.calificacion, t.comentario as comentarioEmpresa, t.idAlumno, u.nombre as nombre_alumno, u.apellidos as apellidos_alumno 
+        $sql = "SELECT t.idTarea as id, t.codigo_auto, t.titulo, t.fecha_inicio as fechaIni, t.fecha_fin as fechaFin, t.fecha_fin as fechaLimite, t.descripcion, t.calificacion, t.comentario as comentarioEmpresa, t.documento, t.idAlumno, u.nombre as nombre_alumno, u.apellidos as apellidos_alumno 
                 FROM Tarea t 
                 JOIN Alumno a ON t.idAlumno = a.idAlumno
                 JOIN Usuario u ON a.idAlumno = u.idUsuario
@@ -116,7 +116,7 @@ class ModTareas {
      * @return array Lista de Tarea.
      */
     public function listarPorAlumno($idAlumno) {
-        $sql = "SELECT t.idTarea as id, t.codigo_auto, t.titulo, t.fecha_inicio as fechaIni, t.fecha_fin as fechaFin, t.fecha_fin as fechaLimite, t.descripcion, t.calificacion, t.comentario as comentarioEmpresa, t.idAlumno
+        $sql = "SELECT t.idTarea as id, t.codigo_auto, t.titulo, t.fecha_inicio as fechaIni, t.fecha_fin as fechaFin, t.fecha_fin as fechaLimite, t.descripcion, t.calificacion, t.comentario as comentarioEmpresa, t.documento, t.idAlumno
                 FROM Tarea t 
                 WHERE t.idAlumno = :idAlumno 
                 ORDER BY t.idTarea DESC";
@@ -145,7 +145,7 @@ class ModTareas {
      * @return array|false Datos de la tarea solicitada.
      */
     public function obtener($id) {
-        $sql = "SELECT t.idTarea as id, t.codigo_auto, t.titulo, t.fecha_inicio as fechaIni, t.fecha_fin as fechaFin, t.fecha_fin as fechaLimite, t.descripcion, t.calificacion, t.comentario as comentarioEmpresa, t.idAlumno
+        $sql = "SELECT t.idTarea as id, t.codigo_auto, t.titulo, t.fecha_inicio as fechaIni, t.fecha_fin as fechaFin, t.fecha_fin as fechaLimite, t.descripcion, t.calificacion, t.comentario as comentarioEmpresa, t.documento, t.idAlumno
                 FROM Tarea t 
                 WHERE t.idTarea = :id";
         $stmt = $this->db->prepare($sql);
@@ -178,7 +178,7 @@ class ModTareas {
         $t['actividadesSeleccionadas'] = array_map('intval', $stmtAct->fetchAll(PDO::FETCH_COLUMN));
         
         // Adjuntar revisiones por módulo
-        $sqlRev = "SELECT m.nombre as modulo, mtr.revisada, mtr.observaciones 
+        $sqlRev = "SELECT m.sigla as modulo, mtr.revisada, mtr.observaciones 
                    FROM Modulo_Tarea_Revision mtr
                    JOIN Modulo m ON mtr.idModulo = m.idModulo
                    WHERE mtr.idTarea = :idTarea";
@@ -237,8 +237,8 @@ class ModTareas {
         $anio = $info ? trim($info['anio_escolar']) : '24-25';
         $siglas = $info ? trim($info['siglas']) : 'DAW';
 
-        $sql = "INSERT INTO Tarea (idAlumno, codigo_auto, titulo, fecha_inicio, fecha_fin, descripcion, calificacion, comentario) 
-                VALUES (:idAlumno, '', :titulo, :fecha_inicio, :fecha_fin, :descripcion, :calificacion, :comentario)";
+        $sql = "INSERT INTO Tarea (idAlumno, codigo_auto, titulo, fecha_inicio, fecha_fin, descripcion, calificacion, comentario, documento) 
+                VALUES (:idAlumno, '', :titulo, :fecha_inicio, :fecha_fin, :descripcion, :calificacion, :comentario, :documento)";
         
         $stmt = $this->db->prepare($sql);
         $stmt->execute([
@@ -248,7 +248,8 @@ class ModTareas {
             ':fecha_fin'    => $datos['fechaFin'] ?? date('Y-m-d H:i:s'),
             ':descripcion'  => $datos['descripcion'] ?? '',
             ':calificacion' => $this->mapCalificacionToDb($datos['evaluacionEmpresa'] ?? $datos['calificacion'] ?? null),
-            ':comentario'   => $datos['comentarioEmpresa'] ?? null
+            ':comentario'   => $datos['comentarioEmpresa'] ?? null,
+            ':documento'    => $datos['documento'] ?? null
         ]);
         
         $idTarea = $this->db->lastInsertId();
@@ -275,7 +276,7 @@ class ModTareas {
         // Calcular módulos únicos de las actividades para crear la revisión
         $modules = [];
         if (!empty($datos['actividadesSeleccionadas'])) {
-            $sqlMods = "SELECT DISTINCT ma.idModulo, m.nombre 
+            $sqlMods = "SELECT DISTINCT ma.idModulo, m.nombre, m.sigla
                         FROM Modulo_Actividad ma
                         JOIN Modulo m ON ma.idModulo = m.idModulo
                         WHERE ma.idActividad IN (" . implode(',', array_map('intval', $datos['actividadesSeleccionadas'])) . ")";
@@ -287,7 +288,9 @@ class ModTareas {
         $revisionesMap = [];
         if (!empty($datos['revisionesModulos'])) {
             foreach ($datos['revisionesModulos'] as $rev) {
-                $revisionesMap[$rev['modulo']] = [
+                $key = strtoupper(trim($rev['modulo'] ?? ''));
+                if ($key === '') continue;
+                $revisionesMap[$key] = [
                     'revisado' => (bool)$rev['revisado'],
                     'comentario' => $rev['comentario'] ?? ''
                 ];
@@ -296,8 +299,13 @@ class ModTareas {
         
         if (!empty($modules)) {
             foreach ($modules as $mod) {
-                $revisadaVal = (isset($revisionesMap[$mod['nombre']]) && $revisionesMap[$mod['nombre']]['revisado']) ? 1 : 0;
-                $observacionesVal = isset($revisionesMap[$mod['nombre']]) ? $revisionesMap[$mod['nombre']]['comentario'] : '';
+                // El frontend puede enviar el módulo por nombre o por sigla (p.ej. "Programación" o "PROG").
+                $keyNombre = strtoupper(trim($mod['nombre'] ?? ''));
+                $keySigla = strtoupper(trim($mod['sigla'] ?? ''));
+                $key = isset($revisionesMap[$keyNombre]) ? $keyNombre : (isset($revisionesMap[$keySigla]) ? $keySigla : null);
+
+                $revisadaVal = ($key && !empty($revisionesMap[$key]['revisado'])) ? 1 : 0;
+                $observacionesVal = $key ? ($revisionesMap[$key]['comentario'] ?? '') : '';
                 $sqlRev = "INSERT INTO Modulo_Tarea_Revision (idModulo, idTarea, revisada, observaciones) 
                            VALUES (:idModulo, :idTarea, $revisadaVal, :observaciones)";
                 $stmtRev = $this->db->prepare($sqlRev);
@@ -326,7 +334,8 @@ class ModTareas {
                 fecha_fin = :fecha_fin, 
                 descripcion = :descripcion, 
                 calificacion = :calificacion, 
-                comentario = :comentario 
+                comentario = :comentario,
+                documento = COALESCE(:documento, documento) 
                 WHERE idTarea = :id";
         $stmt = $this->db->prepare($sql);
         $stmt->execute([
@@ -336,7 +345,8 @@ class ModTareas {
             ':fecha_fin' => $datos['fechaFin'],
             ':descripcion' => $datos['descripcion'] ?? '',
             ':calificacion' => $this->mapCalificacionToDb($datos['evaluacionEmpresa'] ?? $datos['calificacion'] ?? null),
-            ':comentario' => $datos['comentarioEmpresa'] ?? null
+            ':comentario' => $datos['comentarioEmpresa'] ?? null,
+            ':documento' => $datos['documento'] ?? null
         ]);
         
         // Actualizar actividades relacionadas
@@ -355,7 +365,7 @@ class ModTareas {
         // Actualizar revisiones de módulos
         $modules = [];
         if (!empty($datos['actividadesSeleccionadas'])) {
-            $sqlMods = "SELECT DISTINCT ma.idModulo, m.nombre 
+            $sqlMods = "SELECT DISTINCT ma.idModulo, m.nombre, m.sigla
                         FROM Modulo_Actividad ma
                         JOIN Modulo m ON ma.idModulo = m.idModulo
                         WHERE ma.idActividad IN (" . implode(',', array_map('intval', $datos['actividadesSeleccionadas'])) . ")";
@@ -367,7 +377,9 @@ class ModTareas {
         $revisionesMap = [];
         if (!empty($datos['revisionesModulos'])) {
             foreach ($datos['revisionesModulos'] as $rev) {
-                $revisionesMap[$rev['modulo']] = [
+                $key = strtoupper(trim($rev['modulo'] ?? ''));
+                if ($key === '') continue;
+                $revisionesMap[$key] = [
                     'revisado' => (bool)$rev['revisado'],
                     'comentario' => $rev['comentario'] ?? ''
                 ];
@@ -380,8 +392,12 @@ class ModTareas {
         
         if (!empty($modules)) {
             foreach ($modules as $mod) {
-                $revisadaVal = (isset($revisionesMap[$mod['nombre']]) && $revisionesMap[$mod['nombre']]['revisado']) ? 1 : 0;
-                $observacionesVal = isset($revisionesMap[$mod['nombre']]) ? $revisionesMap[$mod['nombre']]['comentario'] : '';
+                $keyNombre = strtoupper(trim($mod['nombre'] ?? ''));
+                $keySigla = strtoupper(trim($mod['sigla'] ?? ''));
+                $key = isset($revisionesMap[$keyNombre]) ? $keyNombre : (isset($revisionesMap[$keySigla]) ? $keySigla : null);
+
+                $revisadaVal = ($key && !empty($revisionesMap[$key]['revisado'])) ? 1 : 0;
+                $observacionesVal = $key ? ($revisionesMap[$key]['comentario'] ?? '') : '';
                 $sqlRev = "INSERT INTO Modulo_Tarea_Revision (idModulo, idTarea, revisada, observaciones) 
                            VALUES (:idModulo, :idTarea, $revisadaVal, :observaciones)";
                 $stmtRev = $this->db->prepare($sqlRev);
@@ -394,6 +410,60 @@ class ModTareas {
         }
         
         return $this->obtener($id);
+    }
+
+    /**
+     * Guarda un PDF en el servidor asociado a una tarea.
+     * 
+     * @param int $idTarea ID de la tarea.
+     * @param array $archivo $_FILES['documento']
+     * @return string|false Nombre del archivo guardado o false si falla.
+     */
+    public function subirDocumento($idTarea, $archivo) {
+        $uploadDir = __DIR__ . '/../../uploads/documentos/';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
+        }
+
+        $extension = strtolower(pathinfo($archivo['name'], PATHINFO_EXTENSION));
+        if ($extension !== 'pdf') {
+            return false;
+        }
+
+        $nombreArchivo = 'tarea_' . $idTarea . '_' . time() . '.pdf';
+        $rutaDestino = $uploadDir . $nombreArchivo;
+
+        if (move_uploaded_file($archivo['tmp_name'], $rutaDestino)) {
+            $sql = "UPDATE Tarea SET documento = :documento WHERE idTarea = :id";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([
+                ':documento' => $nombreArchivo,
+                ':id' => $idTarea
+            ]);
+            return $nombreArchivo;
+        }
+
+        return false;
+    }
+
+    /**
+     * Obtiene la ruta de un documento PDF asociado a una tarea.
+     * 
+     * @param int $idTarea ID de la tarea.
+     * @return string|null Ruta absoluta del archivo o null si no existe.
+     */
+    public function obtenerRutaDocumento($idTarea) {
+        $sql = "SELECT documento FROM Tarea WHERE idTarea = :id";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':id' => $idTarea]);
+        $nombreArchivo = $stmt->fetchColumn();
+
+        if (!$nombreArchivo) {
+            return null;
+        }
+
+        $ruta = __DIR__ . '/../../uploads/documentos/' . $nombreArchivo;
+        return file_exists($ruta) ? $ruta : null;
     }
 
     /**

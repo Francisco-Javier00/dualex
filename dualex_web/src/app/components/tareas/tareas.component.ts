@@ -113,6 +113,18 @@ export class TareasComponent implements OnInit {
   }
 
   /**
+   * Abre el PDF de la tarea en una nueva pestaña si existe.
+   */
+  abrirDocumento(tarea: Tarea): void {
+    if (!tarea.documento) return;
+    const url = this.tareasService.getDocumentoUrl(tarea.id);
+    this.tareasService.getDocumentoBlob(tarea.id).subscribe(blob => {
+      const blobUrl = URL.createObjectURL(blob);
+      window.open(blobUrl, '_blank');
+    });
+  }
+
+  /**
    * Activa el flujo de borrado mostrando el modal de confirmación.
    */
   eliminarTarea(tarea: Tarea): void {

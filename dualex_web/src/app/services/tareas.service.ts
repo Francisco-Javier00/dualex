@@ -79,6 +79,33 @@ export class TareasService {
   }
 
   /**
+   * Sube un documento PDF asociado a una tarea.
+   * 
+   * @param idTarea ID de la tarea.
+   * @param archivo Archivo PDF a subir.
+   * @returns Observable con la respuesta del servidor.
+   */
+  subirDocumento(idTarea: number, archivo: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('documento', archivo);
+    return this.http.post(`${environment.apiUrl}/index.php?c=Tareas&m=subirDocumento&id=${idTarea}`, formData);
+  }
+
+  /**
+   * Devuelve la URL pública para visualizar el PDF asociado a una tarea.
+   *
+   * @param idTarea ID de la tarea.
+   * @returns URL de descarga/visualización inline del documento.
+   */
+  getDocumentoUrl(idTarea: number): string {
+    return `${this.API_URL}&m=descargarDocumento&id=${idTarea}`;
+  }
+
+  getDocumentoBlob(idTarea: number): Observable<Blob> {
+    return this.http.get(`${this.API_URL}&m=descargarDocumento&id=${idTarea}`, { responseType: 'blob' });
+  }
+
+  /**
    * Proxy auxiliar que conecta con `ActividadesService` para poblar listados desplegables
    * en los formularios de nueva tarea.
    * 
