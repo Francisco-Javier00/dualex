@@ -8,24 +8,30 @@
         <h2 class="fw-bold text-dark mb-1 profesores-title">
           <i class="fa-solid fa-chalkboard-user text-primary me-2"></i>Registro de Profesores
         </h2>
-        <p class="text-muted mb-0 profesores-subtitle">Selecciona un profesor para gestionar</p>
+        @if (puedeEditar) {
+          <p class="text-muted mb-0 profesores-subtitle">Selecciona un profesor para gestionar</p>
+        } @else {
+          <p class="text-muted mb-0 profesores-subtitle">Aquí podrás ver los profesores, los módulos que imparten y su rol en la aplicación.</p>
+        }
       </div>
     </div>
 
     <div class="d-flex flex-wrap gap-3">
-      <button class="btn btn-outline-primary px-4 shadow-sm profesores-action-secondary" (click)="importarExcel()">
-        <i class="fa-solid fa-file-excel me-2"></i> Importar Excel
-      </button>
-      <button class="btn btn-primary px-4 shadow-sm profesores-action-primary" (click)="crearNuevaEntrada()">
-        <i class="fa-solid fa-user-plus me-2"></i> Nuevo Profesor
-      </button>
+      @if (puedeEditar) {
+        <button class="btn btn-outline-primary px-4 shadow-sm profesores-action-secondary" (click)="importarExcel()">
+          <i class="fa-solid fa-file-excel me-2"></i> Importar Excel
+        </button>
+        <button class="btn btn-primary px-4 shadow-sm profesores-action-primary" (click)="crearNuevaEntrada()">
+          <i class="fa-solid fa-user-plus me-2"></i> Nuevo Profesor
+        </button>
+      }
     </div>
   </div>
 
   <app-shared-datatable
     tableId="tabla-profesores"
     [dtOptions]="dtOptions"
-    [columnTitles]="[' ', 'Nombre', 'Apellidos', 'Correo', 'Rol', 'Modulos', 'Ciclos', 'Acciones']"
+    [columnTitles]="puedeEditar ? [' ', 'Nombre', 'Apellidos', 'Correo', 'Rol', 'Modulos', 'Ciclos', 'Acciones'] : [' ', 'Nombre', 'Apellidos', 'Correo', 'Rol', 'Modulos', 'Ciclos']"
     (actionClick)="onTableAction($event)">
   </app-shared-datatable>
 </div>
