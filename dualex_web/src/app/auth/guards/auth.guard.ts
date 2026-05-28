@@ -27,7 +27,7 @@ export const authGuard: CanActivateFn = (route, state) => {
   if (!environment.developerMode) {
     // Si no hay sesión (no hay token/perfil), denegar acceso.
     // En un entorno real con SSO, aquí se redirigiría a la URL de login externo.
-    window.location.href = 'https://17.daw.esvirgua.com/';
+    window.location.href = 'https://17.daw.esvirgua.com/dashboard-inicio';
   } else {
     // En modo desarrollo, solo cancelamos la navegación para que el layout principal
     // (con PruebasSistemaComponent) cargue y autogenere el token de prueba local.
