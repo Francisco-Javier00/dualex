@@ -49,7 +49,7 @@ export class AuthService {
 
     if (token) {
       const payload = this.decodificarJwt(token);
-      
+
       if (payload && payload.data) {
         // Mapear rol de Dualex a rol interno
         const rolInterno = this.mapearRol(payload.data.roles);
@@ -188,7 +188,11 @@ export class AuthService {
    */
   public setCookieNativa(nombre: string, valor: string): void {
     if (isPlatformBrowser(this.platformId)) {
-      document.cookie = `${nombre}=${valor}; path=/; max-age=86400; SameSite=Strict; Secure`;
+      if (environment.developerMode || window.location.protocol !== 'https:') {
+        document.cookie = `${nombre}=${valor}; path=/; max-age=86400; SameSite=Lax`;
+      } else {
+        document.cookie = `${nombre}=${valor}; path=/; max-age=86400; SameSite=Lax; Secure`;
+      }
     }
   }
 
@@ -197,8 +201,11 @@ export class AuthService {
    */
   public cerrarSesion(): void {
     if (isPlatformBrowser(this.platformId)) {
-      // Borrar cookie estableciendo fecha de expiración pasada
-      document.cookie = `${this.COOKIE_NAME}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; SameSite=Strict; Secure`;
+      if (environment.developerMode || window.location.protocol !== 'https:') {
+        document.cookie = `${this.COOKIE_NAME}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; SameSite=Lax`;
+      } else {
+        document.cookie = `${this.COOKIE_NAME}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; SameSite=Lax; Secure`;
+      }
 
       // Intentar borrar también sin SameSite por si acaso
       document.cookie = `${this.COOKIE_NAME}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;`;
@@ -206,9 +213,15 @@ export class AuthService {
       // Limpiar estado en memoria
       this.sujetoPerfilUsuario.next(null);
 
-      // Redirección al login externo si no estamos en modo desarrollo
       if (!environment.developerMode) {
-        window.location.href = 'https://17.daw.esvirgua.com/dashboard-inicio';
+        // En producción, la app se abre en nueva pestaña desde el SSO. 
+        // Al cerrar sesión, simplemente cerramos la pestaña para volver al SSO sin duplicarlo.
+        window.close();
+
+        // Fallback por si el navegador bloquea window.close()
+        setTimeout(() => {
+          window.location.href = 'https://17.daw.esvirgua.com/dashboard-inicio';
+        }, 300);
       } else {
         window.location.href = '/';
       }
