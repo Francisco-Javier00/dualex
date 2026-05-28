@@ -17,8 +17,8 @@ import { DocsViewerComponent } from './components/docs-viewer/docs-viewer.compon
 import { authGuard } from './auth/guards/auth.guard';
 
 export const routes: Routes = [
-  { path: '', component: DashboardComponent },
-  { path: 'dashboard', component: DashboardComponent },
+  { path: '', component: DashboardComponent, canActivate: [authGuard] },
+  { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard] },
   { path: 'mis-modulos', component: MisModulosComponent, canActivate: [authGuard], data: { roles: ['COORDINADOR', 'PROFESOR'] } },
   { path: 'acerca-de', component: AboutComponent },
   { path: 'docs/:tipo', component: DocsViewerComponent, canActivate: [authGuard], data: { roles: ['COORDINADOR', 'PROFESOR', 'ALUMNO'] } },

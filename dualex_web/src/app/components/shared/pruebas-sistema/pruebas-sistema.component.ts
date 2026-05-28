@@ -34,18 +34,18 @@ export class PruebasSistemaComponent implements OnInit {
    * Si no hay sesión o hay un cambio forzado vía URL, genera el token.
    */
   private async verificarYSincronizarSesionDev() {
-    const COOKIE_NAME = 'dualex_jwt';
+    const COOKIE_NAME = 'auth_token';
     const token = this.authService.getCookieNativa(COOKIE_NAME);
     const urlParams = new URLSearchParams(window.location.search);
     const devRoleForce = urlParams.get('devRole');
 
     const payload = token ? this.authService.decodificarJwt(token) : null;
-    const rolActual = payload ? payload.roles?.dualex : null;
+    const rolActual = payload?.data?.roles ? payload.data.roles[0].replace('_DUALEX', '') : null;
 
     // Detectar si el token es antiguo, corrupto, inexistente o si hay un cambio forzado
     const tokenInvalido = !token || !payload || token.endsWith('.dev-signature-dualex') || token.includes('=');
     const cambioRolForzado = devRoleForce && devRoleForce.toUpperCase() !== rolActual?.toUpperCase();
-    const esNombreAntiguo = payload && payload.nombre === 'Desarrollador';
+    const esNombreAntiguo = payload?.data?.nombre === 'Desarrollador';
 
     if (tokenInvalido || cambioRolForzado || esNombreAntiguo) {
       const rol = (devRoleForce || rolActual || 'COORDINADOR').toUpperCase();
@@ -70,7 +70,10 @@ export class PruebasSistemaComponent implements OnInit {
 
   async cambiarRolUsuario(rol: string) {
     const nuevoToken = await this.generarTokenDevReal(rol.toUpperCase());
-    this.authService.setCookieNativa('dualex_jwt', nuevoToken);
+    this.authService.setCookieNativa('auth_token', nuevoToken);
+
+    // Limpiar el historial de navegación para que cargue la pantalla principal del nuevo rol
+    sessionStorage.removeItem('currentRoute');
 
     // Redirigir a la raíz '/' para forzar la recarga total de la app con el nuevo token
     // sin que aparezca la ruta de destino (/dashboard o /tareas) en la barra de direcciones.
@@ -102,16 +105,20 @@ export class PruebasSistemaComponent implements OnInit {
 
     const header = toBase64Url(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
 
+    const rolString = rol === 'COORDINADOR_GENERAL' ? 'COORDINADOR' : rol;
+    
     const payloadStr = JSON.stringify({
-      id,
-      nombre,
-      apellidos,
-      email: `dev.${rol.toLowerCase()}@dualex.es`,
-      foto: null,
-      roles: { dualex: (rol === 'COORDINADOR_GENERAL' ? 'COORDINADOR' : rol).toLowerCase() },
-      esGeneral: rol === 'COORDINADOR_GENERAL',
       iat: Math.floor(Date.now() / 1000),
-      exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24)
+      exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24),
+      data: {
+        id,
+        nombre,
+        apellidos,
+        email: `dev.${rol.toLowerCase()}@dualex.es`,
+        foto: null,
+        roles: [`${rolString}_DUALEX`],
+        esGeneral: rol === 'COORDINADOR_GENERAL'
+      }
     });
 
     const payload = toBase64Url(toUtf8Binary(payloadStr));

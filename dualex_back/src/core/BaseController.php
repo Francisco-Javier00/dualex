@@ -93,11 +93,20 @@ class BaseController {
      * Verifica si el usuario tiene uno de los roles permitidos.
      */
     protected function checkRole($roles) {
-        if (!$this->user || !isset($this->user['roles']['dualex'])) {
+        if (!$this->user || !isset($this->user['data']['roles'])) {
             $this->sendError("No autenticado o sesión inválida", 401);
         }
 
-        $userRole = strtoupper($this->user['roles']['dualex']);
+        $rolesUpper = array_map('strtoupper', $this->user['data']['roles']);
+        
+        $userRole = 'ALUMNO'; // fallback
+        if (in_array('COORDINADOR_DUALEX', $rolesUpper)) {
+            $userRole = 'COORDINADOR';
+        } else if (in_array('PROFESOR_DUALEX', $rolesUpper)) {
+            $userRole = 'PROFESOR';
+        } else if (in_array('ALUMNO_DUALEX', $rolesUpper)) {
+            $userRole = 'ALUMNO';
+        }
         
         // Verificar si es Coordinador General
         $esGeneral = false;

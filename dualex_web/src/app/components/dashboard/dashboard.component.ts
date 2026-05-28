@@ -60,7 +60,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.cargandoModulos = false;
       },
       error: (err) => {
-        console.error('Error al cargar módulos:', err);
+
         this.cargandoModulos = false;
       }
     });

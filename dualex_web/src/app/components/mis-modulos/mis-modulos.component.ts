@@ -35,7 +35,7 @@ export class MisModulosComponent implements OnInit {
         this.cargando = false;
       },
       error: (err) => {
-        console.error('Error al cargar módulos:', err);
+
         this.cargando = false;
       }
     });

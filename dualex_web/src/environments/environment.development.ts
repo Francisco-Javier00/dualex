@@ -1,4 +1,6 @@
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:8080/dualex/dualex_back'
+  developerMode: true,
+  // URL para desarrollo local
+  apiUrl: 'http://localhost:8080'
 };

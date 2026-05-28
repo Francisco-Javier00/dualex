@@ -13,7 +13,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     return null;
   };
 
-  const token = getCookieNativa('dualex_jwt'); // Mismo nombre usado en AuthService
+  const token = getCookieNativa('auth_token'); // Mismo nombre usado en AuthService
 
   if (token) {
     // Clonar la petición para añadir la cabecera de autorización

@@ -18,18 +18,17 @@ export interface PerfilUsuario {
 }
 
 export interface JwtPayload {
-  id: number;
-  nombre: string;
-  apellidos: string;
-  email: string;
-  roles: {
-    global?: string;
-    dualex?: string;
-    [key: string]: string | undefined;
-  };
-  esGeneral?: boolean;
-  exp?: number;
   iat?: number;
+  exp?: number;
+  data: {
+    id: number;
+    nombre: string;
+    apellidos: string;
+    email: string;
+    roles: string[];
+    esGeneral?: boolean;
+    foto?: string;
+  };
 }
 
 export interface Categoria {

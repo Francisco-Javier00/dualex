@@ -9,7 +9,7 @@ import { environment } from '../../../environments/environment';
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly COOKIE_NAME = 'dualex_jwt';
+  private readonly COOKIE_NAME = 'auth_token';
   private http = inject(HttpClient);
 
   // La sesión se mantiene en memoria para que el header, el perfil y las vistas
@@ -34,43 +34,48 @@ export class AuthService {
   public restaurarSesion(): void {
     if (!isPlatformBrowser(this.platformId)) return;
 
+    // Si venimos redirigidos del login con un token en la URL, lo capturamos
+    const params = new URLSearchParams(window.location.search);
+    const tokenUrl = params.get('token');
+
+    if (tokenUrl) {
+      this.setCookieNativa(this.COOKIE_NAME, tokenUrl);
+      // Limpiamos la URL para que no quede el token visible
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
+    // Leemos la cookie (ya sea la recién guardada o una anterior)
     let token = this.getCookieNativa(this.COOKIE_NAME);
 
     if (token) {
-      console.log('AuthService: Token detectado, decodificando...', token);
       const payload = this.decodificarJwt(token);
-
-      if (payload) {
+      
+      if (payload && payload.data) {
         // Mapear rol de Dualex a rol interno
-        const rolInterno = this.mapearRol(payload.roles?.dualex);
+        const rolInterno = this.mapearRol(payload.data.roles);
 
         if (!rolInterno) {
-          console.error('AuthService: Rol inválido o inexistente en el token. Cerrando sesión.');
           this.cerrarSesion();
           return;
         }
 
-
-
         const perfil: PerfilUsuario = {
-          id: payload.id,
-          nombre: payload.nombre,
-          apellidos: payload.apellidos,
-          email: payload.email,
+          id: payload.data.id,
+          nombre: payload.data.nombre,
+          apellidos: payload.data.apellidos,
+          email: payload.data.email,
           rol: rolInterno,
-          esGeneral: payload.esGeneral ?? false
+          esGeneral: payload.data.esGeneral ?? false
         };
-        console.log('AuthService: Emitiendo perfil:', perfil);
+
         this.sujetoPerfilUsuario.next(perfil);
 
         // Cargar datos locales de la base de datos para corregir cualquier discrepancia
         this.cargarPerfilDesdeBD();
       } else {
-        console.error('AuthService: No se pudo decodificar el payload del token.');
         this.sujetoPerfilUsuario.next(null);
       }
     } else {
-      console.log('AuthService: No hay sesión activa.');
       this.sujetoPerfilUsuario.next(null);
     }
   }
@@ -84,7 +89,7 @@ export class AuthService {
     const controller = perfilActual.rol === 'ALUMNO' ? 'Alumnos' : 'Profesores';
     this.http.get<PerfilUsuario>(`${environment.apiUrl}/index.php?c=${controller}&m=obtenerPerfilLocal`).subscribe({
       next: (perfilLocal) => {
-        console.log('AuthService: Perfil local cargado desde la BD:', perfilLocal);
+
         const actual = this.sujetoPerfilUsuario.value;
         if (actual && perfilLocal) {
           this.sujetoPerfilUsuario.next({
@@ -97,7 +102,7 @@ export class AuthService {
         }
       },
       error: (err) => {
-        console.error('AuthService: Error al cargar el perfil local desde la BD', err);
+
       }
     });
   }
@@ -131,21 +136,33 @@ export class AuthService {
 
       return JSON.parse(jsonPayload) as JwtPayload;
     } catch (e) {
-      console.error('Error decodificando JWT:', e);
+
       return null;
     }
   }
 
   /**
-   * Convierte el rol que viene en el JWT al rol interno en mayúsculas usado por el sistema.
-   * Si el rol no es válido, devuelve null.
+   * Extrae el rol de Dualex del array de roles y lo convierte al rol interno.
+   * Busca un rol que termine en '_DUALEX', le quita el sufijo y lo valida.
    */
-  private mapearRol(rolApp?: string): string | null {
-    if (!rolApp) return null;
-    const rol = rolApp.trim().toUpperCase();
-    if (['COORDINADOR', 'PROFESOR', 'ALUMNO'].includes(rol)) {
-      return rol;
+  private mapearRol(roles?: string[]): string | null {
+    if (!roles || !Array.isArray(roles)) return null;
+
+    // Convertimos todos a mayúsculas para facilitar la comparación
+    const rolesUpper = roles.map(r => r.toUpperCase());
+
+    if (rolesUpper.includes('COORDINADOR_DUALEX')) {
+      return 'COORDINADOR';
     }
+
+    if (rolesUpper.includes('PROFESOR_DUALEX')) {
+      return 'PROFESOR';
+    }
+
+    if (rolesUpper.includes('ALUMNO_DUALEX')) {
+      return 'ALUMNO';
+    }
+
     return null;
   }
 
@@ -181,13 +198,20 @@ export class AuthService {
   public cerrarSesion(): void {
     if (isPlatformBrowser(this.platformId)) {
       // Borrar cookie estableciendo fecha de expiración pasada
-      document.cookie = `${this.COOKIE_NAME}=; Max-Age=0; path=/; SameSite=Lax`;
+      document.cookie = `${this.COOKIE_NAME}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; SameSite=Lax`;
+
+      // Intentar borrar también sin SameSite por si acaso
+      document.cookie = `${this.COOKIE_NAME}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;`;
 
       // Limpiar estado en memoria
       this.sujetoPerfilUsuario.next(null);
 
-      // Redirección externa temporal
-      window.location.href = 'https://www.google.es';
+      // Redirección al login externo si no estamos en modo desarrollo
+      if (!environment.developerMode) {
+        window.location.href = 'https://05.daw.esvirgua.com/tfg-server/angular-tfg/dashboard-inicio';
+      } else {
+        window.location.href = '/';
+      }
     }
   }
 }
