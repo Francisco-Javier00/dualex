@@ -1,0 +1,11 @@
+Options -Indexes
+RewriteEngine On
+
+# Si un directorio o un archivo existe, se usa la petición directamente
+RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} -f [OR]
+RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} -d
+RewriteRule ^ - [L]
+
+# Si la petición no es para un archivo o directorio existente,
+# se redirige todo al index.html para que Angular maneje las rutas
+RewriteRule ^ index.html [L]

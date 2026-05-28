@@ -1,0 +1,18 @@
+Options -Indexes
+
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
+
+<FilesMatch "(?i)\.(env|json|lock|md|xml)$">
+    Require all denied
+</FilesMatch>
+
+<Directory "src">
+    Require all denied
+</Directory>
+
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.php [L,QSA]

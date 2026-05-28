@@ -3,7 +3,21 @@
 ob_start();
 
 // Cabeceras de CORS - Deben ir lo primero de todo
-header("Access-Control-Allow-Origin: *");
+$allowed_origins = [
+    'https://05.proyectos.esvirgua.com',
+    'https://17.daw.esvirgua.com',
+    'http://localhost:4200',
+    'http://localhost:8080'
+];
+$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+
+if (in_array($origin, $allowed_origins)) {
+    header("Access-Control-Allow-Origin: " . $origin);
+} else {
+    // Si no coincide, por defecto el de producción para evitar el *
+    header("Access-Control-Allow-Origin: https://05.proyectos.esvirgua.com");
+}
+
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, X-Auth-Token");
 header("Access-Control-Max-Age: 3600");

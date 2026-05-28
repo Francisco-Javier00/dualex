@@ -188,7 +188,7 @@ export class AuthService {
    */
   public setCookieNativa(nombre: string, valor: string): void {
     if (isPlatformBrowser(this.platformId)) {
-      document.cookie = `${nombre}=${valor}; path=/; max-age=86400; SameSite=Lax`;
+      document.cookie = `${nombre}=${valor}; path=/; max-age=86400; SameSite=Strict; Secure`;
     }
   }
 
@@ -198,7 +198,7 @@ export class AuthService {
   public cerrarSesion(): void {
     if (isPlatformBrowser(this.platformId)) {
       // Borrar cookie estableciendo fecha de expiración pasada
-      document.cookie = `${this.COOKIE_NAME}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; SameSite=Lax`;
+      document.cookie = `${this.COOKIE_NAME}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; SameSite=Strict; Secure`;
 
       // Intentar borrar también sin SameSite por si acaso
       document.cookie = `${this.COOKIE_NAME}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;`;
@@ -208,7 +208,7 @@ export class AuthService {
 
       // Redirección al login externo si no estamos en modo desarrollo
       if (!environment.developerMode) {
-        window.location.href = 'https://05.daw.esvirgua.com/tfg-server/angular-tfg/dashboard-inicio';
+        window.location.href = 'https://17.daw.esvirgua.com/dashboard-inicio';
       } else {
         window.location.href = '/';
       }
