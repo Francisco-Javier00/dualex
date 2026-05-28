@@ -20,10 +20,10 @@
           </div>
         }
       </div>
-      <a routerLink="/mis-modulos" class="btn shadow-sm"
+      <button routerLink="/mis-modulos" class="btn shadow-sm"
          [ngClass]="(usuario?.rol === 'COORDINADOR' && usuario?.esGeneral) ? 'btn-coordinador-general' : 'btn-primary'">
         <i class="fa-solid fa-chalkboard"></i> Mis Módulos
-      </a>
+      </button>
     </header>
 
     <div class="category-grid">
