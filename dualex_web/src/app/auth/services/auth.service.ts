@@ -206,8 +206,12 @@ export class AuthService {
       // Limpiar estado en memoria
       this.sujetoPerfilUsuario.next(null);
 
-      // Redirección al login externo
-      window.location.href = 'https://05.daw.esvirgua.com/tfg-server/angular-tfg/dashboard-inicio';
+      // Redirección al login externo si no estamos en modo desarrollo
+      if (!environment.developerMode) {
+        window.location.href = 'https://05.daw.esvirgua.com/tfg-server/angular-tfg/dashboard-inicio';
+      } else {
+        window.location.href = '/';
+      }
     }
   }
 }

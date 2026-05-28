@@ -19,7 +19,6 @@ if (typeof window !== 'undefined' && window.history) {
   window.history.pushState = () => {};
   window.history.replaceState = () => {};
 }
-
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }), 

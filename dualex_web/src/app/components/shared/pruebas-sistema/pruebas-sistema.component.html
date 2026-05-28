@@ -1,0 +1,52 @@
+<div class="dev-panel-container" [class.closed]="!abierto">
+  
+  <!-- Flecha disparadora -->
+  <button class="toggle-btn" (click)="togglePanel()" [title]="abierto ? 'Cerrar Panel' : 'Modo Desarrollo'">
+    <i class="fa-solid fa-chevron-left"></i>
+  </button>
+
+  <!-- Contenido del Panel -->
+  <div class="content-panel">
+    <div class="panel-header d-flex align-items-center gap-2 text-muted">
+      <i class="fa-solid fa-code"></i>
+      <h2 class="h6 fw-bold mb-0 text-uppercase small">Modo Desarrollo</h2>
+    </div>
+
+    <div class="mb-4">
+      <label class="small fw-bold text-muted mb-2 text-uppercase d-block" style="font-size: 0.65rem;">Probar Alertas</label>
+      <div class="d-grid gap-2">
+        <button class="btn btn-sm text-white py-2" style="background-color: #006293;" (click)="probarAlerta('info')">
+          <i class="fa-solid fa-circle-info me-2"></i> Info
+        </button>
+        <button class="btn btn-sm text-white py-2" style="background-color: #28a745;" (click)="probarAlerta('success')">
+          <i class="fa-solid fa-circle-check me-2"></i> Éxito
+        </button>
+        <button class="btn btn-sm text-white py-2" style="background-color: #dc3545;" (click)="probarAlerta('danger')">
+          <i class="fa-solid fa-circle-xmark me-2"></i> Error
+        </button>
+      </div>
+    </div>
+
+    <div>
+      <label class="small fw-bold text-muted mb-2 text-uppercase d-block" style="font-size: 0.65rem;">Cambiar Perfil</label>
+      <div class="d-grid gap-2">
+        <button class="btn btn-sm text-white py-2" style="background-color: var(--primary);" (click)="cambiarRolUsuario('COORDINADOR')">
+          Coordinador
+        </button>
+        <button class="btn btn-sm text-white py-2" style="background-color: #0d47a1;" (click)="cambiarRolUsuario('COORDINADOR_GENERAL')">
+          Coord. General
+        </button>
+        <button class="btn btn-sm text-white py-2" style="background-color: var(--secondary);" (click)="cambiarRolUsuario('PROFESOR')">
+          Profesor
+        </button>
+        <button class="btn btn-sm text-white py-2" style="background-color: #5bb3eb;" (click)="cambiarRolUsuario('ALUMNO')">
+          Alumno
+        </button>
+      </div>
+    </div>
+
+    <div class="mt-4 pt-3 border-top text-center">
+      <span class="badge bg-light text-muted fw-normal" style="font-size: 0.6rem;">Dualex v19 Build 2026</span>
+    </div>
+  </div>
+</div>
