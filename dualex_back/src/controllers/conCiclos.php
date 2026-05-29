@@ -1,6 +1,33 @@
 <?php
+namespace Dualex\Controllers;
+
+use Exception;
+use PDO;
+use PDOException;
+use Dualex\Core\BaseController;
+use Dualex\Core\ConexionDB;
+use Dualex\Core\JWTHelper;
+use Dualex\Models\ModActividades;
+use Dualex\Models\ModAlumnos;
+use Dualex\Models\ModCiclos;
+use Dualex\Models\ModConfiguracion;
+use Dualex\Models\ModCursos;
+use Dualex\Models\ModEmpresas;
+use Dualex\Models\ModModulos;
+use Dualex\Models\ModProfesores;
+use Dualex\Models\ModTareas;
+
+/**
+ * File-level docblock for conCiclos.php
+ * 
+ */
 require_once MODELO . 'modCiclos.php';
 
+/**
+ * Controlador para la gestión de Ciclos Formativos.
+ * 
+ * Permite listar, crear, actualizar y eliminar ciclos.
+ */
 class ConCiclos extends BaseController {
     private $modelo;
 
@@ -9,12 +36,24 @@ class ConCiclos extends BaseController {
         $this->modelo = new ModCiclos($db);
     }
 
+    /**
+     * Lista todos los ciclos disponibles.
+     * 
+     * @return json Respuesta JSON con los datos o un error
+     */
     public function listar() {
+        $this->checkRole(['PROFESOR', 'COORDINADOR']);
         $data = $this->modelo->listar();
         $this->sendResponse($data);
     }
 
+    /**
+     * Obtiene los detalles de un ciclo específico por su ID.
+     * 
+     * @return json Respuesta JSON con los datos o un error
+     */
     public function obtener() {
+        $this->checkRole(['PROFESOR', 'COORDINADOR']);
         $id = $_GET['id'] ?? null;
         if (!$id) {
             $this->sendError("ID no proporcionado.", 400);
@@ -26,13 +65,25 @@ class ConCiclos extends BaseController {
         $this->sendResponse($data);
     }
 
+    /**
+     * Obtiene la lista de ciclos formateada para DataTables.
+     * 
+     * @return json Respuesta JSON con los datos o un error
+     */
     public function obtenerDataTables() {
+        $this->checkRole(['PROFESOR', 'COORDINADOR']);
         $json = file_get_contents('php://input');
         $params = json_decode($json, true);
         $data = $this->modelo->obtenerDataTables($params);
         $this->sendResponse($data);
     }
 
+    /**
+     * Crea un nuevo ciclo.
+     * Requiere rol COORDINADOR.
+     * 
+     * @return json Respuesta JSON con los datos o un error
+     */
     public function crear() {
         $this->checkRole(['COORDINADOR']);
         $json = file_get_contents('php://input');
@@ -49,6 +100,12 @@ class ConCiclos extends BaseController {
         }
     }
 
+    /**
+     * Actualiza un ciclo existente.
+     * Requiere rol COORDINADOR.
+     * 
+     * @return json Respuesta JSON con los datos o un error
+     */
     public function actualizar() {
         $this->checkRole(['COORDINADOR']);
         $id = $_GET['id'] ?? null;
@@ -66,6 +123,12 @@ class ConCiclos extends BaseController {
         }
     }
 
+    /**
+     * Elimina un ciclo.
+     * Requiere rol COORDINADOR.
+     * 
+     * @return json Respuesta JSON con el resultado o un error
+     */
     public function eliminar() {
         $this->checkRole(['COORDINADOR']);
         $id = $_GET['id'] ?? null;

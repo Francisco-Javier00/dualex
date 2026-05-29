@@ -1,6 +1,33 @@
 <?php
+namespace Dualex\Controllers;
+
+use Exception;
+use PDO;
+use PDOException;
+use Dualex\Core\BaseController;
+use Dualex\Core\ConexionDB;
+use Dualex\Core\JWTHelper;
+use Dualex\Models\ModActividades;
+use Dualex\Models\ModAlumnos;
+use Dualex\Models\ModCiclos;
+use Dualex\Models\ModConfiguracion;
+use Dualex\Models\ModCursos;
+use Dualex\Models\ModEmpresas;
+use Dualex\Models\ModModulos;
+use Dualex\Models\ModProfesores;
+use Dualex\Models\ModTareas;
+
+/**
+ * File-level docblock for conTareas.php
+ * 
+ */
 require_once MODELO . 'modTareas.php';
 
+/**
+ * Controlador para la gestión de Tareas.
+ * 
+ * Permite listar, crear, actualizar, eliminar y gestionar documentos de tareas.
+ */
 class ConTareas extends BaseController {
     private $modelo;
 
@@ -9,6 +36,11 @@ class ConTareas extends BaseController {
         $this->modelo = new ModTareas($db);
     }
 
+    /**
+     * Lista todas las tareas (filtra por alumno si el rol actual es ALUMNO).
+     * 
+     * @return json Respuesta JSON con los datos o un error
+     */
     public function listar() {
         $this->checkRole(['ALUMNO', 'PROFESOR', 'COORDINADOR']);
         try {
@@ -28,6 +60,11 @@ class ConTareas extends BaseController {
         }
     }
 
+    /**
+     * Lista las tareas asignadas a un alumno específico.
+     * 
+     * @return json Respuesta JSON con los datos o un error
+     */
     public function listarPorAlumno() {
         $this->checkRole(['ALUMNO', 'PROFESOR', 'COORDINADOR']);
         $idAlumno = $_GET['idAlumno'] ?? null;
@@ -42,6 +79,11 @@ class ConTareas extends BaseController {
         }
     }
 
+    /**
+     * Obtiene los detalles de una tarea específica por su ID.
+     * 
+     * @return json Respuesta JSON con los datos o un error
+     */
     public function obtener() {
         $this->checkRole(['ALUMNO', 'PROFESOR', 'COORDINADOR']);
         $id = $_GET['id'] ?? null;
@@ -59,8 +101,14 @@ class ConTareas extends BaseController {
         }
     }
 
+    /**
+     * Crea una nueva tarea.
+     * Requiere rol ALUMNO.
+     * 
+     * @return json Respuesta JSON con los datos creados o un error
+     */
     public function crear() {
-        $this->checkRole(['ALUMNO', 'PROFESOR', 'COORDINADOR']);
+        $this->checkRole(['ALUMNO']);
         $json = file_get_contents('php://input');
         $datos = json_decode($json, true);
         if (!$datos) {
@@ -88,6 +136,11 @@ class ConTareas extends BaseController {
         }
     }
 
+    /**
+     * Actualiza los datos de una tarea existente.
+     * 
+     * @return json Respuesta JSON con los datos actualizados o un error
+     */
     public function actualizar() {
         $this->checkRole(['ALUMNO', 'PROFESOR', 'COORDINADOR']);
         $id = $_GET['id'] ?? null;
@@ -117,6 +170,12 @@ class ConTareas extends BaseController {
         }
     }
 
+    /**
+     * Sube un documento PDF asociado a una tarea específica.
+     * Requiere rol ALUMNO.
+     * 
+     * @return json Respuesta JSON con el nombre del documento o un error
+     */
     public function subirDocumento() {
         $this->checkRole(['ALUMNO']);
         $idTarea = $_GET['id'] ?? null;
@@ -151,6 +210,11 @@ class ConTareas extends BaseController {
         }
     }
 
+    /**
+     * Descarga el documento PDF de una tarea específica.
+     * 
+     * @return void Inyecta el archivo PDF directamente en la respuesta HTTP o devuelve error JSON
+     */
     public function descargarDocumento() {
         $this->checkRole(['ALUMNO', 'PROFESOR', 'COORDINADOR']);
         $idTarea = $_GET['id'] ?? null;
@@ -174,6 +238,11 @@ class ConTareas extends BaseController {
         }
     }
 
+    /**
+     * Elimina una tarea por su ID.
+     * 
+     * @return json Respuesta JSON con el resultado de éxito o error
+     */
     public function eliminar() {
         $this->checkRole(['ALUMNO', 'PROFESOR', 'COORDINADOR']);
         $id = $_GET['id'] ?? null;

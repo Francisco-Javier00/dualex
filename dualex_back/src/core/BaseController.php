@@ -1,5 +1,14 @@
 <?php
+namespace Dualex\Core;
 
+use Exception;
+use PDO;
+use PDOException;
+
+/**
+ * File-level docblock for BaseController.php
+ * 
+ */
 class BaseController {
     protected $db;
     protected $user;
@@ -165,7 +174,7 @@ class BaseController {
             // Coordinador General
             $dbUser['esGeneral'] = false;
             if ($rol === 'COORDINADOR') {
-                $stmtG = $this->db->prepare("SELECT general FROM Coordinador WHERE idCoordinador = :id");
+                $stmtG = $this->db->prepare("SELECT CAST(general AS UNSIGNED) as general FROM Coordinador WHERE idCoordinador = :id");
                 $stmtG->execute([':id' => $id]);
                 $res = $stmtG->fetch(PDO::FETCH_ASSOC);
                 if ($res && $res['general'] == 1) {

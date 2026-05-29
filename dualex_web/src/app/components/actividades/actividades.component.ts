@@ -10,6 +10,12 @@ import { ActividadDTO } from '../../dto/dualex.dto';
 import { Config } from 'datatables.net';
 import 'datatables.net-responsive-bs5';
 
+/**
+ * Componente para el Catálogo de Actividades.
+ * 
+ * Permite visualizar todas las actividades registradas en una tabla interactiva,
+ * así como la funcionalidad para crear, editar y eliminar actividades.
+ */
 @Component({
   selector: 'app-actividades',
   standalone: true,

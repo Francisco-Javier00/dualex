@@ -1,4 +1,15 @@
 <?php
+namespace Dualex\Models;
+
+use Exception;
+use PDO;
+use PDOException;
+use Dualex\Core\ConexionDB;
+
+/**
+ * File-level docblock for modAlumnos.php
+ * 
+ */
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 /**
@@ -9,7 +20,6 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
  * asociadas a los registros de Alumno.
  * 
  * @category Model
- * @package  Dualex\Models
  */
 class ModAlumnos {
     /**

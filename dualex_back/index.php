@@ -45,6 +45,12 @@ require_once 'src/config/rutas.php';
 require_once 'src/core/conexionDB.php';
 require_once 'src/core/JWTHelper.php';
 require_once 'src/core/BaseController.php';
+
+// Namespaces para phpDocumentor
+use Dualex\Core\ConexionDB;
+use Dualex\Core\JWTHelper;
+use Dualex\Core\BaseController;
+
 // Cargamos las dependencias de Composer (PhpSpreadsheet, etc.)
 $autoloadPath = __DIR__ . '/vendor/autoload.php';
 if (!file_exists($autoloadPath)) {
@@ -91,95 +97,7 @@ if ($authHeader && preg_match('/Bearer\s+(.*)$/i', $authHeader, $matches)) {
         $user = JWTHelper::validar($token, $secret);
         
         if ($user && isset($user['data']['email'])) {
-            // Verificar si el usuario ya existe en la base de datos local
-            $stmt = $db->prepare("SELECT idUsuario FROM Usuario WHERE correo = :correo");
-            $stmt->execute([':correo' => $user['data']['email']]);
-            $dbUser = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            if (!$dbUser) {
-                // Determinar tipo y rol del token
-                $roles = $user['data']['roles'] ?? [];
-                $rolesUpper = array_map('strtoupper', $roles);
-                
-                $rol = 'ALUMNO'; // Por defecto
-                if (in_array('COORDINADOR_DUALEX', $rolesUpper)) {
-                    $rol = 'COORDINADOR';
-                } else if (in_array('PROFESOR_DUALEX', $rolesUpper)) {
-                    $rol = 'PROFESOR';
-                } else if (in_array('ALUMNO_DUALEX', $rolesUpper)) {
-                    $rol = 'ALUMNO';
-                }
-
-                try {
-                    $db->beginTransaction();
-
-                    $tipo = ($rol === 'ALUMNO') ? 'A' : 'P';
-
-                    $sqlU = "INSERT INTO Usuario (nombre, apellidos, correo, tipo) VALUES (:nombre, :apellidos, :correo, :tipo)";
-                    $stmtU = $db->prepare($sqlU);
-                    $stmtU->execute([
-                        ':nombre'    => $user['data']['nombre'] ?? '',
-                        ':apellidos' => $user['data']['apellidos'] ?? '',
-                        ':correo'    => $user['data']['email'],
-                        ':tipo'      => $tipo
-                    ]);
-                    $idUsuario = $db->lastInsertId();
-
-                    if ($rol === 'ALUMNO') {
-                        // Alumno requiere campos NOT NULL en la tabla Alumno (dni, nia, telefono, idCurso)
-                        // Buscamos un idCurso existente como placeholder
-                        $stmtC = $db->query("SELECT idCurso FROM Curso LIMIT 1");
-                        $idCurso = $stmtC->fetchColumn();
-                        if (!$idCurso) {
-                            // Si no hay cursos, buscamos o creamos un ciclo
-                            $stmtCiclo = $db->query("SELECT idCiclo FROM Ciclo LIMIT 1");
-                            $idCiclo = $stmtCiclo->fetchColumn();
-                            if (!$idCiclo) {
-                                $db->exec("INSERT INTO Ciclo (nombre, siglas, grado) VALUES ('Ciclo Temporal', 'TEMP', 'medio')");
-                                $idCiclo = $db->lastInsertId();
-                            }
-                            $db->exec("INSERT INTO Curso (nombre, anio_escolar, idCiclo) VALUES ('Curso Temporal', '24-25', $idCiclo)");
-                            $idCurso = $db->lastInsertId();
-                        }
-
-                        // Generamos placeholders únicos para DNI y NIA
-                        $dniPlaceholder = 'TEMP_' . str_pad($idUsuario, 8, '0', STR_PAD_LEFT);
-                        $niaPlaceholder = 'TEMP_' . str_pad($idUsuario, 6, '0', STR_PAD_LEFT);
-                        $telefonoPlaceholder = '000000000';
-
-                        $sqlA = "INSERT INTO Alumno (idAlumno, dni, nia, telefono, idCurso) VALUES (:idAlumno, :dni, :nia, :telefono, :idCurso)";
-                        $stmtA = $db->prepare($sqlA);
-                        $stmtA->execute([
-                            ':idAlumno' => $idUsuario,
-                            ':dni'      => $dniPlaceholder,
-                            ':nia'      => $niaPlaceholder,
-                            ':telefono' => $telefonoPlaceholder,
-                            ':idCurso'  => $idCurso
-                        ]);
-                    } else if ($rol === 'COORDINADOR') {
-                        // Un Coordinador requiere ser Profesor primero
-                        $sqlP = "INSERT INTO Profesor (idProfesor) VALUES (:id)";
-                        $stmtP = $db->prepare($sqlP);
-                        $stmtP->execute([':id' => $idUsuario]);
-
-                        $sqlC = "INSERT INTO Coordinador (idCoordinador) VALUES (:id)";
-                        $stmtC = $db->prepare($sqlC);
-                        $stmtC->execute([':id' => $idUsuario]);
-                    } else {
-                        // Profesor por defecto o rol PROFESOR
-                        $sqlP = "INSERT INTO Profesor (idProfesor) VALUES (:id)";
-                        $stmtP = $db->prepare($sqlP);
-                        $stmtP->execute([':id' => $idUsuario]);
-                    }
-
-                    $db->commit();
-                    $user['id'] = $idUsuario;
-                } catch (Exception $e) {
-                    $db->rollBack();
-                }
-            } else {
-                $user['id'] = $dbUser['idUsuario'];
-            }
+            $user = JWTHelper::syncUser($db, $user);
         }
     }
 }
@@ -188,7 +106,10 @@ $ruta = CONTROLADOR . "con$c.php";
 
 if (file_exists($ruta)) {
     require_once $ruta;
-    $clase = "Con$c";
+    // Instanciamos el controlador usando su Namespace completo.
+    // Esto es necesario debido a la refactorización que permite a phpDocumentor
+    // agrupar correctamente las clases en el árbol de navegación.
+    $clase = "\\Dualex\\Controllers\\Con$c";
     $obj = new $clase($db, $user); 
 
     if (method_exists($obj, $m)) {
@@ -203,5 +124,6 @@ if (file_exists($ruta)) {
     echo json_encode(["error" => "Controlador no encontrado"]);
 }
 
+// Limpiamos el buffer de salida
 ob_end_flush();
 ?>

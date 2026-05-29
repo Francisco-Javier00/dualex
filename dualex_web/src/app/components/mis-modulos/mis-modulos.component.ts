@@ -4,8 +4,13 @@ import { RouterModule } from '@angular/router';
 import { AuthService } from '../../auth/services/auth.service';
 import { ProfesorDashboardService } from '../../services/profesor-dashboard.service';
 import { AlertService } from '../../services/alert.service';
-import { ModuloProfesor, PerfilUsuario } from '../../dto/dualex.dto';
+import { ModuloProfesorDTO, PerfilUsuarioDTO } from '../../dto/dualex.dto';
 
+/**
+ * Componente para mostrar los módulos asignados al profesor en sesión ("Mis Módulos").
+ * 
+ * Permite a los docentes visualizar y acceder rápidamente a los módulos que imparten.
+ */
 @Component({
   selector: 'app-mis-modulos',
   standalone: true,
@@ -17,8 +22,8 @@ export class MisModulosComponent implements OnInit {
   private profesorDashboardService = inject(ProfesorDashboardService);
   private alertService = inject(AlertService);
   
-  usuario: PerfilUsuario | null = null;
-  modulos: ModuloProfesor[] = [];
+  usuario: PerfilUsuarioDTO | null = null;
+  modulos: ModuloProfesorDTO[] = [];
   cargando = true;
 
   ngOnInit() {

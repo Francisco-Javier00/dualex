@@ -1,6 +1,33 @@
 <?php
+namespace Dualex\Controllers;
+
+use Exception;
+use PDO;
+use PDOException;
+use Dualex\Core\BaseController;
+use Dualex\Core\ConexionDB;
+use Dualex\Core\JWTHelper;
+use Dualex\Models\ModActividades;
+use Dualex\Models\ModAlumnos;
+use Dualex\Models\ModCiclos;
+use Dualex\Models\ModConfiguracion;
+use Dualex\Models\ModCursos;
+use Dualex\Models\ModEmpresas;
+use Dualex\Models\ModModulos;
+use Dualex\Models\ModProfesores;
+use Dualex\Models\ModTareas;
+
+/**
+ * File-level docblock for conConfiguracion.php
+ * 
+ */
 require_once MODELO . 'modConfiguracion.php';
 
+/**
+ * Controlador para gestionar la Configuración del sistema.
+ * 
+ * Permite obtener y actualizar la configuración global y verificar permisos generales.
+ */
 class ConConfiguracion {
     private $modelo;
     private $db;
@@ -12,6 +39,11 @@ class ConConfiguracion {
         $this->modelo = new ModConfiguracion($db);
     }
 
+    /**
+     * Verifica si el usuario actual tiene permisos de coordinador general.
+     * 
+     * @return array Array asociativo con la clave esGeneral (boolean)
+     */
     public function esGeneral() {
         if (!$this->user || !isset($this->user['id'])) {
             return ["esGeneral" => false];
@@ -22,11 +54,31 @@ class ConConfiguracion {
         return ["esGeneral" => ($res && $res['general'] == 1)];
     }
 
+    /**
+     * Obtiene la configuración actual del sistema.
+     * 
+     * @return array Datos de la configuración actual
+     */
     public function obtenerConfiguracion() {
+        if (!$this->user) {
+            http_response_code(401);
+            echo json_encode(["error" => "No autenticado"]);
+            exit;
+        }
         return $this->modelo->obtenerConfiguracion();
     }
 
+    /**
+     * Actualiza la configuración global del sistema (días de aviso, url, etc.).
+     * 
+     * @return array|json Respuesta con los datos o un error
+     */
     public function actualizarConfiguracion() {
+        if (!$this->user) {
+            http_response_code(401);
+            echo json_encode(["error" => "No autenticado"]);
+            exit;
+        }
         $json = file_get_contents('php://input');
         $datos = json_decode($json, true);
 

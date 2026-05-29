@@ -1,4 +1,10 @@
-export interface Alerta {
+/**
+ * Archivo central de DTOs e Interfaces para el tipado estricto en el Frontend.
+ * 
+ * Define las estructuras de datos devueltas por la API y usadas internamente
+ * por los componentes y servicios de la aplicación Dualex.
+ */
+export interface AlertaDTO {
   id: string;
   tipo: 'info' | 'warning' | 'success' | 'danger';
   titulo: string;
@@ -8,7 +14,7 @@ export interface Alerta {
   duracion?: number; // milisegundos
 }
 
-export interface PerfilUsuario {
+export interface PerfilUsuarioDTO {
   id: number;
   nombre: string;
   apellidos: string;
@@ -31,7 +37,7 @@ export interface JwtPayload {
   };
 }
 
-export interface Categoria {
+export interface CategoriaDTO {
   titulo: string;
   icono: string;
   imagen: string;
@@ -39,7 +45,7 @@ export interface Categoria {
   ruta?: string;
 }
 
-export interface ModuloProfesor {
+export interface ModuloProfesorDTO {
   idModulo: number;
   nombre: string;
   sigla: string;
@@ -48,7 +54,7 @@ export interface ModuloProfesor {
   numActividades?: number;
 }
 
-export interface Tarea {
+export interface TareaDTO {
   id: number;
   modulos: { sigla: string; color: string }[];
   titulo: string;
@@ -66,13 +72,13 @@ export interface Tarea {
   comentarioEmpresa?: string;
   revisadoProfesor?: boolean;
   comentarioProfesor?: string;
-  revisionesModulos?: ModuloRevision[];
+  revisionesModulos?: ModuloRevisionDTO[];
   idAlumno?: number;
   codigo_auto?: string;
   documento?: string;
 }
 
-export interface ModuloRevision {
+export interface ModuloRevisionDTO {
   modulo: string;
   revisado: boolean;
   comentario?: string;

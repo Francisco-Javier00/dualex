@@ -16,6 +16,13 @@ import 'datatables.net-responsive-bs5';
 import { AuthService } from '../../auth/services/auth.service';
 import { Subscription } from 'rxjs';
 
+/**
+ * Componente para la gestión de Alumnos.
+ * 
+ * Muestra una tabla interactiva con la lista de alumnos, permite filtrar por ciclo/curso,
+ * y ofrece acciones para crear, editar, eliminar o importar alumnos masivamente,
+ * dependiendo de los permisos del usuario (Coordinador vs Profesor).
+ */
 @Component({
   selector: 'app-alumnos',
   standalone: true,

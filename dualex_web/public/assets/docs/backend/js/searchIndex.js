@@ -3,7 +3,7 @@ Search.appendIndex(
                 {
             "fqsen": "\\CONTROLADOR",
             "name": "CONTROLADOR",
-            "summary": "",
+            "summary": "Archivo\u0020de\u0020configuraci\u00F3n\u0020de\u0020rutas",
             "url": "namespaces/default.html#constant_CONTROLADOR"
         },                {
             "fqsen": "\\MODELO",
@@ -16,984 +16,1129 @@ Search.appendIndex(
             "summary": "",
             "url": "namespaces/default.html#constant_CORE"
         },                {
-            "fqsen": "\\ConActividades",
+            "fqsen": "\\Dualex\\Controllers\\ConActividades",
             "name": "ConActividades",
-            "summary": "",
-            "url": "classes/ConActividades.html"
+            "summary": "Controlador\u0020para\u0020la\u0020gesti\u00F3n\u0020de\u0020Actividades.",
+            "url": "classes/Dualex-Controllers-ConActividades.html"
         },                {
-            "fqsen": "\\ConActividades\u003A\u003A__construct\u0028\u0029",
+            "fqsen": "\\Dualex\\Controllers\\ConActividades\u003A\u003A__construct\u0028\u0029",
             "name": "__construct",
             "summary": "",
-            "url": "classes/ConActividades.html#method___construct"
+            "url": "classes/Dualex-Controllers-ConActividades.html#method___construct"
         },                {
-            "fqsen": "\\ConActividades\u003A\u003Alistar\u0028\u0029",
+            "fqsen": "\\Dualex\\Controllers\\ConActividades\u003A\u003Alistar\u0028\u0029",
             "name": "listar",
-            "summary": "",
-            "url": "classes/ConActividades.html#method_listar"
+            "summary": "Lista\u0020todas\u0020las\u0020actividades\u0020sin\u0020paginaci\u00F3n.",
+            "url": "classes/Dualex-Controllers-ConActividades.html#method_listar"
         },                {
-            "fqsen": "\\ConActividades\u003A\u003Aobtener\u0028\u0029",
-            "name": "obtener",
-            "summary": "",
-            "url": "classes/ConActividades.html#method_obtener"
-        },                {
-            "fqsen": "\\ConActividades\u003A\u003Acrear\u0028\u0029",
-            "name": "crear",
-            "summary": "",
-            "url": "classes/ConActividades.html#method_crear"
-        },                {
-            "fqsen": "\\ConActividades\u003A\u003Aactualizar\u0028\u0029",
-            "name": "actualizar",
-            "summary": "",
-            "url": "classes/ConActividades.html#method_actualizar"
-        },                {
-            "fqsen": "\\ConActividades\u003A\u003Aeliminar\u0028\u0029",
-            "name": "eliminar",
-            "summary": "",
-            "url": "classes/ConActividades.html#method_eliminar"
-        },                {
-            "fqsen": "\\ConActividades\u003A\u003A\u0024modelo",
-            "name": "modelo",
-            "summary": "",
-            "url": "classes/ConActividades.html#property_modelo"
-        },                {
-            "fqsen": "\\ConAlumnos",
-            "name": "ConAlumnos",
-            "summary": "",
-            "url": "classes/ConAlumnos.html"
-        },                {
-            "fqsen": "\\ConAlumnos\u003A\u003A__construct\u0028\u0029",
-            "name": "__construct",
-            "summary": "",
-            "url": "classes/ConAlumnos.html#method___construct"
-        },                {
-            "fqsen": "\\ConAlumnos\u003A\u003Alistar\u0028\u0029",
-            "name": "listar",
-            "summary": "",
-            "url": "classes/ConAlumnos.html#method_listar"
-        },                {
-            "fqsen": "\\ConAlumnos\u003A\u003Aobtener\u0028\u0029",
-            "name": "obtener",
-            "summary": "",
-            "url": "classes/ConAlumnos.html#method_obtener"
-        },                {
-            "fqsen": "\\ConAlumnos\u003A\u003AobtenerDataTables\u0028\u0029",
-            "name": "obtenerDataTables",
-            "summary": "",
-            "url": "classes/ConAlumnos.html#method_obtenerDataTables"
-        },                {
-            "fqsen": "\\ConAlumnos\u003A\u003Acrear\u0028\u0029",
-            "name": "crear",
-            "summary": "",
-            "url": "classes/ConAlumnos.html#method_crear"
-        },                {
-            "fqsen": "\\ConAlumnos\u003A\u003Aactualizar\u0028\u0029",
-            "name": "actualizar",
-            "summary": "",
-            "url": "classes/ConAlumnos.html#method_actualizar"
-        },                {
-            "fqsen": "\\ConAlumnos\u003A\u003Aeliminar\u0028\u0029",
-            "name": "eliminar",
-            "summary": "",
-            "url": "classes/ConAlumnos.html#method_eliminar"
-        },                {
-            "fqsen": "\\ConAlumnos\u003A\u003AlistarPorModulo\u0028\u0029",
-            "name": "listarPorModulo",
-            "summary": "",
-            "url": "classes/ConAlumnos.html#method_listarPorModulo"
-        },                {
-            "fqsen": "\\ConAlumnos\u003A\u003A\u0024modelo",
-            "name": "modelo",
-            "summary": "",
-            "url": "classes/ConAlumnos.html#property_modelo"
-        },                {
-            "fqsen": "\\ConCiclos",
-            "name": "ConCiclos",
-            "summary": "",
-            "url": "classes/ConCiclos.html"
-        },                {
-            "fqsen": "\\ConCiclos\u003A\u003A__construct\u0028\u0029",
-            "name": "__construct",
-            "summary": "",
-            "url": "classes/ConCiclos.html#method___construct"
-        },                {
-            "fqsen": "\\ConCiclos\u003A\u003Alistar\u0028\u0029",
-            "name": "listar",
-            "summary": "",
-            "url": "classes/ConCiclos.html#method_listar"
-        },                {
-            "fqsen": "\\ConCiclos\u003A\u003Aobtener\u0028\u0029",
-            "name": "obtener",
-            "summary": "",
-            "url": "classes/ConCiclos.html#method_obtener"
-        },                {
-            "fqsen": "\\ConCiclos\u003A\u003AobtenerDataTables\u0028\u0029",
-            "name": "obtenerDataTables",
-            "summary": "",
-            "url": "classes/ConCiclos.html#method_obtenerDataTables"
-        },                {
-            "fqsen": "\\ConCiclos\u003A\u003Acrear\u0028\u0029",
-            "name": "crear",
-            "summary": "",
-            "url": "classes/ConCiclos.html#method_crear"
-        },                {
-            "fqsen": "\\ConCiclos\u003A\u003Aactualizar\u0028\u0029",
-            "name": "actualizar",
-            "summary": "",
-            "url": "classes/ConCiclos.html#method_actualizar"
-        },                {
-            "fqsen": "\\ConCiclos\u003A\u003Aeliminar\u0028\u0029",
-            "name": "eliminar",
-            "summary": "",
-            "url": "classes/ConCiclos.html#method_eliminar"
-        },                {
-            "fqsen": "\\ConCiclos\u003A\u003A\u0024modelo",
-            "name": "modelo",
-            "summary": "",
-            "url": "classes/ConCiclos.html#property_modelo"
-        },                {
-            "fqsen": "\\ConConfiguracion",
-            "name": "ConConfiguracion",
-            "summary": "",
-            "url": "classes/ConConfiguracion.html"
-        },                {
-            "fqsen": "\\ConConfiguracion\u003A\u003A__construct\u0028\u0029",
-            "name": "__construct",
-            "summary": "",
-            "url": "classes/ConConfiguracion.html#method___construct"
-        },                {
-            "fqsen": "\\ConConfiguracion\u003A\u003AobtenerConfiguracion\u0028\u0029",
-            "name": "obtenerConfiguracion",
-            "summary": "",
-            "url": "classes/ConConfiguracion.html#method_obtenerConfiguracion"
-        },                {
-            "fqsen": "\\ConConfiguracion\u003A\u003AactualizarConfiguracion\u0028\u0029",
-            "name": "actualizarConfiguracion",
-            "summary": "",
-            "url": "classes/ConConfiguracion.html#method_actualizarConfiguracion"
-        },                {
-            "fqsen": "\\ConConfiguracion\u003A\u003A\u0024modelo",
-            "name": "modelo",
-            "summary": "",
-            "url": "classes/ConConfiguracion.html#property_modelo"
-        },                {
-            "fqsen": "\\ConCursos",
-            "name": "ConCursos",
-            "summary": "",
-            "url": "classes/ConCursos.html"
-        },                {
-            "fqsen": "\\ConCursos\u003A\u003A__construct\u0028\u0029",
-            "name": "__construct",
-            "summary": "",
-            "url": "classes/ConCursos.html#method___construct"
-        },                {
-            "fqsen": "\\ConCursos\u003A\u003Alistar\u0028\u0029",
-            "name": "listar",
-            "summary": "",
-            "url": "classes/ConCursos.html#method_listar"
-        },                {
-            "fqsen": "\\ConCursos\u003A\u003AlistarPorProfesor\u0028\u0029",
-            "name": "listarPorProfesor",
-            "summary": "",
-            "url": "classes/ConCursos.html#method_listarPorProfesor"
-        },                {
-            "fqsen": "\\ConCursos\u003A\u003Aobtener\u0028\u0029",
-            "name": "obtener",
-            "summary": "",
-            "url": "classes/ConCursos.html#method_obtener"
-        },                {
-            "fqsen": "\\ConCursos\u003A\u003Acrear\u0028\u0029",
-            "name": "crear",
-            "summary": "",
-            "url": "classes/ConCursos.html#method_crear"
-        },                {
-            "fqsen": "\\ConCursos\u003A\u003Aactualizar\u0028\u0029",
-            "name": "actualizar",
-            "summary": "",
-            "url": "classes/ConCursos.html#method_actualizar"
-        },                {
-            "fqsen": "\\ConCursos\u003A\u003Aeliminar\u0028\u0029",
-            "name": "eliminar",
-            "summary": "",
-            "url": "classes/ConCursos.html#method_eliminar"
-        },                {
-            "fqsen": "\\ConCursos\u003A\u003A\u0024modelo",
-            "name": "modelo",
-            "summary": "",
-            "url": "classes/ConCursos.html#property_modelo"
-        },                {
-            "fqsen": "\\ConEmpresas",
-            "name": "ConEmpresas",
-            "summary": "Controlador\u0020para\u0020la\u0020gesti\u00F3n\u0020de\u0020Empresas\u0020y\u0020sus\u0020respectivos\u0020contactos.",
-            "url": "classes/ConEmpresas.html"
-        },                {
-            "fqsen": "\\ConEmpresas\u003A\u003A__construct\u0028\u0029",
-            "name": "__construct",
-            "summary": "Constructor\u0020del\u0020controlador.",
-            "url": "classes/ConEmpresas.html#method___construct"
-        },                {
-            "fqsen": "\\ConEmpresas\u003A\u003Alistar\u0028\u0029",
-            "name": "listar",
-            "summary": "Obtiene\u0020el\u0020listado\u0020completo\u0020de\u0020todas\u0020las\u0020empresas\u0020sin\u0020paginaci\u00F3n.",
-            "url": "classes/ConEmpresas.html#method_listar"
-        },                {
-            "fqsen": "\\ConEmpresas\u003A\u003Aobtener\u0028\u0029",
-            "name": "obtener",
-            "summary": "Obtiene\u0020los\u0020datos\u0020detallados\u0020de\u0020una\u0020empresa\u0020en\u0020concreto\u0020mediante\u0020su\u0020ID.",
-            "url": "classes/ConEmpresas.html#method_obtener"
-        },                {
-            "fqsen": "\\ConEmpresas\u003A\u003AobtenerDataTables\u0028\u0029",
-            "name": "obtenerDataTables",
-            "summary": "Procesa\u0020la\u0020petici\u00F3n\u0020estructurada\u0020proveniente\u0020del\u0020plugin\u0020DataTables\u0020de\u0020Angular.",
-            "url": "classes/ConEmpresas.html#method_obtenerDataTables"
-        },                {
-            "fqsen": "\\ConEmpresas\u003A\u003Acrear\u0028\u0029",
-            "name": "crear",
-            "summary": "Gestiona\u0020la\u0020creaci\u00F3n\u0020de\u0020una\u0020nueva\u0020empresa\u0020y\u0020sus\u0020contactos.",
-            "url": "classes/ConEmpresas.html#method_crear"
-        },                {
-            "fqsen": "\\ConEmpresas\u003A\u003Aactualizar\u0028\u0029",
-            "name": "actualizar",
-            "summary": "Gestiona\u0020la\u0020actualizaci\u00F3n\u0020completa\u0020de\u0020los\u0020datos\u0020de\u0020una\u0020empresa\u0020y\u0020reemplaza\u0020todos\u0020sus\u0020contactos.",
-            "url": "classes/ConEmpresas.html#method_actualizar"
-        },                {
-            "fqsen": "\\ConEmpresas\u003A\u003Aeliminar\u0028\u0029",
-            "name": "eliminar",
-            "summary": "Gestiona\u0020la\u0020eliminaci\u00F3n\u0020de\u0020una\u0020empresa\u0020bas\u00E1ndose\u0020en\u0020su\u0020ID.",
-            "url": "classes/ConEmpresas.html#method_eliminar"
-        },                {
-            "fqsen": "\\ConEmpresas\u003A\u003AvalidarLongitudes\u0028\u0029",
-            "name": "validarLongitudes",
-            "summary": "Valida\u0020que\u0020las\u0020cadenas\u0020de\u0020texto\u0020recibidas\u0020no\u0020excedan\u0020el\u0020tama\u00F1o\u0020definido\nen\u0020el\u0020script\u0020SQL\u0020de\u0020creaci\u00F3n\u0020de\u0020la\u0020base\u0020de\u0020datos\u0020\u0028scriptDB.sql\u0029.",
-            "url": "classes/ConEmpresas.html#method_validarLongitudes"
-        },                {
-            "fqsen": "\\ConEmpresas\u003A\u003A\u0024modelo",
-            "name": "modelo",
-            "summary": "",
-            "url": "classes/ConEmpresas.html#property_modelo"
-        },                {
-            "fqsen": "\\ConModulos",
-            "name": "ConModulos",
-            "summary": "",
-            "url": "classes/ConModulos.html"
-        },                {
-            "fqsen": "\\ConModulos\u003A\u003A__construct\u0028\u0029",
-            "name": "__construct",
-            "summary": "",
-            "url": "classes/ConModulos.html#method___construct"
-        },                {
-            "fqsen": "\\ConModulos\u003A\u003Alistar\u0028\u0029",
-            "name": "listar",
-            "summary": "",
-            "url": "classes/ConModulos.html#method_listar"
-        },                {
-            "fqsen": "\\ConModulos\u003A\u003AlistarPorCiclo\u0028\u0029",
-            "name": "listarPorCiclo",
-            "summary": "",
-            "url": "classes/ConModulos.html#method_listarPorCiclo"
-        },                {
-            "fqsen": "\\ConModulos\u003A\u003Aobtener\u0028\u0029",
-            "name": "obtener",
-            "summary": "",
-            "url": "classes/ConModulos.html#method_obtener"
-        },                {
-            "fqsen": "\\ConModulos\u003A\u003AobtenerDataTables\u0028\u0029",
-            "name": "obtenerDataTables",
-            "summary": "",
-            "url": "classes/ConModulos.html#method_obtenerDataTables"
-        },                {
-            "fqsen": "\\ConModulos\u003A\u003Acrear\u0028\u0029",
-            "name": "crear",
-            "summary": "",
-            "url": "classes/ConModulos.html#method_crear"
-        },                {
-            "fqsen": "\\ConModulos\u003A\u003Aactualizar\u0028\u0029",
-            "name": "actualizar",
-            "summary": "",
-            "url": "classes/ConModulos.html#method_actualizar"
-        },                {
-            "fqsen": "\\ConModulos\u003A\u003Aeliminar\u0028\u0029",
-            "name": "eliminar",
-            "summary": "",
-            "url": "classes/ConModulos.html#method_eliminar"
-        },                {
-            "fqsen": "\\ConModulos\u003A\u003AlistarProfesor\u0028\u0029",
-            "name": "listarProfesor",
-            "summary": "",
-            "url": "classes/ConModulos.html#method_listarProfesor"
-        },                {
-            "fqsen": "\\ConModulos\u003A\u003A\u0024modelo",
-            "name": "modelo",
-            "summary": "",
-            "url": "classes/ConModulos.html#property_modelo"
-        },                {
-            "fqsen": "\\ConProfesores",
-            "name": "ConProfesores",
-            "summary": "Controlador\u0020para\u0020la\u0020secci\u00F3n\u0020de\u0020Profesores.",
-            "url": "classes/ConProfesores.html"
-        },                {
-            "fqsen": "\\ConProfesores\u003A\u003A__construct\u0028\u0029",
-            "name": "__construct",
-            "summary": "",
-            "url": "classes/ConProfesores.html#method___construct"
-        },                {
-            "fqsen": "\\ConProfesores\u003A\u003Alistar\u0028\u0029",
-            "name": "listar",
-            "summary": "Devuelve\u0020el\u0020listado\u0020completo\u0020de\u0020profesores\u0020\u0028para\u0020selects\u0020o\u0020listas\u0020simples\u0029.",
-            "url": "classes/ConProfesores.html#method_listar"
-        },                {
-            "fqsen": "\\ConProfesores\u003A\u003Aobtener\u0028\u0029",
-            "name": "obtener",
-            "summary": "Obtiene\u0020un\u0020profesor\u0020espec\u00EDfico\u0020por\u0020su\u0020ID.",
-            "url": "classes/ConProfesores.html#method_obtener"
-        },                {
-            "fqsen": "\\ConProfesores\u003A\u003AobtenerDataTables\u0028\u0029",
-            "name": "obtenerDataTables",
-            "summary": "Punto\u0020de\u0020entrada\u0020para\u0020la\u0020carga\u0020de\u0020datos\u0020de\u0020DataTables.",
-            "url": "classes/ConProfesores.html#method_obtenerDataTables"
-        },                {
-            "fqsen": "\\ConProfesores\u003A\u003Acrear\u0028\u0029",
-            "name": "crear",
-            "summary": "Crea\u0020un\u0020nuevo\u0020profesor.",
-            "url": "classes/ConProfesores.html#method_crear"
-        },                {
-            "fqsen": "\\ConProfesores\u003A\u003Aactualizar\u0028\u0029",
-            "name": "actualizar",
-            "summary": "Actualiza\u0020un\u0020profesor\u0020existente.",
-            "url": "classes/ConProfesores.html#method_actualizar"
-        },                {
-            "fqsen": "\\ConProfesores\u003A\u003Aeliminar\u0028\u0029",
-            "name": "eliminar",
-            "summary": "Elimina\u0020un\u0020profesor.",
-            "url": "classes/ConProfesores.html#method_eliminar"
-        },                {
-            "fqsen": "\\ConProfesores\u003A\u003A\u0024modelo",
-            "name": "modelo",
-            "summary": "",
-            "url": "classes/ConProfesores.html#property_modelo"
-        },                {
-            "fqsen": "\\ConTareas",
-            "name": "ConTareas",
-            "summary": "",
-            "url": "classes/ConTareas.html"
-        },                {
-            "fqsen": "\\ConTareas\u003A\u003A__construct\u0028\u0029",
-            "name": "__construct",
-            "summary": "",
-            "url": "classes/ConTareas.html#method___construct"
-        },                {
-            "fqsen": "\\ConTareas\u003A\u003Alistar\u0028\u0029",
-            "name": "listar",
-            "summary": "",
-            "url": "classes/ConTareas.html#method_listar"
-        },                {
-            "fqsen": "\\ConTareas\u003A\u003AlistarPorAlumno\u0028\u0029",
-            "name": "listarPorAlumno",
-            "summary": "",
-            "url": "classes/ConTareas.html#method_listarPorAlumno"
-        },                {
-            "fqsen": "\\ConTareas\u003A\u003Aobtener\u0028\u0029",
-            "name": "obtener",
-            "summary": "",
-            "url": "classes/ConTareas.html#method_obtener"
-        },                {
-            "fqsen": "\\ConTareas\u003A\u003Acrear\u0028\u0029",
-            "name": "crear",
-            "summary": "",
-            "url": "classes/ConTareas.html#method_crear"
-        },                {
-            "fqsen": "\\ConTareas\u003A\u003Aactualizar\u0028\u0029",
-            "name": "actualizar",
-            "summary": "",
-            "url": "classes/ConTareas.html#method_actualizar"
-        },                {
-            "fqsen": "\\ConTareas\u003A\u003Aeliminar\u0028\u0029",
-            "name": "eliminar",
-            "summary": "",
-            "url": "classes/ConTareas.html#method_eliminar"
-        },                {
-            "fqsen": "\\ConTareas\u003A\u003A\u0024modelo",
-            "name": "modelo",
-            "summary": "",
-            "url": "classes/ConTareas.html#property_modelo"
-        },                {
-            "fqsen": "\\BaseController",
-            "name": "BaseController",
-            "summary": "",
-            "url": "classes/BaseController.html"
-        },                {
-            "fqsen": "\\BaseController\u003A\u003A__construct\u0028\u0029",
-            "name": "__construct",
-            "summary": "",
-            "url": "classes/BaseController.html#method___construct"
-        },                {
-            "fqsen": "\\BaseController\u003A\u003AsendResponse\u0028\u0029",
-            "name": "sendResponse",
-            "summary": "Env\u00EDa\u0020una\u0020respuesta\u0020JSON\u0020y\u0020finaliza\u0020la\u0020ejecuci\u00F3n.",
-            "url": "classes/BaseController.html#method_sendResponse"
-        },                {
-            "fqsen": "\\BaseController\u003A\u003AsendError\u0028\u0029",
-            "name": "sendError",
-            "summary": "Env\u00EDa\u0020un\u0020error\u0020JSON\u0020y\u0020finaliza\u0020la\u0020ejecuci\u00F3n.",
-            "url": "classes/BaseController.html#method_sendError"
-        },                {
-            "fqsen": "\\BaseController\u003A\u003AcheckRole\u0028\u0029",
-            "name": "checkRole",
-            "summary": "Verifica\u0020si\u0020el\u0020usuario\u0020tiene\u0020uno\u0020de\u0020los\u0020roles\u0020permitidos.",
-            "url": "classes/BaseController.html#method_checkRole"
-        },                {
-            "fqsen": "\\BaseController\u003A\u003A\u0024db",
-            "name": "db",
-            "summary": "",
-            "url": "classes/BaseController.html#property_db"
-        },                {
-            "fqsen": "\\BaseController\u003A\u003A\u0024user",
-            "name": "user",
-            "summary": "",
-            "url": "classes/BaseController.html#property_user"
-        },                {
-            "fqsen": "\\ConexionDB",
-            "name": "ConexionDB",
-            "summary": "",
-            "url": "classes/ConexionDB.html"
-        },                {
-            "fqsen": "\\ConexionDB\u003A\u003A__construct\u0028\u0029",
-            "name": "__construct",
-            "summary": "",
-            "url": "classes/ConexionDB.html#method___construct"
-        },                {
-            "fqsen": "\\ConexionDB\u003A\u003AgetConnection\u0028\u0029",
-            "name": "getConnection",
-            "summary": "",
-            "url": "classes/ConexionDB.html#method_getConnection"
-        },                {
-            "fqsen": "\\ConexionDB\u003A\u003A\u0024host",
-            "name": "host",
-            "summary": "",
-            "url": "classes/ConexionDB.html#property_host"
-        },                {
-            "fqsen": "\\ConexionDB\u003A\u003A\u0024db_name",
-            "name": "db_name",
-            "summary": "",
-            "url": "classes/ConexionDB.html#property_db_name"
-        },                {
-            "fqsen": "\\ConexionDB\u003A\u003A\u0024username",
-            "name": "username",
-            "summary": "",
-            "url": "classes/ConexionDB.html#property_username"
-        },                {
-            "fqsen": "\\ConexionDB\u003A\u003A\u0024password",
-            "name": "password",
-            "summary": "",
-            "url": "classes/ConexionDB.html#property_password"
-        },                {
-            "fqsen": "\\ConexionDB\u003A\u003A\u0024charset",
-            "name": "charset",
-            "summary": "",
-            "url": "classes/ConexionDB.html#property_charset"
-        },                {
-            "fqsen": "\\ConexionDB\u003A\u003A\u0024conn",
-            "name": "conn",
-            "summary": "",
-            "url": "classes/ConexionDB.html#property_conn"
-        },                {
-            "fqsen": "\\JWTHelper",
-            "name": "JWTHelper",
-            "summary": "",
-            "url": "classes/JWTHelper.html"
-        },                {
-            "fqsen": "\\JWTHelper\u003A\u003Abase64UrlEncode\u0028\u0029",
-            "name": "base64UrlEncode",
-            "summary": "",
-            "url": "classes/JWTHelper.html#method_base64UrlEncode"
-        },                {
-            "fqsen": "\\JWTHelper\u003A\u003Abase64UrlDecode\u0028\u0029",
-            "name": "base64UrlDecode",
-            "summary": "",
-            "url": "classes/JWTHelper.html#method_base64UrlDecode"
-        },                {
-            "fqsen": "\\JWTHelper\u003A\u003Avalidar\u0028\u0029",
-            "name": "validar",
-            "summary": "Valida\u0020un\u0020token\u0020JWT\u0020y\u0020devuelve\u0020el\u0020payload\u0020si\u0020es\u0020v\u00E1lido.",
-            "url": "classes/JWTHelper.html#method_validar"
-        },                {
-            "fqsen": "\\ModActividades",
-            "name": "ModActividades",
-            "summary": "Modelo\u0020para\u0020la\u0020gesti\u00F3n\u0020de\u0020Actividades\u0020en\u0020la\u0020base\u0020de\u0020datos.",
-            "url": "classes/ModActividades.html"
-        },                {
-            "fqsen": "\\ModActividades\u003A\u003A__construct\u0028\u0029",
-            "name": "__construct",
-            "summary": "",
-            "url": "classes/ModActividades.html#method___construct"
-        },                {
-            "fqsen": "\\ModActividades\u003A\u003Alistar\u0028\u0029",
-            "name": "listar",
-            "summary": "Obtiene\u0020el\u0020listado\u0020completo\u0020de\u0020actividades\u0020registradas,\u0020incluyendo\u0020el\u0020m\u00F3dulo\u0020asociado\u0020si\u0020lo\u0020tiene.",
-            "url": "classes/ModActividades.html#method_listar"
-        },                {
-            "fqsen": "\\ModActividades\u003A\u003Aobtener\u0028\u0029",
+            "fqsen": "\\Dualex\\Controllers\\ConActividades\u003A\u003Aobtener\u0028\u0029",
             "name": "obtener",
             "summary": "Obtiene\u0020una\u0020actividad\u0020espec\u00EDfica\u0020por\u0020su\u0020ID.",
-            "url": "classes/ModActividades.html#method_obtener"
+            "url": "classes/Dualex-Controllers-ConActividades.html#method_obtener"
         },                {
-            "fqsen": "\\ModActividades\u003A\u003Acrear\u0028\u0029",
+            "fqsen": "\\Dualex\\Controllers\\ConActividades\u003A\u003AobtenerDataTables\u0028\u0029",
+            "name": "obtenerDataTables",
+            "summary": "Obtiene\u0020las\u0020actividades\u0020formateadas\u0020para\u0020DataTables.",
+            "url": "classes/Dualex-Controllers-ConActividades.html#method_obtenerDataTables"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConActividades\u003A\u003Acrear\u0028\u0029",
             "name": "crear",
-            "summary": "Crea\u0020una\u0020nueva\u0020actividad\u0020en\u0020el\u0020sistema.",
-            "url": "classes/ModActividades.html#method_crear"
+            "summary": "Crea\u0020una\u0020nueva\u0020actividad.",
+            "url": "classes/Dualex-Controllers-ConActividades.html#method_crear"
         },                {
-            "fqsen": "\\ModActividades\u003A\u003Aactualizar\u0028\u0029",
+            "fqsen": "\\Dualex\\Controllers\\ConActividades\u003A\u003Aactualizar\u0028\u0029",
             "name": "actualizar",
-            "summary": "Actualiza\u0020la\u0020informaci\u00F3n\u0020de\u0020una\u0020actividad\u0020existente.",
-            "url": "classes/ModActividades.html#method_actualizar"
+            "summary": "Actualiza\u0020una\u0020actividad\u0020existente.",
+            "url": "classes/Dualex-Controllers-ConActividades.html#method_actualizar"
         },                {
-            "fqsen": "\\ModActividades\u003A\u003Aeliminar\u0028\u0029",
+            "fqsen": "\\Dualex\\Controllers\\ConActividades\u003A\u003Aeliminar\u0028\u0029",
             "name": "eliminar",
-            "summary": "Elimina\u0020una\u0020actividad\u0020del\u0020cat\u00E1logo\u0020de\u0020forma\u0020permanente.",
-            "url": "classes/ModActividades.html#method_eliminar"
+            "summary": "Elimina\u0020una\u0020actividad.",
+            "url": "classes/Dualex-Controllers-ConActividades.html#method_eliminar"
         },                {
-            "fqsen": "\\ModActividades\u003A\u003A\u0024conn",
+            "fqsen": "\\Dualex\\Controllers\\ConActividades\u003A\u003A\u0024modelo",
+            "name": "modelo",
+            "summary": "",
+            "url": "classes/Dualex-Controllers-ConActividades.html#property_modelo"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConAlumnos",
+            "name": "ConAlumnos",
+            "summary": "Controlador\u0020para\u0020la\u0020gesti\u00F3n\u0020de\u0020Alumnos.",
+            "url": "classes/Dualex-Controllers-ConAlumnos.html"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConAlumnos\u003A\u003A__construct\u0028\u0029",
+            "name": "__construct",
+            "summary": "",
+            "url": "classes/Dualex-Controllers-ConAlumnos.html#method___construct"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConAlumnos\u003A\u003Alistar\u0028\u0029",
+            "name": "listar",
+            "summary": "Lista\u0020todos\u0020los\u0020alumnos\u0020sin\u0020paginaci\u00F3n.",
+            "url": "classes/Dualex-Controllers-ConAlumnos.html#method_listar"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConAlumnos\u003A\u003Aobtener\u0028\u0029",
+            "name": "obtener",
+            "summary": "Obtiene\u0020un\u0020alumno\u0020espec\u00EDfico\u0020por\u0020su\u0020ID.",
+            "url": "classes/Dualex-Controllers-ConAlumnos.html#method_obtener"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConAlumnos\u003A\u003AobtenerDataTables\u0028\u0029",
+            "name": "obtenerDataTables",
+            "summary": "Obtiene\u0020los\u0020alumnos\u0020formateados\u0020para\u0020DataTables,\u0020aplicando\u0020filtros\u0020por\u0020m\u00F3dulo\u0020y\u0020rol.",
+            "url": "classes/Dualex-Controllers-ConAlumnos.html#method_obtenerDataTables"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConAlumnos\u003A\u003Acrear\u0028\u0029",
+            "name": "crear",
+            "summary": "Crea\u0020un\u0020nuevo\u0020alumno.",
+            "url": "classes/Dualex-Controllers-ConAlumnos.html#method_crear"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConAlumnos\u003A\u003Aactualizar\u0028\u0029",
+            "name": "actualizar",
+            "summary": "Actualiza\u0020los\u0020datos\u0020de\u0020un\u0020alumno\u0020existente.",
+            "url": "classes/Dualex-Controllers-ConAlumnos.html#method_actualizar"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConAlumnos\u003A\u003Aeliminar\u0028\u0029",
+            "name": "eliminar",
+            "summary": "Elimina\u0020un\u0020alumno.",
+            "url": "classes/Dualex-Controllers-ConAlumnos.html#method_eliminar"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConAlumnos\u003A\u003AlistarPorModulo\u0028\u0029",
+            "name": "listarPorModulo",
+            "summary": "Lista\u0020los\u0020alumnos\u0020filtrados\u0020por\u0020un\u0020m\u00F3dulo\u0020espec\u00EDfico.",
+            "url": "classes/Dualex-Controllers-ConAlumnos.html#method_listarPorModulo"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConAlumnos\u003A\u003AimportarExcel\u0028\u0029",
+            "name": "importarExcel",
+            "summary": "Importa\u0020alumnos\u0020masivamente\u0020desde\u0020un\u0020archivo\u0020Excel.",
+            "url": "classes/Dualex-Controllers-ConAlumnos.html#method_importarExcel"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConAlumnos\u003A\u003AlistarTodosDataTables\u0028\u0029",
+            "name": "listarTodosDataTables",
+            "summary": "Obtiene\u0020todos\u0020los\u0020alumnos\u0020para\u0020DataTables\u0020sin\u0020aplicar\u0020filtros\u0020de\u0020rol\u0020espec\u00EDficos,\nusualmente\u0020para\u0020vistas\u0020de\u0020administraci\u00F3n\u0020general.",
+            "url": "classes/Dualex-Controllers-ConAlumnos.html#method_listarTodosDataTables"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConAlumnos\u003A\u003A\u0024modelo",
+            "name": "modelo",
+            "summary": "",
+            "url": "classes/Dualex-Controllers-ConAlumnos.html#property_modelo"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConAuth",
+            "name": "ConAuth",
+            "summary": "File\u002Dlevel\u0020docblock\u0020for\u0020conAuth.php",
+            "url": "classes/Dualex-Controllers-ConAuth.html"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConAuth\u003A\u003AssoLogin\u0028\u0029",
+            "name": "ssoLogin",
+            "summary": "Endpoint\u0020para\u0020recibir\u0020el\u0020login\u0020desde\u0020el\u0020SSO\u0020por\u0020m\u00E9todo\u0020POST\nURL\u0020esperada\u003A\u0020index.php\u003Fc\u003DAuth\u0026m\u003DssoLogin",
+            "url": "classes/Dualex-Controllers-ConAuth.html#method_ssoLogin"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConCiclos",
+            "name": "ConCiclos",
+            "summary": "Controlador\u0020para\u0020la\u0020gesti\u00F3n\u0020de\u0020Ciclos\u0020Formativos.",
+            "url": "classes/Dualex-Controllers-ConCiclos.html"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConCiclos\u003A\u003A__construct\u0028\u0029",
+            "name": "__construct",
+            "summary": "",
+            "url": "classes/Dualex-Controllers-ConCiclos.html#method___construct"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConCiclos\u003A\u003Alistar\u0028\u0029",
+            "name": "listar",
+            "summary": "Lista\u0020todos\u0020los\u0020ciclos\u0020disponibles.",
+            "url": "classes/Dualex-Controllers-ConCiclos.html#method_listar"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConCiclos\u003A\u003Aobtener\u0028\u0029",
+            "name": "obtener",
+            "summary": "Obtiene\u0020los\u0020detalles\u0020de\u0020un\u0020ciclo\u0020espec\u00EDfico\u0020por\u0020su\u0020ID.",
+            "url": "classes/Dualex-Controllers-ConCiclos.html#method_obtener"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConCiclos\u003A\u003AobtenerDataTables\u0028\u0029",
+            "name": "obtenerDataTables",
+            "summary": "Obtiene\u0020la\u0020lista\u0020de\u0020ciclos\u0020formateada\u0020para\u0020DataTables.",
+            "url": "classes/Dualex-Controllers-ConCiclos.html#method_obtenerDataTables"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConCiclos\u003A\u003Acrear\u0028\u0029",
+            "name": "crear",
+            "summary": "Crea\u0020un\u0020nuevo\u0020ciclo.",
+            "url": "classes/Dualex-Controllers-ConCiclos.html#method_crear"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConCiclos\u003A\u003Aactualizar\u0028\u0029",
+            "name": "actualizar",
+            "summary": "Actualiza\u0020un\u0020ciclo\u0020existente.",
+            "url": "classes/Dualex-Controllers-ConCiclos.html#method_actualizar"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConCiclos\u003A\u003Aeliminar\u0028\u0029",
+            "name": "eliminar",
+            "summary": "Elimina\u0020un\u0020ciclo.",
+            "url": "classes/Dualex-Controllers-ConCiclos.html#method_eliminar"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConCiclos\u003A\u003A\u0024modelo",
+            "name": "modelo",
+            "summary": "",
+            "url": "classes/Dualex-Controllers-ConCiclos.html#property_modelo"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConConfiguracion",
+            "name": "ConConfiguracion",
+            "summary": "Controlador\u0020para\u0020gestionar\u0020la\u0020Configuraci\u00F3n\u0020del\u0020sistema.",
+            "url": "classes/Dualex-Controllers-ConConfiguracion.html"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConConfiguracion\u003A\u003A__construct\u0028\u0029",
+            "name": "__construct",
+            "summary": "",
+            "url": "classes/Dualex-Controllers-ConConfiguracion.html#method___construct"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConConfiguracion\u003A\u003AesGeneral\u0028\u0029",
+            "name": "esGeneral",
+            "summary": "Verifica\u0020si\u0020el\u0020usuario\u0020actual\u0020tiene\u0020permisos\u0020de\u0020coordinador\u0020general.",
+            "url": "classes/Dualex-Controllers-ConConfiguracion.html#method_esGeneral"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConConfiguracion\u003A\u003AobtenerConfiguracion\u0028\u0029",
+            "name": "obtenerConfiguracion",
+            "summary": "Obtiene\u0020la\u0020configuraci\u00F3n\u0020actual\u0020del\u0020sistema.",
+            "url": "classes/Dualex-Controllers-ConConfiguracion.html#method_obtenerConfiguracion"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConConfiguracion\u003A\u003AactualizarConfiguracion\u0028\u0029",
+            "name": "actualizarConfiguracion",
+            "summary": "Actualiza\u0020la\u0020configuraci\u00F3n\u0020global\u0020del\u0020sistema\u0020\u0028d\u00EDas\u0020de\u0020aviso,\u0020url,\u0020etc.\u0029.",
+            "url": "classes/Dualex-Controllers-ConConfiguracion.html#method_actualizarConfiguracion"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConConfiguracion\u003A\u003A\u0024modelo",
+            "name": "modelo",
+            "summary": "",
+            "url": "classes/Dualex-Controllers-ConConfiguracion.html#property_modelo"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConConfiguracion\u003A\u003A\u0024db",
+            "name": "db",
+            "summary": "",
+            "url": "classes/Dualex-Controllers-ConConfiguracion.html#property_db"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConConfiguracion\u003A\u003A\u0024user",
+            "name": "user",
+            "summary": "",
+            "url": "classes/Dualex-Controllers-ConConfiguracion.html#property_user"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConCursos",
+            "name": "ConCursos",
+            "summary": "Controlador\u0020para\u0020la\u0020gesti\u00F3n\u0020de\u0020Cursos.",
+            "url": "classes/Dualex-Controllers-ConCursos.html"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConCursos\u003A\u003A__construct\u0028\u0029",
+            "name": "__construct",
+            "summary": "",
+            "url": "classes/Dualex-Controllers-ConCursos.html#method___construct"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConCursos\u003A\u003Alistar\u0028\u0029",
+            "name": "listar",
+            "summary": "Lista\u0020los\u0020cursos.\u0020Si\u0020se\u0020proporciona\u0020un\u0020idCiclo,\u0020filtra\u0020por\u0020ese\u0020ciclo.",
+            "url": "classes/Dualex-Controllers-ConCursos.html#method_listar"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConCursos\u003A\u003AlistarPorProfesor\u0028\u0029",
+            "name": "listarPorProfesor",
+            "summary": "Lista\u0020los\u0020cursos\u0020asignados\u0020a\u0020un\u0020profesor\u0020en\u0020particular.",
+            "url": "classes/Dualex-Controllers-ConCursos.html#method_listarPorProfesor"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConCursos\u003A\u003Aobtener\u0028\u0029",
+            "name": "obtener",
+            "summary": "Obtiene\u0020un\u0020curso\u0020espec\u00EDfico\u0020por\u0020su\u0020ID.",
+            "url": "classes/Dualex-Controllers-ConCursos.html#method_obtener"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConCursos\u003A\u003Acrear\u0028\u0029",
+            "name": "crear",
+            "summary": "Crea\u0020un\u0020nuevo\u0020curso.",
+            "url": "classes/Dualex-Controllers-ConCursos.html#method_crear"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConCursos\u003A\u003Aactualizar\u0028\u0029",
+            "name": "actualizar",
+            "summary": "Actualiza\u0020los\u0020datos\u0020de\u0020un\u0020curso\u0020existente.",
+            "url": "classes/Dualex-Controllers-ConCursos.html#method_actualizar"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConCursos\u003A\u003Aeliminar\u0028\u0029",
+            "name": "eliminar",
+            "summary": "Elimina\u0020un\u0020curso.",
+            "url": "classes/Dualex-Controllers-ConCursos.html#method_eliminar"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConCursos\u003A\u003A\u0024modelo",
+            "name": "modelo",
+            "summary": "",
+            "url": "classes/Dualex-Controllers-ConCursos.html#property_modelo"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConEmpresas",
+            "name": "ConEmpresas",
+            "summary": "Controlador\u0020para\u0020la\u0020gesti\u00F3n\u0020de\u0020Empresas\u0020y\u0020sus\u0020respectivos\u0020contactos.",
+            "url": "classes/Dualex-Controllers-ConEmpresas.html"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConEmpresas\u003A\u003A__construct\u0028\u0029",
+            "name": "__construct",
+            "summary": "Constructor\u0020del\u0020controlador.",
+            "url": "classes/Dualex-Controllers-ConEmpresas.html#method___construct"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConEmpresas\u003A\u003Alistar\u0028\u0029",
+            "name": "listar",
+            "summary": "Obtiene\u0020el\u0020listado\u0020completo\u0020de\u0020todas\u0020las\u0020empresas\u0020sin\u0020paginaci\u00F3n.",
+            "url": "classes/Dualex-Controllers-ConEmpresas.html#method_listar"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConEmpresas\u003A\u003Aobtener\u0028\u0029",
+            "name": "obtener",
+            "summary": "Obtiene\u0020los\u0020datos\u0020detallados\u0020de\u0020una\u0020empresa\u0020en\u0020concreto\u0020mediante\u0020su\u0020ID.",
+            "url": "classes/Dualex-Controllers-ConEmpresas.html#method_obtener"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConEmpresas\u003A\u003AobtenerDataTables\u0028\u0029",
+            "name": "obtenerDataTables",
+            "summary": "Procesa\u0020la\u0020petici\u00F3n\u0020estructurada\u0020proveniente\u0020del\u0020plugin\u0020DataTables\u0020de\u0020Angular.",
+            "url": "classes/Dualex-Controllers-ConEmpresas.html#method_obtenerDataTables"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConEmpresas\u003A\u003Acrear\u0028\u0029",
+            "name": "crear",
+            "summary": "Gestiona\u0020la\u0020creaci\u00F3n\u0020de\u0020una\u0020nueva\u0020empresa\u0020y\u0020sus\u0020contactos.",
+            "url": "classes/Dualex-Controllers-ConEmpresas.html#method_crear"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConEmpresas\u003A\u003Aactualizar\u0028\u0029",
+            "name": "actualizar",
+            "summary": "Gestiona\u0020la\u0020actualizaci\u00F3n\u0020completa\u0020de\u0020los\u0020datos\u0020de\u0020una\u0020empresa\u0020y\u0020reemplaza\u0020todos\u0020sus\u0020contactos.",
+            "url": "classes/Dualex-Controllers-ConEmpresas.html#method_actualizar"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConEmpresas\u003A\u003Aeliminar\u0028\u0029",
+            "name": "eliminar",
+            "summary": "Gestiona\u0020la\u0020eliminaci\u00F3n\u0020de\u0020una\u0020empresa\u0020bas\u00E1ndose\u0020en\u0020su\u0020ID.",
+            "url": "classes/Dualex-Controllers-ConEmpresas.html#method_eliminar"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConEmpresas\u003A\u003AvalidarLongitudes\u0028\u0029",
+            "name": "validarLongitudes",
+            "summary": "Valida\u0020que\u0020las\u0020cadenas\u0020de\u0020texto\u0020recibidas\u0020no\u0020excedan\u0020el\u0020tama\u00F1o\u0020definido\nen\u0020el\u0020script\u0020SQL\u0020de\u0020creaci\u00F3n\u0020de\u0020la\u0020base\u0020de\u0020datos\u0020\u0028scriptDB.sql\u0029.",
+            "url": "classes/Dualex-Controllers-ConEmpresas.html#method_validarLongitudes"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConEmpresas\u003A\u003A\u0024modelo",
+            "name": "modelo",
+            "summary": "",
+            "url": "classes/Dualex-Controllers-ConEmpresas.html#property_modelo"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConModulos",
+            "name": "ConModulos",
+            "summary": "Controlador\u0020para\u0020la\u0020gesti\u00F3n\u0020de\u0020M\u00F3dulos.",
+            "url": "classes/Dualex-Controllers-ConModulos.html"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConModulos\u003A\u003A__construct\u0028\u0029",
+            "name": "__construct",
+            "summary": "",
+            "url": "classes/Dualex-Controllers-ConModulos.html#method___construct"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConModulos\u003A\u003Alistar\u0028\u0029",
+            "name": "listar",
+            "summary": "Lista\u0020todos\u0020los\u0020m\u00F3dulos\u0020disponibles.",
+            "url": "classes/Dualex-Controllers-ConModulos.html#method_listar"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConModulos\u003A\u003AlistarPorCiclo\u0028\u0029",
+            "name": "listarPorCiclo",
+            "summary": "Lista\u0020los\u0020m\u00F3dulos\u0020pertenecientes\u0020a\u0020un\u0020ciclo\u0020espec\u00EDfico\u0020\u0028por\u0020sus\u0020siglas\u0029.",
+            "url": "classes/Dualex-Controllers-ConModulos.html#method_listarPorCiclo"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConModulos\u003A\u003Aobtener\u0028\u0029",
+            "name": "obtener",
+            "summary": "Obtiene\u0020los\u0020detalles\u0020de\u0020un\u0020m\u00F3dulo\u0020por\u0020su\u0020ID.",
+            "url": "classes/Dualex-Controllers-ConModulos.html#method_obtener"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConModulos\u003A\u003AobtenerDataTables\u0028\u0029",
+            "name": "obtenerDataTables",
+            "summary": "Obtiene\u0020los\u0020m\u00F3dulos\u0020formateados\u0020para\u0020DataTables,\u0020aplicando\u0020filtro\u0020de\u0020Coordinador.",
+            "url": "classes/Dualex-Controllers-ConModulos.html#method_obtenerDataTables"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConModulos\u003A\u003Acrear\u0028\u0029",
+            "name": "crear",
+            "summary": "Crea\u0020un\u0020nuevo\u0020m\u00F3dulo.",
+            "url": "classes/Dualex-Controllers-ConModulos.html#method_crear"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConModulos\u003A\u003Aactualizar\u0028\u0029",
+            "name": "actualizar",
+            "summary": "Actualiza\u0020un\u0020m\u00F3dulo\u0020existente.",
+            "url": "classes/Dualex-Controllers-ConModulos.html#method_actualizar"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConModulos\u003A\u003Aeliminar\u0028\u0029",
+            "name": "eliminar",
+            "summary": "Elimina\u0020un\u0020m\u00F3dulo\u0020por\u0020su\u0020ID.",
+            "url": "classes/Dualex-Controllers-ConModulos.html#method_eliminar"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConModulos\u003A\u003AlistarProfesor\u0028\u0029",
+            "name": "listarProfesor",
+            "summary": "Lista\u0020los\u0020m\u00F3dulos\u0020asociados\u0020al\u0020profesor\u0020en\u0020sesi\u00F3n\u0020\u0028o\u0020al\u0020especificado\u0020por\u0020par\u00E1metro\u0029.",
+            "url": "classes/Dualex-Controllers-ConModulos.html#method_listarProfesor"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConModulos\u003A\u003A\u0024modelo",
+            "name": "modelo",
+            "summary": "",
+            "url": "classes/Dualex-Controllers-ConModulos.html#property_modelo"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConProfesores",
+            "name": "ConProfesores",
+            "summary": "Controlador\u0020para\u0020la\u0020secci\u00F3n\u0020de\u0020Profesores.",
+            "url": "classes/Dualex-Controllers-ConProfesores.html"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConProfesores\u003A\u003A__construct\u0028\u0029",
+            "name": "__construct",
+            "summary": "",
+            "url": "classes/Dualex-Controllers-ConProfesores.html#method___construct"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConProfesores\u003A\u003Alistar\u0028\u0029",
+            "name": "listar",
+            "summary": "Devuelve\u0020el\u0020listado\u0020completo\u0020de\u0020profesores\u0020\u0028para\u0020selects\u0020o\u0020listas\u0020simples\u0029.",
+            "url": "classes/Dualex-Controllers-ConProfesores.html#method_listar"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConProfesores\u003A\u003Aobtener\u0028\u0029",
+            "name": "obtener",
+            "summary": "Obtiene\u0020un\u0020profesor\u0020espec\u00EDfico\u0020por\u0020su\u0020ID.",
+            "url": "classes/Dualex-Controllers-ConProfesores.html#method_obtener"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConProfesores\u003A\u003AobtenerDataTables\u0028\u0029",
+            "name": "obtenerDataTables",
+            "summary": "Punto\u0020de\u0020entrada\u0020para\u0020la\u0020carga\u0020de\u0020datos\u0020de\u0020DataTables.",
+            "url": "classes/Dualex-Controllers-ConProfesores.html#method_obtenerDataTables"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConProfesores\u003A\u003AesGeneral\u0028\u0029",
+            "name": "esGeneral",
+            "summary": "Crea\u0020un\u0020nuevo\u0020profesor.",
+            "url": "classes/Dualex-Controllers-ConProfesores.html#method_esGeneral"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConProfesores\u003A\u003Acrear\u0028\u0029",
+            "name": "crear",
+            "summary": "",
+            "url": "classes/Dualex-Controllers-ConProfesores.html#method_crear"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConProfesores\u003A\u003Aactualizar\u0028\u0029",
+            "name": "actualizar",
+            "summary": "Actualiza\u0020un\u0020profesor\u0020existente.",
+            "url": "classes/Dualex-Controllers-ConProfesores.html#method_actualizar"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConProfesores\u003A\u003Aeliminar\u0028\u0029",
+            "name": "eliminar",
+            "summary": "Elimina\u0020un\u0020profesor.",
+            "url": "classes/Dualex-Controllers-ConProfesores.html#method_eliminar"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConProfesores\u003A\u003AimportarExcel\u0028\u0029",
+            "name": "importarExcel",
+            "summary": "Importa\u0020profesores\u0020de\u0020forma\u0020masiva\u0020desde\u0020un\u0020archivo\u0020Excel.",
+            "url": "classes/Dualex-Controllers-ConProfesores.html#method_importarExcel"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConProfesores\u003A\u003A\u0024modelo",
+            "name": "modelo",
+            "summary": "",
+            "url": "classes/Dualex-Controllers-ConProfesores.html#property_modelo"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConTareas",
+            "name": "ConTareas",
+            "summary": "Controlador\u0020para\u0020la\u0020gesti\u00F3n\u0020de\u0020Tareas.",
+            "url": "classes/Dualex-Controllers-ConTareas.html"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConTareas\u003A\u003A__construct\u0028\u0029",
+            "name": "__construct",
+            "summary": "",
+            "url": "classes/Dualex-Controllers-ConTareas.html#method___construct"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConTareas\u003A\u003Alistar\u0028\u0029",
+            "name": "listar",
+            "summary": "Lista\u0020todas\u0020las\u0020tareas\u0020\u0028filtra\u0020por\u0020alumno\u0020si\u0020el\u0020rol\u0020actual\u0020es\u0020ALUMNO\u0029.",
+            "url": "classes/Dualex-Controllers-ConTareas.html#method_listar"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConTareas\u003A\u003AlistarPorAlumno\u0028\u0029",
+            "name": "listarPorAlumno",
+            "summary": "Lista\u0020las\u0020tareas\u0020asignadas\u0020a\u0020un\u0020alumno\u0020espec\u00EDfico.",
+            "url": "classes/Dualex-Controllers-ConTareas.html#method_listarPorAlumno"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConTareas\u003A\u003Aobtener\u0028\u0029",
+            "name": "obtener",
+            "summary": "Obtiene\u0020los\u0020detalles\u0020de\u0020una\u0020tarea\u0020espec\u00EDfica\u0020por\u0020su\u0020ID.",
+            "url": "classes/Dualex-Controllers-ConTareas.html#method_obtener"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConTareas\u003A\u003Acrear\u0028\u0029",
+            "name": "crear",
+            "summary": "Crea\u0020una\u0020nueva\u0020tarea.",
+            "url": "classes/Dualex-Controllers-ConTareas.html#method_crear"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConTareas\u003A\u003Aactualizar\u0028\u0029",
+            "name": "actualizar",
+            "summary": "Actualiza\u0020los\u0020datos\u0020de\u0020una\u0020tarea\u0020existente.",
+            "url": "classes/Dualex-Controllers-ConTareas.html#method_actualizar"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConTareas\u003A\u003AsubirDocumento\u0028\u0029",
+            "name": "subirDocumento",
+            "summary": "Sube\u0020un\u0020documento\u0020PDF\u0020asociado\u0020a\u0020una\u0020tarea\u0020espec\u00EDfica.",
+            "url": "classes/Dualex-Controllers-ConTareas.html#method_subirDocumento"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConTareas\u003A\u003AdescargarDocumento\u0028\u0029",
+            "name": "descargarDocumento",
+            "summary": "Descarga\u0020el\u0020documento\u0020PDF\u0020de\u0020una\u0020tarea\u0020espec\u00EDfica.",
+            "url": "classes/Dualex-Controllers-ConTareas.html#method_descargarDocumento"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConTareas\u003A\u003Aeliminar\u0028\u0029",
+            "name": "eliminar",
+            "summary": "Elimina\u0020una\u0020tarea\u0020por\u0020su\u0020ID.",
+            "url": "classes/Dualex-Controllers-ConTareas.html#method_eliminar"
+        },                {
+            "fqsen": "\\Dualex\\Controllers\\ConTareas\u003A\u003A\u0024modelo",
+            "name": "modelo",
+            "summary": "",
+            "url": "classes/Dualex-Controllers-ConTareas.html#property_modelo"
+        },                {
+            "fqsen": "\\Dualex\\Core\\BaseController",
+            "name": "BaseController",
+            "summary": "File\u002Dlevel\u0020docblock\u0020for\u0020BaseController.php",
+            "url": "classes/Dualex-Core-BaseController.html"
+        },                {
+            "fqsen": "\\Dualex\\Core\\BaseController\u003A\u003A__construct\u0028\u0029",
+            "name": "__construct",
+            "summary": "",
+            "url": "classes/Dualex-Core-BaseController.html#method___construct"
+        },                {
+            "fqsen": "\\Dualex\\Core\\BaseController\u003A\u003AsendResponse\u0028\u0029",
+            "name": "sendResponse",
+            "summary": "Env\u00EDa\u0020una\u0020respuesta\u0020JSON\u0020y\u0020finaliza\u0020la\u0020ejecuci\u00F3n.",
+            "url": "classes/Dualex-Core-BaseController.html#method_sendResponse"
+        },                {
+            "fqsen": "\\Dualex\\Core\\BaseController\u003A\u003AsendError\u0028\u0029",
+            "name": "sendError",
+            "summary": "Env\u00EDa\u0020un\u0020error\u0020JSON\u0020y\u0020finaliza\u0020la\u0020ejecuci\u00F3n.",
+            "url": "classes/Dualex-Core-BaseController.html#method_sendError"
+        },                {
+            "fqsen": "\\Dualex\\Core\\BaseController\u003A\u003AcheckRole\u0028\u0029",
+            "name": "checkRole",
+            "summary": "Verifica\u0020si\u0020el\u0020usuario\u0020tiene\u0020uno\u0020de\u0020los\u0020roles\u0020permitidos.",
+            "url": "classes/Dualex-Core-BaseController.html#method_checkRole"
+        },                {
+            "fqsen": "\\Dualex\\Core\\BaseController\u003A\u003AobtenerPerfilLocal\u0028\u0029",
+            "name": "obtenerPerfilLocal",
+            "summary": "Obtiene\u0020el\u0020perfil\u0020del\u0020usuario\u0020actual\u0020directamente\u0020desde\u0020la\u0020base\u0020de\u0020datos\u0020local.",
+            "url": "classes/Dualex-Core-BaseController.html#method_obtenerPerfilLocal"
+        },                {
+            "fqsen": "\\Dualex\\Core\\BaseController\u003A\u003A\u0024db",
+            "name": "db",
+            "summary": "",
+            "url": "classes/Dualex-Core-BaseController.html#property_db"
+        },                {
+            "fqsen": "\\Dualex\\Core\\BaseController\u003A\u003A\u0024user",
+            "name": "user",
+            "summary": "",
+            "url": "classes/Dualex-Core-BaseController.html#property_user"
+        },                {
+            "fqsen": "\\Dualex\\Core\\ConexionDB",
+            "name": "ConexionDB",
+            "summary": "Clase\u0020ConexionDB",
+            "url": "classes/Dualex-Core-ConexionDB.html"
+        },                {
+            "fqsen": "\\Dualex\\Core\\ConexionDB\u003A\u003A__construct\u0028\u0029",
+            "name": "__construct",
+            "summary": "Constructor\u0020de\u0020la\u0020clase\u0020ConexionDB.",
+            "url": "classes/Dualex-Core-ConexionDB.html#method___construct"
+        },                {
+            "fqsen": "\\Dualex\\Core\\ConexionDB\u003A\u003AgetConnection\u0028\u0029",
+            "name": "getConnection",
+            "summary": "Establece\u0020y\u0020devuelve\u0020la\u0020conexi\u00F3n\u0020PDO\u0020a\u0020la\u0020base\u0020de\u0020datos.",
+            "url": "classes/Dualex-Core-ConexionDB.html#method_getConnection"
+        },                {
+            "fqsen": "\\Dualex\\Core\\ConexionDB\u003A\u003A\u0024host",
+            "name": "host",
+            "summary": "",
+            "url": "classes/Dualex-Core-ConexionDB.html#property_host"
+        },                {
+            "fqsen": "\\Dualex\\Core\\ConexionDB\u003A\u003A\u0024db_name",
+            "name": "db_name",
+            "summary": "",
+            "url": "classes/Dualex-Core-ConexionDB.html#property_db_name"
+        },                {
+            "fqsen": "\\Dualex\\Core\\ConexionDB\u003A\u003A\u0024username",
+            "name": "username",
+            "summary": "",
+            "url": "classes/Dualex-Core-ConexionDB.html#property_username"
+        },                {
+            "fqsen": "\\Dualex\\Core\\ConexionDB\u003A\u003A\u0024password",
+            "name": "password",
+            "summary": "",
+            "url": "classes/Dualex-Core-ConexionDB.html#property_password"
+        },                {
+            "fqsen": "\\Dualex\\Core\\ConexionDB\u003A\u003A\u0024charset",
+            "name": "charset",
+            "summary": "",
+            "url": "classes/Dualex-Core-ConexionDB.html#property_charset"
+        },                {
+            "fqsen": "\\Dualex\\Core\\ConexionDB\u003A\u003A\u0024conn",
             "name": "conn",
             "summary": "",
-            "url": "classes/ModActividades.html#property_conn"
+            "url": "classes/Dualex-Core-ConexionDB.html#property_conn"
         },                {
-            "fqsen": "\\ModActividades\u003A\u003A\u0024table_name",
+            "fqsen": "\\Dualex\\Core\\JWTHelper",
+            "name": "JWTHelper",
+            "summary": "File\u002Dlevel\u0020docblock\u0020for\u0020JWTHelper.php",
+            "url": "classes/Dualex-Core-JWTHelper.html"
+        },                {
+            "fqsen": "\\Dualex\\Core\\JWTHelper\u003A\u003Abase64UrlEncode\u0028\u0029",
+            "name": "base64UrlEncode",
+            "summary": "",
+            "url": "classes/Dualex-Core-JWTHelper.html#method_base64UrlEncode"
+        },                {
+            "fqsen": "\\Dualex\\Core\\JWTHelper\u003A\u003Abase64UrlDecode\u0028\u0029",
+            "name": "base64UrlDecode",
+            "summary": "",
+            "url": "classes/Dualex-Core-JWTHelper.html#method_base64UrlDecode"
+        },                {
+            "fqsen": "\\Dualex\\Core\\JWTHelper\u003A\u003Avalidar\u0028\u0029",
+            "name": "validar",
+            "summary": "Valida\u0020un\u0020token\u0020JWT\u0020y\u0020devuelve\u0020el\u0020payload\u0020si\u0020es\u0020v\u00E1lido.",
+            "url": "classes/Dualex-Core-JWTHelper.html#method_validar"
+        },                {
+            "fqsen": "\\Dualex\\Models\\ModActividades",
+            "name": "ModActividades",
+            "summary": "Modelo\u0020para\u0020la\u0020gesti\u00F3n\u0020de\u0020Actividades\u0020en\u0020la\u0020base\u0020de\u0020datos.",
+            "url": "classes/Dualex-Models-ModActividades.html"
+        },                {
+            "fqsen": "\\Dualex\\Models\\ModActividades\u003A\u003A__construct\u0028\u0029",
+            "name": "__construct",
+            "summary": "",
+            "url": "classes/Dualex-Models-ModActividades.html#method___construct"
+        },                {
+            "fqsen": "\\Dualex\\Models\\ModActividades\u003A\u003Avalidar\u0028\u0029",
+            "name": "validar",
+            "summary": "Valida\u0020los\u0020datos\u0020recibidos\u0020de\u0020la\u0020petici\u00F3n.",
+            "url": "classes/Dualex-Models-ModActividades.html#method_validar"
+        },                {
+            "fqsen": "\\Dualex\\Models\\ModActividades\u003A\u003Alistar\u0028\u0029",
+            "name": "listar",
+            "summary": "Obtiene\u0020el\u0020listado\u0020completo\u0020de\u0020actividades\u0020con\u0020la\u0020concatenaci\u00F3n\u0020de\u0020nombres\u0020e\u0020IDs\u0020de\u0020m\u00F3dulos.",
+            "url": "classes/Dualex-Models-ModActividades.html#method_listar"
+        },                {
+            "fqsen": "\\Dualex\\Models\\ModActividades\u003A\u003Aobtener\u0028\u0029",
+            "name": "obtener",
+            "summary": "Obtiene\u0020una\u0020actividad\u0020espec\u00EDfica\u0020por\u0020su\u0020ID.",
+            "url": "classes/Dualex-Models-ModActividades.html#method_obtener"
+        },                {
+            "fqsen": "\\Dualex\\Models\\ModActividades\u003A\u003AobtenerDataTables\u0028\u0029",
+            "name": "obtenerDataTables",
+            "summary": "Obtiene\u0020los\u0020datos\u0020paginados,\u0020ordenados\u0020y\u0020filtrados\u0020para\u0020renderizar\u0020con\u0020DataTables\u0020en\u0020frontend.",
+            "url": "classes/Dualex-Models-ModActividades.html#method_obtenerDataTables"
+        },                {
+            "fqsen": "\\Dualex\\Models\\ModActividades\u003A\u003Acrear\u0028\u0029",
+            "name": "crear",
+            "summary": "Crea\u0020una\u0020nueva\u0020actividad\u0020y\u0020asocia\u0020sus\u0020m\u00F3dulos\u0020correspondientes\u0020bajo\u0020transacci\u00F3n\u0020at\u00F3mica.",
+            "url": "classes/Dualex-Models-ModActividades.html#method_crear"
+        },                {
+            "fqsen": "\\Dualex\\Models\\ModActividades\u003A\u003Aactualizar\u0028\u0029",
+            "name": "actualizar",
+            "summary": "Actualiza\u0020la\u0020informaci\u00F3n\u0020b\u00E1sica\u0020de\u0020la\u0020actividad\u0020y\u0020sincroniza\u0020sus\u0020m\u00F3dulos\u0020asociados\u0020bajo\u0020transacci\u00F3n.",
+            "url": "classes/Dualex-Models-ModActividades.html#method_actualizar"
+        },                {
+            "fqsen": "\\Dualex\\Models\\ModActividades\u003A\u003Aeliminar\u0028\u0029",
+            "name": "eliminar",
+            "summary": "Elimina\u0020una\u0020actividad\u0020del\u0020cat\u00E1logo\u0020y\u0020limpia\u0020autom\u00E1ticamente\u0020sus\u0020relaciones.",
+            "url": "classes/Dualex-Models-ModActividades.html#method_eliminar"
+        },                {
+            "fqsen": "\\Dualex\\Models\\ModActividades\u003A\u003A\u0024conn",
+            "name": "conn",
+            "summary": "",
+            "url": "classes/Dualex-Models-ModActividades.html#property_conn"
+        },                {
+            "fqsen": "\\Dualex\\Models\\ModActividades\u003A\u003A\u0024table_name",
             "name": "table_name",
             "summary": "",
-            "url": "classes/ModActividades.html#property_table_name"
+            "url": "classes/Dualex-Models-ModActividades.html#property_table_name"
         },                {
-            "fqsen": "\\ModAlumnos",
+            "fqsen": "\\Dualex\\Models\\ModAlumnos",
             "name": "ModAlumnos",
-            "summary": "Modelo\u0020de\u0020datos\u0020para\u0020la\u0020gesti\u00F3n\u0020y\u0020persistencia\u0020de\u0020Alumnos\u0020en\u0020la\u0020base\u0020de\u0020datos\u0020de\u0020Dualex.",
-            "url": "classes/ModAlumnos.html"
+            "summary": "Modelo\u0020de\u0020datos\u0020para\u0020la\u0020gesti\u00F3n\u0020y\u0020persistencia\u0020de\u0020Alumno\u0020en\u0020la\u0020base\u0020de\u0020datos\u0020de\u0020Dualex.",
+            "url": "classes/Dualex-Models-ModAlumnos.html"
         },                {
-            "fqsen": "\\ModAlumnos\u003A\u003A__construct\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModAlumnos\u003A\u003A__construct\u0028\u0029",
             "name": "__construct",
             "summary": "Constructor\u0020del\u0020modelo.",
-            "url": "classes/ModAlumnos.html#method___construct"
+            "url": "classes/Dualex-Models-ModAlumnos.html#method___construct"
         },                {
-            "fqsen": "\\ModAlumnos\u003A\u003Alistar\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModAlumnos\u003A\u003Alistar\u0028\u0029",
             "name": "listar",
-            "summary": "Obtiene\u0020el\u0020listado\u0020completo\u0020de\u0020todos\u0020los\u0020alumnos\u0020registrados\u0020en\u0020el\u0020sistema,\nasociando\u0020sus\u0020datos\u0020personales\u0020de\u0020usuario,\u0020curso\u0020y\u0020empresa\u0020vinculada.",
-            "url": "classes/ModAlumnos.html#method_listar"
+            "summary": "Obtiene\u0020el\u0020listado\u0020completo\u0020de\u0020todos\u0020los\u0020Alumno\u0020registrados\u0020en\u0020el\u0020sistema,\nasociando\u0020sus\u0020datos\u0020personales\u0020de\u0020usuario,\u0020curso\u0020y\u0020empresa\u0020vinculada.",
+            "url": "classes/Dualex-Models-ModAlumnos.html#method_listar"
         },                {
-            "fqsen": "\\ModAlumnos\u003A\u003Aobtener\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModAlumnos\u003A\u003Aobtener\u0028\u0029",
             "name": "obtener",
             "summary": "Obtiene\u0020la\u0020informaci\u00F3n\u0020detallada\u0020de\u0020un\u0020alumno\u0020espec\u00EDfico\u0020mediante\u0020su\u0020identificador.",
-            "url": "classes/ModAlumnos.html#method_obtener"
+            "url": "classes/Dualex-Models-ModAlumnos.html#method_obtener"
         },                {
-            "fqsen": "\\ModAlumnos\u003A\u003Acrear\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModAlumnos\u003A\u003Acrear\u0028\u0029",
             "name": "crear",
             "summary": "Registra\u0020un\u0020nuevo\u0020alumno\u0020en\u0020la\u0020base\u0020de\u0020datos,\u0020creando\u0020el\u0020usuario\u0020base\ny\u0020asociando\u0020el\u0020alumno\u0020y\u0020su\u0020empresa\u0020bajo\u0020una\u0020transacci\u00F3n\u0020segura.",
-            "url": "classes/ModAlumnos.html#method_crear"
+            "url": "classes/Dualex-Models-ModAlumnos.html#method_crear"
         },                {
-            "fqsen": "\\ModAlumnos\u003A\u003Aactualizar\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModAlumnos\u003A\u003Aactualizar\u0028\u0029",
             "name": "actualizar",
             "summary": "Actualiza\u0020la\u0020informaci\u00F3n\u0020de\u0020un\u0020alumno\u0020y\u0020su\u0020relaci\u00F3n\u0020con\u0020la\u0020empresa\u0020bajo\u0020una\u0020transacci\u00F3n\u0020segura.",
-            "url": "classes/ModAlumnos.html#method_actualizar"
+            "url": "classes/Dualex-Models-ModAlumnos.html#method_actualizar"
         },                {
-            "fqsen": "\\ModAlumnos\u003A\u003Aeliminar\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModAlumnos\u003A\u003Aeliminar\u0028\u0029",
             "name": "eliminar",
-            "summary": "Elimina\u0020un\u0020alumno\u0020y\u0020su\u0020correspondiente\u0020registro\u0020de\u0020la\u0020tabla\u0020Usuarios\u0020en\u0020cascada.",
-            "url": "classes/ModAlumnos.html#method_eliminar"
+            "summary": "Elimina\u0020un\u0020alumno\u0020y\u0020su\u0020correspondiente\u0020registro\u0020de\u0020la\u0020tabla\u0020Usuario\u0020en\u0020cascada.",
+            "url": "classes/Dualex-Models-ModAlumnos.html#method_eliminar"
         },                {
-            "fqsen": "\\ModAlumnos\u003A\u003AobtenerDataTables\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModAlumnos\u003A\u003AobtenerDataTables\u0028\u0029",
             "name": "obtenerDataTables",
-            "summary": "Obtiene\u0020los\u0020alumnos\u0020paginados,\u0020ordenados\u0020y\u0020filtrados\u0020seg\u00FAn\u0020la\u0020petici\u00F3n\u0020de\u0020DataTables,\naplicando\u0020reglas\u0020de\u0020visibilidad\u0020y\u0020filtros\u0020espec\u00EDficos\u0020de\u0020acuerdo\u0020al\u0020Rol\u0020del\u0020usuario\u0020\u0028Coordinador,\u0020Profesor\u0020o\u0020Administrador\u0029.",
-            "url": "classes/ModAlumnos.html#method_obtenerDataTables"
+            "summary": "Obtiene\u0020los\u0020Alumno\u0020paginados,\u0020ordenados\u0020y\u0020filtrados\u0020seg\u00FAn\u0020la\u0020petici\u00F3n\u0020de\u0020DataTables,\naplicando\u0020reglas\u0020de\u0020visibilidad\u0020y\u0020filtros\u0020espec\u00EDficos\u0020de\u0020acuerdo\u0020al\u0020Rol\u0020del\u0020usuario\u0020\u0028Coordinador,\u0020Profesor\u0020o\u0020Administrador\u0029.",
+            "url": "classes/Dualex-Models-ModAlumnos.html#method_obtenerDataTables"
         },                {
-            "fqsen": "\\ModAlumnos\u003A\u003AlistarPorModulo\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModAlumnos\u003A\u003AlistarTodosDataTables\u0028\u0029",
+            "name": "listarTodosDataTables",
+            "summary": "",
+            "url": "classes/Dualex-Models-ModAlumnos.html#method_listarTodosDataTables"
+        },                {
+            "fqsen": "\\Dualex\\Models\\ModAlumnos\u003A\u003AlistarPorModulo\u0028\u0029",
             "name": "listarPorModulo",
-            "summary": "Obtiene\u0020el\u0020listado\u0020de\u0020alumnos\u0020que\u0020est\u00E1n\u0020cursando\u0020un\u0020m\u00F3dulo\u0020espec\u00EDfico.",
-            "url": "classes/ModAlumnos.html#method_listarPorModulo"
+            "summary": "Obtiene\u0020el\u0020listado\u0020de\u0020Alumno\u0020que\u0020est\u00E1n\u0020cursando\u0020un\u0020m\u00F3dulo\u0020espec\u00EDfico.",
+            "url": "classes/Dualex-Models-ModAlumnos.html#method_listarPorModulo"
         },                {
-            "fqsen": "\\ModAlumnos\u003A\u003Avalidar\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModAlumnos\u003A\u003Avalidar\u0028\u0029",
             "name": "validar",
             "summary": "Realiza\u0020la\u0020validaci\u00F3n\u0020de\u0020negocio\u0020de\u0020los\u0020datos\u0020de\u0020un\u0020alumno,\u0020incluyendo\u0020campos\u0020obligatorios,\nformato\u0020de\u0020correo,\u0020l\u00EDmites\u0020de\u0020caracteres\u0020y\u0020algoritmo\u0020oficial\u0020de\u0020validaci\u00F3n\u0020de\u0020DNI\/NIE.",
-            "url": "classes/ModAlumnos.html#method_validar"
+            "url": "classes/Dualex-Models-ModAlumnos.html#method_validar"
         },                {
-            "fqsen": "\\ModAlumnos\u003A\u003A\u0024db",
+            "fqsen": "\\Dualex\\Models\\ModAlumnos\u003A\u003AimportarExcel\u0028\u0029",
+            "name": "importarExcel",
+            "summary": "Importa\u0020alumnos\u0020de\u0020forma\u0020masiva\u0020desde\u0020un\u0020archivo\u0020.xlsx\u0020\/\u0020.xls.",
+            "url": "classes/Dualex-Models-ModAlumnos.html#method_importarExcel"
+        },                {
+            "fqsen": "\\Dualex\\Models\\ModAlumnos\u003A\u003A\u0024db",
             "name": "db",
             "summary": "",
-            "url": "classes/ModAlumnos.html#property_db"
+            "url": "classes/Dualex-Models-ModAlumnos.html#property_db"
         },                {
-            "fqsen": "\\ModCiclos",
+            "fqsen": "\\Dualex\\Models\\ModCiclos",
             "name": "ModCiclos",
-            "summary": "Modelo\u0020para\u0020la\u0020gesti\u00F3n\u0020de\u0020Ciclos\u0020Formativos.",
-            "url": "classes/ModCiclos.html"
+            "summary": "Modelo\u0020para\u0020la\u0020gesti\u00F3n\u0020de\u0020Ciclo\u0020Formativos.",
+            "url": "classes/Dualex-Models-ModCiclos.html"
         },                {
-            "fqsen": "\\ModCiclos\u003A\u003A__construct\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModCiclos\u003A\u003A__construct\u0028\u0029",
             "name": "__construct",
             "summary": "",
-            "url": "classes/ModCiclos.html#method___construct"
+            "url": "classes/Dualex-Models-ModCiclos.html#method___construct"
         },                {
-            "fqsen": "\\ModCiclos\u003A\u003Alistar\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModCiclos\u003A\u003Alistar\u0028\u0029",
             "name": "listar",
-            "summary": "Recupera\u0020todos\u0020los\u0020ciclos\u0020formativos\u0020junto\u0020a\u0020sus\u0020coordinadores.",
-            "url": "classes/ModCiclos.html#method_listar"
+            "summary": "Recupera\u0020todos\u0020los\u0020Ciclo\u0020formativos\u0020junto\u0020a\u0020sus\u0020coordinadores.",
+            "url": "classes/Dualex-Models-ModCiclos.html#method_listar"
         },                {
-            "fqsen": "\\ModCiclos\u003A\u003Aobtener\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModCiclos\u003A\u003Aobtener\u0028\u0029",
             "name": "obtener",
             "summary": "Busca\u0020un\u0020ciclo\u0020espec\u00EDfico\u0020por\u0020su\u0020identificador\u0020\u00FAnico.",
-            "url": "classes/ModCiclos.html#method_obtener"
+            "url": "classes/Dualex-Models-ModCiclos.html#method_obtener"
         },                {
-            "fqsen": "\\ModCiclos\u003A\u003AobtenerCursos\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModCiclos\u003A\u003AobtenerCursos\u0028\u0029",
             "name": "obtenerCursos",
-            "summary": "Obtiene\u0020los\u0020cursos\u0020que\u0020pertenecen\u0020a\u0020un\u0020ciclo\u0020formativo\u0020espec\u00EDfico.",
-            "url": "classes/ModCiclos.html#method_obtenerCursos"
+            "summary": "Obtiene\u0020los\u0020Curso\u0020que\u0020pertenecen\u0020a\u0020un\u0020ciclo\u0020formativo\u0020espec\u00EDfico.",
+            "url": "classes/Dualex-Models-ModCiclos.html#method_obtenerCursos"
         },                {
-            "fqsen": "\\ModCiclos\u003A\u003Acrear\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModCiclos\u003A\u003Acrear\u0028\u0029",
             "name": "crear",
             "summary": "Registra\u0020un\u0020nuevo\u0020ciclo\u0020formativo.",
-            "url": "classes/ModCiclos.html#method_crear"
+            "url": "classes/Dualex-Models-ModCiclos.html#method_crear"
         },                {
-            "fqsen": "\\ModCiclos\u003A\u003Aactualizar\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModCiclos\u003A\u003Aactualizar\u0028\u0029",
             "name": "actualizar",
-            "summary": "Actualiza\u0020un\u0020ciclo\u0020formativo\u0020y\u0020aplica\u0020el\u0020cambio\u0020de\u0020siglas\u0020en\u0020cascada\u0020a\u0020sus\u0020cursos.",
-            "url": "classes/ModCiclos.html#method_actualizar"
+            "summary": "Actualiza\u0020un\u0020ciclo\u0020formativo\u0020y\u0020aplica\u0020el\u0020cambio\u0020de\u0020siglas\u0020en\u0020cascada\u0020a\u0020sus\u0020Curso.",
+            "url": "classes/Dualex-Models-ModCiclos.html#method_actualizar"
         },                {
-            "fqsen": "\\ModCiclos\u003A\u003Aeliminar\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModCiclos\u003A\u003Aeliminar\u0028\u0029",
             "name": "eliminar",
-            "summary": "Elimina\u0020un\u0020ciclo\u0020y\u0020todos\u0020sus\u0020cursos\u0020asociados\u0020de\u0020forma\u0020manual\u0020mediante\u0020transacci\u00F3n.",
-            "url": "classes/ModCiclos.html#method_eliminar"
+            "summary": "Elimina\u0020un\u0020ciclo\u0020y\u0020todos\u0020sus\u0020Curso\u0020asociados\u0020de\u0020forma\u0020manual\u0020mediante\u0020transacci\u00F3n.",
+            "url": "classes/Dualex-Models-ModCiclos.html#method_eliminar"
         },                {
-            "fqsen": "\\ModCiclos\u003A\u003AobtenerDataTables\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModCiclos\u003A\u003AobtenerDataTables\u0028\u0029",
             "name": "obtenerDataTables",
             "summary": "Proporciona\u0020la\u0020estructura\u0020y\u0020el\u0020filtrado\u0020paginado\u0020para\u0020el\u0020plugin\u0020DataTables\u0020en\u0020la\u0020vista.",
-            "url": "classes/ModCiclos.html#method_obtenerDataTables"
+            "url": "classes/Dualex-Models-ModCiclos.html#method_obtenerDataTables"
         },                {
-            "fqsen": "\\ModCiclos\u003A\u003A\u0024db",
+            "fqsen": "\\Dualex\\Models\\ModCiclos\u003A\u003A\u0024db",
             "name": "db",
             "summary": "",
-            "url": "classes/ModCiclos.html#property_db"
+            "url": "classes/Dualex-Models-ModCiclos.html#property_db"
         },                {
-            "fqsen": "\\ModConfiguracion",
+            "fqsen": "\\Dualex\\Models\\ModConfiguracion",
             "name": "ModConfiguracion",
             "summary": "Modelo\u0020para\u0020la\u0020configuraci\u00F3n\u0020global\u0020del\u0020sistema\u0020\u0028una\u0020sola\u0020fila\u0020en\u0020BD\u0029.",
-            "url": "classes/ModConfiguracion.html"
+            "url": "classes/Dualex-Models-ModConfiguracion.html"
         },                {
-            "fqsen": "\\ModConfiguracion\u003A\u003A__construct\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModConfiguracion\u003A\u003A__construct\u0028\u0029",
             "name": "__construct",
             "summary": "",
-            "url": "classes/ModConfiguracion.html#method___construct"
+            "url": "classes/Dualex-Models-ModConfiguracion.html#method___construct"
         },                {
-            "fqsen": "\\ModConfiguracion\u003A\u003AobtenerConfiguracion\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModConfiguracion\u003A\u003AobtenerConfiguracion\u0028\u0029",
             "name": "obtenerConfiguracion",
             "summary": "Obtiene\u0020los\u0020valores\u0020actuales\u0020de\u0020la\u0020configuraci\u00F3n\u0020global.",
-            "url": "classes/ModConfiguracion.html#method_obtenerConfiguracion"
+            "url": "classes/Dualex-Models-ModConfiguracion.html#method_obtenerConfiguracion"
         },                {
-            "fqsen": "\\ModConfiguracion\u003A\u003AactualizarConfiguracion\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModConfiguracion\u003A\u003AactualizarConfiguracion\u0028\u0029",
             "name": "actualizarConfiguracion",
             "summary": "Actualiza\u0020la\u0020\u00FAnica\u0020fila\u0020de\u0020configuraci\u00F3n\u0020en\u0020la\u0020base\u0020de\u0020datos.",
-            "url": "classes/ModConfiguracion.html#method_actualizarConfiguracion"
+            "url": "classes/Dualex-Models-ModConfiguracion.html#method_actualizarConfiguracion"
         },                {
-            "fqsen": "\\ModConfiguracion\u003A\u003A\u0024conn",
+            "fqsen": "\\Dualex\\Models\\ModConfiguracion\u003A\u003A\u0024conn",
             "name": "conn",
             "summary": "",
-            "url": "classes/ModConfiguracion.html#property_conn"
+            "url": "classes/Dualex-Models-ModConfiguracion.html#property_conn"
         },                {
-            "fqsen": "\\ModConfiguracion\u003A\u003A\u0024table_name",
+            "fqsen": "\\Dualex\\Models\\ModConfiguracion\u003A\u003A\u0024table_name",
             "name": "table_name",
             "summary": "",
-            "url": "classes/ModConfiguracion.html#property_table_name"
+            "url": "classes/Dualex-Models-ModConfiguracion.html#property_table_name"
         },                {
-            "fqsen": "\\ModCursos",
+            "fqsen": "\\Dualex\\Models\\ModCursos",
             "name": "ModCursos",
-            "summary": "Modelo\u0020para\u0020la\u0020gesti\u00F3n\u0020de\u0020los\u0020Cursos\u0020escolares\u0020dentro\u0020de\u0020los\u0020ciclos.",
-            "url": "classes/ModCursos.html"
+            "summary": "Modelo\u0020para\u0020la\u0020gesti\u00F3n\u0020de\u0020los\u0020Curso\u0020escolares\u0020dentro\u0020de\u0020los\u0020Ciclo.",
+            "url": "classes/Dualex-Models-ModCursos.html"
         },                {
-            "fqsen": "\\ModCursos\u003A\u003A__construct\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModCursos\u003A\u003A__construct\u0028\u0029",
             "name": "__construct",
             "summary": "",
-            "url": "classes/ModCursos.html#method___construct"
+            "url": "classes/Dualex-Models-ModCursos.html#method___construct"
         },                {
-            "fqsen": "\\ModCursos\u003A\u003Alistar\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModCursos\u003A\u003Alistar\u0028\u0029",
             "name": "listar",
-            "summary": "Obtiene\u0020todos\u0020los\u0020cursos,\u0020opcionalmente\u0020filtrados\u0020por\u0020ciclo.",
-            "url": "classes/ModCursos.html#method_listar"
+            "summary": "Obtiene\u0020todos\u0020los\u0020Curso,\u0020opcionalmente\u0020filtrados\u0020por\u0020ciclo.",
+            "url": "classes/Dualex-Models-ModCursos.html#method_listar"
         },                {
-            "fqsen": "\\ModCursos\u003A\u003Aobtener\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModCursos\u003A\u003Aobtener\u0028\u0029",
             "name": "obtener",
             "summary": "Obtiene\u0020los\u0020detalles\u0020de\u0020un\u0020curso\u0020en\u0020espec\u00EDfico.",
-            "url": "classes/ModCursos.html#method_obtener"
+            "url": "classes/Dualex-Models-ModCursos.html#method_obtener"
         },                {
-            "fqsen": "\\ModCursos\u003A\u003AlistarPorCiclo\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModCursos\u003A\u003AlistarPorCiclo\u0028\u0029",
             "name": "listarPorCiclo",
-            "summary": "Variante\u0020simple\u0020para\u0020recuperar\u0020cursos\u0020dado\u0020el\u0020ID\u0020de\u0020un\u0020ciclo.",
-            "url": "classes/ModCursos.html#method_listarPorCiclo"
+            "summary": "Variante\u0020simple\u0020para\u0020recuperar\u0020Curso\u0020dado\u0020el\u0020ID\u0020de\u0020un\u0020ciclo.",
+            "url": "classes/Dualex-Models-ModCursos.html#method_listarPorCiclo"
         },                {
-            "fqsen": "\\ModCursos\u003A\u003AlistarPorProfesor\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModCursos\u003A\u003AlistarPorProfesor\u0028\u0029",
             "name": "listarPorProfesor",
-            "summary": "Obtiene\u0020los\u0020cursos\u0020relevantes\u0020para\u0020un\u0020profesor,\u0020ya\u0020sea\u0020por\u0020ser\u0020coordinador\ndel\u0020ciclo\u0020al\u0020que\u0020pertenece\u0020el\u0020curso,\u0020o\u0020por\u0020impartir\u0020m\u00F3dulos\u0020en\u0020dicho\u0020curso.",
-            "url": "classes/ModCursos.html#method_listarPorProfesor"
+            "summary": "Obtiene\u0020los\u0020Curso\u0020relevantes\u0020para\u0020un\u0020profesor,\u0020ya\u0020sea\u0020por\u0020ser\u0020coordinador\ndel\u0020ciclo\u0020al\u0020que\u0020pertenece\u0020el\u0020curso,\u0020o\u0020por\u0020impartir\u0020m\u00F3dulos\u0020en\u0020dicho\u0020curso.",
+            "url": "classes/Dualex-Models-ModCursos.html#method_listarPorProfesor"
         },                {
-            "fqsen": "\\ModCursos\u003A\u003Acrear\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModCursos\u003A\u003Acrear\u0028\u0029",
             "name": "crear",
             "summary": "Registra\u0020un\u0020nuevo\u0020curso\u0020formativo.",
-            "url": "classes/ModCursos.html#method_crear"
+            "url": "classes/Dualex-Models-ModCursos.html#method_crear"
         },                {
-            "fqsen": "\\ModCursos\u003A\u003Aactualizar\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModCursos\u003A\u003Aactualizar\u0028\u0029",
             "name": "actualizar",
             "summary": "Modifica\u0020los\u0020datos\u0020de\u0020un\u0020curso.",
-            "url": "classes/ModCursos.html#method_actualizar"
+            "url": "classes/Dualex-Models-ModCursos.html#method_actualizar"
         },                {
-            "fqsen": "\\ModCursos\u003A\u003Aeliminar\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModCursos\u003A\u003Aeliminar\u0028\u0029",
             "name": "eliminar",
             "summary": "Elimina\u0020un\u0020curso\u0020de\u0020la\u0020base\u0020de\u0020datos\u0020de\u0020manera\u0020definitiva.",
-            "url": "classes/ModCursos.html#method_eliminar"
+            "url": "classes/Dualex-Models-ModCursos.html#method_eliminar"
         },                {
-            "fqsen": "\\ModCursos\u003A\u003A\u0024db",
+            "fqsen": "\\Dualex\\Models\\ModCursos\u003A\u003A\u0024db",
             "name": "db",
             "summary": "",
-            "url": "classes/ModCursos.html#property_db"
+            "url": "classes/Dualex-Models-ModCursos.html#property_db"
         },                {
-            "fqsen": "\\ModEmpresas",
+            "fqsen": "\\Dualex\\Models\\ModEmpresas",
             "name": "ModEmpresas",
             "summary": "Clase\u0020encargada\u0020de\u0020interactuar\u0020directamente\u0020con\u0020la\u0020base\u0020de\u0020datos\u0020para\u0020la\u0020entidad\u0020\u0022Empresa\u0022\ny\u0020sus\u0020entidades\u0020dependientes\u0020\u0028\u0022Contacto\u0022\u0029.",
-            "url": "classes/ModEmpresas.html"
+            "url": "classes/Dualex-Models-ModEmpresas.html"
         },                {
-            "fqsen": "\\ModEmpresas\u003A\u003A__construct\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModEmpresas\u003A\u003A__construct\u0028\u0029",
             "name": "__construct",
             "summary": "Constructor\u0020del\u0020modelo.",
-            "url": "classes/ModEmpresas.html#method___construct"
+            "url": "classes/Dualex-Models-ModEmpresas.html#method___construct"
         },                {
-            "fqsen": "\\ModEmpresas\u003A\u003Alistar\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModEmpresas\u003A\u003Alistar\u0028\u0029",
             "name": "listar",
             "summary": "Obtiene\u0020una\u0020lista\u0020simplificada\u0020de\u0020todas\u0020las\u0020empresas.",
-            "url": "classes/ModEmpresas.html#method_listar"
+            "url": "classes/Dualex-Models-ModEmpresas.html#method_listar"
         },                {
-            "fqsen": "\\ModEmpresas\u003A\u003Aobtener\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModEmpresas\u003A\u003Aobtener\u0028\u0029",
             "name": "obtener",
             "summary": "Busca\u0020y\u0020devuelve\u0020todos\u0020los\u0020datos\u0020y\u0020contactos\u0020de\u0020una\u0020empresa\u0020espec\u00EDfica\u0020mediante\u0020su\u0020ID.",
-            "url": "classes/ModEmpresas.html#method_obtener"
+            "url": "classes/Dualex-Models-ModEmpresas.html#method_obtener"
         },                {
-            "fqsen": "\\ModEmpresas\u003A\u003Acrear\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModEmpresas\u003A\u003Acrear\u0028\u0029",
             "name": "crear",
             "summary": "Crea\u0020un\u0020nuevo\u0020registro\u0020de\u0020empresa\u0020en\u0020la\u0020base\u0020de\u0020datos\u0020junto\u0020con\u0020todos\u0020sus\u0020contactos.",
-            "url": "classes/ModEmpresas.html#method_crear"
+            "url": "classes/Dualex-Models-ModEmpresas.html#method_crear"
         },                {
-            "fqsen": "\\ModEmpresas\u003A\u003Aactualizar\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModEmpresas\u003A\u003Aactualizar\u0028\u0029",
             "name": "actualizar",
             "summary": "Actualiza\u0020la\u0020informaci\u00F3n\u0020de\u0020una\u0020empresa\u0020ya\u0020existente\u0020bas\u00E1ndose\u0020en\u0020su\u0020ID.",
-            "url": "classes/ModEmpresas.html#method_actualizar"
+            "url": "classes/Dualex-Models-ModEmpresas.html#method_actualizar"
         },                {
-            "fqsen": "\\ModEmpresas\u003A\u003Aeliminar\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModEmpresas\u003A\u003Aeliminar\u0028\u0029",
             "name": "eliminar",
             "summary": "Elimina\u0020el\u0020registro\u0020de\u0020una\u0020empresa.",
-            "url": "classes/ModEmpresas.html#method_eliminar"
+            "url": "classes/Dualex-Models-ModEmpresas.html#method_eliminar"
         },                {
-            "fqsen": "\\ModEmpresas\u003A\u003AobtenerDataTables\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModEmpresas\u003A\u003AobtenerDataTables\u0028\u0029",
             "name": "obtenerDataTables",
             "summary": "Obtiene\u0020el\u0020listado\u0020de\u0020empresas\u0020preparado\u0020exclusivamente\u0020para\u0020ser\u0020consumido\npor\u0020la\u0020tabla\u0020de\u0020Angular\u0020\u0028DataTables\u0029.\u0020Soporta\u0020paginado\u0020autom\u00E1tico\u0020del\u0020servidor,\nb\u00FAsquedas\u0020de\u0020texto\u0020\u0028\u0027search\u0027\u0029\u0020y\u0020ordenamiento\u0020ascendente\u0020o\u0020descendente.",
-            "url": "classes/ModEmpresas.html#method_obtenerDataTables"
+            "url": "classes/Dualex-Models-ModEmpresas.html#method_obtenerDataTables"
         },                {
-            "fqsen": "\\ModEmpresas\u003A\u003AformatearEmpresas\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModEmpresas\u003A\u003AformatearEmpresas\u0028\u0029",
             "name": "formatearEmpresas",
             "summary": "Funci\u00F3n\u0020privada\u0020que\u0020procesa\u0020en\u0020bruto\u0020las\u0020filas\u0020devueltas\u0020por\u0020MySQL\u0020para\u0020inyectarles\u003A\n\u002D\u0020Fechas\u0020calculadas\u0020\u0028fin\u0020de\u0020convenio\u0020seg\u00FAn\u0020configuraci\u00F3n\u0020central\u0029.",
-            "url": "classes/ModEmpresas.html#method_formatearEmpresas"
+            "url": "classes/Dualex-Models-ModEmpresas.html#method_formatearEmpresas"
         },                {
-            "fqsen": "\\ModEmpresas\u003A\u003AinsertarContacto\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModEmpresas\u003A\u003AinsertarContacto\u0028\u0029",
             "name": "insertarContacto",
             "summary": "Funci\u00F3n\u0020privada\u0020que\u0020encapsula\u0020la\u0020peque\u00F1a\u0020pero\u0020repetitiva\u0020l\u00F3gica\u0020de\u0020insertar\u0020un\u0020registro\nen\u0020la\u0020tabla\u0020secundaria\u0020Contacto.",
-            "url": "classes/ModEmpresas.html#method_insertarContacto"
+            "url": "classes/Dualex-Models-ModEmpresas.html#method_insertarContacto"
         },                {
-            "fqsen": "\\ModEmpresas\u003A\u003AinsertarCicloEmpresa\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModEmpresas\u003A\u003AinsertarCicloEmpresa\u0028\u0029",
             "name": "insertarCicloEmpresa",
             "summary": "Vincula\u0020una\u0020empresa\u0020a\u0020un\u0020ciclo\u0020espec\u00EDfico\u0020mediante\u0020sus\u0020siglas,\u0020incluyendo\u0020opcionalmente\u0020el\u0020tutor.",
-            "url": "classes/ModEmpresas.html#method_insertarCicloEmpresa"
+            "url": "classes/Dualex-Models-ModEmpresas.html#method_insertarCicloEmpresa"
         },                {
-            "fqsen": "\\ModEmpresas\u003A\u003A\u0024db",
+            "fqsen": "\\Dualex\\Models\\ModEmpresas\u003A\u003A\u0024db",
             "name": "db",
             "summary": "",
-            "url": "classes/ModEmpresas.html#property_db"
+            "url": "classes/Dualex-Models-ModEmpresas.html#property_db"
         },                {
-            "fqsen": "\\ModModulos",
+            "fqsen": "\\Dualex\\Models\\ModModulos",
             "name": "ModModulos",
             "summary": "Modelo\u0020para\u0020la\u0020gesti\u00F3n\u0020de\u0020M\u00F3dulos\u0020\u0028Asignaturas\u0029.",
-            "url": "classes/ModModulos.html"
+            "url": "classes/Dualex-Models-ModModulos.html"
         },                {
-            "fqsen": "\\ModModulos\u003A\u003A__construct\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModModulos\u003A\u003A__construct\u0028\u0029",
             "name": "__construct",
             "summary": "",
-            "url": "classes/ModModulos.html#method___construct"
+            "url": "classes/Dualex-Models-ModModulos.html#method___construct"
         },                {
-            "fqsen": "\\ModModulos\u003A\u003Alistar\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModModulos\u003A\u003Alistar\u0028\u0029",
             "name": "listar",
             "summary": "Devuelve\u0020todos\u0020los\u0020m\u00F3dulos\u0020\u00FAnicos\u0020disponibles\u0020en\u0020el\u0020sistema\u0020con\u0020informaci\u00F3n\nsobre\u0020a\u0020qu\u00E9\u0020ciclo\u0020pertenecen\u0020\u0028utiliza\u0020LEFT\u0020JOIN\u0029.",
-            "url": "classes/ModModulos.html#method_listar"
+            "url": "classes/Dualex-Models-ModModulos.html#method_listar"
         },                {
-            "fqsen": "\\ModModulos\u003A\u003AlistarPorCiclo\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModModulos\u003A\u003AlistarPorCiclo\u0028\u0029",
             "name": "listarPorCiclo",
             "summary": "Obtiene\u0020los\u0020m\u00F3dulos\u0020que\u0020pertenecen\u0020a\u0020un\u0020ciclo\u0020formativo\u0020espec\u00EDfico.",
-            "url": "classes/ModModulos.html#method_listarPorCiclo"
+            "url": "classes/Dualex-Models-ModModulos.html#method_listarPorCiclo"
         },                {
-            "fqsen": "\\ModModulos\u003A\u003Aobtener\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModModulos\u003A\u003Aobtener\u0028\u0029",
             "name": "obtener",
             "summary": "Devuelve\u0020la\u0020informaci\u00F3n\u0020de\u0020un\u0020m\u00F3dulo\u0020mediante\u0020su\u0020ID.",
-            "url": "classes/ModModulos.html#method_obtener"
+            "url": "classes/Dualex-Models-ModModulos.html#method_obtener"
         },                {
-            "fqsen": "\\ModModulos\u003A\u003AobtenerModulosProfesor\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModModulos\u003A\u003AobtenerModulosProfesor\u0028\u0029",
             "name": "obtenerModulosProfesor",
             "summary": "Recupera\u0020todos\u0020los\u0020m\u00F3dulos\u0020que\u0020imparte\u0020un\u0020profesor\u0020espec\u00EDfico\u0020en\u0020base\u0020a\u0020su\u0020correo\u0020electr\u00F3nico.",
-            "url": "classes/ModModulos.html#method_obtenerModulosProfesor"
+            "url": "classes/Dualex-Models-ModModulos.html#method_obtenerModulosProfesor"
         },                {
-            "fqsen": "\\ModModulos\u003A\u003Acrear\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModModulos\u003A\u003Acrear\u0028\u0029",
             "name": "crear",
-            "summary": "Registra\u0020un\u0020nuevo\u0020m\u00F3dulo\u0020y\u0020lo\u0020vincula\u0020con\u0020los\u0020cursos\u0020de\u0020un\u0020ciclo\u0020determinado\u0020mediante\u0020transacci\u00F3n.",
-            "url": "classes/ModModulos.html#method_crear"
+            "summary": "Registra\u0020un\u0020nuevo\u0020m\u00F3dulo\u0020y\u0020lo\u0020vincula\u0020con\u0020los\u0020Curso\u0020de\u0020un\u0020ciclo\u0020determinado\u0020mediante\u0020transacci\u00F3n.",
+            "url": "classes/Dualex-Models-ModModulos.html#method_crear"
         },                {
-            "fqsen": "\\ModModulos\u003A\u003Aactualizar\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModModulos\u003A\u003Aactualizar\u0028\u0029",
             "name": "actualizar",
             "summary": "Actualiza\u0020la\u0020informaci\u00F3n\u0020de\u0020un\u0020m\u00F3dulo\u0020existente.",
-            "url": "classes/ModModulos.html#method_actualizar"
+            "url": "classes/Dualex-Models-ModModulos.html#method_actualizar"
         },                {
-            "fqsen": "\\ModModulos\u003A\u003Aeliminar\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModModulos\u003A\u003Aeliminar\u0028\u0029",
             "name": "eliminar",
             "summary": "Elimina\u0020permanentemente\u0020un\u0020m\u00F3dulo\u0020del\u0020sistema.",
-            "url": "classes/ModModulos.html#method_eliminar"
+            "url": "classes/Dualex-Models-ModModulos.html#method_eliminar"
         },                {
-            "fqsen": "\\ModModulos\u003A\u003AobtenerDataTables\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModModulos\u003A\u003AobtenerDataTables\u0028\u0029",
             "name": "obtenerDataTables",
             "summary": "Proveedor\u0020de\u0020datos\u0020para\u0020la\u0020tabla\u0020DataTables\u0020de\u0020la\u0020vista.",
-            "url": "classes/ModModulos.html#method_obtenerDataTables"
+            "url": "classes/Dualex-Models-ModModulos.html#method_obtenerDataTables"
         },                {
-            "fqsen": "\\ModModulos\u003A\u003A\u0024db",
+            "fqsen": "\\Dualex\\Models\\ModModulos\u003A\u003A\u0024db",
             "name": "db",
             "summary": "",
-            "url": "classes/ModModulos.html#property_db"
+            "url": "classes/Dualex-Models-ModModulos.html#property_db"
         },                {
-            "fqsen": "\\ModProfesores",
+            "fqsen": "\\Dualex\\Models\\ModProfesores",
             "name": "ModProfesores",
             "summary": "Modelo\u0020para\u0020la\u0020gesti\u00F3n\u0020de\u0020Profesores.",
-            "url": "classes/ModProfesores.html"
+            "url": "classes/Dualex-Models-ModProfesores.html"
         },                {
-            "fqsen": "\\ModProfesores\u003A\u003A__construct\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModProfesores\u003A\u003A__construct\u0028\u0029",
             "name": "__construct",
             "summary": "",
-            "url": "classes/ModProfesores.html#method___construct"
+            "url": "classes/Dualex-Models-ModProfesores.html#method___construct"
         },                {
-            "fqsen": "\\ModProfesores\u003A\u003Alistar\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModProfesores\u003A\u003Alistar\u0028\u0029",
             "name": "listar",
             "summary": "Devuelve\u0020el\u0020listado\u0020completo\u0020de\u0020profesores\u0020\u0028sin\u0020paginaci\u00F3n\u0029.",
-            "url": "classes/ModProfesores.html#method_listar"
+            "url": "classes/Dualex-Models-ModProfesores.html#method_listar"
         },                {
-            "fqsen": "\\ModProfesores\u003A\u003AobtenerDataTables\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModProfesores\u003A\u003AobtenerDataTables\u0028\u0029",
             "name": "obtenerDataTables",
             "summary": "Prepara\u0020y\u0020retorna\u0020la\u0020estructura\u0020requerida\u0020por\u0020DataTables.",
-            "url": "classes/ModProfesores.html#method_obtenerDataTables"
+            "url": "classes/Dualex-Models-ModProfesores.html#method_obtenerDataTables"
         },                {
-            "fqsen": "\\ModProfesores\u003A\u003Acrear\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModProfesores\u003A\u003Acrear\u0028\u0029",
             "name": "crear",
             "summary": "Crea\u0020un\u0020profesor\u0020y\u0020gestiona\u0020todas\u0020sus\u0020vinculaciones\u0020en\u0020una\u0020sola\u0020transacci\u00F3n.",
-            "url": "classes/ModProfesores.html#method_crear"
+            "url": "classes/Dualex-Models-ModProfesores.html#method_crear"
         },                {
-            "fqsen": "\\ModProfesores\u003A\u003Aactualizar\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModProfesores\u003A\u003Aactualizar\u0028\u0029",
             "name": "actualizar",
             "summary": "Actualiza\u0020un\u0020profesor\u0020y\u0020sincroniza\u0020sus\u0020roles\u0020y\u0020asignaciones.",
-            "url": "classes/ModProfesores.html#method_actualizar"
+            "url": "classes/Dualex-Models-ModProfesores.html#method_actualizar"
         },                {
-            "fqsen": "\\ModProfesores\u003A\u003AcargarInformacionRelacionada\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModProfesores\u003A\u003AcargarInformacionRelacionada\u0028\u0029",
             "name": "cargarInformacionRelacionada",
-            "summary": "Carga\u0020m\u00F3dulos\u0020y\u0020ciclos\u0020asociados\u0020a\u0020un\u0020profesor\u0020\u0028Por\u0020referencia\u0029.",
-            "url": "classes/ModProfesores.html#method_cargarInformacionRelacionada"
+            "summary": "Carga\u0020m\u00F3dulos\u0020y\u0020Ciclo\u0020asociados\u0020a\u0020un\u0020profesor\u0020\u0028Por\u0020referencia\u0029.",
+            "url": "classes/Dualex-Models-ModProfesores.html#method_cargarInformacionRelacionada"
         },                {
-            "fqsen": "\\ModProfesores\u003A\u003AasignarModulos\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModProfesores\u003A\u003AasignarModulos\u0028\u0029",
             "name": "asignarModulos",
             "summary": "Vincula\u0020un\u0020profesor\u0020con\u0020los\u0020m\u00F3dulos\u0020que\u0020imparte.",
-            "url": "classes/ModProfesores.html#method_asignarModulos"
+            "url": "classes/Dualex-Models-ModProfesores.html#method_asignarModulos"
         },                {
-            "fqsen": "\\ModProfesores\u003A\u003AasignarCiclos\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModProfesores\u003A\u003AasignarCiclos\u0028\u0029",
             "name": "asignarCiclos",
-            "summary": "Vincula\u0020un\u0020coordinador\u0020con\u0020los\u0020ciclos\u0020que\u0020gestiona.",
-            "url": "classes/ModProfesores.html#method_asignarCiclos"
+            "summary": "Vincula\u0020un\u0020coordinador\u0020con\u0020los\u0020Ciclo\u0020que\u0020gestiona.",
+            "url": "classes/Dualex-Models-ModProfesores.html#method_asignarCiclos"
         },                {
-            "fqsen": "\\ModProfesores\u003A\u003AnormalizarLista\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModProfesores\u003A\u003AnormalizarLista\u0028\u0029",
             "name": "normalizarLista",
             "summary": "Normaliza\u0020listas\u0020recibidas\u0020como\u0020array\u0020o\u0020cadena\u0020separada\u0020por\u0020comas\u0020a\u0020un\u0020array\u0020plano\u0020limpio.",
-            "url": "classes/ModProfesores.html#method_normalizarLista"
+            "url": "classes/Dualex-Models-ModProfesores.html#method_normalizarLista"
         },                {
-            "fqsen": "\\ModProfesores\u003A\u003AobtenerModulosIdsDeCiclos\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModProfesores\u003A\u003AobtenerModulosIdsDeCiclos\u0028\u0029",
             "name": "obtenerModulosIdsDeCiclos",
-            "summary": "Devuelve\u0020todas\u0020las\u0020siglas\u0020de\u0020m\u00F3dulos\u0020pertenecientes\u0020a\u0020los\u0020ciclos\u0020recibidos.",
-            "url": "classes/ModProfesores.html#method_obtenerModulosIdsDeCiclos"
+            "summary": "Devuelve\u0020todas\u0020las\u0020siglas\u0020de\u0020m\u00F3dulos\u0020pertenecientes\u0020a\u0020los\u0020Ciclo\u0020recibidos.",
+            "url": "classes/Dualex-Models-ModProfesores.html#method_obtenerModulosIdsDeCiclos"
         },                {
-            "fqsen": "\\ModProfesores\u003A\u003AquitarCoordinacionDeTodo\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModProfesores\u003A\u003AquitarCoordinacionDeTodo\u0028\u0029",
             "name": "quitarCoordinacionDeTodo",
             "summary": "Anula\u0020todas\u0020las\u0020coordinaciones\u0020previas\u0020de\u0020un\u0020profesor.",
-            "url": "classes/ModProfesores.html#method_quitarCoordinacionDeTodo"
+            "url": "classes/Dualex-Models-ModProfesores.html#method_quitarCoordinacionDeTodo"
         },                {
-            "fqsen": "\\ModProfesores\u003A\u003AesCoordinador\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModProfesores\u003A\u003AesCoordinador\u0028\u0029",
             "name": "esCoordinador",
             "summary": "Verifica\u0020si\u0020el\u0020profesor\u0020tiene\u0020asignado\u0020el\u0020rol\u0020de\u0020Coordinador\u0020en\u0020la\u0020base\u0020de\u0020datos.",
-            "url": "classes/ModProfesores.html#method_esCoordinador"
+            "url": "classes/Dualex-Models-ModProfesores.html#method_esCoordinador"
         },                {
-            "fqsen": "\\ModProfesores\u003A\u003Aobtener\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModProfesores\u003A\u003Aobtener\u0028\u0029",
             "name": "obtener",
             "summary": "Obtiene\u0020el\u0020perfil\u0020completo\u0020de\u0020un\u0020profesor\u0020mediante\u0020su\u0020ID.",
-            "url": "classes/ModProfesores.html#method_obtener"
+            "url": "classes/Dualex-Models-ModProfesores.html#method_obtener"
         },                {
-            "fqsen": "\\ModProfesores\u003A\u003AobtenerPorCorreo\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModProfesores\u003A\u003AobtenerPorCorreo\u0028\u0029",
             "name": "obtenerPorCorreo",
             "summary": "Obtiene\u0020el\u0020perfil\u0020completo\u0020de\u0020un\u0020profesor\u0020mediante\u0020su\u0020correo\u0020electr\u00F3nico.",
-            "url": "classes/ModProfesores.html#method_obtenerPorCorreo"
+            "url": "classes/Dualex-Models-ModProfesores.html#method_obtenerPorCorreo"
         },                {
-            "fqsen": "\\ModProfesores\u003A\u003Aeliminar\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModProfesores\u003A\u003Aeliminar\u0028\u0029",
             "name": "eliminar",
             "summary": "Elimina\u0020por\u0020completo\u0020un\u0020usuario\u0020Profesor\u0020del\u0020sistema\u0020\u0028y\u0020sus\u0020relaciones\u0029.",
-            "url": "classes/ModProfesores.html#method_eliminar"
+            "url": "classes/Dualex-Models-ModProfesores.html#method_eliminar"
         },                {
-            "fqsen": "\\ModProfesores\u003A\u003A\u0024db",
+            "fqsen": "\\Dualex\\Models\\ModProfesores\u003A\u003Avalidar\u0028\u0029",
+            "name": "validar",
+            "summary": "Realiza\u0020la\u0020validaci\u00F3n\u0020de\u0020negocio\u0020de\u0020los\u0020datos\u0020de\u0020un\u0020profesor,\u0020incluyendo\u0020campos\u0020obligatorios,\nformato\u0020de\u0020correo\u0020y\u0020l\u00EDmites\u0020de\u0020caracteres.",
+            "url": "classes/Dualex-Models-ModProfesores.html#method_validar"
+        },                {
+            "fqsen": "\\Dualex\\Models\\ModProfesores\u003A\u003AimportarExcel\u0028\u0029",
+            "name": "importarExcel",
+            "summary": "Importa\u0020profesores\u0020de\u0020forma\u0020masiva\u0020desde\u0020un\u0020archivo\u0020.xlsx\u0020\/\u0020.xls.",
+            "url": "classes/Dualex-Models-ModProfesores.html#method_importarExcel"
+        },                {
+            "fqsen": "\\Dualex\\Models\\ModProfesores\u003A\u003A\u0024db",
             "name": "db",
             "summary": "",
-            "url": "classes/ModProfesores.html#property_db"
+            "url": "classes/Dualex-Models-ModProfesores.html#property_db"
         },                {
-            "fqsen": "\\ModTareas",
+            "fqsen": "\\Dualex\\Models\\ModTareas",
             "name": "ModTareas",
-            "summary": "Modelo\u0020para\u0020la\u0020gesti\u00F3n\u0020de\u0020las\u0020Tareas\u0020asignadas\u0020y\u0020entregadas\u0020por\u0020los\u0020alumnos.",
-            "url": "classes/ModTareas.html"
+            "summary": "Modelo\u0020para\u0020la\u0020gesti\u00F3n\u0020de\u0020las\u0020Tarea\u0020asignadas\u0020y\u0020entregadas\u0020por\u0020los\u0020Alumno.",
+            "url": "classes/Dualex-Models-ModTareas.html"
         },                {
-            "fqsen": "\\ModTareas\u003A\u003A__construct\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModTareas\u003A\u003A__construct\u0028\u0029",
             "name": "__construct",
             "summary": "",
-            "url": "classes/ModTareas.html#method___construct"
+            "url": "classes/Dualex-Models-ModTareas.html#method___construct"
         },                {
-            "fqsen": "\\ModTareas\u003A\u003Alistar\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModTareas\u003A\u003AmapCalificacionToDb\u0028\u0029",
+            "name": "mapCalificacionToDb",
+            "summary": "Mapea\u0020el\u0020texto\u0020de\u0020calificaci\u00F3n\u0020del\u0020frontend\u0020al\u0020valor\u0020de\u0020base\u0020de\u0020datos.",
+            "url": "classes/Dualex-Models-ModTareas.html#method_mapCalificacionToDb"
+        },                {
+            "fqsen": "\\Dualex\\Models\\ModTareas\u003A\u003AmapCalificacionFromDb\u0028\u0029",
+            "name": "mapCalificacionFromDb",
+            "summary": "Mapea\u0020el\u0020valor\u0020de\u0020la\u0020base\u0020de\u0020datos\u0020al\u0020formato\u0020del\u0020frontend.",
+            "url": "classes/Dualex-Models-ModTareas.html#method_mapCalificacionFromDb"
+        },                {
+            "fqsen": "\\Dualex\\Models\\ModTareas\u003A\u003AobtenerModulosSiglas\u0028\u0029",
+            "name": "obtenerModulosSiglas",
+            "summary": "Helper\u0020para\u0020obtener\u0020las\u0020siglas\u0020de\u0020los\u0020m\u00F3dulos\u0020de\u0020una\u0020tarea.",
+            "url": "classes/Dualex-Models-ModTareas.html#method_obtenerModulosSiglas"
+        },                {
+            "fqsen": "\\Dualex\\Models\\ModTareas\u003A\u003AobtenerProgreso\u0028\u0029",
+            "name": "obtenerProgreso",
+            "summary": "Helper\u0020para\u0020calcular\u0020el\u0020progreso\u0020\u0028revisado\/total\u0029\u0020de\u0020una\u0020tarea.",
+            "url": "classes/Dualex-Models-ModTareas.html#method_obtenerProgreso"
+        },                {
+            "fqsen": "\\Dualex\\Models\\ModTareas\u003A\u003Alistar\u0028\u0029",
             "name": "listar",
-            "summary": "Lista\u0020todas\u0020las\u0020tareas\u0020globales\u0020almacenadas\u0020en\u0020el\u0020sistema\u0020uniendo\u0020datos\u0020del\u0020alumno\u0020respectivo.",
-            "url": "classes/ModTareas.html#method_listar"
+            "summary": "Lista\u0020todas\u0020las\u0020Tarea\u0020globales\u0020almacenadas\u0020en\u0020el\u0020sistema\u0020uniendo\u0020datos\u0020del\u0020alumno\u0020respectivo.",
+            "url": "classes/Dualex-Models-ModTareas.html#method_listar"
         },                {
-            "fqsen": "\\ModTareas\u003A\u003AlistarPorAlumno\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModTareas\u003A\u003AlistarPorAlumno\u0028\u0029",
             "name": "listarPorAlumno",
-            "summary": "Recupera\u0020exclusivamente\u0020las\u0020tareas\u0020ligadas\u0020a\u0020un\u0020alumno\u0020espec\u00EDfico.",
-            "url": "classes/ModTareas.html#method_listarPorAlumno"
+            "summary": "Recupera\u0020exclusivamente\u0020las\u0020Tarea\u0020ligadas\u0020a\u0020un\u0020alumno\u0020espec\u00EDfico.",
+            "url": "classes/Dualex-Models-ModTareas.html#method_listarPorAlumno"
         },                {
-            "fqsen": "\\ModTareas\u003A\u003Aobtener\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModTareas\u003A\u003Aobtener\u0028\u0029",
             "name": "obtener",
             "summary": "Devuelve\u0020el\u0020estado\u0020y\u0020caracter\u00EDsticas\u0020de\u0020una\u0020sola\u0020tarea\u0020en\u0020base\u0020a\u0020su\u0020ID.",
-            "url": "classes/ModTareas.html#method_obtener"
+            "url": "classes/Dualex-Models-ModTareas.html#method_obtener"
         },                {
-            "fqsen": "\\ModTareas\u003A\u003Acrear\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModTareas\u003A\u003Acrear\u0028\u0029",
             "name": "crear",
             "summary": "Inserta\u0020una\u0020nueva\u0020entrega\/tarea\u0020del\u0020cuaderno\u0020del\u0020alumno\u0020en\u0020el\u0020sistema.",
-            "url": "classes/ModTareas.html#method_crear"
+            "url": "classes/Dualex-Models-ModTareas.html#method_crear"
         },                {
-            "fqsen": "\\ModTareas\u003A\u003Aactualizar\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModTareas\u003A\u003Aactualizar\u0028\u0029",
             "name": "actualizar",
-            "summary": "Aplica\u0020modificaciones\u0020sobre\u0020una\u0020tarea\u0020existente\u0020\u0028Ej.\u0020cambios\u0020del\u0020profesor\u0020en\u0020la\u0020calificaci\u00F3n\u0029.",
-            "url": "classes/ModTareas.html#method_actualizar"
+            "summary": "Aplica\u0020modificaciones\u0020sobre\u0020una\u0020tarea\u0020existente.",
+            "url": "classes/Dualex-Models-ModTareas.html#method_actualizar"
         },                {
-            "fqsen": "\\ModTareas\u003A\u003Aeliminar\u0028\u0029",
+            "fqsen": "\\Dualex\\Models\\ModTareas\u003A\u003AsubirDocumento\u0028\u0029",
+            "name": "subirDocumento",
+            "summary": "Guarda\u0020un\u0020PDF\u0020en\u0020el\u0020servidor\u0020asociado\u0020a\u0020una\u0020tarea.",
+            "url": "classes/Dualex-Models-ModTareas.html#method_subirDocumento"
+        },                {
+            "fqsen": "\\Dualex\\Models\\ModTareas\u003A\u003AobtenerRutaDocumento\u0028\u0029",
+            "name": "obtenerRutaDocumento",
+            "summary": "Obtiene\u0020la\u0020ruta\u0020de\u0020un\u0020documento\u0020PDF\u0020asociado\u0020a\u0020una\u0020tarea.",
+            "url": "classes/Dualex-Models-ModTareas.html#method_obtenerRutaDocumento"
+        },                {
+            "fqsen": "\\Dualex\\Models\\ModTareas\u003A\u003Aeliminar\u0028\u0029",
             "name": "eliminar",
             "summary": "Elimina\u0020el\u0020registro\u0020de\u0020una\u0020tarea\u0020de\u0020forma\u0020definitiva.",
-            "url": "classes/ModTareas.html#method_eliminar"
+            "url": "classes/Dualex-Models-ModTareas.html#method_eliminar"
         },                {
-            "fqsen": "\\ModTareas\u003A\u003A\u0024db",
+            "fqsen": "\\Dualex\\Models\\ModTareas\u003A\u003A\u0024db",
             "name": "db",
             "summary": "",
-            "url": "classes/ModTareas.html#property_db"
+            "url": "classes/Dualex-Models-ModTareas.html#property_db"
         },                {
             "fqsen": "\\",
             "name": "\\",
             "summary": "",
             "url": "namespaces/default.html"
+        },                {
+            "fqsen": "\\Dualex\\Controllers",
+            "name": "Controllers",
+            "summary": "",
+            "url": "namespaces/dualex-controllers.html"
+        },                {
+            "fqsen": "\\Dualex",
+            "name": "Dualex",
+            "summary": "",
+            "url": "namespaces/dualex.html"
+        },                {
+            "fqsen": "\\Dualex\\Core",
+            "name": "Core",
+            "summary": "",
+            "url": "namespaces/dualex-core.html"
+        },                {
+            "fqsen": "\\Dualex\\Models",
+            "name": "Models",
+            "summary": "",
+            "url": "namespaces/dualex-models.html"
         }            ]
 );

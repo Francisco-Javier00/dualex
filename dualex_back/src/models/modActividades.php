@@ -1,10 +1,20 @@
 <?php
+namespace Dualex\Models;
+
+use Exception;
+use PDO;
+use PDOException;
+use Dualex\Core\ConexionDB;
+
+/**
+ * File-level docblock for modActividades.php
+ * 
+ */
 /**
  * Modelo para la gestión de Actividades en la base de datos.
  * Proporciona métodos CRUD para el catálogo maestro de actividades,
  * incluyendo su vinculación con múltiples módulos formativos de forma atómica.
  * 
- * @package Dualex\Models
  */
 class ModActividades {
     private $conn;

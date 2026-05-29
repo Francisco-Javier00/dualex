@@ -4,8 +4,13 @@ import { Router, RouterModule } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { AuthService } from '../../auth/services/auth.service';
 import { AlertService } from '../../services/alert.service';
-import { PerfilUsuario } from '../../dto/dualex.dto';
+import { PerfilUsuarioDTO } from '../../dto/dualex.dto';
 
+/**
+ * Componente para visualizar y gestionar el perfil de usuario activo.
+ * 
+ * Muestra información personal, roles y otra configuración relacionada con la sesión actual.
+ */
 @Component({
   selector: 'app-perfil',
   standalone: true,
@@ -22,7 +27,7 @@ export class PerfilComponent implements OnInit, OnDestroy {
   private cdr = inject(ChangeDetectorRef);
   private suscripcion?: Subscription;
 
-  perfil: PerfilUsuario | null = null;
+  perfil: PerfilUsuarioDTO | null = null;
 
   ngOnInit(): void {
     // El perfil se escucha como observable para mantener sincronizado el estado.

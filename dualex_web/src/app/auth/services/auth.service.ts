@@ -2,7 +2,7 @@ import { Injectable, Inject, PLATFORM_ID, inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject } from 'rxjs';
-import { PerfilUsuario, JwtPayload } from '../../dto/dualex.dto';
+import { PerfilUsuarioDTO, JwtPayload } from '../../dto/dualex.dto';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
@@ -14,13 +14,13 @@ export class AuthService {
 
   // La sesión se mantiene en memoria para que el header, el perfil y las vistas
   // compartan el mismo usuario sin depender de llamadas repetidas al backend.
-  private sujetoPerfilUsuario = new BehaviorSubject<PerfilUsuario | null>(null);
+  private sujetoPerfilUsuario = new BehaviorSubject<PerfilUsuarioDTO | null>(null);
   perfilUsuario$ = this.sujetoPerfilUsuario.asObservable();
 
   /**
    * Obtiene el valor actual del perfil de usuario sin necesidad de suscripción.
    */
-  public get currentUserValue(): PerfilUsuario | null {
+  public get currentUserValue(): PerfilUsuarioDTO | null {
     return this.sujetoPerfilUsuario.value;
   }
 
@@ -59,7 +59,7 @@ export class AuthService {
           return;
         }
 
-        const perfil: PerfilUsuario = {
+        const perfil: PerfilUsuarioDTO = {
           id: payload.data.id,
           nombre: payload.data.nombre,
           apellidos: payload.data.apellidos,
@@ -87,7 +87,7 @@ export class AuthService {
     const perfilActual = this.sujetoPerfilUsuario.value;
     if (!perfilActual) return;
     const controller = perfilActual.rol === 'ALUMNO' ? 'Alumnos' : 'Profesores';
-    this.http.get<PerfilUsuario>(`${environment.apiUrl}/index.php?c=${controller}&m=obtenerPerfilLocal`).subscribe({
+    this.http.get<PerfilUsuarioDTO>(`${environment.apiUrl}/index.php?c=${controller}&m=obtenerPerfilLocal`).subscribe({
       next: (perfilLocal) => {
 
         const actual = this.sujetoPerfilUsuario.value;
@@ -179,7 +179,7 @@ export class AuthService {
   /**
    * Método de utilidad para forzar un perfil (útil para pruebas locales o actualizaciones rápidas de UI).
    */
-  public forzarPerfilPrueba(perfil: PerfilUsuario): void {
+  public forzarPerfilPrueba(perfil: PerfilUsuarioDTO): void {
     this.sujetoPerfilUsuario.next(perfil);
   }
 

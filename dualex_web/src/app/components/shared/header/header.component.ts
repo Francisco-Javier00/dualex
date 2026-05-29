@@ -2,7 +2,7 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../auth/services/auth.service';
-import { PerfilUsuario } from '../../../dto/dualex.dto';
+import { PerfilUsuarioDTO } from '../../../dto/dualex.dto';
 import { Observable, take } from 'rxjs';
 
 @Component({
@@ -15,7 +15,7 @@ export class HeaderComponent {
   private authService = inject(AuthService);
   private router = inject(Router);
 
-  usuario$: Observable<PerfilUsuario | null> = this.authService.perfilUsuario$;
+  usuario$: Observable<PerfilUsuarioDTO | null> = this.authService.perfilUsuario$;
 
   obtenerEnlacesNavegacion(rol: string) {
     const enlacesBase = [

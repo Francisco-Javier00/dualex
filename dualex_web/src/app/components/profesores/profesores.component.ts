@@ -13,6 +13,12 @@ import { ProfesoresService } from '../../services/profesores.service';
 import { ProfesorDTO } from '../../dto/dualex.dto';
 import { AuthService } from '../../auth/services/auth.service';
 
+/**
+ * Componente para la gestión de Profesores.
+ * 
+ * Muestra una tabla con el listado de docentes, permitiendo su administración (crear, editar, eliminar)
+ * y la funcionalidad de importación masiva mediante archivos Excel.
+ */
 @Component({
   selector: 'app-profesores',
   standalone: true,

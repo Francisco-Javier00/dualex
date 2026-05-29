@@ -4,7 +4,7 @@ import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ConfirmarBorradoModalComponent } from '../shared/modals/confirmar-borrado-modal/confirmar-borrado-modal.component';
 import { TareasService } from '../../services/tareas.service';
-import { Tarea } from '../../dto/dualex.dto';
+import { TareaDTO } from '../../dto/dualex.dto';
 import { AuthService } from '../../auth/services/auth.service';
 
 /**
@@ -31,8 +31,8 @@ export class TareasComponent implements OnInit {
   
   // ESTADO DEL COMPONENTE
   modalBorradoVisible = false;           // Controla el modal de confirmación
-  tareaSeleccionada: Tarea | null = null; // Tarea que se pretende borrar o editar
-  tareas: Tarea[] = [];                 // Lista de tareas cargadas
+  tareaSeleccionada: TareaDTO | null = null; // TareaDTO que se pretende borrar o editar
+  tareas: TareaDTO[] = [];                 // Lista de tareas cargadas
   alumnoId: number | null = null;       // ID del alumno si la ruta es /tareas/:alumnoId
   esProfesor = false;                   // Flag para saber si es perfil profesor
 
@@ -114,14 +114,14 @@ export class TareasComponent implements OnInit {
   /**
    * Navegación al formulario de edición/vista de una tarea específica.
    */
-  verTarea(tarea: Tarea): void {
+  verTarea(tarea: TareaDTO): void {
     this.router.navigate(['/tarea', tarea.id]);
   }
 
   /**
    * Abre el PDF de la tarea en una nueva pestaña si existe.
    */
-  abrirDocumento(tarea: Tarea): void {
+  abrirDocumento(tarea: TareaDTO): void {
     if (!tarea.documento) return;
     const url = this.tareasService.getDocumentoUrl(tarea.id);
     this.tareasService.getDocumentoBlob(tarea.id)
@@ -135,7 +135,7 @@ export class TareasComponent implements OnInit {
   /**
    * Activa el flujo de borrado mostrando el modal de confirmación.
    */
-  eliminarTarea(tarea: Tarea): void {
+  eliminarTarea(tarea: TareaDTO): void {
     this.tareaSeleccionada = tarea;
     this.modalBorradoVisible = true;
   }

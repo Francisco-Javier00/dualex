@@ -13,6 +13,11 @@ import { AlertService } from '../../services/alert.service';
 import { CicloModalComponent } from '../modals/ciclo-modal/ciclo-modal.component';
 import { VincularCoordinadorModalComponent } from '../modals/vincular-coordinador-modal/vincular-coordinador-modal.component';
 
+/**
+ * Componente para la gestión de Ciclos Formativos.
+ * 
+ * Permite visualizar, crear, editar y eliminar los ciclos impartidos en el centro educativo.
+ */
 @Component({
   selector: 'app-ciclos',
   standalone: true,

@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { ModuloProfesor } from '../dto/dualex.dto';
+import { ModuloProfesorDTO } from '../dto/dualex.dto';
 import { environment } from '../../environments/environment';
 
 /**
@@ -15,17 +15,17 @@ export class ProfesorDashboardService {
   private http = inject(HttpClient);
   private readonly API_URL = `${environment.apiUrl}/index.php?c=Modulos`;
 
-  obtenerModulosPorEmail(email: string): Observable<ModuloProfesor[]> {
-    return this.http.get<ModuloProfesor[]>(`${this.API_URL}&m=listarProfesor&emailProfesor=${email}`);
+  obtenerModulosPorEmail(email: string): Observable<ModuloProfesorDTO[]> {
+    return this.http.get<ModuloProfesorDTO[]>(`${this.API_URL}&m=listarProfesor&emailProfesor=${email}`);
   }
 
   /**
    * Recupera la lista de módulos en los que el profesor autenticado imparte clase.
    * El ID del profesor se deduce de la sesión activa en el backend.
    * 
-   * @returns Un `Observable` con un array de `ModuloProfesor`.
+   * @returns Un `Observable` con un array de `ModuloProfesorDTO`.
    */
-  obtenerModulosDelProfesor(): Observable<ModuloProfesor[]> {
-    return this.http.get<ModuloProfesor[]>(`${this.API_URL}&m=listarProfesor`);
+  obtenerModulosDelProfesor(): Observable<ModuloProfesorDTO[]> {
+    return this.http.get<ModuloProfesorDTO[]>(`${this.API_URL}&m=listarProfesor`);
   }
 }
