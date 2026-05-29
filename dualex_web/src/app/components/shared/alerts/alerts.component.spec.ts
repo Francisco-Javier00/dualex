@@ -11,7 +11,7 @@ describe('AlertsComponent', () => {
 
   beforeEach(async () => {
     // Arrange
-    const dummyAlerts = [{ id: '1', type: 'success', message: 'Exito', timeout: 3000 }];
+    const dummyAlerts = [{ id: '1', tipo: 'success', titulo: 'Exito', mensaje: 'Exito', timeout: 3000 } as any];
     alertServiceSpy = jasmine.createSpyObj('AlertService', ['eliminarAlerta'], {
       alertas$: of(dummyAlerts)
     });
@@ -39,7 +39,7 @@ describe('AlertsComponent', () => {
 
     // Assert
     expect(component.alertas.length).toBe(1);
-    expect(component.alertas[0].message).toBe('Exito');
+    expect(component.alertas[0].mensaje).toBe('Exito');
   });
 
   it('should call eliminarAlerta on quitarAlerta', () => {

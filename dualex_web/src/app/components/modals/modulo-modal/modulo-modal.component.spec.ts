@@ -21,8 +21,8 @@ describe('ModuloModalComponent', () => {
     cursosSpy = jasmine.createSpyObj('CursosService', ['getCursos']);
     rendererSpy = jasmine.createSpyObj('Renderer2', ['addClass', 'removeClass']);
 
-    ciclosSpy.getCiclos.and.returnValue(of([{ id: 1, nombre: 'DAM', siglas: 'DAM' }]));
-    cursosSpy.getCursos.and.returnValue(of([{ id: 10, idCiclo: 1, ciclo: 'DAM' }]));
+    ciclosSpy.getCiclos.and.returnValue(of([{ id: 1, nombre: 'DAM', siglas: 'DAM' } as any]));
+    cursosSpy.getCursos.and.returnValue(of([{ id: 10, idCiclo: 1, ciclo: 'DAM' } as any]));
 
     await TestBed.configureTestingModule({
       imports: [ModuloModalComponent, ReactiveFormsModule],

@@ -28,9 +28,9 @@ describe('ActividadModalComponent', () => {
     profesSpy = jasmine.createSpyObj('ProfesoresService', ['getProfesorByEmail']);
     rendererSpy = jasmine.createSpyObj('Renderer2', ['addClass', 'removeClass']);
 
-    ciclosSpy.getCiclos.and.returnValue(of([{ id: 1, nombre: 'DAM', siglas: 'DAM' }]));
-    modulosSpy.getModulos.and.returnValue(of([{ id: 10, nombre: 'Programacion', ciclo: 'DAM' }]));
-    profesSpy.getProfesorByEmail.and.returnValue(of({ ciclos: 'DAM' }));
+    ciclosSpy.getCiclos.and.returnValue(of([{ id: 1, nombre: 'DAM', siglas: 'DAM' } as any]));
+    modulosSpy.getModulos.and.returnValue(of([{ id: 10, nombre: 'Programacion', siglas: 'PRG', ciclo: 'DAM' } as any]));
+    profesSpy.getProfesorByEmail.and.returnValue(of({ ciclos: 'DAM' } as any));
 
     await TestBed.configureTestingModule({
       imports: [ActividadModalComponent, ReactiveFormsModule],
