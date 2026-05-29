@@ -111,6 +111,7 @@ describe('AlumnoModalComponent', () => {
 
   it('should toggle body scroll on visible change', () => {
     const addSpy = spyOn((component as any).renderer, 'addClass');
+    component.visible = true;
     component.ngOnChanges({ visible: { currentValue: true, previousValue: false, firstChange: true, isFirstChange: () => true } });
     expect(addSpy).toHaveBeenCalled();
   });
