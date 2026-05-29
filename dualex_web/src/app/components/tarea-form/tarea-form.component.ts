@@ -1,4 +1,5 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule, Location } from '@angular/common';
 import { FormBuilder, FormGroup, FormArray, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -76,6 +77,7 @@ export class TareaFormComponent implements OnInit {
   public location = inject(Location);
   private alertService = inject(AlertService);
   private authService = inject(AuthService);
+  private destroyRef = inject(DestroyRef);
 
   get jwtToken(): string | null {
     return this.authService.getCookieNativa('auth_token');
@@ -162,14 +164,16 @@ export class TareaFormComponent implements OnInit {
     this.cargarActividades(); // Cargamos el catÃ¡logo para mapear IDs a TÃ­tulos
 
     if (this.esProfesor && user?.email) {
-      this.modulosService.getModulosProfesor(user.email).subscribe(mods => {
-        this.modulosTutor = mods || [];
-        this.actualizarControlesPorTutor();
-      });
+      this.modulosService.getModulosProfesor(user.email)
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe(mods => {
+          this.modulosTutor = mods || [];
+          this.actualizarControlesPorTutor();
+        });
     }
 
     // Detectamos el alumnoId en los queryParams (si viene de la vista de un alumno)
-    this.route.queryParams.subscribe(params => {
+    this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
       const aId = params['alumnoId'];
       if (aId) {
         this.idAlumno = +aId;
@@ -177,7 +181,7 @@ export class TareaFormComponent implements OnInit {
     });
 
     // Detectamos si la URL contiene un ID para activar el modo ediciÃ³n
-    this.route.paramMap.subscribe(params => {
+    this.route.paramMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
       const id = params.get('id');
       if (id && id !== 'nueva') {
         this.esEdicion = true;
@@ -191,44 +195,48 @@ export class TareaFormComponent implements OnInit {
    * Recupera el catÃ¡logo de actividades desde el servicio.
    */
   cargarActividades(): void {
-    this.tareasService.getActividades().subscribe(data => {
-      // Normalizar IDs por si el backend los devuelve como string
-      this.actividades = (data || []).map((a: any) => ({
-        ...a,
-        id: typeof a?.id === 'number' ? a.id : Number(a?.id)
-      }));
-      const ids = this.getActividadesSeleccionadasIds();
-      if (ids.length > 0) {
-        this.actualizarRevisionesModulos(ids);
-      }
-    });
+    this.tareasService.getActividades()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(data => {
+        // Normalizar IDs por si el backend los devuelve como string
+        this.actividades = (data || []).map((a: any) => ({
+          ...a,
+          id: typeof a?.id === 'number' ? a.id : Number(a?.id)
+        }));
+        const ids = this.getActividadesSeleccionadasIds();
+        if (ids.length > 0) {
+          this.actualizarRevisionesModulos(ids);
+        }
+      });
   }
 
   /**
    * Recupera los datos de una tarea especÃ­fica y los carga en el formulario.
    */
   cargarDatosTarea(id: number): void {
-    this.tareasService.getTareaById(id).subscribe(tarea => {
-      if (tarea) {
-        if (tarea.idAlumno) {
-          this.idAlumno = tarea.idAlumno;
+    this.tareasService.getTareaById(id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(tarea => {
+        if (tarea) {
+          if (tarea.idAlumno) {
+            this.idAlumno = tarea.idAlumno;
+          }
+          if (tarea.codigo_auto) {
+            this.codigoTarea = tarea.codigo_auto;
+          }
+          this.documentoActual = tarea.documento ?? null;
+          this.documentoFile = null;
+          // Mapeamos los datos del objeto al formulario reactivo
+          const actividadesNorm = this.normalizarIds(tarea.actividadesSeleccionadas);
+          this.tareaForm.patchValue({ ...tarea, actividadesSeleccionadas: actividadesNorm });
+          // Regeneramos el listado de mÃ³dulos revisables segÃºn las actividades cargadas
+          if (actividadesNorm.length > 0) {
+            this.actualizarRevisionesModulos(actividadesNorm, tarea.revisionesModulos);
+          }
+          // Aplicamos la lÃ³gica de bloqueo y permisos
+          this.aplicarBloqueos(tarea);
         }
-        if (tarea.codigo_auto) {
-          this.codigoTarea = tarea.codigo_auto;
-        }
-        this.documentoActual = tarea.documento ?? null;
-        this.documentoFile = null;
-        // Mapeamos los datos del objeto al formulario reactivo
-        const actividadesNorm = this.normalizarIds(tarea.actividadesSeleccionadas);
-        this.tareaForm.patchValue({ ...tarea, actividadesSeleccionadas: actividadesNorm });
-        // Regeneramos el listado de mÃ³dulos revisables segÃºn las actividades cargadas
-        if (actividadesNorm.length > 0) {
-          this.actualizarRevisionesModulos(actividadesNorm, tarea.revisionesModulos);
-        }
-        // Aplicamos la lÃ³gica de bloqueo y permisos
-        this.aplicarBloqueos(tarea);
-      }
-    });
+      });
   }
 
   private normalizarIds(ids: unknown): number[] {
@@ -567,32 +575,34 @@ export class TareaFormComponent implements OnInit {
       return;
     }
 
-    this.tareasService.getTareasByAlumno(this.idAlumno).subscribe({
-      next: (tareas) => {
-        const siguiente = [...(tareas || [])]
-          .filter((tarea) => tarea.id !== this.idTarea)
-          .filter((tarea) => (tarea.progreso?.actual ?? 0) < (tarea.progreso?.total ?? 1))
-          .sort((a, b) => {
-            const fechaA = a.fechaFin ? new Date(a.fechaFin).getTime() : Number.MAX_SAFE_INTEGER;
-            const fechaB = b.fechaFin ? new Date(b.fechaFin).getTime() : Number.MAX_SAFE_INTEGER;
-            if (fechaA !== fechaB) return fechaA - fechaB;
-            return a.id - b.id;
-          })[0];
-
-        if (!siguiente) {
-          this.siguienteTareaPendienteId = null;
+    this.tareasService.getTareasByAlumno(this.idAlumno)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (tareas) => {
+          const siguiente = [...(tareas || [])]
+            .filter((tarea) => tarea.id !== this.idTarea)
+            .filter((tarea) => (tarea.progreso?.actual ?? 0) < (tarea.progreso?.total ?? 1))
+            .sort((a, b) => {
+              const fechaA = a.fechaFin ? new Date(a.fechaFin).getTime() : Number.MAX_SAFE_INTEGER;
+              const fechaB = b.fechaFin ? new Date(b.fechaFin).getTime() : Number.MAX_SAFE_INTEGER;
+              if (fechaA !== fechaB) return fechaA - fechaB;
+              return a.id - b.id;
+            })[0];
+  
+          if (!siguiente) {
+            this.siguienteTareaPendienteId = null;
+            this.modalSiguienteTareaVisible = true;
+            return;
+          }
+  
+          this.siguienteTareaPendienteId = siguiente.id;
           this.modalSiguienteTareaVisible = true;
-          return;
+        },
+  
+        error: () => {
+          this.volver();
         }
-
-        this.siguienteTareaPendienteId = siguiente.id;
-        this.modalSiguienteTareaVisible = true;
-      },
-
-      error: () => {
-        this.volver();
-      }
-    });
+      });
   }
 
   irASiguienteTareaPendiente(): void {

@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, inject, Renderer2 } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, inject, Renderer2, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { forkJoin, Subscription } from 'rxjs';
@@ -13,13 +13,15 @@ import { AuthService } from '../../../auth/services/auth.service';
   standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule],
   templateUrl: './profesor-modal.component.html',
-  styleUrls: ['./profesor-modal.component.css']
+  styleUrls: ['./profesor-modal.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ProfesorModalComponent implements OnInit, OnDestroy {
   private renderer = inject(Renderer2);
   private ciclosService = inject(CiclosService);
   private modulosService = inject(ModulosService);
   private fb = inject(FormBuilder);
+  private cdr = inject(ChangeDetectorRef);
   private alertService = inject(AlertService);
   public authService = inject(AuthService); // Cambiado a public para acceso en HTML
 
@@ -71,6 +73,7 @@ export class ProfesorModalComponent implements OnInit, OnDestroy {
     if (this.profesor) this.syncProfesor(this.profesor);
     this.perfilSubscription = this.authService.perfilUsuario$.subscribe(() => {
       this.actualizarEstadoDeshabilitadoRol();
+      this.cdr.markForCheck();
     });
   }
 
@@ -98,6 +101,7 @@ export class ProfesorModalComponent implements OnInit, OnDestroy {
     this.sincronizarIdsModulosSeleccionados();
     this.refrescarEstadoVisual();
     this.actualizarEstadoDeshabilitadoRol();
+    this.cdr.markForCheck();
   }
 
       forkJoin(ciclos.map(ciclo => this.modulosService.getModulosPorCiclo(ciclo.siglas))).subscribe(modulosPorCiclo => {
@@ -117,6 +121,7 @@ export class ProfesorModalComponent implements OnInit, OnDestroy {
         this.modulosBD = Array.from(indexById.values());
         this.sincronizarIdsModulosSeleccionados();
         this.refrescarEstadoVisual();
+        this.cdr.markForCheck();
       });
     });
   }

@@ -1,5 +1,5 @@
 import { CommonModule, Location } from '@angular/common';
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { AuthService } from '../../auth/services/auth.service';
@@ -11,13 +11,15 @@ import { PerfilUsuario } from '../../dto/dualex.dto';
   standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './perfil.component.html',
-  styleUrl: './perfil.component.css'
+  styleUrl: './perfil.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PerfilComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
   private alertService = inject(AlertService);
   private router = inject(Router);
   private location = inject(Location);
+  private cdr = inject(ChangeDetectorRef);
   private suscripcion?: Subscription;
 
   perfil: PerfilUsuario | null = null;
@@ -26,6 +28,7 @@ export class PerfilComponent implements OnInit, OnDestroy {
     // El perfil se escucha como observable para mantener sincronizado el estado.
     this.suscripcion = this.authService.perfilUsuario$.subscribe(perfil => {
       this.perfil = perfil;
+      this.cdr.markForCheck();
     });
   }
 

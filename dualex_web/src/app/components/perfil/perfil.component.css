@@ -1,9 +1,15 @@
 .perfil-page {
   min-height: calc(100vh - 80px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   background:
     radial-gradient(circle at top left, rgba(59, 130, 246, 0.12), transparent 28%),
     radial-gradient(circle at top right, rgba(16, 185, 129, 0.10), transparent 24%),
     linear-gradient(180deg, #eaf4ff 0%, #eef7ff 42%, #e7f2fb 100%);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment: fixed;
 }
 
 .perfil-shell {

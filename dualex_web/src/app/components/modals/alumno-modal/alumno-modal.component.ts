@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, inject, OnChanges, SimpleChanges, OnDestroy, Renderer2 } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, inject, OnChanges, SimpleChanges, OnDestroy, Renderer2, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { AlumnoDTO, CursoDTO, EmpresaDTO } from '../../../dto/dualex.dto';
@@ -11,11 +11,13 @@ import { EmpresasService } from '../../../services/empresas.service';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './alumno-modal.component.html',
-  styleUrls: ['./alumno-modal.component.css']
+  styleUrls: ['./alumno-modal.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AlumnoModalComponent implements OnInit, OnChanges, OnDestroy {
   private renderer = inject(Renderer2);
   private fb = inject(FormBuilder);
+  private cdr = inject(ChangeDetectorRef);
 
   private cursosService = inject(CursosService);
   private empresasService = inject(EmpresasService);
@@ -84,6 +86,7 @@ export class AlumnoModalComponent implements OnInit, OnChanges, OnDestroy {
       this.todosLosCursos = data.map(c => ({ ...c, id: Number(c.id) }));
       this.aplicarFiltroCursos();
       if (this.alumno) this.aplicarDatosAlumno();
+      this.cdr.markForCheck();
     });
 
     // Carga de Empresas
@@ -91,6 +94,7 @@ export class AlumnoModalComponent implements OnInit, OnChanges, OnDestroy {
       this.todasLasEmpresas = data.map((e: EmpresaDTO) => ({ ...e, id: Number(e.id) }));
       this.aplicarFiltroEmpresas();
       if (this.alumno) this.aplicarDatosAlumno();
+      this.cdr.markForCheck();
     });
   }
 
@@ -122,6 +126,7 @@ export class AlumnoModalComponent implements OnInit, OnChanges, OnDestroy {
       // Mantenemos el pequeño retardo para asegurar que Angular ha renderizado los <option>
       setTimeout(() => {
         this.alumnoForm.patchValue(alumnoData);
+        this.cdr.markForCheck();
       }, 50);
     }
   }

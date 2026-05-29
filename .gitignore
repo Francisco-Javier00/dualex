@@ -1,0 +1,18 @@
+# Archivos de entorno y configuración sensible (DevSecOps)
+.env
+.env.*
+!.env.example
+docker-compose.override.yml
+
+# Dependencias (por si se instalan en la raíz accidentalmente)
+node_modules/
+vendor/
+
+# Archivos de sistema y logs
+.DS_Store
+Thumbs.db
+*.log
+
+# Entornos de desarrollo
+.vscode/
+.idea/

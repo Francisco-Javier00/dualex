@@ -1,4 +1,5 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ConfirmarBorradoModalComponent } from '../shared/modals/confirmar-borrado-modal/confirmar-borrado-modal.component';
@@ -26,6 +27,7 @@ export class TareasComponent implements OnInit {
   private tareasService = inject(TareasService);
   private authService = inject(AuthService);
   private location = inject(Location);
+  private destroyRef = inject(DestroyRef);
   
   // ESTADO DEL COMPONENTE
   modalBorradoVisible = false;           // Controla el modal de confirmación
@@ -39,7 +41,7 @@ export class TareasComponent implements OnInit {
    */
   ngOnInit(): void {
     this.esProfesor = this.authService.currentUserValue?.rol === 'PROFESOR';
-    this.route.paramMap.subscribe(params => {
+    this.route.paramMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
       const id = params.get('alumnoId');
       this.alumnoId = id ? +id : null;
       this.cargarTareas();
@@ -52,14 +54,18 @@ export class TareasComponent implements OnInit {
   cargarTareas(): void {
     if (this.alumnoId) {
       // Vista filtrada por alumno
-      this.tareasService.getTareasByAlumno(this.alumnoId).subscribe(data => {
-        this.tareas = data;
-      });
+      this.tareasService.getTareasByAlumno(this.alumnoId)
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe(data => {
+          this.tareas = data;
+        });
     } else {
       // Vista global (Coordinador / Profesor)
-      this.tareasService.getTareas().subscribe(data => {
-        this.tareas = data;
-      });
+      this.tareasService.getTareas()
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe(data => {
+          this.tareas = data;
+        });
     }
   }
 
@@ -118,8 +124,10 @@ export class TareasComponent implements OnInit {
   abrirDocumento(tarea: Tarea): void {
     if (!tarea.documento) return;
     const url = this.tareasService.getDocumentoUrl(tarea.id);
-    this.tareasService.getDocumentoBlob(tarea.id).subscribe(blob => {
-      const blobUrl = URL.createObjectURL(blob);
+    this.tareasService.getDocumentoBlob(tarea.id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(blob => {
+        const blobUrl = URL.createObjectURL(blob);
       window.open(blobUrl, '_blank');
     });
   }
@@ -137,9 +145,11 @@ export class TareasComponent implements OnInit {
    */
   onConfirmarBorrado(): void {
     if (this.tareaSeleccionada) {
-      this.tareasService.deleteTarea(this.tareaSeleccionada.id).subscribe(() => {
-        this.cargarTareas(); // Recargamos la lista tras el borrado
-      });
+      this.tareasService.deleteTarea(this.tareaSeleccionada.id)
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe(() => {
+          this.cargarTareas(); // Recargamos la lista tras el borrado
+        });
     }
     this.modalBorradoVisible = false;
     this.tareaSeleccionada = null;

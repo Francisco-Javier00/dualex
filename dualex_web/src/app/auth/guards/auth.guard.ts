@@ -16,7 +16,6 @@ export const authGuard: CanActivateFn = (route, state) => {
     if (rolesRequeridos && rolesRequeridos.length > 0) {
       if (!rolesRequeridos.includes(currentUser.rol)) {
         // Redirigir al inicio o mostrar alerta si no tiene permiso
-
         return router.parseUrl('/dashboard');
       }
     }
@@ -28,7 +27,7 @@ export const authGuard: CanActivateFn = (route, state) => {
   if (!environment.developerMode) {
     // Si no hay sesión (no hay token/perfil), denegar acceso.
     // En un entorno real con SSO, aquí se redirigiría a la URL de login externo.
-    window.location.href = 'https://05.daw.esvirgua.com/tfg-server/angular-tfg/dashboard-inicio';
+    window.location.href = 'https://17.daw.esvirgua.com/dashboard-inicio';
   } else {
     // En modo desarrollo, solo cancelamos la navegación para que el layout principal
     // (con PruebasSistemaComponent) cargue y autogenere el token de prueba local.
