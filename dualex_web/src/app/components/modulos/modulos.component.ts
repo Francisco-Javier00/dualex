@@ -85,7 +85,9 @@ export class ModulosComponent implements OnInit, OnDestroy {
               });
 
               // Refrescar tabla para que recoja los cursos cargados
-              this.datatable.refrescar(false);
+              if (this.datatable) {
+                this.datatable.refrescar(false);
+              }
             }
           });
         }
