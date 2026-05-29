@@ -191,7 +191,29 @@
 .empresas-contactos-table {
   border: 1px solid #dbe3ee;
   border-radius: 14px;
-  overflow: hidden;
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+.empresas-contactos-table {
+  border: 1px solid #dbe3ee;
+  border-radius: 14px;
+  overflow-x: auto;
+  width: 100%;
+  max-width: 100%;
+  display: block;
+}
+
+.empresas-contactos-table table {
+  width: 100%;
+  min-width: 300px;
+  table-layout: auto;
+  margin-bottom: 0;
+}
+
+.empresas-contactos-table td, .empresas-contactos-table th {
+  white-space: nowrap;
+  padding: 0.75rem !important;
 }
 
 .empresas-contactos-table thead th {
