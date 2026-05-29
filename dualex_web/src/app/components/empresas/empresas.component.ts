@@ -36,6 +36,7 @@ export class EmpresasComponent implements OnInit {
   dtOptions: any = {};
   modalConfiguracionVisible = false;
   modalContactosVisible = false;
+  modalCiclosVisible = false;
   modalBorradoVisible = false;
   modalCrearVisible = false;
   modoFormulario: 'crear' | 'editar' | 'enlazar' = 'crear';
@@ -123,7 +124,20 @@ export class EmpresasComponent implements OnInit {
           data: 'ciclos',
           width: '10%',
           responsivePriority: 4,
-          render: (data: string) => data ? data : '<span class="text-muted italic">No asignado</span>'
+          render: (data: string) => {
+            if (!data || data === 'No asignado') {
+              return '<span class="text-muted italic">No asignado</span>';
+            }
+            return `
+              <button
+                type="button"
+                class="btn btn-link p-0 text-decoration-none empresa-ciclos-link fw-semibold"
+                data-action="viewCiclos"
+                title="Ver tutores de ciclos">
+                ${data}
+              </button>
+            `;
+          }
         },
         {
           data: 'convenioUrl',
@@ -237,6 +251,11 @@ export class EmpresasComponent implements OnInit {
       return;
     }
 
+    if (event.action === 'viewCiclos') {
+      this.abrirCiclosEmpresa(event.data);
+      return;
+    }
+
     if (event.action === 'delete') {
       this.empresaSeleccionada = event.data;
       this.modalBorradoVisible = true;
@@ -290,6 +309,16 @@ export class EmpresasComponent implements OnInit {
 
   cerrarContactosEmpresa(): void {
     this.modalContactosVisible = false;
+    this.empresaSeleccionada = null;
+  }
+
+  abrirCiclosEmpresa(empresa: EmpresaDTO): void {
+    this.empresaSeleccionada = empresa;
+    this.modalCiclosVisible = true;
+  }
+
+  cerrarCiclosEmpresa(): void {
+    this.modalCiclosVisible = false;
     this.empresaSeleccionada = null;
   }
 

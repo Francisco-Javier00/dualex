@@ -306,10 +306,11 @@ class ModAlumnos {
                 2 => 'apellidos',
                 3 => 'correo',
                 4 => 'c.nombre',
-                5 => 'DNI',
-                6 => 'NUSS',
-                7 => 'NIA',
-                8 => 'telefono'
+                5 => 'repetidor',
+                6 => 'DNI',
+                7 => 'NUSS',
+                8 => 'NIA',
+                9 => 'telefono'
             ];
 
             if (isset($columnsMap[$orderColumnIndex])) {

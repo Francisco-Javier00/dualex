@@ -70,7 +70,7 @@ export class AlumnosComponent implements OnInit, OnDestroy {
   }
 
   get columnTitles(): string[] {
-    const base = [' ', 'Nombre', 'Apellidos', 'Correo', 'Curso/Ciclo'];
+    const base = [' ', 'Nombre', 'Apellidos', 'Correo', 'Curso/Ciclo', 'Repetidor'];
     if (!this.esSoloLectura) {
       base.push('DNI', 'NUSS', 'NIA', 'Teléfono');
     }
@@ -94,18 +94,30 @@ export class AlumnosComponent implements OnInit, OnDestroy {
         defaultContent: '',
         responsivePriority: 1
       },
-      { data: 'nombre', width: ocultarSensibles ? '20%' : '12%', responsivePriority: 2 },
-      { data: 'apellidos', width: ocultarSensibles ? '30%' : '16%', responsivePriority: 3 },
-      { data: 'email', width: ocultarSensibles ? '34%' : '20%', responsivePriority: 4 },
-      { data: 'nombreCurso', className: 'text-nowrap', defaultContent: '<span class="text-muted">Sin curso</span>', width: '10%', responsivePriority: 5 },
+      { data: 'nombre', width: ocultarSensibles ? '18%' : '11%', responsivePriority: 2 },
+      { data: 'apellidos', width: ocultarSensibles ? '26%' : '15%', responsivePriority: 3 },
+      { data: 'email', width: ocultarSensibles ? '30%' : '18%', responsivePriority: 4 },
+      { data: 'nombreCurso', className: 'text-nowrap', defaultContent: '<span class="text-muted">Sin curso</span>', width: ocultarSensibles ? '10%' : '9%', responsivePriority: 5 },
+      {
+        data: 'repetidor',
+        className: 'text-center',
+        width: ocultarSensibles ? '10%' : '8%',
+        responsivePriority: 6,
+        render: (data: any) => {
+          const isRepetidor = Number(data) === 1 || data === true;
+          return isRepetidor 
+            ? '<span class="badge bg-danger bg-opacity-10 text-danger border border-danger-subtle px-2 py-1">Sí</span>'
+            : '<span class="badge bg-success bg-opacity-10 text-success border border-success-subtle px-2 py-1">No</span>';
+        }
+      }
     ];
     
     // Desde "Mis Módulos" o Profesor: ocultar sensibles
     if (!ocultarSensibles) {
       cols.push(
-        { data: 'dni', className: 'text-nowrap', width: '9%', responsivePriority: 9 },
-        { data: 'nuss', className: 'text-nowrap', width: '9%', responsivePriority: 8 },
-        { data: 'nia', className: 'text-nowrap', width: '9%', responsivePriority: 7 },
+        { data: 'dni', className: 'text-nowrap', width: '8%', responsivePriority: 9 },
+        { data: 'nuss', className: 'text-nowrap', width: '8%', responsivePriority: 8 },
+        { data: 'nia', className: 'text-nowrap', width: '8%', responsivePriority: 7 },
         { data: 'telefono', className: 'text-nowrap', width: '9%', responsivePriority: 10 }
       );
     }

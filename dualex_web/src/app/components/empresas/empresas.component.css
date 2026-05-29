@@ -18,6 +18,17 @@
   text-decoration: underline !important;
 }
 
+.empresa-ciclos-link {
+  font-weight: 600;
+  color: #2563eb;
+  text-align: left;
+}
+
+.empresa-ciclos-link:hover {
+  color: #1d4ed8;
+  text-decoration: underline !important;
+}
+
 .empresas-create-modal {
   background: transparent;
 }

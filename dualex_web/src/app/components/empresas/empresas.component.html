@@ -97,6 +97,55 @@
   </div>
 }
 
+@if (modalCiclosVisible && empresaSeleccionada) {
+  <div class="modal d-block empresas-contactos-modal" tabindex="-1" role="dialog" aria-modal="true">
+    <div class="empresas-contactos-backdrop" (click)="cerrarCiclosEmpresa()"></div>
+
+    <div class="modal-dialog modal-dialog-centered empresas-contactos-dialog" role="document">
+      <div class="modal-content empresas-contactos-content">
+        <div class="modal-header border-0 pb-0 px-4 pt-4">
+          <div>
+            <h5 class="modal-title fw-bold mb-1 empresas-contactos-title">{{ empresaSeleccionada.nombre }}</h5>
+            <p class="text-muted mb-0 empresas-contactos-subtitle">Ciclos formativos y tutores de la empresa</p>
+          </div>
+          <button type="button" class="btn-close" aria-label="Cerrar" (click)="cerrarCiclosEmpresa()"></button>
+        </div>
+
+        <div class="modal-body px-4 pb-4 pt-3">
+          <div class="table-responsive empresas-contactos-table">
+            <table class="table align-middle mb-0">
+              <thead>
+                <tr>
+                  <th>Ciclo</th>
+                  <th>Tutor/a de prácticas</th>
+                </tr>
+              </thead>
+              <tbody>
+                @if (empresaSeleccionada.ciclosInfo && empresaSeleccionada.ciclosInfo.length > 0) {
+                  @for (cicloInfo of empresaSeleccionada.ciclosInfo; track $index) {
+                    <tr>
+                      <td class="fw-bold text-primary">{{ cicloInfo.siglas }}</td>
+                      <td>{{ cicloInfo.tutor || 'Sin tutor asignado' }}</td>
+                    </tr>
+                  }
+                } @else {
+                  <tr>
+                    <td colspan="2" class="text-center text-muted py-3">No hay ciclos asignados a esta empresa.</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <div class="d-flex justify-content-end mt-4">
+            <button class="btn btn-primary px-4" (click)="cerrarCiclosEmpresa()">Cerrar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
 @if (modalConfiguracionVisible) {
   <div class="modal d-block empresas-config-modal" tabindex="-1" role="dialog" aria-modal="true">
     <div class="empresas-config-backdrop"></div>
