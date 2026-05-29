@@ -13,7 +13,7 @@
       </div>
     </div>
     <button *ngIf="!esProfesor" type="button" class="btn btn-primary rounded-3 px-4 py-2 shadow-sm" (click)="crearTarea()">
-      <i class="fa-solid fa-plus me-2"></i> Nueva TareaDTO
+      <i class="fa-solid fa-plus me-2"></i> Nueva Tarea
     </button>
   </div>
 
@@ -83,7 +83,7 @@
                   </button>
                 </div>
                 <button type="button" class="btn btn-outline-danger btn-sm rounded-3 shadow-sm" 
-                        (click)="eliminarTarea(tarea)" title="Eliminar TareaDTO">
+                        (click)="eliminarTarea(tarea)" title="Eliminar Tarea">
                   <i class="fa-solid fa-trash-can"></i>
                 </button>
               </div>
@@ -106,7 +106,7 @@
 <!-- Modal de Borrado -->
 <app-confirmar-borrado-modal 
   [visible]="modalBorradoVisible"
-  [titulo]="'Eliminar TareaDTO'"
+  [titulo]="'Eliminar Tarea'"
   [mensaje]="'¿Estás seguro de que deseas eliminar la tarea &quot;' + (tareaSeleccionada?.titulo ?? '') + '&quot;? Esta acción no se puede deshacer.'"
   (confirmarEvent)="onConfirmarBorrado()"
   (cancelarEvent)="onCancelarBorrado()">

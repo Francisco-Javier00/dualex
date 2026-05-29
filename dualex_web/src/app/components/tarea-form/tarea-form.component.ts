@@ -542,7 +542,7 @@ export class TareaFormComponent implements OnInit {
             if (this.documentoFile && nuevoId) {
               this.tareasService.subirDocumento(nuevoId, this.documentoFile).subscribe({
                 next: () => {
-                  this.alertService.exito('TareaDTO registrada', 'La tarea se ha creado correctamente.');
+                  this.alertService.exito('Tarea registrada', 'La tarea se ha creado correctamente.');
                   this.volver();
                 },
                 error: (err) => {
@@ -551,7 +551,7 @@ export class TareaFormComponent implements OnInit {
                 }
               });
             } else {
-              this.alertService.exito('TareaDTO registrada', 'La tarea se ha creado correctamente.');
+              this.alertService.exito('Tarea registrada', 'La tarea se ha creado correctamente.');
               this.volver();
             }
           },
@@ -568,7 +568,7 @@ export class TareaFormComponent implements OnInit {
   }
 
   private gestionarPostGuardado(): void {
-    this.alertService.exito('TareaDTO actualizada', 'La tarea se ha guardado correctamente.');
+    this.alertService.exito('Tarea actualizada', 'La tarea se ha guardado correctamente.');
 
     if (!this.esProfesor || !this.idAlumno || !this.idTarea) {
       this.volver();
