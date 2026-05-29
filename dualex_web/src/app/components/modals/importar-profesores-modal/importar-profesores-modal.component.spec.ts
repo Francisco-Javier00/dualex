@@ -5,16 +5,10 @@ import { Renderer2 } from '@angular/core';
 describe('ImportarProfesoresModalComponent', () => {
   let component: ImportarProfesoresModalComponent;
   let fixture: ComponentFixture<ImportarProfesoresModalComponent>;
-  let rendererSpy: jasmine.SpyObj<Renderer2>;
 
   beforeEach(async () => {
-    rendererSpy = jasmine.createSpyObj('Renderer2', ['addClass', 'removeClass']);
-
     await TestBed.configureTestingModule({
-      imports: [ImportarProfesoresModalComponent],
-      providers: [
-        { provide: Renderer2, useValue: rendererSpy }
-      ]
+      imports: [ImportarProfesoresModalComponent]
     })
     .compileComponents();
     
@@ -48,7 +42,8 @@ describe('ImportarProfesoresModalComponent', () => {
   });
 
   it('should toggle body scroll on visible change', () => {
+    const addSpy = spyOn((component as any).renderer, 'addClass');
     component.ngOnChanges({ visible: { currentValue: true, previousValue: false, firstChange: true, isFirstChange: () => true } });
-    expect(rendererSpy.addClass).toHaveBeenCalled();
+    expect(addSpy).toHaveBeenCalled();
   });
 });

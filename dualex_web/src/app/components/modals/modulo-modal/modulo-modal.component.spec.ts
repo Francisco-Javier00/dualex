@@ -13,13 +13,11 @@ describe('ModuloModalComponent', () => {
   let alertSpy: jasmine.SpyObj<AlertService>;
   let ciclosSpy: jasmine.SpyObj<CiclosService>;
   let cursosSpy: jasmine.SpyObj<CursosService>;
-  let rendererSpy: jasmine.SpyObj<Renderer2>;
 
   beforeEach(async () => {
     alertSpy = jasmine.createSpyObj('AlertService', ['advertencia']);
     ciclosSpy = jasmine.createSpyObj('CiclosService', ['getCiclos']);
     cursosSpy = jasmine.createSpyObj('CursosService', ['getCursos']);
-    rendererSpy = jasmine.createSpyObj('Renderer2', ['addClass', 'removeClass']);
 
     ciclosSpy.getCiclos.and.returnValue(of([{ id: 1, nombre: 'DAM', siglas: 'DAM' } as any]));
     cursosSpy.getCursos.and.returnValue(of([{ id: 10, idCiclo: 1, ciclo: 'DAM' } as any]));
@@ -29,8 +27,7 @@ describe('ModuloModalComponent', () => {
       providers: [
         { provide: AlertService, useValue: alertSpy },
         { provide: CiclosService, useValue: ciclosSpy },
-        { provide: CursosService, useValue: cursosSpy },
-        { provide: Renderer2, useValue: rendererSpy }
+        { provide: CursosService, useValue: cursosSpy }
       ]
     })
     .compileComponents();
@@ -83,7 +80,8 @@ describe('ModuloModalComponent', () => {
   });
 
   it('should toggle body scroll on visible change', () => {
+    const addSpy = spyOn((component as any).renderer, 'addClass');
     component.ngOnChanges({ visible: { currentValue: true, previousValue: false, firstChange: true, isFirstChange: () => true } });
-    expect(rendererSpy.addClass).toHaveBeenCalled();
+    expect(addSpy).toHaveBeenCalled();
   });
 });

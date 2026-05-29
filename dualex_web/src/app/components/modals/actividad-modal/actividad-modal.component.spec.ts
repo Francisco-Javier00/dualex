@@ -17,7 +17,6 @@ describe('ActividadModalComponent', () => {
   let modulosSpy: jasmine.SpyObj<ModulosService>;
   let authSpy: jasmine.SpyObj<AuthService>;
   let profesSpy: jasmine.SpyObj<ProfesoresService>;
-  let rendererSpy: jasmine.SpyObj<Renderer2>;
 
   beforeEach(async () => {
     // Arrange
@@ -26,7 +25,6 @@ describe('ActividadModalComponent', () => {
     modulosSpy = jasmine.createSpyObj('ModulosService', ['getModulos']);
     authSpy = jasmine.createSpyObj('AuthService', [], { currentUserValue: { rol: 'COORDINADOR', email: 'test@test.com' } });
     profesSpy = jasmine.createSpyObj('ProfesoresService', ['getProfesorByEmail']);
-    rendererSpy = jasmine.createSpyObj('Renderer2', ['addClass', 'removeClass']);
 
     ciclosSpy.getCiclos.and.returnValue(of([{ id: 1, nombre: 'DAM', siglas: 'DAM' } as any]));
     modulosSpy.getModulos.and.returnValue(of([{ id: 10, nombre: 'Programacion', siglas: 'PRG', ciclo: 'DAM' } as any]));
@@ -39,8 +37,7 @@ describe('ActividadModalComponent', () => {
         { provide: CiclosService, useValue: ciclosSpy },
         { provide: ModulosService, useValue: modulosSpy },
         { provide: AuthService, useValue: authSpy },
-        { provide: ProfesoresService, useValue: profesSpy },
-        { provide: Renderer2, useValue: rendererSpy }
+        { provide: ProfesoresService, useValue: profesSpy }
       ]
     })
     .compileComponents();
@@ -139,14 +136,16 @@ describe('ActividadModalComponent', () => {
   });
 
   it('should toggle scroll on visible change', () => {
+    const addSpy = spyOn((component as any).renderer, 'addClass');
+    const removeSpy = spyOn((component as any).renderer, 'removeClass');
     // Act 1
     component.ngOnChanges({ visible: { currentValue: true, previousValue: false, firstChange: true, isFirstChange: () => true } });
     // Assert 1
-    expect(rendererSpy.addClass).toHaveBeenCalled();
+    expect(addSpy).toHaveBeenCalled();
 
     // Act 2
     component.cerrar();
     // Assert 2
-    expect(rendererSpy.removeClass).toHaveBeenCalled();
+    expect(removeSpy).toHaveBeenCalled();
   });
 });

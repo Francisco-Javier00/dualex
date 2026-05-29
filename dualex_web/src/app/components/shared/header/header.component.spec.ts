@@ -95,7 +95,7 @@ describe('HeaderComponent', () => {
 
   it('should navigate to dashboard if user is not ALUMNO on irAInicio', () => {
     // Arrange
-    Object.defineProperty(authServiceSpy, 'perfilUsuario$', { get: () => of({ rol: 'PROFESOR' }) });
+    Object.defineProperty(authServiceSpy, 'perfilUsuario$', { get: () => of({ rol: 'PROFESOR', nombre: 'Test', apellidos: 'Profesor', email: 'test@test.com' }) });
     fixture = TestBed.createComponent(HeaderComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

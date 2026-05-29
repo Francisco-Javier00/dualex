@@ -8,17 +8,14 @@ describe('CicloModalComponent', () => {
   let component: CicloModalComponent;
   let fixture: ComponentFixture<CicloModalComponent>;
   let alertSpy: jasmine.SpyObj<AlertService>;
-  let rendererSpy: jasmine.SpyObj<Renderer2>;
 
   beforeEach(async () => {
     alertSpy = jasmine.createSpyObj('AlertService', ['advertencia']);
-    rendererSpy = jasmine.createSpyObj('Renderer2', ['addClass', 'removeClass']);
 
     await TestBed.configureTestingModule({
       imports: [CicloModalComponent, ReactiveFormsModule],
       providers: [
-        { provide: AlertService, useValue: alertSpy },
-        { provide: Renderer2, useValue: rendererSpy }
+        { provide: AlertService, useValue: alertSpy }
       ]
     })
     .compileComponents();
@@ -64,9 +61,12 @@ describe('CicloModalComponent', () => {
   });
 
   it('should toggle body scroll on init and destroy', () => {
-    expect(rendererSpy.addClass).toHaveBeenCalled();
+    const addSpy = spyOn((component as any).renderer, 'addClass');
+    const removeSpy = spyOn((component as any).renderer, 'removeClass');
+    component.ngOnInit();
+    expect(addSpy).toHaveBeenCalled();
     
     component.ngOnDestroy();
-    expect(rendererSpy.removeClass).toHaveBeenCalled();
+    expect(removeSpy).toHaveBeenCalled();
   });
 });

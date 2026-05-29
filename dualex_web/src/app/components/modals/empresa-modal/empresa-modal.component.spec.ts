@@ -70,7 +70,7 @@ describe('EmpresaModalComponent', () => {
     component.ciclosSeleccionados = [{ sigla: 'DAM', tutor: 'Test Tutor' }];
     
     // Asignar empresa para tener un id
-    const empresaDto: any = { id: 5, siglas: 'TEST', nombre: 'Test', convenioUrl: '', inicioConvenio: '', contacto: '', correo: '', numeroContacto: '' };
+    const empresaDto: any = { id: 5, siglas: 'TEST', nombre: 'Test', convenioUrl: '', inicioConvenio: '', contacto: '', correo: '', numeroContacto: '', ciclosInfo: [{ siglas: 'DAM', tutor: 'Test Tutor' }] };
     component.empresa = empresaDto;
 
     component.onSubmit();
