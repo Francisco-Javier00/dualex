@@ -4,6 +4,7 @@ namespace Dualex\Models;
 use Exception;
 use PDO;
 use PDOException;
+use DateTime;
 use Dualex\Core\ConexionDB;
 
 /**
