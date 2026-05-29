@@ -37,7 +37,10 @@ class BaseController {
             // Error 1062 es "Duplicate Entry" en MySQL
             if (strpos($sqlMessage, '1062') !== false || $error->getCode() == 23000) {
                 $code = 400;
-                if (strpos($sqlMessage, 'uq_alumno_dni') !== false || strpos($sqlMessage, 'dni') !== false) {
+                // Si el modelo ya tradujo el error, usamos su mensaje
+                if (!($error instanceof PDOException)) {
+                    $message = $sqlMessage;
+                } else if (strpos($sqlMessage, 'uq_alumno_dni') !== false || strpos($sqlMessage, 'dni') !== false) {
                     $message = "Este DNI ya está registrado en el sistema.";
                 } else if (strpos($sqlMessage, 'uq_alumno_nia') !== false || strpos($sqlMessage, 'nia') !== false) {
                     $message = "Este NIA ya está en uso por otro alumno.";

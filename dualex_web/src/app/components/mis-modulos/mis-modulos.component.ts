@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../auth/services/auth.service';
 import { ProfesorDashboardService } from '../../services/profesor-dashboard.service';
+import { AlertService } from '../../services/alert.service';
 import { ModuloProfesor, PerfilUsuario } from '../../dto/dualex.dto';
 
 @Component({
@@ -14,6 +15,7 @@ import { ModuloProfesor, PerfilUsuario } from '../../dto/dualex.dto';
 export class MisModulosComponent implements OnInit {
   private authService = inject(AuthService);
   private profesorDashboardService = inject(ProfesorDashboardService);
+  private alertService = inject(AlertService);
   
   usuario: PerfilUsuario | null = null;
   modulos: ModuloProfesor[] = [];

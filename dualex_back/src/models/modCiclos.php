@@ -188,7 +188,7 @@ class ModCiclos {
             return $stmt->execute([':idCoordinador' => $idCoordinador, ':idCiclo' => $idCiclo]);
         } catch (PDOException $e) {
             if ($e->getCode() == 23000) {
-                throw new InvalidArgumentException('Ese coordinador ya está asignado a otro ciclo.');
+                throw new InvalidArgumentException('Ese coordinador ya está asignado a otro ciclo.', 23000);
             }
             throw $e;
         }
