@@ -8,7 +8,7 @@
       <div>
         <h2 class="fw-bold text-dark mb-1 d-flex align-items-center gap-2 flex-wrap">
           <i class="fa-solid fa-file-pen text-primary me-2"></i>
-          <span>{{ esEdicion ? 'Editar Tarea' : 'Nueva Tarea' }}</span>
+          <span>{{ esEdicion ? 'Editar TareaDTO' : 'Nueva TareaDTO' }}</span>
           <span *ngIf="esEdicion && codigoTarea" class="badge bg-white border text-secondary px-3 py-1.5 fs-6 rounded-3 font-monospace shadow-sm">
             {{ codigoTarea }}
           </span>
@@ -18,7 +18,7 @@
     </div>
     <div class="d-flex gap-2">
       <button type="button" class="btn btn-primary rounded-3 px-4 py-2 shadow-sm" (click)="guardar()" [disabled]="tareaForm.disabled">
-        <i class="fa-solid fa-save me-2"></i> Guardar Tarea
+        <i class="fa-solid fa-save me-2"></i> Guardar TareaDTO
       </button>
     </div>
   </div>
@@ -27,7 +27,7 @@
     <!-- Primera Fila: Título y Fechas -->
     <div class="row g-3 mb-4">
       <div class="col-lg-6">
-        <label class="form-label small fw-bold text-uppercase opacity-75">Título de la Tarea</label>
+        <label class="form-label small fw-bold text-uppercase opacity-75">Título de la TareaDTO</label>
         <div class="input-group shadow-sm rounded-3 overflow-hidden border"
              [class.is-invalid]="tareaForm.get('titulo')?.invalid && tareaForm.get('titulo')?.touched">
           <span class="input-group-text bg-white border-0"><i class="fa-solid fa-heading text-muted"></i></span>
@@ -238,7 +238,7 @@
   <!-- Botón Guardar adicional al final -->
   <div class="d-flex justify-content-end mb-4">
     <button type="button" class="btn btn-primary rounded-3 px-5 py-2 shadow-sm" (click)="guardar()" [disabled]="tareaForm.disabled">
-      <i class="fa-solid fa-save me-2"></i> Guardar Tarea
+      <i class="fa-solid fa-save me-2"></i> Guardar TareaDTO
     </button>
   </div>
 </div>
@@ -260,7 +260,7 @@
                 <i class="fa-solid fa-file-circle-check"></i>
               </div>
               <div>
-                <h5 class="mb-1 fw-bold text-dark">{{ siguienteTareaPendienteId ? 'Tarea guardada' : 'Todas las tareas corregidas' }}</h5>
+                <h5 class="mb-1 fw-bold text-dark">{{ siguienteTareaPendienteId ? 'TareaDTO guardada' : 'Todas las tareas corregidas' }}</h5>
                 <p class="mb-0 text-muted small">{{ siguienteTareaPendienteId ? 'Queda otra tarea pendiente para este alumno.' : 'Ya no hay más tareas pendientes para este alumno.' }}</p>
               </div>
             </div>

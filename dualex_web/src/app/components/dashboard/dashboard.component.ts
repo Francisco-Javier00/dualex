@@ -5,9 +5,15 @@ import { AuthService } from '../../auth/services/auth.service';
 import { DashboardService } from '../../services/dashboard.service';
 import { ProfesorDashboardService } from '../../services/profesor-dashboard.service';
 import { ProfesoresService } from '../../services/profesores.service';
-import { Categoria, ModuloProfesor, PerfilUsuario } from '../../dto/dualex.dto';
+import { CategoriaDTO, ModuloProfesorDTO, PerfilUsuarioDTO } from '../../dto/dualex.dto';
 import { Observable, Subscription } from 'rxjs';
 
+/**
+ * Componente para el Panel de Control (Dashboard) principal de la aplicación.
+ * 
+ * Gestiona la visualización de módulos y categorías dependiendo del rol del usuario 
+ * (PROFESOR, COORDINADOR o ALUMNO).
+ */
 @Component({
   selector: 'app-dashboard',
   standalone: true,
@@ -22,14 +28,18 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private profesoresService = inject(ProfesoresService);
   private router = inject(Router);
 
-  usuario: PerfilUsuario | null = null;
-  categorias$: Observable<Categoria[]> = this.servicioDashboard.categorias$;
-  modulosProfesor: ModuloProfesor[] = [];
+  usuario: PerfilUsuarioDTO | null = null;
+  categorias$: Observable<CategoriaDTO[]> = this.servicioDashboard.categorias$;
+  modulosProfesor: ModuloProfesorDTO[] = [];
   cargandoModulos = false;
   ciclosCoordinados: string[] = [];
 
   private suscripcionUsuario!: Subscription;
 
+  /**
+   * Inicializa el componente y se suscribe al perfil del usuario actual para
+   * redirigirlo si es alumno, o cargar sus módulos si es profesor/coordinador.
+   */
   ngOnInit() {
     this.suscripcionUsuario = this.authService.perfilUsuario$.subscribe(perfil => {
       if (perfil) {
@@ -52,6 +62,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
     });
   }
 
+  /**
+   * Carga la lista de módulos asignados al profesor en sesión desde el backend.
+   */
   private cargarModulosProfesor(): void {
     this.cargandoModulos = true;
     this.profesorDashboardService.obtenerModulosDelProfesor().subscribe({
@@ -66,6 +79,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
     });
   }
 
+  /**
+   * Limpia las suscripciones al destruir el componente para evitar fugas de memoria.
+   */
   ngOnDestroy() {
     if (this.suscripcionUsuario) {
       this.suscripcionUsuario.unsubscribe();

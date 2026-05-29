@@ -1,9 +1,18 @@
 <?php
+namespace Dualex\Models;
 
+use Exception;
+use PDO;
+use PDOException;
+use Dualex\Core\ConexionDB;
+
+/**
+ * File-level docblock for modCursos.php
+ * 
+ */
 /**
  * Modelo para la gestión de los Curso escolares dentro de los Ciclo.
  * 
- * @package Dualex\Models
  */
 class ModCursos {
     private $db;

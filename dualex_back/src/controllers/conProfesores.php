@@ -1,4 +1,26 @@
 <?php
+namespace Dualex\Controllers;
+
+use Exception;
+use PDO;
+use PDOException;
+use Dualex\Core\BaseController;
+use Dualex\Core\ConexionDB;
+use Dualex\Core\JWTHelper;
+use Dualex\Models\ModActividades;
+use Dualex\Models\ModAlumnos;
+use Dualex\Models\ModCiclos;
+use Dualex\Models\ModConfiguracion;
+use Dualex\Models\ModCursos;
+use Dualex\Models\ModEmpresas;
+use Dualex\Models\ModModulos;
+use Dualex\Models\ModProfesores;
+use Dualex\Models\ModTareas;
+
+/**
+ * File-level docblock for conProfesores.php
+ * 
+ */
 require_once MODELO . 'modProfesores.php';
 
 /**
@@ -17,6 +39,7 @@ class ConProfesores extends BaseController {
      * Devuelve el listado completo de profesores (para selects o listas simples).
      */
     public function listar() {
+        $this->checkRole(['PROFESOR', 'COORDINADOR']);
         try {
             $data = $this->modelo->listar();
             $this->sendResponse($data);
@@ -29,6 +52,7 @@ class ConProfesores extends BaseController {
      * Obtiene un profesor específico por su ID.
      */
     public function obtener() {
+        $this->checkRole(['PROFESOR', 'COORDINADOR']);
         $id = $_GET['id'] ?? null;
         $correo = $_GET['correo'] ?? null;
 
@@ -55,6 +79,7 @@ class ConProfesores extends BaseController {
      * Punto de entrada para la carga de datos de DataTables.
      */
     public function obtenerDataTables() {
+        $this->checkRole(['PROFESOR', 'COORDINADOR']);
         try {
             $json = file_get_contents('php://input');
             $params = json_decode($json, true) ?: [];

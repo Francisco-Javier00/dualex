@@ -1,5 +1,14 @@
 <?php
+namespace Dualex\Core;
 
+use Exception;
+use PDO;
+use PDOException;
+
+/**
+ * File-level docblock for JWTHelper.php
+ * 
+ */
 class JWTHelper {
     private static function base64UrlEncode($data) {
         return str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($data));

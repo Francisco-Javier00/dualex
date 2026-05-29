@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { Categoria } from '../dto/dualex.dto';
+import { CategoriaDTO } from '../dto/dualex.dto';
 import { AuthService } from '../auth/services/auth.service';
 
 /**
@@ -13,7 +13,7 @@ import { AuthService } from '../auth/services/auth.service';
 export class DashboardService {
   private authService = inject(AuthService);
 
-  private categoriasCoordinador: Categoria[] = [
+  private categoriasCoordinador: CategoriaDTO[] = [
     { titulo: 'Profesores', icono: 'fa-solid fa-id-badge', imagen: '/assets/img/profesores.png', ruta: '/profesores' },
     { titulo: 'Alumnos', icono: 'fa-solid fa-user-graduate', imagen: '/assets/img/alumnos.png', ruta: '/alumnos' },
     { titulo: 'Empresas', icono: 'fa-solid fa-building', imagen: '/assets/img/empresas.png', ruta: '/empresas' },
@@ -22,21 +22,21 @@ export class DashboardService {
     { titulo: 'Ciclos', icono: 'fa-solid fa-rotate', imagen: '/assets/img/ciclos.png', ruta: '/ciclos' },
   ];
 
-  private categoriasProfesor: Categoria[] = [
+  private categoriasProfesor: CategoriaDTO[] = [
     { titulo: 'Mis Clases', icono: 'fa-solid fa-chalkboard-user', imagen: '/assets/img/clases.png', ruta: '/modulos' },
     { titulo: 'Mis Alumnos', icono: 'fa-solid fa-users', imagen: '/assets/img/profesores.png', ruta: '/alumnos' },
     { titulo: 'Actividades', icono: 'fa-solid fa-calendar-days', colorIcono: 'text-primary', imagen: '/assets/img/actividades.png', ruta: '/actividades' },
     { titulo: 'Calificaciones', icono: 'fa-solid fa-award', imagen: '/assets/img/notas.png', ruta: '/tareas' }
   ];
 
-  private categoriasAlumno: Categoria[] = [
+  private categoriasAlumno: CategoriaDTO[] = [
     { titulo: 'Mi Cuaderno', icono: 'fa-solid fa-book-open', imagen: '/assets/img/clases.png', ruta: '/modulos' },
     { titulo: 'Mis Notas', icono: 'fa-solid fa-clipboard', imagen: '/assets/img/notas.png', ruta: '/tareas' },
     { titulo: 'Actividades', icono: 'fa-solid fa-calendar-days', colorIcono: 'text-primary', imagen: '/assets/img/actividades.png', ruta: '/actividades' },
     { titulo: 'Mi Empresa', icono: 'fa-solid fa-building', imagen: '/assets/img/empresas.png', ruta: '/empresas' }
   ];
 
-  private sujetoCategorias = new BehaviorSubject<Categoria[]>(this.categoriasCoordinador);
+  private sujetoCategorias = new BehaviorSubject<CategoriaDTO[]>(this.categoriasCoordinador);
   categorias$ = this.sujetoCategorias.asObservable();
 
   constructor() {
@@ -73,9 +73,9 @@ export class DashboardService {
   /**
    * Obtiene el valor actual síncrono de las categorías asignadas al usuario.
    * 
-   * @returns Un array de objetos `Categoria` configurados para el menú.
+   * @returns Un array de objetos `CategoriaDTO` configurados para el menú.
    */
-  obtenerCategorias(): Categoria[] {
+  obtenerCategorias(): CategoriaDTO[] {
     return this.sujetoCategorias.value;
   }
 }

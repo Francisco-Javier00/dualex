@@ -1,4 +1,15 @@
 <?php
+namespace Dualex\Models;
+
+use Exception;
+use PDO;
+use PDOException;
+use Dualex\Core\ConexionDB;
+
+/**
+ * File-level docblock for modProfesores.php
+ * 
+ */
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 /**
@@ -6,7 +17,6 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
  * Este modelo maneja la persistencia de Usuario con tipo 'P' (Profesor),
  * gestionando sus roles de coordinador, sus Ciclo asignados y sus módulos docentes.
  * 
- * @package Dualex\Models
  */
 class ModProfesores {
     private $db;

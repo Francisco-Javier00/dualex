@@ -1,6 +1,33 @@
 <?php
+namespace Dualex\Controllers;
+
+use Exception;
+use PDO;
+use PDOException;
+use Dualex\Core\BaseController;
+use Dualex\Core\ConexionDB;
+use Dualex\Core\JWTHelper;
+use Dualex\Models\ModActividades;
+use Dualex\Models\ModAlumnos;
+use Dualex\Models\ModCiclos;
+use Dualex\Models\ModConfiguracion;
+use Dualex\Models\ModCursos;
+use Dualex\Models\ModEmpresas;
+use Dualex\Models\ModModulos;
+use Dualex\Models\ModProfesores;
+use Dualex\Models\ModTareas;
+
+/**
+ * File-level docblock for conAlumnos.php
+ * 
+ */
 require_once MODELO . 'modAlumnos.php';
 
+/**
+ * Controlador para la gestión de Alumnos.
+ * 
+ * Permite listar, crear, actualizar, eliminar e importar alumnos.
+ */
 class ConAlumnos extends BaseController {
     private $modelo;
 
@@ -9,12 +36,24 @@ class ConAlumnos extends BaseController {
         $this->modelo = new ModAlumnos($db);
     }
 
+    /**
+     * Lista todos los alumnos sin paginación.
+     * 
+     * @return json Respuesta JSON con los datos o un error (vía sendResponse o sendError)
+     */
     public function listar() {
+        $this->checkRole(['PROFESOR', 'COORDINADOR']);
         $data = $this->modelo->listar();
         $this->sendResponse($data);
     }
 
+    /**
+     * Obtiene un alumno específico por su ID.
+     * 
+     * @return json Respuesta JSON con los datos o un error (vía sendResponse o sendError)
+     */
     public function obtener() {
+        $this->checkRole(['PROFESOR', 'COORDINADOR']);
         $id = $_GET['id'] ?? null;
         if (!$id) {
             $this->sendError("ID no proporcionado.", 400);
@@ -26,7 +65,13 @@ class ConAlumnos extends BaseController {
         $this->sendResponse($data);
     }
 
+    /**
+     * Obtiene los alumnos formateados para DataTables, aplicando filtros por módulo y rol.
+     * 
+     * @return json Respuesta JSON con los datos o un error (vía sendResponse o sendError)
+     */
     public function obtenerDataTables() {
+        $this->checkRole(['PROFESOR', 'COORDINADOR']);
         // 1. Capturar parámetros del cuerpo JSON (POST)
         $json = file_get_contents('php://input');
         $params = json_decode($json, true) ?? [];
@@ -50,8 +95,14 @@ class ConAlumnos extends BaseController {
         $this->sendResponse($data);
     }
 
+    /**
+     * Crea un nuevo alumno.
+     * Requiere rol COORDINADOR.
+     * 
+     * @return json Respuesta JSON con los datos o un error (vía sendResponse o sendError)
+     */
     public function crear() {
-        $this->checkRole(['PROFESOR', 'COORDINADOR']);
+        $this->checkRole(['COORDINADOR']);
         $json = file_get_contents('php://input');
         $datos = json_decode($json, true);
 
@@ -69,8 +120,14 @@ class ConAlumnos extends BaseController {
         }
     }
 
+    /**
+     * Actualiza los datos de un alumno existente.
+     * Requiere rol COORDINADOR.
+     * 
+     * @return json Respuesta JSON con los datos o un error (vía sendResponse o sendError)
+     */
     public function actualizar() {
-        $this->checkRole(['PROFESOR', 'COORDINADOR']);
+        $this->checkRole(['COORDINADOR']);
         $id = $_GET['id'] ?? null;
         if (!$id) {
             $this->sendError("ID no proporcionado.", 400);
@@ -92,8 +149,14 @@ class ConAlumnos extends BaseController {
         }
     }
 
+    /**
+     * Elimina un alumno.
+     * Requiere rol COORDINADOR.
+     * 
+     * @return json Respuesta JSON con los datos o un error (vía sendResponse o sendError)
+     */
     public function eliminar() {
-        $this->checkRole(['PROFESOR', 'COORDINADOR']);
+        $this->checkRole(['COORDINADOR']);
         $id = $_GET['id'] ?? null;
         if (!$id) {
             $this->sendError("ID no proporcionado.", 400);
@@ -102,7 +165,13 @@ class ConAlumnos extends BaseController {
         $this->sendResponse(["success" => $success]);
     }
 
+    /**
+     * Lista los alumnos filtrados por un módulo específico.
+     * 
+     * @return json Respuesta JSON con los datos o un error (vía sendResponse o sendError)
+     */
     public function listarPorModulo() {
+        $this->checkRole(['PROFESOR', 'COORDINADOR']);
         $idModulo = $_GET['idModulo'] ?? null;
         if (!$idModulo) {
             $this->sendError("ID de módulo no proporcionado.", 400);
@@ -111,6 +180,12 @@ class ConAlumnos extends BaseController {
         $this->sendResponse($data);
     }
 
+    /**
+     * Importa alumnos masivamente desde un archivo Excel.
+     * Requiere rol COORDINADOR.
+     * 
+     * @return json Respuesta JSON con los datos o un error (vía sendResponse o sendError)
+     */
     public function importarExcel() {
         $this->checkRole(['COORDINADOR']);
         
@@ -147,7 +222,14 @@ class ConAlumnos extends BaseController {
         }
     }
 
+    /**
+     * Obtiene todos los alumnos para DataTables sin aplicar filtros de rol específicos,
+     * usualmente para vistas de administración general.
+     * 
+     * @return json Respuesta JSON con los datos o un error (vía sendResponse o sendError)
+     */
     public function listarTodosDataTables() {
+        $this->checkRole(['PROFESOR', 'COORDINADOR']);
         $json = file_get_contents('php://input');
         $params = json_decode($json, true) ?? [];
         $data = $this->modelo->listarTodosDataTables($params);

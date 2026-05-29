@@ -45,6 +45,10 @@ require_once 'src/config/rutas.php';
 require_once 'src/core/conexionDB.php';
 require_once 'src/core/JWTHelper.php';
 require_once 'src/core/BaseController.php';
+
+use Dualex\Core\ConexionDB;
+use Dualex\Core\JWTHelper;
+use Dualex\Core\BaseController;
 // Cargamos las dependencias de Composer (PhpSpreadsheet, etc.)
 $autoloadPath = __DIR__ . '/vendor/autoload.php';
 if (!file_exists($autoloadPath)) {
@@ -188,7 +192,10 @@ $ruta = CONTROLADOR . "con$c.php";
 
 if (file_exists($ruta)) {
     require_once $ruta;
-    $clase = "Con$c";
+    // Instanciamos el controlador usando su Namespace completo.
+    // Esto es necesario debido a la refactorización que permite a phpDocumentor
+    // agrupar correctamente las clases en el árbol de navegación.
+    $clase = "\\Dualex\\Controllers\\Con$c";
     $obj = new $clase($db, $user); 
 
     if (method_exists($obj, $m)) {

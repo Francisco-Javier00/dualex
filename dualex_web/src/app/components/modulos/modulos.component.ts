@@ -14,6 +14,12 @@ import { ProfesoresService } from '../../services/profesores.service';
 import { CursosService } from '../../services/cursos.service';
 import { Subscription } from 'rxjs';
 
+/**
+ * Componente para la gestión de Módulos.
+ * 
+ * Permite visualizar el catálogo de módulos, filtrarlos por curso o ciclo,
+ * y ofrece acciones administrativas como crear, editar y eliminar módulos.
+ */
 @Component({
   selector: 'app-modulos',
   standalone: true,

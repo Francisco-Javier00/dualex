@@ -1,5 +1,15 @@
 import { inject } from '@angular/core';
 import { HttpInterceptorFn } from '@angular/common/http';
+/**
+ * Interceptor HTTP de autenticación.
+ * 
+ * Se encarga de interceptar todas las peticiones HTTP salientes y adjuntar el 
+ * token de autorización JWT (Bearer) almacenado en las cookies, si existe.
+ * 
+ * @param req La petición HTTP original
+ * @param next El siguiente manejador en la cadena de interceptores
+ * @returns Un observable del evento HTTP
+ */
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   // Como usamos lectura nativa en AuthService, podemos exponer un método para obtener el token crudo
   // o simplemente leerlo de nuevo. Para simplificar, leemos la cookie directamente aquí.

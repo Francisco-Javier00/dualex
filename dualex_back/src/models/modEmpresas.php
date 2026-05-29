@@ -1,11 +1,20 @@
 <?php
+namespace Dualex\Models;
 
+use Exception;
+use PDO;
+use PDOException;
+use Dualex\Core\ConexionDB;
+
+/**
+ * File-level docblock for modEmpresas.php
+ * 
+ */
 /**
  * Clase encargada de interactuar directamente con la base de datos para la entidad "Empresa"
  * y sus entidades dependientes ("Contacto").
  * Ejecuta consultas SQL puras utilizando sentencias preparadas de PDO.
  * 
- * @package Dualex\Models
  */
 class ModEmpresas {
     private $db;

@@ -5,6 +5,12 @@ import { Config } from 'datatables.net';
 import { DatatableComponent } from '../shared/datatable/datatable.component';
 import { AlumnosService } from '../../services/alumnos.service';
 
+/**
+ * Componente de vista general de alumnos para la revisión de Tareas.
+ * 
+ * Permite a los profesores y coordinadores visualizar rápidamente todos los alumnos
+ * para navegar hacia sus tareas individuales.
+ */
 @Component({
   selector: 'app-tareas-todos',
   standalone: true,

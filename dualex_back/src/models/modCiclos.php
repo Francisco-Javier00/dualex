@@ -1,10 +1,19 @@
 <?php
+namespace Dualex\Models;
 
+use Exception;
+use PDO;
+use PDOException;
+use Dualex\Core\ConexionDB;
+
+/**
+ * File-level docblock for modCiclos.php
+ * 
+ */
 /**
  * Modelo para la gestión de Ciclo Formativos.
  * Incluye lógica transaccional para operaciones en cascada.
  * 
- * @package Dualex\Models
  */
 class ModCiclos {
     private $db;

@@ -1,5 +1,26 @@
 <?php
+namespace Dualex\Controllers;
 
+use Exception;
+use PDO;
+use PDOException;
+use Dualex\Core\BaseController;
+use Dualex\Core\ConexionDB;
+use Dualex\Core\JWTHelper;
+use Dualex\Models\ModActividades;
+use Dualex\Models\ModAlumnos;
+use Dualex\Models\ModCiclos;
+use Dualex\Models\ModConfiguracion;
+use Dualex\Models\ModCursos;
+use Dualex\Models\ModEmpresas;
+use Dualex\Models\ModModulos;
+use Dualex\Models\ModProfesores;
+use Dualex\Models\ModTareas;
+
+/**
+ * File-level docblock for conAuth.php
+ * 
+ */
 class ConAuth extends BaseController {
 
     /**

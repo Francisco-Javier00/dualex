@@ -6,6 +6,10 @@ import { AlertsComponent } from './components/shared/alerts/alerts.component';
 import { PruebasSistemaComponent } from './components/shared/pruebas-sistema/pruebas-sistema.component';
 import { environment } from '../environments/environment';
 
+/**
+ * Componente principal de la aplicación Dualex.
+ * Gestiona el layout base, la restauración de rutas y el estado de navegación.
+ */
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -18,6 +22,10 @@ export class AppComponent implements OnInit {
   developerMode = environment.developerMode;
   private router = inject(Router);
 
+  /**
+   * Método de ciclo de vida invocado al inicializar el componente.
+   * Restaura la ruta anterior guardada en la sesión para mejorar la experiencia de usuario.
+   */
   ngOnInit() {
     // Si estamos en el navegador, gestionar el estado de navegación
     if (typeof window !== 'undefined' && window.sessionStorage) {

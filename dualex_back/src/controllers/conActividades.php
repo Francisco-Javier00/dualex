@@ -1,6 +1,34 @@
 <?php
+namespace Dualex\Controllers;
+
+use Exception;
+use PDO;
+use PDOException;
+use Dualex\Core\BaseController;
+use Dualex\Core\ConexionDB;
+use Dualex\Core\JWTHelper;
+use Dualex\Models\ModActividades;
+use Dualex\Models\ModAlumnos;
+use Dualex\Models\ModCiclos;
+use Dualex\Models\ModConfiguracion;
+use Dualex\Models\ModCursos;
+use Dualex\Models\ModEmpresas;
+use Dualex\Models\ModModulos;
+use Dualex\Models\ModProfesores;
+use Dualex\Models\ModTareas;
+
+/**
+ * File-level docblock for conActividades.php
+ * 
+ */
 require_once MODELO . 'modActividades.php';
 
+/**
+ * Controlador para la gestión de Actividades.
+ * 
+ * Permite listar, crear, actualizar y eliminar actividades.
+ * Hereda de BaseController para funcionalidades comunes.
+ */
 class ConActividades extends BaseController {
     private $modelo;
 
@@ -9,12 +37,24 @@ class ConActividades extends BaseController {
         $this->modelo = new ModActividades($db);
     }
 
+    /**
+     * Lista todas las actividades sin paginación.
+     * 
+     * @return json Respuesta JSON con los datos o un error (vía sendResponse o sendError)
+     */
     public function listar() {
+        $this->checkRole(['PROFESOR', 'COORDINADOR']);
         $data = $this->modelo->listar();
         $this->sendResponse($data);
     }
 
+    /**
+     * Obtiene una actividad específica por su ID.
+     * 
+     * @return json Respuesta JSON con los datos o un error (vía sendResponse o sendError)
+     */
     public function obtener() {
+        $this->checkRole(['PROFESOR', 'COORDINADOR']);
         $id = $_GET['id'] ?? null;
         if (!$id) {
             $this->sendError("ID de actividad no proporcionado.", 400);
@@ -26,7 +66,13 @@ class ConActividades extends BaseController {
         $this->sendResponse($data);
     }
 
+    /**
+     * Obtiene las actividades formateadas para DataTables.
+     * 
+     * @return json Respuesta JSON con los datos o un error (vía sendResponse o sendError)
+     */
     public function obtenerDataTables() {
+        $this->checkRole(['PROFESOR', 'COORDINADOR']);
         // Capturar parámetros de la petición (JSON POST)
         $json = file_get_contents('php://input');
         $params = json_decode($json, true) ?? [];
@@ -35,8 +81,14 @@ class ConActividades extends BaseController {
         $this->sendResponse($data);
     }
 
+    /**
+     * Crea una nueva actividad.
+     * Requiere rol COORDINADOR.
+     * 
+     * @return json Respuesta JSON con los datos o un error (vía sendResponse o sendError)
+     */
     public function crear() {
-        $this->checkRole(['PROFESOR', 'COORDINADOR']);
+        $this->checkRole(['COORDINADOR']);
         $json = file_get_contents('php://input');
         $datos = json_decode($json, true);
 
@@ -58,8 +110,14 @@ class ConActividades extends BaseController {
         }
     }
 
+    /**
+     * Actualiza una actividad existente.
+     * Requiere rol COORDINADOR.
+     * 
+     * @return json Respuesta JSON con los datos o un error (vía sendResponse o sendError)
+     */
     public function actualizar() {
-        $this->checkRole(['PROFESOR', 'COORDINADOR']);
+        $this->checkRole(['COORDINADOR']);
         $id = $_GET['id'] ?? null;
         if (!$id) {
             $this->sendError("ID de actividad no proporcionado.", 400);
@@ -86,8 +144,14 @@ class ConActividades extends BaseController {
         }
     }
 
+    /**
+     * Elimina una actividad.
+     * Requiere rol COORDINADOR.
+     * 
+     * @return json Respuesta JSON con los datos o un error (vía sendResponse o sendError)
+     */
     public function eliminar() {
-        $this->checkRole(['PROFESOR', 'COORDINADOR']);
+        $this->checkRole(['COORDINADOR']);
         $id = $_GET['id'] ?? null;
         if (!$id) {
             $this->sendError("ID de actividad no proporcionado.", 400);

@@ -3,6 +3,16 @@ import { CanActivateFn, Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 import { environment } from '../../../environments/environment';
 
+/**
+ * Guard de autenticación para proteger rutas de la aplicación.
+ * 
+ * Verifica si hay un usuario autenticado y si tiene los roles necesarios.
+ * Si no está autenticado, redirige al sistema de login o permite el acceso si está en modo desarrollo.
+ * 
+ * @param route La ruta a la que se intenta acceder
+ * @param state El estado actual del router
+ * @returns boolean o UrlTree dependiendo de si se permite el acceso o requiere redirección
+ */
 export const authGuard: CanActivateFn = (route, state) => {
   const authService = inject(AuthService);
   const router = inject(Router);

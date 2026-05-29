@@ -1,9 +1,18 @@
 <?php
+namespace Dualex\Models;
 
+use Exception;
+use PDO;
+use PDOException;
+use Dualex\Core\ConexionDB;
+
+/**
+ * File-level docblock for modTareas.php
+ * 
+ */
 /**
  * Modelo para la gestión de las Tarea asignadas y entregadas por los Alumno.
  * 
- * @package Dualex\Models
  */
 class ModTareas {
     private $db;

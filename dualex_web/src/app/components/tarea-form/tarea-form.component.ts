@@ -50,7 +50,7 @@ import { ActividadesService } from '../../services/actividades.service';
 import { AlertService } from '../../services/alert.service';
 import { AuthService } from '../../auth/services/auth.service';
 import { ModulosService } from '../../services/modulos.service';
-import { ActividadDTO, Tarea } from '../../dto/dualex.dto';
+import { ActividadDTO, TareaDTO } from '../../dto/dualex.dto';
 
 // Componentes compartidos
 import { SeleccionActividadesModalComponent } from '../shared/modals/seleccion-actividades-modal/seleccion-actividades-modal.component';
@@ -333,7 +333,7 @@ export class TareaFormComponent implements OnInit {
    * - Si estÃ¡ totalmente revisada (todas las revisiones de mÃ³dulos estÃ¡n en 'true')
    * - O si se ha superado la fecha lÃ­mite (fechaFin).
    */
-  checkBloqueada(tarea: Tarea): boolean {
+  checkBloqueada(tarea: TareaDTO): boolean {
     if (!tarea) return false;
 
     // 1. Revisada por completo
@@ -364,7 +364,7 @@ export class TareaFormComponent implements OnInit {
   /**
    * Aplica la lÃ³gica de bloqueo sobre los controles del formulario segÃºn el rol y estado.
    */
-  aplicarBloqueos(tarea: Tarea): void {
+  aplicarBloqueos(tarea: TareaDTO): void {
     this.tareaBloqueada = this.checkBloqueada(tarea);
 
     if (this.esAlumno) {
@@ -542,7 +542,7 @@ export class TareaFormComponent implements OnInit {
             if (this.documentoFile && nuevoId) {
               this.tareasService.subirDocumento(nuevoId, this.documentoFile).subscribe({
                 next: () => {
-                  this.alertService.exito('Tarea registrada', 'La tarea se ha creado correctamente.');
+                  this.alertService.exito('TareaDTO registrada', 'La tarea se ha creado correctamente.');
                   this.volver();
                 },
                 error: (err) => {
@@ -551,7 +551,7 @@ export class TareaFormComponent implements OnInit {
                 }
               });
             } else {
-              this.alertService.exito('Tarea registrada', 'La tarea se ha creado correctamente.');
+              this.alertService.exito('TareaDTO registrada', 'La tarea se ha creado correctamente.');
               this.volver();
             }
           },
@@ -568,7 +568,7 @@ export class TareaFormComponent implements OnInit {
   }
 
   private gestionarPostGuardado(): void {
-    this.alertService.exito('Tarea actualizada', 'La tarea se ha guardado correctamente.');
+    this.alertService.exito('TareaDTO actualizada', 'La tarea se ha guardado correctamente.');
 
     if (!this.esProfesor || !this.idAlumno || !this.idTarea) {
       this.volver();

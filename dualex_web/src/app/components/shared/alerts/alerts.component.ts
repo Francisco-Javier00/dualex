@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { Subscription } from 'rxjs';
 import { AlertService } from '../../../services/alert.service';
-import { Alerta } from '../../../dto/dualex.dto';
+import { AlertaDTO } from '../../../dto/dualex.dto';
 
 @Component({
   selector: 'app-alerts',
@@ -35,7 +35,7 @@ import { Alerta } from '../../../dto/dualex.dto';
 })
 export class AlertsComponent implements OnInit, OnDestroy {
 
-  alertas: Alerta[] = [];
+  alertas: AlertaDTO[] = [];
   private suscripcion!: Subscription;
 
   constructor(private servicioAlertas: AlertService) { }
@@ -43,7 +43,7 @@ export class AlertsComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     // Suscribirse a las alertas del servicio
     this.suscripcion = this.servicioAlertas.alertas$.subscribe(
-      (alertas: Alerta[]) => {
+      (alertas: AlertaDTO[]) => {
         this.alertas = alertas;
       }
     );

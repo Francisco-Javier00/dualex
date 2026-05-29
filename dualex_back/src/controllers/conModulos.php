@@ -1,6 +1,33 @@
 <?php
+namespace Dualex\Controllers;
+
+use Exception;
+use PDO;
+use PDOException;
+use Dualex\Core\BaseController;
+use Dualex\Core\ConexionDB;
+use Dualex\Core\JWTHelper;
+use Dualex\Models\ModActividades;
+use Dualex\Models\ModAlumnos;
+use Dualex\Models\ModCiclos;
+use Dualex\Models\ModConfiguracion;
+use Dualex\Models\ModCursos;
+use Dualex\Models\ModEmpresas;
+use Dualex\Models\ModModulos;
+use Dualex\Models\ModProfesores;
+use Dualex\Models\ModTareas;
+
+/**
+ * File-level docblock for conModulos.php
+ * 
+ */
 require_once MODELO . 'modModulos.php';
 
+/**
+ * Controlador para la gestión de Módulos.
+ * 
+ * Permite listar, crear, actualizar y eliminar módulos, filtrados por ciclo o profesor.
+ */
 class ConModulos extends BaseController {
     private $modelo;
 
@@ -9,7 +36,13 @@ class ConModulos extends BaseController {
         $this->modelo = new ModModulos($db);
     }
 
+    /**
+     * Lista todos los módulos disponibles.
+     * 
+     * @return json Respuesta JSON con los datos o un error
+     */
     public function listar() {
+        $this->checkRole(['PROFESOR', 'COORDINADOR']);
         try {
             $data = $this->modelo->listar();
             $this->sendResponse($data);
@@ -18,7 +51,13 @@ class ConModulos extends BaseController {
         }
     }
 
+    /**
+     * Lista los módulos pertenecientes a un ciclo específico (por sus siglas).
+     * 
+     * @return json Respuesta JSON con los datos o un error
+     */
     public function listarPorCiclo() {
+        $this->checkRole(['PROFESOR', 'COORDINADOR']);
         $siglasCiclo = $_GET['siglasCiclo'] ?? null;
         if (!$siglasCiclo) {
             $this->sendError("Siglas de ciclo no proporcionadas.", 400);
@@ -32,7 +71,13 @@ class ConModulos extends BaseController {
         }
     }
 
+    /**
+     * Obtiene los detalles de un módulo por su ID.
+     * 
+     * @return json Respuesta JSON con los datos o un error
+     */
     public function obtener() {
+        $this->checkRole(['PROFESOR', 'COORDINADOR']);
         $id = $_GET['id'] ?? null;
         if (!$id) {
             $this->sendError("ID no proporcionado.", 400);
@@ -48,7 +93,13 @@ class ConModulos extends BaseController {
         }
     }
 
+    /**
+     * Obtiene los módulos formateados para DataTables, aplicando filtro de Coordinador.
+     * 
+     * @return json Respuesta JSON con los datos o un error
+     */
     public function obtenerDataTables() {
+        $this->checkRole(['PROFESOR', 'COORDINADOR']);
         $json = file_get_contents('php://input');
         $params = json_decode($json, true);
 
@@ -65,8 +116,14 @@ class ConModulos extends BaseController {
         }
     }
 
+    /**
+     * Crea un nuevo módulo.
+     * Requiere rol COORDINADOR.
+     * 
+     * @return json Respuesta JSON con los datos o un error
+     */
     public function crear() {
-        $this->checkRole(['PROFESOR', 'COORDINADOR']);
+        $this->checkRole(['COORDINADOR']);
         $json = file_get_contents('php://input');
         $datos = json_decode($json, true);
         
@@ -82,8 +139,14 @@ class ConModulos extends BaseController {
         }
     }
 
+    /**
+     * Actualiza un módulo existente.
+     * Requiere rol COORDINADOR.
+     * 
+     * @return json Respuesta JSON con los datos o un error
+     */
     public function actualizar() {
-        $this->checkRole(['PROFESOR', 'COORDINADOR']);
+        $this->checkRole(['COORDINADOR']);
         $id = $_GET['id'] ?? null;
         if (!$id) {
             $this->sendError("ID no proporcionado.", 400);
@@ -103,6 +166,12 @@ class ConModulos extends BaseController {
         }
     }
 
+    /**
+     * Elimina un módulo por su ID.
+     * Requiere rol COORDINADOR.
+     * 
+     * @return json Respuesta JSON con el resultado de éxito o error
+     */
     public function eliminar() {
         $this->checkRole(['COORDINADOR']);
         $id = $_GET['id'] ?? null;
@@ -113,7 +182,13 @@ class ConModulos extends BaseController {
         $this->sendResponse(["success" => $success]);
     }
 
+    /**
+     * Lista los módulos asociados al profesor en sesión (o al especificado por parámetro).
+     * 
+     * @return json Respuesta JSON con los datos o un error
+     */
     public function listarProfesor() {
+        $this->checkRole(['PROFESOR', 'COORDINADOR']);
         try {
             // Protección contra acceso a offset en null si el usuario no está autenticado
             $emailToken = null;

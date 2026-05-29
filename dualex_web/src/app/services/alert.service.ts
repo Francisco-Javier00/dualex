@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { Alerta } from '../dto/dualex.dto';
+import { AlertaDTO } from '../dto/dualex.dto';
 
 /**
  * Servicio encargado de la gestión y visualización de notificaciones tipo Toast/Alert.
@@ -11,7 +11,7 @@ import { Alerta } from '../dto/dualex.dto';
 })
 export class AlertService {
 
-  private sujetoAlertas = new BehaviorSubject<Alerta[]>([]);
+  private sujetoAlertas = new BehaviorSubject<AlertaDTO[]>([]);
   public alertas$ = this.sujetoAlertas.asObservable();
 
   constructor() { }
@@ -92,8 +92,8 @@ export class AlertService {
    * @param autoCierre Booleano para cierre automático.
    * @param duracion Milisegundos de duración.
    */
-  private agregarAlerta(tipo: Alerta['tipo'], titulo: string, mensaje: string, autoCierre: boolean, duracion: number): void {
-    const alerta: Alerta = {
+  private agregarAlerta(tipo: AlertaDTO['tipo'], titulo: string, mensaje: string, autoCierre: boolean, duracion: number): void {
+    const alerta: AlertaDTO = {
       id: this.generarId(),
       tipo,
       titulo,

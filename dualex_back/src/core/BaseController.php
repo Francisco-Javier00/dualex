@@ -1,5 +1,14 @@
 <?php
+namespace Dualex\Core;
 
+use Exception;
+use PDO;
+use PDOException;
+
+/**
+ * File-level docblock for BaseController.php
+ * 
+ */
 class BaseController {
     protected $db;
     protected $user;
