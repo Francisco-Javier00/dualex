@@ -8,11 +8,13 @@ Options -Indexes
     Require all denied
 </FilesMatch>
 
-<Directory "src">
+<If "%{REQUEST_URI} =~ m#^/(src|vendor)/#">
     Require all denied
-</Directory>
+</If>
 
-RewriteEngine On
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^ index.php [L,QSA]
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^ index.php [L,QSA]
+</IfModule>
