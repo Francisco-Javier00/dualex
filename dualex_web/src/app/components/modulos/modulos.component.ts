@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy, inject, ViewChild } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { DatatableComponent } from '../shared/datatable/datatable.component';
 import { ConfirmarBorradoModalComponent } from '../shared/modals/confirmar-borrado-modal/confirmar-borrado-modal.component';
@@ -17,7 +18,7 @@ import { Subscription } from 'rxjs';
 @Component({
   selector: 'app-modulos',
   standalone: true,
-  imports: [CommonModule, RouterModule, DatatableComponent, ConfirmarBorradoModalComponent, ModuloModalComponent],
+  imports: [CommonModule, FormsModule, RouterModule, DatatableComponent, ConfirmarBorradoModalComponent, ModuloModalComponent],
   templateUrl: './modulos.component.html'
 })
 export class ModulosComponent implements OnInit, OnDestroy {
@@ -33,7 +34,21 @@ export class ModulosComponent implements OnInit, OnDestroy {
   dtOptions: any = {};
   modalBorradoVisible = false;
   modalModuloVisible = false;
-  moduloSeleccionado: ModuloDTO | null = null;
+  modalVincularVisible = false;
+  moduloSeleccionado: any = null;
+  todosLosProfesores: any[] = [];
+  profesoresSeleccionadosIds: number[] = [];
+  filtroProfesor = '';
+
+  get profesoresFiltrados(): any[] {
+    const busqueda = this.filtroProfesor.toLowerCase().trim();
+    if (!busqueda) return this.todosLosProfesores;
+    return this.todosLosProfesores.filter(p =>
+      p.nombre.toLowerCase().includes(busqueda) ||
+      p.apellidos.toLowerCase().includes(busqueda) ||
+      p.correo.toLowerCase().includes(busqueda)
+    );
+  }
 
   // Lista de cursos que el coordinador gestiona
   cursosGestionados: number[] = [];
@@ -138,24 +153,30 @@ export class ModulosComponent implements OnInit, OnDestroy {
           className: 'text-center text-muted text-nowrap',
           width: '14%',
           responsivePriority: 6,
-          render: (data: any) => data || 'Sin asignar'
+          render: (data: any) => {
+            if (!data) return 'Sin asignar';
+            return data.split(',').map((c: string) => c.split(' - ')[0].trim()).join(', ');
+          }
         },
         { 
-          data: 'cursoCompleto',
-          className: 'text-center text-muted text-nowrap',
-          width: '13%',
+          data: 'profesoresImparten',
+          className: 'text-center text-muted',
+          width: '40%',
           responsivePriority: 7,
-          render: (data: any) => data || 'Sin asignar'
+          render: (data: any) => data || '<span class="text-muted italic">Sin asignar</span>'
         },
         {
           data: null,
           orderable: false,
           searchable: false,
           className: 'text-center',
-          width: '8%',
+          width: '12%',
           responsivePriority: 5,
           render: () => `
             <div class="d-flex gap-2 justify-content-center">
+              <button class="btn btn-sm btn-outline-info shadow-sm link-btn" data-action="link" title="Vincular Profesores">
+                <i class="fa-solid fa-link"></i>
+              </button>
               <button class="btn btn-sm btn-outline-primary shadow-sm edit-btn" data-action="edit" title="Editar">
                 <i class="fa-solid fa-pen"></i>
               </button>
@@ -200,7 +221,62 @@ export class ModulosComponent implements OnInit, OnDestroy {
     } else if (event.action === 'delete') {
       this.moduloSeleccionado = event.data;
       this.modalBorradoVisible = true;
+    } else if (event.action === 'link') {
+      this.abrirVincularProfesores(event.data);
     }
+  }
+
+  abrirVincularProfesores(modulo: any): void {
+    this.moduloSeleccionado = modulo;
+    this.profesoresService.getProfesores().subscribe({
+      next: (profesores) => {
+        this.todosLosProfesores = profesores;
+        this.profesoresSeleccionadosIds = profesores
+          .filter(p => {
+            const modulosList = p.modulos ? p.modulos.split(',').map((m: string) => m.trim()) : [];
+            return modulosList.includes(modulo.sigla);
+          })
+          .map(p => p.id);
+        this.modalVincularVisible = true;
+      },
+      error: () => this.alertService.error('Error', 'No se pudo obtener la lista de profesores.')
+    });
+  }
+
+  cerrarVincularProfesores(): void {
+    this.modalVincularVisible = false;
+    this.moduloSeleccionado = null;
+    this.profesoresSeleccionadosIds = [];
+    this.filtroProfesor = '';
+  }
+
+  isProfesorSeleccionado(id: number): boolean {
+    return this.profesoresSeleccionadosIds.includes(id);
+  }
+
+  onToggleProfesorVinculo(id: number, event: Event): void {
+    const checkbox = event.target as HTMLInputElement;
+    if (checkbox.checked) {
+      if (!this.profesoresSeleccionadosIds.includes(id)) {
+        this.profesoresSeleccionadosIds.push(id);
+      }
+    } else {
+      this.profesoresSeleccionadosIds = this.profesoresSeleccionadosIds.filter(pId => pId !== id);
+    }
+  }
+
+  guardarVinculosProfesores(): void {
+    if (!this.moduloSeleccionado) return;
+    this.modulosService.vincularProfesores(this.moduloSeleccionado.id, this.profesoresSeleccionadosIds).subscribe({
+      next: () => {
+        this.alertService.exito('Vínculos actualizados', 'Profesores asociados correctamente al módulo.');
+        this.modalVincularVisible = false;
+        this.moduloSeleccionado = null;
+        this.profesoresSeleccionadosIds = [];
+        this.recargarTabla();
+      },
+      error: (err) => this.alertService.error('Error', err.error?.message || 'Fallo al vincular profesores.')
+    });
   }
 
   onGuardarModulo(modulo: any): void {

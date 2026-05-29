@@ -112,6 +112,7 @@
   gap: 0.35rem !important;
 }
 
+:host ::ng-deep .action-link,
 :host ::ng-deep .action-edit,
 :host ::ng-deep .action-delete,
 :host ::ng-deep .action-view {

@@ -321,19 +321,22 @@ class ModModulos {
         }
 
         // Datos
-        $sql = "SELECT m.idModulo as id, m.nombre, sigla, color, 
+        $sql = "SELECT m.idModulo as id, m.nombre, m.sigla, m.color, 
                        MIN(c.idCiclo) as idCiclo,
                        MIN(cur.idCurso) as idCurso,
                        GROUP_CONCAT(DISTINCT CONCAT(siglas, ' - ', c.nombre) SEPARATOR ', ') as cicloCompleto,
-                       GROUP_CONCAT(DISTINCT cur.nombre SEPARATOR ', ') as cursoCompleto
-                 FROM Modulo m
-                 LEFT JOIN Modulo_Curso mc ON m.idModulo = mc.idModulo
-                 LEFT JOIN Curso cur ON mc.idCurso = cur.idCurso
-                 LEFT JOIN Ciclo c ON cur.idCiclo = c.idCiclo
-                 $where 
-                 GROUP BY m.idModulo, m.nombre, sigla, color
-                 $orderBy
-                 LIMIT :start, :length";
+                       GROUP_CONCAT(DISTINCT cur.nombre SEPARATOR ', ') as cursoCompleto,
+                       GROUP_CONCAT(DISTINCT CONCAT(u.nombre, ' ', u.apellidos) SEPARATOR ', ') as profesoresImparten
+                  FROM Modulo m
+                  LEFT JOIN Modulo_Curso mc ON m.idModulo = mc.idModulo
+                  LEFT JOIN Curso cur ON mc.idCurso = cur.idCurso
+                  LEFT JOIN Ciclo c ON cur.idCiclo = c.idCiclo
+                  LEFT JOIN Modulo_Profesor mp ON m.idModulo = mp.idModulo
+                  LEFT JOIN Usuario u ON mp.idProfesor = u.idUsuario
+                  $where 
+                  GROUP BY m.idModulo, m.nombre, m.sigla, m.color
+                  $orderBy
+                  LIMIT :start, :length";
         
         $stmt = $this->db->prepare($sql);
         foreach ($binds as $key => $val) {
@@ -349,5 +352,29 @@ class ModModulos {
             "recordsFiltered" => (int)$totalFiltrados,
             "data" => $stmt->fetchAll(PDO::FETCH_ASSOC)
         ];
+    }
+
+    public function vincularProfesores($idModulo, $profesoresIds) {
+        try {
+            $this->db->beginTransaction();
+
+            // Borrar vínculos anteriores
+            $stmtDel = $this->db->prepare("DELETE FROM Modulo_Profesor WHERE idModulo = :idModulo");
+            $stmtDel->execute([':idModulo' => $idModulo]);
+
+            // Insertar nuevos
+            if (!empty($profesoresIds) && is_array($profesoresIds)) {
+                $stmtIns = $this->db->prepare("INSERT INTO Modulo_Profesor (idModulo, idProfesor) VALUES (:idModulo, :idProfesor)");
+                foreach ($profesoresIds as $idProfesor) {
+                    $stmtIns->execute([':idModulo' => $idModulo, ':idProfesor' => $idProfesor]);
+                }
+            }
+
+            $this->db->commit();
+            return true;
+        } catch (Exception $e) {
+            $this->db->rollBack();
+            throw $e;
+        }
     }
 }

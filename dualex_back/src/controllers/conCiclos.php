@@ -75,4 +75,24 @@ class ConCiclos extends BaseController {
         $success = $this->modelo->eliminar($id);
         $this->sendResponse(["success" => $success]);
     }
+
+    public function vincularCoordinador() {
+        $this->checkRole(['COORDINADOR']);
+        $id = $_GET['id'] ?? null;
+        if (!$id) {
+            $this->sendError("ID de ciclo no proporcionado.", 400);
+        }
+        $json = file_get_contents('php://input');
+        $datos = json_decode($json, true);
+        if (!$datos || !isset($datos['idProfesor'])) {
+            $this->sendError("ID de profesor no proporcionado.", 400);
+        }
+        
+        try {
+            $res = $this->modelo->vincularCoordinador($id, $datos['idProfesor']);
+            $this->sendResponse(["success" => $res]);
+        } catch (Exception $e) {
+            $this->sendError($e);
+        }
+    }
 }

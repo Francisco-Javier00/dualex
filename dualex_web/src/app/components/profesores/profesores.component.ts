@@ -71,28 +71,6 @@ export class ProfesoresComponent implements OnInit {
         { data: 'apellidos', width: '18%', responsivePriority: 3 },
         { data: 'correo', width: '22%', responsivePriority: 4 },
         { data: 'rol', className: 'text-nowrap', width: '10%', responsivePriority: 5 },
-        {
-          data: 'modulos',
-          width: '15%',
-          responsivePriority: 7,
-          render: (data: any, type: any, row: any) => {
-            if (data && data.trim() !== '') return data;
-            return row?.rol === 'COORDINADOR'
-              ? '<span class="text-muted opacity-50 italic small">Sin módulos asignados</span>'
-              : '<span class="text-muted opacity-50 italic small">No imparte módulos</span>';
-          }
-        },
-        {
-          data: 'ciclos',
-          width: '12%',
-          responsivePriority: 8,
-          render: (data: any, type: any, row: any) => {
-            if (data && data.trim() !== '') return data;
-            return row?.rol === 'COORDINADOR'
-              ? '<span class="text-muted opacity-50 italic small">Sin ciclos coordinados</span>'
-              : '<span class="text-muted opacity-50 italic small">No coordina ciclos</span>';
-          }
-        },
         ...(this.puedeEditar ? [{
           data: null,
           className: 'text-center align-middle',

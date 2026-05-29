@@ -133,4 +133,22 @@ class ConModulos extends BaseController {
             $this->sendError($e);
         }
     }
+
+    public function vincularProfesores() {
+        $this->checkRole(['PROFESOR', 'COORDINADOR']);
+        $idModulo = $_GET['id'] ?? null;
+        if (!$idModulo) {
+            $this->sendError("ID de módulo no proporcionado.", 400);
+        }
+        $json = file_get_contents('php://input');
+        $datos = json_decode($json, true);
+        $profesoresIds = $datos['profesoresIds'] ?? [];
+
+        try {
+            $res = $this->modelo->vincularProfesores($idModulo, $profesoresIds);
+            $this->sendResponse(["success" => $res]);
+        } catch (Exception $e) {
+            $this->sendError($e);
+        }
+    }
 }

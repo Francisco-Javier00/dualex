@@ -799,3 +799,17 @@ WHERE idCoordinador = (
 ALTER TABLE Alumno MODIFY COLUMN nuss CHAR(12) NULL;
 ALTER TABLE Contacto ADD COLUMN cargo VARCHAR(100) NULL;
 ALTER TABLE Tarea ADD COLUMN documento VARCHAR(255) NULL;
+
+-- Primero, limpia posibles duplicados existentes (deja solo el primer ciclo con cada coordinador, los demás a NULL)
+UPDATE Ciclo c1
+JOIN (
+    SELECT MIN(idCiclo) AS keep_id, idCoordinador
+    FROM Ciclo
+    WHERE idCoordinador IS NOT NULL
+    GROUP BY idCoordinador
+    HAVING COUNT(*) > 1
+) c2 ON c1.idCoordinador = c2.idCoordinador AND c1.idCiclo != c2.keep_id
+SET c1.idCoordinador = NULL;
+
+-- Añade la restricción UNIQUE
+ALTER TABLE Ciclo ADD CONSTRAINT uq_ciclo_coordinador UNIQUE (idCoordinador);

@@ -17,7 +17,7 @@
 .modal-content {
   background: white;
   width: 95%;
-  max-width: 1040px;
+  max-width: 520px;
   max-height: 95vh;
   border-radius: 1.25rem;
   box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);

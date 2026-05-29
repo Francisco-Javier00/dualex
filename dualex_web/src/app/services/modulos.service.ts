@@ -97,4 +97,15 @@ export class ModulosService {
     const url = email ? `${this.API_URL}&m=listarProfesor&emailProfesor=${encodeURIComponent(email)}` : `${this.API_URL}&m=listarProfesor`;
     return this.http.get<any[]>(url);
   }
+
+  /**
+   * Asocia una lista de profesores a un módulo en particular.
+   * 
+   * @param idModulo ID único del módulo.
+   * @param profesoresIds Array de IDs de los profesores seleccionados.
+   * @returns Un `Observable` con la respuesta del backend.
+   */
+  vincularProfesores(idModulo: number, profesoresIds: number[]): Observable<any> {
+    return this.http.post<any>(`${this.API_URL}&m=vincularProfesores&id=${idModulo}`, { profesoresIds });
+  }
 }

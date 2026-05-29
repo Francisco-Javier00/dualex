@@ -31,7 +31,7 @@
   <app-shared-datatable
     tableId="tabla-profesores"
     [dtOptions]="dtOptions"
-    [columnTitles]="puedeEditar ? [' ', 'Nombre', 'Apellidos', 'Correo', 'Rol', 'Modulos', 'Ciclos', 'Acciones'] : [' ', 'Nombre', 'Apellidos', 'Correo', 'Rol', 'Modulos', 'Ciclos']"
+    [columnTitles]="puedeEditar ? [' ', 'Nombre', 'Apellidos', 'Correo', 'Rol', 'Acciones'] : [' ', 'Nombre', 'Apellidos', 'Correo', 'Rol']"
     (actionClick)="onTableAction($event)">
   </app-shared-datatable>
 </div>

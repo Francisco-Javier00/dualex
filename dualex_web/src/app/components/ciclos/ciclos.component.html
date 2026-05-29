@@ -45,3 +45,15 @@
     (cancelar)="cerrarEditModal()">
   </app-ciclo-modal>
 }
+
+@if (isVincularModalOpen) {
+  <app-vincular-coordinador-modal
+    [visible]="isVincularModalOpen"
+    [ciclo]="cicloSeleccionado"
+    [todosLosProfesores]="todosLosProfesores"
+    [coordinadorId]="cicloSeleccionado?.idCoordinador"
+    (visibleChange)="isVincularModalOpen = $event"
+    (guardarEvent)="guardarCoordinador($event)"
+    (cancelarEvent)="isVincularModalOpen = false">
+  </app-vincular-coordinador-modal>
+}
