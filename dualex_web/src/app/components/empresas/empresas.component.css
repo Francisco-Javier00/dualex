@@ -18,6 +18,17 @@
   text-decoration: underline !important;
 }
 
+.empresa-ciclos-link {
+  font-weight: 600;
+  color: #2563eb;
+  text-align: left;
+}
+
+.empresa-ciclos-link:hover {
+  color: #1d4ed8;
+  text-decoration: underline !important;
+}
+
 .empresas-create-modal {
   background: transparent;
 }
@@ -155,7 +166,8 @@
 .empresas-contactos-dialog {
   position: relative;
   z-index: 1056;
-  max-width: 760px;
+  max-width: 95%;
+  width: 760px;
   margin: 1.5rem auto;
 }
 
@@ -179,7 +191,29 @@
 .empresas-contactos-table {
   border: 1px solid #dbe3ee;
   border-radius: 14px;
-  overflow: hidden;
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+.empresas-contactos-table {
+  border: 1px solid #dbe3ee;
+  border-radius: 14px;
+  overflow-x: auto;
+  width: 100%;
+  max-width: 100%;
+  display: block;
+}
+
+.empresas-contactos-table table {
+  width: 100%;
+  min-width: 300px;
+  table-layout: auto;
+  margin-bottom: 0;
+}
+
+.empresas-contactos-table td, .empresas-contactos-table th {
+  white-space: nowrap;
+  padding: 0.75rem !important;
 }
 
 .empresas-contactos-table thead th {

@@ -1,0 +1,45 @@
+@if (visible) {
+  <div class="modal d-block" tabindex="-1" role="dialog" aria-modal="true" style="background: rgba(0,0,0,0.55); backdrop-filter: blur(4px); z-index: 1055;">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document" style="max-width: 650px; z-index: 1056; position: relative;">
+      <div class="modal-content border-0 shadow-lg" style="border-radius: 1.25rem;">
+        <div class="modal-header d-flex justify-content-between align-items-center" style="padding: 1.25rem 1.5rem; border-bottom: 1px solid #f0f0f0;">
+          <h5 class="fw-bold text-dark mb-0">
+            <i class="fa-solid fa-user-tie text-info me-2"></i> Asignar Coordinador
+          </h5>
+          <button type="button" class="btn-close" (click)="cerrar()" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body" style="padding: 1.25rem 1.5rem;">
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <span class="small text-muted">Ciclo: <span class="fw-semibold text-primary">{{ ciclo?.nombre }}</span></span>
+            <span class="badge bg-light text-secondary rounded-pill px-3 py-2">{{ profesoresFiltrados.length }} de {{ todosLosProfesores.length }}</span>
+          </div>
+          <div class="position-relative mb-3">
+            <i class="fa-solid fa-search position-absolute text-muted" style="left: 12px; top: 50%; transform: translateY(-50%); z-index: 5; font-size: 0.85rem;"></i>
+            <input type="text" class="form-control border ps-5" placeholder="Buscar profesor..." style="border-radius: 0.75rem; height: 38px; font-size: 0.9rem;" [(ngModel)]="filtroProfesor">
+          </div>
+          <div class="list-group list-group-flush border rounded-3" style="max-height: 400px; overflow-y: auto;">
+            @for (p of profesoresFiltrados; track p.id) {
+              <label class="list-group-item list-group-item-action d-flex align-items-center gap-3 py-2 px-3 border-0 border-bottom" [for]="'prof_' + p.id" style="cursor: pointer; border-color: #f0f0f0 !important;">
+                <input class="form-check-input flex-shrink-0" type="radio" name="coordinador" [id]="'prof_' + p.id" [checked]="isCoordinador(p.id)" (change)="seleccionarCoordinador(p.id)" style="width: 18px; height: 18px; cursor: pointer;">
+                <div class="d-flex flex-column flex-grow-1 min-w-0">
+                  <span class="fw-semibold text-dark">{{ p.nombre }} {{ p.apellidos }}</span>
+                  <small class="text-muted text-truncate">{{ p.correo }}</small>
+                </div>
+              </label>
+            }
+            @if (profesoresFiltrados.length === 0) {
+              <div class="text-center py-4 text-muted">
+                <i class="fa-solid fa-user-slash mb-2 d-block" style="font-size: 1.5rem;"></i>
+                <small>No hay profesores que coincidan</small>
+              </div>
+            }
+          </div>
+        </div>
+        <div class="modal-footer d-flex gap-2 justify-content-end" style="padding: 1rem 1.5rem; border-top: 1px solid #f0f0f0;">
+          <button type="button" class="btn btn-light border px-4" (click)="cerrar()">Cancelar</button>
+          <button type="button" class="btn btn-primary shadow-sm px-4" (click)="guardar()">Guardar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

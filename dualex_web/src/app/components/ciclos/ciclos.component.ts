@@ -7,9 +7,11 @@ import { ConfirmarBorradoModalComponent } from '../shared/modals/confirmar-borra
 import { Config } from 'datatables.net';
 import 'datatables.net-responsive-bs5';
 import { CiclosService } from '../../services/ciclos.service';
+import { ProfesoresService } from '../../services/profesores.service';
 import { CicloDTO } from '../../dto/dualex.dto';
 import { AlertService } from '../../services/alert.service';
 import { CicloModalComponent } from '../modals/ciclo-modal/ciclo-modal.component';
+import { VincularCoordinadorModalComponent } from '../modals/vincular-coordinador-modal/vincular-coordinador-modal.component';
 
 /**
  * Componente para la gestión de Ciclos Formativos.
@@ -19,22 +21,25 @@ import { CicloModalComponent } from '../modals/ciclo-modal/ciclo-modal.component
 @Component({
   selector: 'app-ciclos',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, DatatableComponent, ConfirmarBorradoModalComponent, CicloModalComponent],
+  imports: [CommonModule, RouterModule, FormsModule, DatatableComponent, ConfirmarBorradoModalComponent, CicloModalComponent, VincularCoordinadorModalComponent],
   templateUrl: './ciclos.component.html',
   styleUrl: './ciclos.component.css'
 })
 export class CiclosComponent implements OnInit {
   private ciclosService = inject(CiclosService);
+  private profesoresService = inject(ProfesoresService);
   private alertService = inject(AlertService);
   private location = inject(Location);
 
   ciclos: CicloDTO[] = [];
 
   dtOptions: any = {};
-  columnTitles: string[] = [' ', 'Nombre', 'Siglas', 'Grado', 'Cursos', 'Acciones'];
+  columnTitles: string[] = [' ', 'Nombre', 'Siglas', 'Grado', 'Cursos', 'Coordinador', 'Acciones'];
 
   isDeleteModalOpen = false;
   cicloToDelete: any = null;
+  isVincularModalOpen = false;
+  todosLosProfesores: any[] = [];
 
   isEditModalOpen = false;
   isEditing = false;
@@ -62,6 +67,13 @@ export class CiclosComponent implements OnInit {
         { data: 'siglas', className: 'text-nowrap', width: '10%', responsivePriority: 3 },
         { data: 'grado', className: 'text-nowrap', width: '10%', responsivePriority: 4 },
         { data: 'Curso', className: 'text-nowrap', width: '15%', responsivePriority: 6 },
+        { 
+          data: 'nombreCoordinador', 
+          className: 'text-nowrap', 
+          width: '15%', 
+          responsivePriority: 7,
+          render: (data: any, type: any, row: any) => data ? `${data} ${row.apellidosCoordinador}` : '<span class="text-muted italic">Sin asignar</span>'
+        },
         {
           data: null,
           orderable: false,
@@ -70,6 +82,9 @@ export class CiclosComponent implements OnInit {
           responsivePriority: 5,
           render: () => `
             <div class="d-flex gap-2 justify-content-center align-items-center action-buttons w-100">
+              <button class="btn btn-sm btn-outline-info shadow-sm action-link" data-action="link" title="Vincular Coordinador">
+                <i class="fa-solid fa-user-tie"></i>
+              </button>
               <button class="btn btn-sm btn-outline-primary shadow-sm action-edit" data-action="edit" title="Editar">
                 <i class="fa-solid fa-pen"></i>
               </button>
@@ -115,7 +130,34 @@ export class CiclosComponent implements OnInit {
       this.isDeleteModalOpen = true;
     } else if (event.action === 'edit') {
       this.abrirEditModal(event.data);
+    } else if (event.action === 'link') {
+      this.abrirVincularCoordinador(event.data);
     }
+  }
+
+  abrirVincularCoordinador(ciclo: any) {
+    this.cicloSeleccionado = ciclo;
+    this.profesoresService.getProfesores().subscribe({
+      next: (profesores) => {
+        this.todosLosProfesores = profesores;
+        this.isVincularModalOpen = true;
+      },
+      error: () => this.alertService.error('Error', 'No se pudo obtener la lista de profesores.')
+    });
+  }
+
+  guardarCoordinador(idProfesor: number) {
+    // Need to call a service method here. For now let's assume it exists or call updateCiclo
+    // or add a dedicated method in CiclosService.
+    console.log('Vinculando profesor', idProfesor, 'al ciclo', this.cicloSeleccionado.id);
+    this.ciclosService.vincularCoordinador(this.cicloSeleccionado.id, idProfesor).subscribe({
+      next: () => {
+        this.alertService.exito('Coordinador asignado', 'El coordinador ha sido asignado correctamente.');
+        this.isVincularModalOpen = false;
+        this.cargarCiclos();
+      },
+      error: (err) => this.alertService.error('Error', err.error?.mensaje || 'No se pudo asignar el coordinador.')
+    });
   }
 
   abrirEditModal(ciclo?: any) {

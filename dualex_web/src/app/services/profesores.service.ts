@@ -19,6 +19,15 @@ export class ProfesoresService {
   private readonly API_URL = `${environment.apiUrl}/index.php?c=Profesores`;
 
   /**
+   * Obtiene el listado completo de profesores registrados sin paginar.
+   * 
+   * @returns Un `Observable` con la lista completa de profesores.
+   */
+  getProfesores(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.API_URL}&m=listar`);
+  }
+
+  /**
    * Obtiene la lista de profesores paginada y filtrada para la integración con DataTables.
    * 
    * @param dataTablesParameters Parámetros estándar enviados por la librería DataTables (start, length, search, etc.).

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../auth/services/auth.service';
 import { ProfesorDashboardService } from '../../services/profesor-dashboard.service';
+import { AlertService } from '../../services/alert.service';
 import { ModuloProfesorDTO, PerfilUsuarioDTO } from '../../dto/dualex.dto';
 
 /**
@@ -19,6 +20,7 @@ import { ModuloProfesorDTO, PerfilUsuarioDTO } from '../../dto/dualex.dto';
 export class MisModulosComponent implements OnInit {
   private authService = inject(AuthService);
   private profesorDashboardService = inject(ProfesorDashboardService);
+  private alertService = inject(AlertService);
   
   usuario: PerfilUsuarioDTO | null = null;
   modulos: ModuloProfesorDTO[] = [];
@@ -40,7 +42,8 @@ export class MisModulosComponent implements OnInit {
         this.cargando = false;
       },
       error: (err) => {
-
+        console.error('Error cargando módulos:', err);
+        this.alertService.error('Error', 'No se pudieron cargar tus módulos: ' + (err.message || 'Error desconocido'));
         this.cargando = false;
       }
     });

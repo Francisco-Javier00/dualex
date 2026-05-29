@@ -93,7 +93,7 @@ class ModCiclos {
             $stmt->execute([
                 ':nombre'        => $datos['nombre'],
                 ':siglas'        => $datos['siglas'],
-                ':idCoordinador' => $datos['idCoordinador'] ?? 1,
+                ':idCoordinador' => $datos['idCoordinador'] ?? null,
                 ':grado'         => $datos['grado'] ?? 'superior'
             ]);
             $idCiclo = $this->db->lastInsertId();
@@ -125,7 +125,7 @@ class ModCiclos {
                 ':id'            => $id,
                 ':nombre'        => $datos['nombre'],
                 ':siglas'        => $datos['siglas'],
-                ':idCoordinador' => $datos['idCoordinador'] ?? 1,
+                ':idCoordinador' => $datos['idCoordinador'] ?? null,
                 ':grado'         => $datos['grado']
             ]);
 
@@ -179,6 +179,26 @@ class ModCiclos {
             return true;
         } catch (Exception $e) {
             $this->db->rollBack();
+            throw $e;
+        }
+    }
+
+    public function vincularCoordinador($idCiclo, $idCoordinador) {
+        try {
+            // Asegurar que el profesor exista en la tabla Coordinador
+            $check = $this->db->prepare("SELECT 1 FROM Coordinador WHERE idCoordinador = :id");
+            $check->execute([':id' => $idCoordinador]);
+            if (!$check->fetch()) {
+                $this->db->prepare("INSERT INTO Coordinador (idCoordinador) VALUES (:id)")->execute([':id' => $idCoordinador]);
+            }
+
+            $sql = "UPDATE Ciclo SET idCoordinador = :idCoordinador WHERE idCiclo = :idCiclo";
+            $stmt = $this->db->prepare($sql);
+            return $stmt->execute([':idCoordinador' => $idCoordinador, ':idCiclo' => $idCiclo]);
+        } catch (PDOException $e) {
+            if ($e->getCode() == 23000) {
+                throw new InvalidArgumentException('Ese coordinador ya está asignado a otro ciclo.', 23000);
+            }
             throw $e;
         }
     }

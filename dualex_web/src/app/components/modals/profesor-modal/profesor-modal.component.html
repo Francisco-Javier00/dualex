@@ -15,8 +15,8 @@
       <form [formGroup]="profesorForm">
         <div class="row g-4">
 
-          <!-- COLUMNA IZQUIERDA: INFORMACIÓN PERSONAL -->
-          <div class="col-lg-5">
+          <!-- INFORMACIÓN PERSONAL -->
+          <div class="col-12">
             <h6 class="text-primary text-uppercase small fw-bold mb-3">Información Personal</h6>
             
             <div class="d-flex flex-column gap-3">
@@ -67,107 +67,9 @@
               </div>
 
               <!-- Rol -->
-              <div>
-                <label class="form-label small fw-bold text-uppercase opacity-75">Rol</label>
-                <div class="input-group shadow-sm rounded-3 overflow-hidden border"
-                     [class.is-invalid]="profesorForm.get('rol')?.touched && profesorForm.get('rol')?.invalid">
-                  <span class="input-group-text bg-white border-0"><i class="fa-solid fa-shield-halved text-muted"></i></span>
-                    <select class="form-select border-0 px-3" formControlName="rol" (change)="onRolChange(profesorForm.get('rol')?.value)"
-                            [class.is-invalid]="profesorForm.get('rol')?.touched && profesorForm.get('rol')?.invalid">
-                      <option value="PROFESOR">Profesor</option>
-                      <option value="COORDINADOR">Coordinador</option>
-                    </select>
-                </div>
-              </div>
-            </div>
-
-          </div>
-
-          <div class="col-lg-7">
-            <h6 class="text-primary text-uppercase small fw-bold mb-3">Ciclos y Módulos</h6>
-
-            <div class="tree-legend d-flex justify-content-between small text-muted mb-2 px-1">
-              <span>{{ ciclosBD.length }} ciclos formativos</span>
-              <span>{{ ciclosSeleccionadosCount }} seleccionados</span>
-            </div>
-
-            <!-- Árbol de ciclos y módulos -->
-            <div class="tree-shell shadow-sm rounded-3 border overflow-auto" style="max-height: 350px;">
-              @for (ciclo of ciclosBD; track ciclo.id) {
-                <div class="cycle-card border-bottom">
-                  <button
-                    type="button"
-                    class="cycle-header w-100 border-0 bg-white d-flex align-items-center justify-content-between p-3 text-start"
-                    [class.selected]="nuevoProfesor.rol === 'COORDINADOR' ? isCicloSeleccionado(ciclo.siglas) : isCicloExpandido(ciclo.siglas)"
-                    (click)="onToggleCiclo(ciclo.siglas, nuevoProfesor.rol === 'COORDINADOR' ? !isCicloSeleccionado(ciclo.siglas) : !isCicloExpandido(ciclo.siglas))"
-                  >
-                    <div class="cycle-left d-flex align-items-center gap-3">
-                      <div class="custom-checkbox-mini d-flex align-items-center justify-content-center">
-                        @if (nuevoProfesor.rol === 'COORDINADOR') {
-                          @if (isCicloSeleccionado(ciclo.siglas)) {
-                            <i class="fa-solid fa-check text-white" style="font-size: 0.65rem;"></i>
-                          } @else {
-                            <i class="fa-regular fa-circle text-slate-400"></i>
-                          }
-                        } @else {
-                          <i class="fa-solid" [ngClass]="isCicloExpandido(ciclo.siglas) ? 'fa-folder-open text-primary' : 'fa-folder text-slate-400'"></i>
-                        }
-                      </div>
-
-                      <div class="cycle-meta">
-                        <div class="cycle-name fw-bold text-dark" style="font-size: 0.95rem;">{{ ciclo.nombre }}</div>
-                        <div class="cycle-subtitle small text-muted d-flex align-items-center gap-2">
-                          <span class="cycle-siglas fw-bold text-secondary">{{ ciclo.siglas }}</span>
-                          <span class="cycle-dot"></span>
-                          <span>{{ tieneModulos(ciclo.siglas) ? contarModulos(ciclo.siglas) + ' módulos' : 'Sin módulos' }}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div class="cycle-state">
-                      @if (nuevoProfesor.rol === 'COORDINADOR') {
-                        <span class="badge" [class.bg-primary]="isCicloSeleccionado(ciclo.siglas)" [class.bg-light]="!isCicloSeleccionado(ciclo.siglas)" [class.text-dark]="!isCicloSeleccionado(ciclo.siglas)">
-                          {{ isCicloSeleccionado(ciclo.siglas) ? 'Coordinando' : 'Disponible' }}
-                        </span>
-                      } @else {
-                        <i class="fa-solid text-muted" [ngClass]="isCicloExpandido(ciclo.siglas) ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
-                      }
-                    </div>
-                  </button>
-
-                  @if (debeMostrarModulos(ciclo.siglas)) {
-                    <div class="module-list bg-light p-2 border-top">
-                      @if (getModulosPorCiclo(ciclo.siglas).length > 0) {
-                        @for (modulo of getModulosPorCiclo(ciclo.siglas); track modulo.id) {
-                          <button
-                            type="button"
-                            class="module-row w-100 d-flex align-items-center gap-3 border-0 bg-transparent py-2 px-4 text-start"
-                            [class.active]="modulosSeleccionadosIds.includes(modulo.id)"
-                            (click)="$event.stopPropagation(); onToggleModulo(obtenerSiglaModulo(modulo), !modulosSeleccionadosIds.includes(modulo.id))"
-                          >
-                            <div class="custom-checkbox-mini module-check d-flex align-items-center justify-content-center">
-                              @if (modulosSeleccionadosIds.includes(modulo.id)) {
-                                <i class="fa-solid fa-check text-white" style="font-size: 0.6rem;"></i>
-                              }
-                            </div>
-                            <div class="module-info">
-                              <span class="module-name text-dark fw-semibold" style="font-size: 0.9rem;">{{ modulo.nombre }}</span>
-                              <span class="module-sigla text-muted small ms-2">({{ obtenerSiglaModulo(modulo) }})</span>
-                            </div>
-                          </button>
-                        }
-                      } @else {
-                        <div class="empty-state text-muted small p-3 text-center">
-                          No hay módulos asociados a este ciclo.
-                        </div>
-                      }
-                    </div>
-                  }
-                </div>
-              }
+              <!-- Rol oculto a petición del usuario -->
             </div>
           </div>
-
         </div>
 
         <!-- ACCIONES -->

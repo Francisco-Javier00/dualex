@@ -67,6 +67,10 @@ export class CiclosService {
     return this.http.delete<boolean>(`${this.API_URL}&m=eliminar&id=${id}`);
   }
 
+  vincularCoordinador(idCiclo: number, idProfesor: number): Observable<any> {
+    return this.http.post<any>(`${this.API_URL}&m=vincularCoordinador&id=${idCiclo}`, { idProfesor });
+  }
+
   /**
    * Recupera todos los ciclos para mostrar opciones en formularios o vistas legacy
    * que requieren la estructura combinada de nombre y siglas.

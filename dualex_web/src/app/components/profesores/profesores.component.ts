@@ -11,6 +11,7 @@ import { ImportarProfesoresModalComponent } from '../modals/importar-profesores-
 import { AlertService } from '../../services/alert.service';
 import { ProfesoresService } from '../../services/profesores.service';
 import { ProfesorDTO } from '../../dto/dualex.dto';
+import { AuthService } from '../../auth/services/auth.service';
 
 /**
  * Componente para la gestión de Profesores.
@@ -30,9 +31,12 @@ export class ProfesoresComponent implements OnInit {
   private alertService = inject(AlertService);
   private location = inject(Location);
 
+  private authService = inject(AuthService);
+
   @ViewChild(DatatableComponent) datatable?: DatatableComponent;
 
   dtOptions: any = {};
+  puedeEditar = false;
   modalBorradoVisible = false;
   modalCrearVisible = false;
   modalImportarVisible = false;
@@ -42,6 +46,8 @@ export class ProfesoresComponent implements OnInit {
   profesorSeleccionado: ProfesorDTO | null = null;
 
   ngOnInit(): void {
+    this.puedeEditar = this.authService.currentUserValue?.rol === 'COORDINADOR' && !!this.authService.currentUserValue?.esGeneral;
+
     this.dtOptions = {
       order: [],
       responsive: true,
@@ -71,29 +77,7 @@ export class ProfesoresComponent implements OnInit {
         { data: 'apellidos', width: '18%', responsivePriority: 3 },
         { data: 'correo', width: '22%', responsivePriority: 4 },
         { data: 'rol', className: 'text-nowrap', width: '10%', responsivePriority: 5 },
-        {
-          data: 'modulos',
-          width: '15%',
-          responsivePriority: 7,
-          render: (data: any, type: any, row: any) => {
-            if (data && data.trim() !== '') return data;
-            return row?.rol === 'COORDINADOR'
-              ? '<span class="text-muted opacity-50 italic small">Sin módulos asignados</span>'
-              : '<span class="text-muted opacity-50 italic small">No imparte módulos</span>';
-          }
-        },
-        {
-          data: 'ciclos',
-          width: '12%',
-          responsivePriority: 8,
-          render: (data: any, type: any, row: any) => {
-            if (data && data.trim() !== '') return data;
-            return row?.rol === 'COORDINADOR'
-              ? '<span class="text-muted opacity-50 italic small">Sin ciclos coordinados</span>'
-              : '<span class="text-muted opacity-50 italic small">No coordina ciclos</span>';
-          }
-        },
-        {
+        ...(this.puedeEditar ? [{
           data: null,
           className: 'text-center align-middle',
           orderable: false,
@@ -110,7 +94,7 @@ export class ProfesoresComponent implements OnInit {
               </button>
             </div>
           `
-        }
+        }] : [])
       ],
       language: {
         emptyTable: 'No hay profesores disponibles',
@@ -135,6 +119,7 @@ export class ProfesoresComponent implements OnInit {
   }
 
   importarExcel(): void {
+    if (!this.puedeEditar) return;
     this.modalImportarVisible = true;
   }
 
@@ -184,6 +169,7 @@ export class ProfesoresComponent implements OnInit {
   }
 
   crearNuevaEntrada(): void {
+    if (!this.puedeEditar) return;
     this.modoFormulario = 'crear';
     this.profesorSeleccionado = null;
     this.modalCrearVisible = true;
@@ -246,6 +232,7 @@ export class ProfesoresComponent implements OnInit {
   }
 
   abrirEdicionProfesor(profesor: ProfesorDTO): void {
+    if (!this.puedeEditar) return;
     this.modoFormulario = 'editar';
     this.profesorSeleccionado = { ...profesor };
     this.modalCrearVisible = true;
