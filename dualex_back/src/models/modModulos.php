@@ -97,7 +97,13 @@ class ModModulos {
                         JOIN Curso cur ON mc.idCurso = cur.idCurso 
                         WHERE mc.idModulo = m.idModulo LIMIT 1) as idCiclo,
                        (SELECT mc.idCurso FROM Modulo_Curso mc 
-                        WHERE mc.idModulo = m.idModulo LIMIT 1) as idCurso
+                        WHERE mc.idModulo = m.idModulo LIMIT 1) as idCurso,
+                       (SELECT GROUP_CONCAT(mc2.idCurso SEPARATOR ',') FROM Modulo_Curso mc2 
+                        WHERE mc2.idModulo = m.idModulo) as cursos,
+                       (SELECT GROUP_CONCAT(DISTINCT cur2.siglas SEPARATOR ',') FROM Modulo_Curso mc3 
+                        JOIN Curso c2 ON mc3.idCurso = c2.idCurso
+                        JOIN Ciclo cur2 ON c2.idCiclo = cur2.idCiclo
+                        WHERE mc3.idModulo = m.idModulo) as ciclos
                 FROM Modulo m 
                 WHERE m.idModulo = :id";
         $stmt = $this->db->prepare($sql);

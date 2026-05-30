@@ -87,11 +87,22 @@ class ConAlumnos extends BaseController {
         }
         
         // 4. Inyectamos los datos del token de sesión
-        $params['email'] = $this->user['email'] ?? null;
-        $params['idUsuario'] = $this->user['id'] ?? $this->user['idUsuario'] ?? $this->user['sub'] ?? null;
-        $params['rol_token'] = $this->user['roles']['dualex'] ?? null;
+        $params['email'] = $this->user['data']['email'] ?? null;
+        $params['idUsuario'] = $this->user['id'] ?? null;
+        
+        $rolesUpper = array_map('strtoupper', $this->user['data']['roles'] ?? []);
+        $rol_token = 'ALUMNO';
+        if (in_array('COORDINADOR_GENERAL_DUALEX', $rolesUpper)) {
+            $rol_token = 'COORDINADOR_GENERAL';
+        } else if (in_array('COORDINADOR_DUALEX', $rolesUpper)) {
+            $rol_token = 'COORDINADOR';
+        } else if (in_array('PROFESOR_DUALEX', $rolesUpper)) {
+            $rol_token = 'PROFESOR';
+        }
+        $params['rol_token'] = $rol_token;
         
         $data = $this->modelo->obtenerDataTables($params);
+        error_log("PARAMS: " . print_r($params, true) . " DATA: " . print_r($data, true));
         $this->sendResponse($data);
     }
 
