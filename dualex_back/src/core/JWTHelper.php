@@ -60,8 +60,8 @@ class JWTHelper {
             $roles = $user['data']['roles'] ?? [];
             $rolesUpper = array_map('strtoupper', $roles);
             
-            $rol = 'ALUMNO'; // Por defecto
-            if (in_array('COORDINADOR_DUALEX', $rolesUpper)) {
+            $rol = null;
+            if (in_array('COORDINADOR_DUALEX', $rolesUpper) || in_array('COORDINADOR_GENERAL_DUALEX', $rolesUpper)) {
                 $rol = 'COORDINADOR';
             } else if (in_array('PROFESOR_DUALEX', $rolesUpper)) {
                 $rol = 'PROFESOR';
@@ -69,7 +69,7 @@ class JWTHelper {
                 $rol = 'ALUMNO';
             }
 
-            if ($rol === 'ALUMNO') {
+            if ($rol === 'ALUMNO' || $rol === null) {
                 throw new Exception("No estás registrado en Dualex. Tu coordinador de ciclo debe darte de alta primero.");
             }
 
