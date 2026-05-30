@@ -55,7 +55,7 @@ class ConActividades extends BaseController {
                       in_array('PROFESOR_DUALEX', $rolesUpper);
 
         if (!$esProfesor && (in_array('ALUMNO_DUALEX', $rolesUpper) || in_array('ALUMNO', $rolesUpper))) {
-            $idAlumno = $this->user['data']['id'];
+            $idAlumno = $this->user['id'];
         }
 
         $data = $this->modelo->listar($idAlumno);

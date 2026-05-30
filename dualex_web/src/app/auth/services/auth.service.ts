@@ -98,6 +98,7 @@ export class AuthService {
         if (actual && perfilLocal) {
           this.sujetoPerfilUsuario.next({
             ...actual,
+            id: perfilLocal.id,
             nombre: perfilLocal.nombre,
             apellidos: perfilLocal.apellidos,
             email: perfilLocal.email,
