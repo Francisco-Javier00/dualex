@@ -44,12 +44,9 @@ class ConTareas extends BaseController {
     public function listar() {
         $this->checkRole(['ALUMNO', 'PROFESOR', 'COORDINADOR']);
         try {
-            $userRole = strtoupper($this->user['roles']['dualex'] ?? '');
-            if ($userRole === 'ALUMNO') {
-                $email = $this->user['email'] ?? '';
-                $stmt = $this->db->prepare("SELECT idUsuario FROM Usuario WHERE correo = :email");
-                $stmt->execute([':email' => $email]);
-                $idAlumno = $stmt->fetchColumn();
+            $rolesUpper = array_map('strtoupper', $this->user['data']['roles'] ?? []);
+            if (in_array('ALUMNO_DUALEX', $rolesUpper)) {
+                $idAlumno = $this->user['id'];
                 $data = $this->modelo->listarPorAlumno($idAlumno);
             } else {
                 $data = $this->modelo->listar();
@@ -115,13 +112,9 @@ class ConTareas extends BaseController {
             $this->sendError("Datos no válidos.", 400);
         }
         
-        $userRole = strtoupper($this->user['roles']['dualex'] ?? '');
-        if ($userRole === 'ALUMNO') {
-            $email = $this->user['email'] ?? '';
-            $stmt = $this->db->prepare("SELECT idUsuario FROM Usuario WHERE correo = :email");
-            $stmt->execute([':email' => $email]);
-            $idAlumno = $stmt->fetchColumn();
-            $datos['idAlumno'] = $idAlumno ? $idAlumno : null;
+        $rolesUpper = array_map('strtoupper', $this->user['data']['roles'] ?? []);
+        if (in_array('ALUMNO_DUALEX', $rolesUpper)) {
+            $datos['idAlumno'] = $this->user['id'];
         }
         
         if (empty($datos['idAlumno'])) {
@@ -153,13 +146,9 @@ class ConTareas extends BaseController {
             $this->sendError("Datos no válidos.", 400);
         }
         
-        $userRole = strtoupper($this->user['roles']['dualex'] ?? '');
-        if ($userRole === 'ALUMNO') {
-            $email = $this->user['email'] ?? '';
-            $stmt = $this->db->prepare("SELECT idUsuario FROM Usuario WHERE correo = :email");
-            $stmt->execute([':email' => $email]);
-            $idAlumno = $stmt->fetchColumn();
-            $datos['idAlumno'] = $idAlumno ? $idAlumno : null;
+        $rolesUpper = array_map('strtoupper', $this->user['data']['roles'] ?? []);
+        if (in_array('ALUMNO_DUALEX', $rolesUpper)) {
+            $datos['idAlumno'] = $this->user['id'];
         }
         
         try {

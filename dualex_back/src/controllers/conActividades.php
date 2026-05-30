@@ -43,7 +43,7 @@ class ConActividades extends BaseController {
      * @return json Respuesta JSON con los datos o un error (vía sendResponse o sendError)
      */
     public function listar() {
-        $this->checkRole(['PROFESOR', 'COORDINADOR']);
+        $this->checkRole(['ALUMNO', 'PROFESOR', 'COORDINADOR']);
         $data = $this->modelo->listar();
         $this->sendResponse($data);
     }
