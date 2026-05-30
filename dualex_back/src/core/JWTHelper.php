@@ -131,7 +131,52 @@ class JWTHelper {
                 $db->rollBack();
             }
         } else {
-            $user['id'] = $dbUser['idUsuario'];
+            $idUsuario = $dbUser['idUsuario'];
+            $user['id'] = $idUsuario;
+
+            // Sincronización de roles para usuarios existentes
+            $roles = $user['data']['roles'] ?? [];
+            $rolesUpper = array_map('strtoupper', $roles);
+            
+            $isCoordinadorInToken = in_array('COORDINADOR_DUALEX', $rolesUpper) || in_array('COORDINADOR_GENERAL_DUALEX', $rolesUpper);
+            $isProfesorInToken = in_array('PROFESOR_DUALEX', $rolesUpper);
+
+            if ($isCoordinadorInToken || $isProfesorInToken) {
+                try {
+                    $db->beginTransaction();
+
+                    if ($isCoordinadorInToken) {
+                        $checkP = $db->prepare("SELECT 1 FROM Profesor WHERE idProfesor = :id");
+                        $checkP->execute([':id' => $idUsuario]);
+                        if (!$checkP->fetch()) {
+                            $db->prepare("INSERT INTO Profesor (idProfesor) VALUES (:id)")->execute([':id' => $idUsuario]);
+                        }
+                        
+                        $checkC = $db->prepare("SELECT 1 FROM Coordinador WHERE idCoordinador = :id");
+                        $checkC->execute([':id' => $idUsuario]);
+                        if (!$checkC->fetch()) {
+                            $db->prepare("INSERT INTO Coordinador (idCoordinador) VALUES (:id)")->execute([':id' => $idUsuario]);
+                        }
+                    } else if ($isProfesorInToken) {
+                        $checkP = $db->prepare("SELECT 1 FROM Profesor WHERE idProfesor = :id");
+                        $checkP->execute([':id' => $idUsuario]);
+                        if (!$checkP->fetch()) {
+                            $db->prepare("INSERT INTO Profesor (idProfesor) VALUES (:id)")->execute([':id' => $idUsuario]);
+                        }
+
+                        $checkC = $db->prepare("SELECT 1 FROM Coordinador WHERE idCoordinador = :id");
+                        $checkC->execute([':id' => $idUsuario]);
+                        if ($checkC->fetch()) {
+                            $db->prepare("UPDATE Ciclo SET idCoordinador = NULL WHERE idCoordinador = :id")->execute([':id' => $idUsuario]);
+                            $db->prepare("DELETE FROM Coordinador WHERE idCoordinador = :id")->execute([':id' => $idUsuario]);
+                        }
+                    }
+
+                    $db->commit();
+                } catch (Exception $e) {
+                    $db->rollBack();
+                }
+            }
         }
 
         return $user;
