@@ -65,7 +65,7 @@ export class EmpresasComponent implements OnInit {
   };
 
   ngOnInit(): void {
-    this.puedeEditar = this.authService.currentUserValue?.rol === 'COORDINADOR';
+    this.puedeEditar = (this.authService.currentUserValue?.rol === 'COORDINADOR' || this.authService.currentUserValue?.rol === 'COORDINADOR_GENERAL');
     if (this.puedeEditar) {
       this.configuracionService.esGeneral().subscribe({
         next: res => this.authService.setEsGeneral(res.esGeneral),

@@ -56,6 +56,7 @@ export class DashboardService {
    */
   private actualizarCategoriasPorRol(rol: string): void {
     switch (rol) {
+      case 'COORDINADOR_GENERAL':
       case 'COORDINADOR':
         this.sujetoCategorias.next(this.categoriasCoordinador);
         break;

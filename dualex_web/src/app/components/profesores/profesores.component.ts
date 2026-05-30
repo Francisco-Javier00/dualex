@@ -46,7 +46,7 @@ export class ProfesoresComponent implements OnInit {
   profesorSeleccionado: ProfesorDTO | null = null;
 
   ngOnInit(): void {
-    this.puedeEditar = this.authService.currentUserValue?.rol === 'COORDINADOR' && !!this.authService.currentUserValue?.esGeneral;
+    this.puedeEditar = (this.authService.currentUserValue?.rol === 'COORDINADOR' || this.authService.currentUserValue?.rol === 'COORDINADOR_GENERAL') && !!this.authService.currentUserValue?.esGeneral;
 
     this.dtOptions = {
       order: [],

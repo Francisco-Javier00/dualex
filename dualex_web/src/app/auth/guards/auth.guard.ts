@@ -24,7 +24,8 @@ export const authGuard: CanActivateFn = (route, state) => {
     const rolesRequeridos = route.data['roles'] as string[];
 
     if (rolesRequeridos && rolesRequeridos.length > 0) {
-      if (!rolesRequeridos.includes(currentUser.rol)) {
+      const allowedAsGeneral = rolesRequeridos.includes('COORDINADOR') && currentUser.rol === 'COORDINADOR_GENERAL';
+      if (!rolesRequeridos.includes(currentUser.rol) && !allowedAsGeneral) {
         // Redirigir al inicio o mostrar alerta si no tiene permiso
         return router.parseUrl('/dashboard');
       }

@@ -75,7 +75,7 @@ export class ModulosComponent implements OnInit, OnDestroy {
     const usuarioActual = this.authService.currentUserValue;
 
     // Si es coordinador, obtenemos sus cursos antes de inicializar/cargar la tabla
-    if (usuarioActual && usuarioActual.rol === 'COORDINADOR' && usuarioActual.email) {
+    if (usuarioActual && (usuarioActual.rol === 'COORDINADOR' || usuarioActual.rol === 'COORDINADOR_GENERAL') && usuarioActual.email) {
       this.profesoresService.getProfesorByEmail(usuarioActual.email).subscribe({
         next: (profesor) => {
           // Parse cycles coordinated by the coordinator (e.g. "DAW, DAM")

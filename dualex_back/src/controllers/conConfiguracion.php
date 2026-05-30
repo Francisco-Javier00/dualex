@@ -45,13 +45,11 @@ class ConConfiguracion {
      * @return array Array asociativo con la clave esGeneral (boolean)
      */
     public function esGeneral() {
-        if (!$this->user || !isset($this->user['id'])) {
+        if (!$this->user || !isset($this->user['data']['roles'])) {
             return ["esGeneral" => false];
         }
-        $stmt = $this->db->prepare("SELECT CAST(general AS UNSIGNED) as general FROM Coordinador WHERE idCoordinador = :id");
-        $stmt->execute([':id' => $this->user['id']]);
-        $res = $stmt->fetch(PDO::FETCH_ASSOC);
-        return ["esGeneral" => ($res && $res['general'] == 1)];
+        $rolesUpper = array_map('strtoupper', $this->user['data']['roles']);
+        return ["esGeneral" => in_array('COORDINADOR_GENERAL_DUALEX', $rolesUpper)];
     }
 
     /**
