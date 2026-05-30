@@ -65,7 +65,7 @@ export class AuthService {
           apellidos: payload.data.apellidos,
           email: payload.data.email,
           rol: rolInterno,
-          esGeneral: payload.data.esGeneral ?? false
+          esGeneral: payload.data.roles?.map(r => r.toUpperCase()).includes('COORDINADOR_GENERAL_DUALEX') || (payload.data.esGeneral ?? false)
         };
 
         this.sujetoPerfilUsuario.next(perfil);
@@ -150,6 +150,10 @@ export class AuthService {
 
     // Convertimos todos a mayúsculas para facilitar la comparación
     const rolesUpper = roles.map(r => r.toUpperCase());
+
+    if (rolesUpper.includes('COORDINADOR_GENERAL_DUALEX')) {
+      return 'COORDINADOR_GENERAL';
+    }
 
     if (rolesUpper.includes('COORDINADOR_DUALEX')) {
       return 'COORDINADOR';

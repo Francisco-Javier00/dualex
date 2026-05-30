@@ -159,7 +159,7 @@ export class TareaFormComponent implements OnInit {
   ngOnInit(): void {
     const user = this.authService.currentUserValue;
     this.esAlumno = user?.rol === 'ALUMNO';
-    this.esProfesor = user?.rol === 'PROFESOR' || user?.rol === 'COORDINADOR';
+    this.esProfesor = user?.rol === 'PROFESOR' || (user?.rol === 'COORDINADOR' || user?.rol === 'COORDINADOR_GENERAL');
     this.crearFormulario();
     this.cargarActividades(); // Cargamos el catálogo para mapear IDs a Títulos
 

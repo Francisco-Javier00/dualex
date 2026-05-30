@@ -21,7 +21,7 @@
         }
       </div>
       <button routerLink="/mis-modulos" class="btn shadow-sm"
-         [ngClass]="(usuario?.rol === 'COORDINADOR' && usuario?.esGeneral) ? 'btn-coordinador-general' : 'btn-primary'">
+         [ngClass]="((usuario?.rol === 'COORDINADOR' || usuario?.rol === 'COORDINADOR_GENERAL') && usuario?.esGeneral) ? 'btn-coordinador-general' : 'btn-primary'">
         <i class="fa-solid fa-chalkboard"></i> Mis Módulos
       </button>
     </header>
@@ -39,7 +39,7 @@
             <button
               class="btn w-100 py-3 border-0 d-flex align-items-center justify-content-center gap-2 fs-5"
               [routerLink]="categoria.ruta"
-              [ngClass]="(usuario?.rol === 'COORDINADOR' && usuario?.esGeneral && (categoria.titulo === 'Profesores' || categoria.titulo === 'Empresas' || categoria.titulo === 'Ciclos')) ? 'btn-coordinador-general' : 'btn-primary-light'">
+              [ngClass]="((usuario?.rol === 'COORDINADOR' || usuario?.rol === 'COORDINADOR_GENERAL') && usuario?.esGeneral && (categoria.titulo === 'Profesores' || categoria.titulo === 'Empresas' || categoria.titulo === 'Ciclos')) ? 'btn-coordinador-general' : 'btn-primary-light'">
               {{ categoria.titulo }} <i class="fa-solid fa-arrow-right"></i>
             </button>
           </div>

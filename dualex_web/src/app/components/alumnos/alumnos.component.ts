@@ -66,7 +66,7 @@ export class AlumnosComponent implements OnInit, OnDestroy {
   get puedeGestionarAlumnos(): boolean {
     // Desde "Mis Módulos" (con moduloId), ningún coordinador gestiona
     if (this.moduloId) return false;
-    return this.rolUsuarioActual === 'COORDINADOR';
+    return (this.rolUsuarioActual === 'COORDINADOR' || this.rolUsuarioActual === 'COORDINADOR_GENERAL');
   }
   
   get esSoloLectura(): boolean {
@@ -164,7 +164,7 @@ export class AlumnosComponent implements OnInit, OnDestroy {
     const usuarioActual = this.authService.currentUserValue;
 
     // Si es coordinador, obtenemos sus cursos antes de inicializar la tabla
-    if (usuarioActual && usuarioActual.rol === 'COORDINADOR' && usuarioActual.email) {
+    if (usuarioActual && (usuarioActual.rol === 'COORDINADOR' || usuarioActual.rol === 'COORDINADOR_GENERAL') && usuarioActual.email) {
       this.profesoresService.getProfesorByEmail(usuarioActual.email).subscribe({
         next: (profesor) => {
           this.cursosService.getCursosByProfesor(profesor.id).subscribe({

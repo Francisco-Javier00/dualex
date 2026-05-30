@@ -105,7 +105,9 @@ export class PruebasSistemaComponent implements OnInit {
 
     const header = toBase64Url(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
 
-    const rolString = rol === 'COORDINADOR_GENERAL' ? 'COORDINADOR' : rol;
+    const rolesArray = rol === 'COORDINADOR_GENERAL' 
+      ? ['COORDINADOR_DUALEX', 'COORDINADOR_GENERAL_DUALEX'] 
+      : [`${rol}_DUALEX`];
     
     const payloadStr = JSON.stringify({
       iat: Math.floor(Date.now() / 1000),
@@ -116,7 +118,7 @@ export class PruebasSistemaComponent implements OnInit {
         apellidos,
         email: `dev.${rol.toLowerCase()}@dualex.es`,
         foto: null,
-        roles: [`${rolString}_DUALEX`],
+        roles: rolesArray,
         esGeneral: rol === 'COORDINADOR_GENERAL'
       }
     });

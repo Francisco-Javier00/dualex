@@ -218,7 +218,7 @@ export class ProfesorModalComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const ciclosBase = this.nuevoProfesor.rol === 'COORDINADOR'
+    const ciclosBase = (this.nuevoProfesor.rol === 'COORDINADOR' || this.nuevoProfesor.rol === 'COORDINADOR_GENERAL')
       ? this.nuevoProfesor.ciclos
       : [];
     const ciclosPorModulos = this.getCiclosDeModulos(this.nuevoProfesor.modulos);
@@ -257,7 +257,7 @@ export class ProfesorModalComponent implements OnInit, OnDestroy {
   }
 
   onToggleCiclo(cicloSiglas: string, checked: boolean): void {
-    const esCoordinador = this.nuevoProfesor.rol === 'COORDINADOR';
+    const esCoordinador = (this.nuevoProfesor.rol === 'COORDINADOR' || this.nuevoProfesor.rol === 'COORDINADOR_GENERAL');
 
     if (!esCoordinador) {
       this.ciclosExpandidos = checked
@@ -292,7 +292,7 @@ export class ProfesorModalComponent implements OnInit, OnDestroy {
   }
 
   debeMostrarModulos(siglas: string): boolean {
-    return this.nuevoProfesor.rol === 'COORDINADOR'
+    return (this.nuevoProfesor.rol === 'COORDINADOR' || this.nuevoProfesor.rol === 'COORDINADOR_GENERAL')
       ? (this.isCicloSeleccionado(siglas) || this.isCicloExpandido(siglas))
       : this.isCicloExpandido(siglas);
   }
@@ -364,7 +364,7 @@ export class ProfesorModalComponent implements OnInit, OnDestroy {
 
   onGuardar(): void {
     if (this.profesorForm.valid) {
-      const ciclosFinales = this.nuevoProfesor.rol === 'COORDINADOR'
+      const ciclosFinales = (this.nuevoProfesor.rol === 'COORDINADOR' || this.nuevoProfesor.rol === 'COORDINADOR_GENERAL')
         ? Array.from(new Set(this.nuevoProfesor.ciclos as string[]))
         : [];
       const modulosIdsDesdeSiglas = this.nuevoProfesor.modulos

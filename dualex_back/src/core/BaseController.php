@@ -112,7 +112,9 @@ class BaseController {
         $rolesUpper = array_map('strtoupper', $this->user['data']['roles']);
         
         $userRole = 'ALUMNO'; // fallback
-        if (in_array('COORDINADOR_DUALEX', $rolesUpper)) {
+        if (in_array('COORDINADOR_GENERAL_DUALEX', $rolesUpper)) {
+            $userRole = 'COORDINADOR_GENERAL';
+        } else if (in_array('COORDINADOR_DUALEX', $rolesUpper)) {
             $userRole = 'COORDINADOR';
         } else if (in_array('PROFESOR_DUALEX', $rolesUpper)) {
             $userRole = 'PROFESOR';
@@ -121,15 +123,7 @@ class BaseController {
         }
         
         // Verificar si es Coordinador General
-        $esGeneral = false;
-        if ($userRole === 'COORDINADOR') {
-            $stmt = $this->db->prepare("SELECT CAST(general AS UNSIGNED) as general FROM Coordinador WHERE idCoordinador = :id");
-            $stmt->execute([':id' => $this->user['id']]);
-            $res = $stmt->fetch(PDO::FETCH_ASSOC);
-            if ($res && $res['general'] == 1) {
-                $esGeneral = true;
-            }
-        }
+        $esGeneral = in_array('COORDINADOR_GENERAL_DUALEX', $rolesUpper);
 
         if ($esGeneral) return; // Coordinador General tiene acceso total
 
@@ -172,14 +166,10 @@ class BaseController {
             $dbUser['rol'] = $rol;
             
             // Coordinador General
-            $dbUser['esGeneral'] = false;
-            if ($rol === 'COORDINADOR') {
-                $stmtG = $this->db->prepare("SELECT CAST(general AS UNSIGNED) as general FROM Coordinador WHERE idCoordinador = :id");
-                $stmtG->execute([':id' => $id]);
-                $res = $stmtG->fetch(PDO::FETCH_ASSOC);
-                if ($res && $res['general'] == 1) {
-                    $dbUser['esGeneral'] = true;
-                }
+            $rolesUpper = array_map('strtoupper', $this->user['data']['roles'] ?? []);
+            $dbUser['esGeneral'] = in_array('COORDINADOR_GENERAL_DUALEX', $rolesUpper);
+            if ($dbUser['esGeneral']) {
+                $dbUser['rol'] = 'COORDINADOR_GENERAL';
             }
             
             // Convertir tipos para coincidir con la interfaz PerfilUsuario

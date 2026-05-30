@@ -67,7 +67,7 @@ export class ActividadModalComponent implements OnChanges, OnDestroy, OnInit {
 
   ngOnInit(): void {
     const user = this.authService.currentUserValue;
-    this.esCoordinador = user?.rol === 'COORDINADOR';
+    this.esCoordinador = (user?.rol === 'COORDINADOR' || user?.rol === 'COORDINADOR_GENERAL');
     this.cargarDatosArbol();
   }
 
@@ -78,7 +78,7 @@ export class ActividadModalComponent implements OnChanges, OnDestroy, OnInit {
     this.cargandoArbol = true;
     const user = this.authService.currentUserValue;
 
-    if (user && user.rol === 'COORDINADOR') {
+    if (user && (user.rol === 'COORDINADOR' || user.rol === 'COORDINADOR_GENERAL')) {
       forkJoin({
         ciclos: this.ciclosService.getCiclos(),
         modulos: this.modulosService.getModulos(),
