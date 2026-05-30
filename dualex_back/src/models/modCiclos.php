@@ -118,6 +118,21 @@ class ModCiclos {
         try {
             $this->db->beginTransaction();
 
+            // Obtener coordinador previo para limpiar si se queda sin ciclos
+            $stmtPrev = $this->db->prepare("SELECT idCoordinador FROM Ciclo WHERE idCiclo = :id");
+            $stmtPrev->execute([':id' => $id]);
+            $prev = $stmtPrev->fetch(PDO::FETCH_ASSOC);
+            $idCoordinadorPrevio = $prev ? $prev['idCoordinador'] : null;
+
+            // Asegurar que el nuevo profesor exista en la tabla Coordinador
+            if (isset($datos['idCoordinador']) && $datos['idCoordinador']) {
+                $check = $this->db->prepare("SELECT 1 FROM Coordinador WHERE idCoordinador = :id");
+                $check->execute([':id' => $datos['idCoordinador']]);
+                if (!$check->fetch()) {
+                    $this->db->prepare("INSERT INTO Coordinador (idCoordinador) VALUES (:id)")->execute([':id' => $datos['idCoordinador']]);
+                }
+            }
+
             // 1. Actualizar el Ciclo
             $sql = "UPDATE Ciclo SET nombre = :nombre, siglas = :siglas, idCoordinador = :idCoordinador, grado = :grado WHERE idCiclo = :id";
             $stmt = $this->db->prepare($sql);
@@ -129,7 +144,7 @@ class ModCiclos {
                 ':grado'         => $datos['grado']
             ]);
 
-            // 2. Actualizar los nombres de los Curso asociados (1º y 2º)
+            // Actualizar los nombres de los Curso asociados (1º y 2º)
             $siglas = $datos['siglas'];
             $sqlCursos = "UPDATE Curso SET nombre = CASE 
                             WHEN nombre LIKE '1º %' THEN :nombre1
@@ -145,6 +160,16 @@ class ModCiclos {
             ]);
 
             $this->db->commit();
+
+            // Limpieza del coordinador anterior si se quedó sin ciclos
+            if ($idCoordinadorPrevio && $idCoordinadorPrevio != $datos['idCoordinador']) {
+                $stmtCheck = $this->db->prepare("SELECT COUNT(*) FROM Ciclo WHERE idCoordinador = :id");
+                $stmtCheck->execute([':id' => $idCoordinadorPrevio]);
+                if ($stmtCheck->fetchColumn() == 0) {
+                    $this->db->prepare("DELETE FROM Coordinador WHERE idCoordinador = :id AND general = 0")->execute([':id' => $idCoordinadorPrevio]);
+                }
+            }
+
             return $this->obtener($id);
         } catch (Exception $e) {
             $this->db->rollBack();
@@ -185,16 +210,35 @@ class ModCiclos {
 
     public function vincularCoordinador($idCiclo, $idCoordinador) {
         try {
+            // Obtener coordinador previo
+            $stmtPrev = $this->db->prepare("SELECT idCoordinador FROM Ciclo WHERE idCiclo = :idCiclo");
+            $stmtPrev->execute([':idCiclo' => $idCiclo]);
+            $prev = $stmtPrev->fetch(PDO::FETCH_ASSOC);
+            $idCoordinadorPrevio = $prev ? $prev['idCoordinador'] : null;
+
             // Asegurar que el profesor exista en la tabla Coordinador
-            $check = $this->db->prepare("SELECT 1 FROM Coordinador WHERE idCoordinador = :id");
-            $check->execute([':id' => $idCoordinador]);
-            if (!$check->fetch()) {
-                $this->db->prepare("INSERT INTO Coordinador (idCoordinador) VALUES (:id)")->execute([':id' => $idCoordinador]);
+            if ($idCoordinador) {
+                $check = $this->db->prepare("SELECT 1 FROM Coordinador WHERE idCoordinador = :id");
+                $check->execute([':id' => $idCoordinador]);
+                if (!$check->fetch()) {
+                    $this->db->prepare("INSERT INTO Coordinador (idCoordinador) VALUES (:id)")->execute([':id' => $idCoordinador]);
+                }
             }
 
             $sql = "UPDATE Ciclo SET idCoordinador = :idCoordinador WHERE idCiclo = :idCiclo";
             $stmt = $this->db->prepare($sql);
-            return $stmt->execute([':idCoordinador' => $idCoordinador, ':idCiclo' => $idCiclo]);
+            $result = $stmt->execute([':idCoordinador' => $idCoordinador, ':idCiclo' => $idCiclo]);
+
+            // Limpieza del coordinador anterior
+            if ($idCoordinadorPrevio && $idCoordinadorPrevio != $idCoordinador) {
+                $stmtCheck = $this->db->prepare("SELECT COUNT(*) FROM Ciclo WHERE idCoordinador = :id");
+                $stmtCheck->execute([':id' => $idCoordinadorPrevio]);
+                if ($stmtCheck->fetchColumn() == 0) {
+                    $this->db->prepare("DELETE FROM Coordinador WHERE idCoordinador = :id AND general = 0")->execute([':id' => $idCoordinadorPrevio]);
+                }
+            }
+
+            return $result;
         } catch (PDOException $e) {
             if ($e->getCode() == 23000) {
                 throw new InvalidArgumentException('Ese coordinador ya está asignado a otro ciclo.', 23000);
