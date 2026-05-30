@@ -1,79 +1,99 @@
-<div class="container-fluid py-4 animate-fade-in mt-4 px-md-5 px-3">
-  <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
-    <div class="d-flex align-items-start gap-3">
-      <button type="button" class="btn back-btn mt-1" title="Volver" (click)="irAtras()">
-        <i class="fa-solid fa-arrow-left"></i>
-      </button>
-      <div>
-        <h2 class="fw-bold text-dark mb-1">
-          <i class="fa-solid fa-user-graduate text-primary me-2"></i>
-          {{ nombreModulo ? 'Mis Alumnos' : 'Gestión de Alumnos' }}
-        </h2>
+@if (esCoordinadorSinCiclo) {
+  <div class="container py-5 text-center animate-fade-in mt-4">
+    <div class="card border-0 shadow-sm rounded-4 p-5 mx-auto" style="max-width: 600px; background-color: #fff;">
+      <div class="d-flex align-items-center justify-content-center mx-auto bg-warning bg-opacity-10 text-warning rounded-circle mb-4" style="width: 80px; height: 80px;">
+        <i class="fa-solid fa-triangle-exclamation" style="font-size: 2.5rem;"></i>
+      </div>
+      <h3 class="fw-bold text-dark mb-2">Ningún ciclo coordinado</h3>
+      <p class="text-muted fs-5 mb-4">
+        Actualmente no tienes ningún ciclo formativo asignado para coordinar. 
+        Solo puedes ver y gestionar la información de los ciclos que coordinas.
+      </p>
+      <div class="d-flex justify-content-center gap-3">
+        <button class="btn btn-outline-secondary px-4 py-2" (click)="irAtras()" style="border-radius: 10px;">
+          <i class="fa-solid fa-arrow-left me-2"></i>Volver
+        </button>
+      </div>
+    </div>
+  </div>
+} @else {
+  <div class="container-fluid py-4 animate-fade-in mt-4 px-md-5 px-3">
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+      <div class="d-flex align-items-start gap-3">
+        <button type="button" class="btn back-btn mt-1" title="Volver" (click)="irAtras()">
+          <i class="fa-solid fa-arrow-left"></i>
+        </button>
+        <div>
+          <h2 class="fw-bold text-dark mb-1">
+            <i class="fa-solid fa-user-graduate text-primary me-2"></i>
+            {{ nombreModulo ? 'Mis Alumnos' : 'Gestión de Alumnos' }}
+          </h2>
 
-        <!-- Etiqueta visual del módulo -->
-        @if (moduloObj) {
-        <div class="d-flex align-items-center mt-2 mb-1">
-          <span class="badge rounded-pill text-white px-3 py-2 shadow-sm d-flex align-items-center gap-2"
-            [style.background-color]="moduloObj.color" style="font-size: 0.85rem;">
-            <i class="fa-solid fa-book"></i>
-            Módulo: {{ moduloObj.sigla }} - {{ moduloObj.nombre }}
-          </span>
+          <!-- Etiqueta visual del módulo -->
+          @if (moduloObj) {
+          <div class="d-flex align-items-center mt-2 mb-1">
+            <span class="badge rounded-pill text-white px-3 py-2 shadow-sm d-flex align-items-center gap-2"
+              [style.background-color]="moduloObj.color" style="font-size: 0.85rem;">
+              <i class="fa-solid fa-book"></i>
+              Módulo: {{ moduloObj.sigla }} - {{ moduloObj.nombre }}
+            </span>
+          </div>
+          }
+
+          <p class="text-muted mb-0 mt-2">
+            {{ nombreModulo ? 'Listado de estudiantes inscritos in tu clase' : 'Listado completo de tus estudiantes
+            matriculados en todos tus módulos' }}
+          </p>
+        </div>
+      </div>
+
+      <div class="d-flex gap-2 align-items-center flex-wrap">
+        @if (todosLosCursos.length > 0) {
+        <div class="d-flex align-items-center gap-2 me-md-2">
+          <label for="filtroCurso" class="text-muted mb-0 fw-semibold" style="white-space: nowrap;">
+            <i class="fa-solid fa-filter me-1 text-primary"></i> Filtrar por:
+          </label>
+          <select id="filtroCurso" class="form-select border shadow-sm rounded-3 px-3 bg-white text-dark fw-medium"
+            style="min-width: 210px; max-width: 250px; font-size: 0.85rem; height: 38px; cursor: pointer;"
+            (change)="onFiltroChange($event)">
+            <option value="all">Todos los ciclos y cursos</option>
+            <ng-container *ngFor="let cicloKey of getCiclosKeys()">
+              <option [value]="'ciclo:' + cicloKey" class="fw-bold text-primary">
+                Ciclo: {{ cicloKey }}
+              </option>
+              <option *ngFor="let curso of cursosAgrupados[cicloKey]" [value]="'curso:' + curso.id">
+                &nbsp;&nbsp;{{ curso.nombre }}
+              </option>
+            </ng-container>
+          </select>
         </div>
         }
 
-        <p class="text-muted mb-0 mt-2">
-          {{ nombreModulo ? 'Listado de estudiantes inscritos en tu clase' : 'Listado completo de tus estudiantes
-          matriculados en todos tus módulos' }}
-        </p>
+        @if (puedeGestionarAlumnos) {
+        <button class="btn btn-outline-primary px-4 shadow-sm" (click)="importarExcel()">
+          <i class="fa-solid fa-file-excel me-2"></i> Importar Excel
+        </button>
+        <button class="btn btn-primary px-4 shadow-sm" (click)="crearNuevo()">
+          <i class="fa-solid fa-user-plus me-2"></i> Nuevo Alumno
+        </button>
+        }
       </div>
     </div>
 
-    <div class="d-flex gap-2 align-items-center flex-wrap">
-      @if (todosLosCursos.length > 0) {
-      <div class="d-flex align-items-center gap-2 me-md-2">
-        <label for="filtroCurso" class="text-muted mb-0 fw-semibold" style="white-space: nowrap;">
-          <i class="fa-solid fa-filter me-1 text-primary"></i> Filtrar por:
-        </label>
-        <select id="filtroCurso" class="form-select border shadow-sm rounded-3 px-3 bg-white text-dark fw-medium"
-          style="min-width: 210px; max-width: 250px; font-size: 0.85rem; height: 38px; cursor: pointer;"
-          (change)="onFiltroChange($event)">
-          <option value="all">Todos los ciclos y cursos</option>
-          <ng-container *ngFor="let cicloKey of getCiclosKeys()">
-            <option [value]="'ciclo:' + cicloKey" class="fw-bold text-primary">
-              Ciclo: {{ cicloKey }}
-            </option>
-            <option *ngFor="let curso of cursosAgrupados[cicloKey]" [value]="'curso:' + curso.id">
-              &nbsp;&nbsp;{{ curso.nombre }}
-            </option>
-          </ng-container>
-        </select>
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+      <div class="card-body p-0">
+        @if (dtOptions.ajax) {
+          <app-shared-datatable
+            tableId="tabla-alumnos"
+            [dtOptions]="dtOptions"
+            [columnTitles]="columnTitles"
+            (actionClick)="onTableAction($event)">
+          </app-shared-datatable>
+        }
       </div>
-      }
-
-      @if (puedeGestionarAlumnos) {
-      <button class="btn btn-outline-primary px-4 shadow-sm" (click)="importarExcel()">
-        <i class="fa-solid fa-file-excel me-2"></i> Importar Excel
-      </button>
-      <button class="btn btn-primary px-4 shadow-sm" (click)="crearNuevo()">
-        <i class="fa-solid fa-user-plus me-2"></i> Nuevo Alumno
-      </button>
-      }
     </div>
   </div>
-
-  <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
-    <div class="card-body p-0">
-      @if (dtOptions.ajax) {
-        <app-shared-datatable
-          tableId="tabla-alumnos"
-          [dtOptions]="dtOptions"
-          [columnTitles]="columnTitles"
-          (actionClick)="onTableAction($event)">
-        </app-shared-datatable>
-      }
-    </div>
-  </div>
-</div>
+}
 
 @if (puedeGestionarAlumnos) {
 <!-- Modal de confirmación de borrado -->

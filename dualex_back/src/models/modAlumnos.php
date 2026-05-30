@@ -114,6 +114,23 @@ class ModAlumnos {
             $stmtA->bindValue(':idCurso', $datos['idCurso'], PDO::PARAM_INT);
             $stmtA->execute();
 
+            // Asignación automática de los módulos del curso al alumno
+            $sqlMC = "SELECT idModulo FROM Modulo_Curso WHERE idCurso = :idCurso";
+            $stmtMC = $this->db->prepare($sqlMC);
+            $stmtMC->execute([':idCurso' => $datos['idCurso']]);
+            $modulos = $stmtMC->fetchAll(PDO::FETCH_COLUMN);
+
+            if (!empty($modulos)) {
+                $sqlMAC = "INSERT IGNORE INTO Modulo_Alumno_Cursa (idModulo, idAlumno) VALUES (:idModulo, :idAlumno)";
+                $stmtMAC = $this->db->prepare($sqlMAC);
+                foreach ($modulos as $idModulo) {
+                    $stmtMAC->execute([
+                        ':idModulo' => $idModulo,
+                        ':idAlumno' => $idUsuario
+                    ]);
+                }
+            }
+
             // Gestión de la empresa (tabla intermedia)
             if (isset($datos['idEmpresa']) && !empty($datos['idEmpresa'])) {
                 $sqlEA = "INSERT INTO Empresa_Alumno (idEmpresa, idAlumno) VALUES (:idEmpresa, :idAlumno)";
@@ -143,6 +160,13 @@ class ModAlumnos {
         try {
             $this->db->beginTransaction();
 
+            // Obtener el curso anterior antes de actualizar
+            $sqlGetOld = "SELECT idCurso FROM Alumno WHERE idAlumno = :id";
+            $stmtGetOld = $this->db->prepare($sqlGetOld);
+            $stmtGetOld->execute([':id' => $id]);
+            $oldCursoRow = $stmtGetOld->fetch(PDO::FETCH_ASSOC);
+            $oldCurso = $oldCursoRow ? (int)$oldCursoRow['idCurso'] : null;
+
             $sqlU = "UPDATE Usuario SET nombre = :nombre, apellidos = :apellidos, correo = :correo WHERE idUsuario = :id";
             $stmtU = $this->db->prepare($sqlU);
             $stmtU->execute([
@@ -167,6 +191,58 @@ class ModAlumnos {
             $stmtA->bindValue(':repetidor', $repetidor, PDO::PARAM_STR);
             $stmtA->bindValue(':idCurso', $datos['idCurso'], PDO::PARAM_INT);
             $stmtA->execute();
+
+            // Si el curso ha cambiado, actualizamos los módulos matriculados
+            if ($oldCurso !== null && $oldCurso !== (int)$datos['idCurso']) {
+                // Eliminar módulos del curso anterior
+                $sqlDelOld = "DELETE FROM Modulo_Alumno_Cursa 
+                              WHERE idAlumno = :idAlumno 
+                                AND idModulo IN (SELECT idModulo FROM Modulo_Curso WHERE idCurso = :oldCurso)";
+                $stmtDelOld = $this->db->prepare($sqlDelOld);
+                $stmtDelOld->execute([':idAlumno' => $id, ':oldCurso' => $oldCurso]);
+
+                // Asignar módulos del nuevo curso
+                $sqlMC = "SELECT idModulo FROM Modulo_Curso WHERE idCurso = :idCurso";
+                $stmtMC = $this->db->prepare($sqlMC);
+                $stmtMC->execute([':idCurso' => $datos['idCurso']]);
+                $newModulos = $stmtMC->fetchAll(PDO::FETCH_COLUMN);
+
+                if (!empty($newModulos)) {
+                    $sqlMAC = "INSERT IGNORE INTO Modulo_Alumno_Cursa (idModulo, idAlumno) VALUES (:idModulo, :idAlumno)";
+                    $stmtMAC = $this->db->prepare($sqlMAC);
+                    foreach ($newModulos as $idModulo) {
+                        $stmtMAC->execute([
+                            ':idModulo' => $idModulo,
+                            ':idAlumno' => $id
+                        ]);
+                    }
+                }
+            } else {
+                // Si el curso no cambió, asegurar que al menos tenga los módulos del curso matriculados
+                $sqlCount = "SELECT COUNT(*) FROM Modulo_Alumno_Cursa WHERE idAlumno = :idAlumno";
+                $stmtCount = $this->db->prepare($sqlCount);
+                $stmtCount->execute([':idAlumno' => $id]);
+                $hasModules = $stmtCount->fetchColumn() > 0;
+
+                if (!$hasModules) {
+                    $sqlMC = "SELECT idModulo FROM Modulo_Curso WHERE idCurso = :idCurso";
+                    $stmtMC = $this->db->prepare($sqlMC);
+                    $stmtMC->execute([':idCurso' => $datos['idCurso']]);
+                    $newModulos = $stmtMC->fetchAll(PDO::FETCH_COLUMN);
+
+                    if (!empty($newModulos)) {
+                        $sqlMAC = "INSERT IGNORE INTO Modulo_Alumno_Cursa (idModulo, idAlumno) VALUES (:idModulo, :idAlumno)";
+                        $stmtMAC = $this->db->prepare($sqlMAC);
+                        foreach ($newModulos as $idModulo) {
+                            $stmtMAC->execute([
+                                ':idModulo' => $idModulo,
+                                ':idAlumno' => $id
+                            ]);
+                        }
+                    }
+                }
+            }
+
             // Primero borramos la relación anterior
             $sqlDelete = "DELETE FROM Empresa_Alumno WHERE idAlumno = :id";
             $stmtDel = $this->db->prepare($sqlDelete);
@@ -231,20 +307,27 @@ class ModAlumnos {
         $length = (int)($params['length'] ?? 10);
         $search = $params['search']['value'] ?? '';
 
+        $conditions = [];
+        $binds = [];
+
+        $numTareasQuery = "(SELECT COUNT(*) FROM Tarea t WHERE t.idAlumno = a.idAlumno AND t.calificacion IS NULL AND t.fecha_fin >= NOW())";
+        if (!empty($idModulo) && $idModulo !== 'null') {
+            $numTareasQuery = "(SELECT COUNT(*) FROM Tarea t 
+                                JOIN Modulo_Tarea_Revision mtr ON t.idTarea = mtr.idTarea 
+                                WHERE t.idAlumno = a.idAlumno AND mtr.idModulo = :idModuloForCount AND t.calificacion IS NULL AND t.fecha_fin >= NOW())";
+            $binds[':idModuloForCount'] = (int)$idModulo;
+        }
+
         // Base de la consulta con DISTINCT para evitar duplicados
         $sql = "SELECT DISTINCT idUsuario as id, u.nombre, apellidos, correo as email, 
                        DNI as dni, NUSS as nuss, NIA as nia, telefono, a.idCurso,
                        CAST(repetidor AS UNSIGNED) as repetidor,
                        c.nombre as nombreCurso, idEmpresa,
-                       (SELECT COUNT(*) FROM Tarea t WHERE t.idAlumno = a.idAlumno) as numTareas
+                       " . $numTareasQuery . " as numTareas
                 FROM Usuario u
                 INNER JOIN Alumno a ON u.idUsuario = a.idAlumno 
                 LEFT JOIN Curso c ON a.idCurso = c.idCurso
-                 LEFT JOIN Empresa_Alumno ea ON a.idAlumno = ea.idAlumno ";
-
-        // Construcción de condiciones
-        $conditions = [];
-        $binds = [];
+                LEFT JOIN Empresa_Alumno ea ON a.idAlumno = ea.idAlumno ";
         $joinClause = "";
         $joinMac = false;
         $joinMp = false;
@@ -332,7 +415,9 @@ class ModAlumnos {
         $sqlData = $sql . $joinClause . $whereClause . $orderBy . " LIMIT :start, :length";
         $stmtData = $this->db->prepare($sqlData);
         foreach ($binds as $key => $val) {
-            $stmtData->bindValue($key, $val, is_int($val) ? PDO::PARAM_INT : PDO::PARAM_STR);
+            if (strpos($sqlData, $key) !== false) {
+                $stmtData->bindValue($key, $val, is_int($val) ? PDO::PARAM_INT : PDO::PARAM_STR);
+            }
         }
         $stmtData->bindValue(':start', (int)$start, PDO::PARAM_INT);
         $stmtData->bindValue(':length', (int)$length, PDO::PARAM_INT);
@@ -345,7 +430,9 @@ class ModAlumnos {
                      LEFT JOIN Curso c ON a.idCurso = c.idCurso " . $joinClause . $whereClause;
         $stmtCount = $this->db->prepare($sqlCount);
         foreach ($binds as $key => $val) {
-            $stmtCount->bindValue($key, $val, is_int($val) ? PDO::PARAM_INT : PDO::PARAM_STR);
+            if (strpos($sqlCount, $key) !== false) {
+                $stmtCount->bindValue($key, $val, is_int($val) ? PDO::PARAM_INT : PDO::PARAM_STR);
+            }
         }
         $stmtCount->execute();
         $count = $stmtCount->fetchColumn();
@@ -367,7 +454,7 @@ class ModAlumnos {
                        DNI as dni, NUSS as nuss, NIA as nia, telefono, a.idCurso,
                        CAST(repetidor AS UNSIGNED) as repetidor,
                        c.nombre as nombreCurso, idEmpresa,
-                       (SELECT COUNT(*) FROM Tarea t WHERE t.idAlumno = a.idAlumno) as numTareas
+                       (SELECT COUNT(*) FROM Tarea t WHERE t.idAlumno = a.idAlumno AND t.calificacion IS NULL AND t.fecha_fin >= NOW()) as numTareas
                 FROM Usuario u
                 INNER JOIN Alumno a ON u.idUsuario = a.idAlumno
                 LEFT JOIN Curso c ON a.idCurso = c.idCurso
@@ -526,12 +613,13 @@ class ModAlumnos {
         $rows = $sheet->toArray(null, true, true, true);
 
         $imported = 0;
+        $skipped = 0;
         $errors = [];
         $rowNumber = 1;
 
         // Sacamos cabecera (primera fila)
         $header = array_map(function($h) {
-            return strtolower(trim($h));
+            return strtolower(trim($h ?? ''));
         }, $rows[1]);
 
         unset($rows[1]); // quitamos cabecera
@@ -563,7 +651,7 @@ class ModAlumnos {
                 continue;
             }
 
-            // Validación básica (igual que CSV)
+            // Validación básica
             if ($nombre === '' || $apellidos === '' || $email === '' ||
                 $dni === '' || $nia === '' || $telefono === '') {
 
@@ -587,16 +675,30 @@ class ModAlumnos {
                 'idEmpresa' => null
             ];
 
+            // Validar
+            $validacionErrores = $this->validar($studentData);
+            if (!empty($validacionErrores)) {
+                $errors[] = "Fila $rowNumber: " . implode(" ", $validacionErrores);
+                continue;
+            }
+
             try {
                 $this->crear($studentData);
                 $imported++;
             } catch (Exception $e) {
-                $errors[] = "Fila $rowNumber: " . $e->getMessage();
+                $msg = $e->getMessage();
+                $code = $e->getCode();
+                if (strpos($msg, '1062') !== false || $code == 23000 || $code == '23000') {
+                    $skipped++;
+                } else {
+                    $errors[] = "Fila $rowNumber: " . $msg;
+                }
             }
         }
 
         return [
             'imported' => $imported,
+            'skipped' => $skipped,
             'errors' => $errors
         ];
     }
