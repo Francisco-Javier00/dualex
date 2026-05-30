@@ -25,7 +25,7 @@ export class TareasTodosComponent implements OnInit {
   @ViewChild(DatatableComponent) datatable!: DatatableComponent;
 
   dtOptions: Config = {};
-  columnTitles = ['Nombre', 'Apellidos', 'Correo', 'Curso', ''];
+  columnTitles = ['Nombre', 'Apellidos', 'Correo', 'Curso', 'Acciones'];
   cargando = true;
 
   ngOnInit(): void {
