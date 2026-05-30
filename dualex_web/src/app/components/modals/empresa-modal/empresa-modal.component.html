@@ -92,8 +92,8 @@
                 <hr class="opacity-10 mb-2">
                 <p class="small fw-bold text-uppercase opacity-50 mb-0">Contactos de la Empresa</p>
               </div>
-              <button type="button" class="btn btn-outline-success btn-sm rounded-circle" (click)="addContacto()" title="Añadir contacto adicional" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
-                <i class="fa-solid fa-plus"></i>
+              <button type="button" class="btn btn-outline-success btn-sm rounded-pill d-flex align-items-center gap-2 px-3" (click)="addContacto()">
+                <i class="fa-solid fa-plus"></i> Añadir contacto adicional
               </button>
             </div>
 
@@ -153,47 +153,54 @@
             <!-- Contactos Adicionales (Bucle) -->
             <div formArrayName="contactosAdicionales" class="col-12">
               @for (group of contactosAdicionales.controls; track $index) {
-                <div [formGroupName]="$index" class="row g-3 mt-1 pb-3 border-bottom animate-fade-in">
-                  <div class="col-md-6">
-                    <label class="form-label small fw-bold text-uppercase opacity-75">Nombre Contacto {{$index + 1}}</label>
-                    <div class="input-group shadow-sm rounded-3 overflow-hidden border" [class.is-invalid]="group.get('contacto')?.invalid && (group.get('contacto')?.dirty || group.get('contacto')?.touched)">
-                      <span class="input-group-text bg-white border-0"><i class="fa-solid fa-user text-muted"></i></span>
-                      <input type="text" formControlName="contacto" class="form-control border-0 px-3" 
-                             [class.is-invalid]="group.get('contacto')?.invalid && (group.get('contacto')?.dirty || group.get('contacto')?.touched)"
-                             placeholder="Ej: Pedro Gómez">
+                <div [formGroupName]="$index" class="bg-light p-3 rounded-4 border mb-3 position-relative animate-fade-in">
+                  
+                  <button type="button" class="btn btn-sm btn-outline-danger border-0 position-absolute top-0 end-0 mt-2 me-2" 
+                          (click)="removeContacto($index)" title="Eliminar contacto" style="z-index: 10;">
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+
+                  <h6 class="small fw-bold text-uppercase opacity-75 mb-3 text-primary">
+                    <i class="fa-solid fa-user-plus me-1"></i> Contacto Adicional {{$index + 1}}
+                  </h6>
+
+                  <div class="row g-3">
+                    <div class="col-md-6">
+                      <label class="form-label small fw-bold text-uppercase opacity-75">Nombre</label>
+                      <div class="input-group shadow-sm rounded-3 overflow-hidden border bg-white" [class.is-invalid]="group.get('contacto')?.invalid && (group.get('contacto')?.dirty || group.get('contacto')?.touched)">
+                        <span class="input-group-text bg-white border-0"><i class="fa-solid fa-user text-muted"></i></span>
+                        <input type="text" formControlName="contacto" class="form-control border-0 px-3 bg-white" 
+                               [class.is-invalid]="group.get('contacto')?.invalid && (group.get('contacto')?.dirty || group.get('contacto')?.touched)"
+                               placeholder="Ej: Pedro Gómez">
+                      </div>
                     </div>
-                  </div>
-                  <div class="col-md-6">
-                    <label class="form-label small fw-bold text-uppercase opacity-75">Cargo / Puesto</label>
-                    <div class="input-group shadow-sm rounded-3 overflow-hidden border" [class.is-invalid]="group.get('cargo')?.invalid && (group.get('cargo')?.dirty || group.get('cargo')?.touched)">
-                      <span class="input-group-text bg-white border-0"><i class="fa-solid fa-briefcase text-muted"></i></span>
-                      <input type="text" formControlName="cargo" class="form-control border-0 px-3" 
-                             [class.is-invalid]="group.get('cargo')?.invalid && (group.get('cargo')?.dirty || group.get('cargo')?.touched)"
-                             placeholder="Ej: Tutor de Empresa, etc.">
+                    <div class="col-md-6">
+                      <label class="form-label small fw-bold text-uppercase opacity-75">Cargo / Puesto</label>
+                      <div class="input-group shadow-sm rounded-3 overflow-hidden border bg-white" [class.is-invalid]="group.get('cargo')?.invalid && (group.get('cargo')?.dirty || group.get('cargo')?.touched)">
+                        <span class="input-group-text bg-white border-0"><i class="fa-solid fa-briefcase text-muted"></i></span>
+                        <input type="text" formControlName="cargo" class="form-control border-0 px-3 bg-white" 
+                               [class.is-invalid]="group.get('cargo')?.invalid && (group.get('cargo')?.dirty || group.get('cargo')?.touched)"
+                               placeholder="Ej: Tutor de Empresa, etc.">
+                      </div>
                     </div>
-                  </div>
-                  <div class="col-md-5">
-                    <label class="form-label small fw-bold text-uppercase opacity-75">Teléfono {{$index + 1}}</label>
-                    <div class="input-group shadow-sm rounded-3 overflow-hidden border" [class.is-invalid]="group.get('numeroContacto')?.invalid && (group.get('numeroContacto')?.dirty || group.get('numeroContacto')?.touched)">
-                      <span class="input-group-text bg-white border-0"><i class="fa-solid fa-phone text-muted"></i></span>
-                      <input type="text" formControlName="numeroContacto" class="form-control border-0 px-3" 
-                             [class.is-invalid]="group.get('numeroContacto')?.invalid && (group.get('numeroContacto')?.dirty || group.get('numeroContacto')?.touched)"
-                             placeholder="Ej: 600111222">
+                    <div class="col-md-6">
+                      <label class="form-label small fw-bold text-uppercase opacity-75">Teléfono</label>
+                      <div class="input-group shadow-sm rounded-3 overflow-hidden border bg-white" [class.is-invalid]="group.get('numeroContacto')?.invalid && (group.get('numeroContacto')?.dirty || group.get('numeroContacto')?.touched)">
+                        <span class="input-group-text bg-white border-0"><i class="fa-solid fa-phone text-muted"></i></span>
+                        <input type="text" formControlName="numeroContacto" class="form-control border-0 px-3 bg-white" 
+                               [class.is-invalid]="group.get('numeroContacto')?.invalid && (group.get('numeroContacto')?.dirty || group.get('numeroContacto')?.touched)"
+                               placeholder="Ej: 600111222">
+                      </div>
                     </div>
-                  </div>
-                  <div class="col-md-6">
-                    <label class="form-label small fw-bold text-uppercase opacity-75">Correo {{$index + 1}}</label>
-                    <div class="input-group shadow-sm rounded-3 overflow-hidden border" [class.is-invalid]="group.get('correo')?.invalid && (group.get('correo')?.dirty || group.get('correo')?.touched)">
-                      <span class="input-group-text bg-white border-0"><i class="fa-solid fa-envelope text-muted"></i></span>
-                      <input type="email" formControlName="correo" class="form-control border-0 px-3" 
-                             [class.is-invalid]="group.get('correo')?.invalid && (group.get('correo')?.dirty || group.get('correo')?.touched)"
-                             placeholder="Ej: pedro@empresa.com">
+                    <div class="col-md-6">
+                      <label class="form-label small fw-bold text-uppercase opacity-75">Correo</label>
+                      <div class="input-group shadow-sm rounded-3 overflow-hidden border bg-white" [class.is-invalid]="group.get('correo')?.invalid && (group.get('correo')?.dirty || group.get('correo')?.touched)">
+                        <span class="input-group-text bg-white border-0"><i class="fa-solid fa-envelope text-muted"></i></span>
+                        <input type="email" formControlName="correo" class="form-control border-0 px-3 bg-white" 
+                               [class.is-invalid]="group.get('correo')?.invalid && (group.get('correo')?.dirty || group.get('correo')?.touched)"
+                               placeholder="Ej: pedro@empresa.com">
+                      </div>
                     </div>
-                  </div>
-                  <div class="col-md-1 d-flex align-items-end pb-1">
-                    <button type="button" class="btn btn-outline-danger btn-sm border-0" (click)="removeContacto($index)" title="Eliminar contacto">
-                      <i class="fa-solid fa-trash"></i>
-                    </button>
                   </div>
                 </div>
               }
