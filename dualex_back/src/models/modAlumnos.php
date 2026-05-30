@@ -350,25 +350,38 @@ class ModAlumnos {
             $conditions[] = "mac.idModulo = :idModulo";
             $binds[':idModulo'] = (int)$idModulo;
         } 
-        // Si es COORDINADOR, aplicamos su filtro de ciclo SIEMPRE (es el mas restrictivo para el)
-        if (strtoupper($rol) === 'COORDINADOR' && !empty($idUsuario)) {
-            $joinClause .= " INNER JOIN Ciclo cic ON c.idCiclo = cic.idCiclo ";
-            $conditions[] = "cic.idCoordinador = :idUsuario";
-            $binds[':idUsuario'] = (int)$idUsuario;
-            
-            // Si además ha filtrado por Curso específicos desde el frontal, los añadimos como filtro extra
-            if (!empty($idsCursos) && is_array($idsCursos)) {
-                $idsValidados = array_filter(array_map('intval', $idsCursos));
-                if (!empty($idsValidados)) {
-                    $conditions[] = "a.idCurso IN (" . implode(',', $idsValidados) . ")";
-                }
-            }
-        }
-        // Si NO es coordinador pero hay una lista de Curso (caso Profesor con seleccion manual)
-        else if (!empty($idsCursos) && is_array($idsCursos)) {
+        // Filtro de Curso manual desde el frontal
+        if (!empty($idsCursos) && is_array($idsCursos)) {
             $idsValidados = array_filter(array_map('intval', $idsCursos));
             if (!empty($idsValidados)) {
                 $conditions[] = "a.idCurso IN (" . implode(',', $idsValidados) . ")";
+            }
+        }
+
+        // Si es COORDINADOR o COORDINADOR_GENERAL
+        if (in_array(strtoupper($rol), ['COORDINADOR', 'COORDINADOR_GENERAL']) && !empty($idUsuario)) {
+            $esProfesorDelModulo = false;
+            if (!empty($idModulo) && $idModulo !== 'null') {
+                $stmtChk = $this->db->prepare("SELECT 1 FROM Modulo_Profesor WHERE idModulo = :idModChk AND idProfesor = :idProfChk LIMIT 1");
+                $stmtChk->execute([':idModChk' => (int)$idModulo, ':idProfChk' => (int)$idUsuario]);
+                $esProfesorDelModulo = (bool)$stmtChk->fetchColumn();
+            }
+
+            if ($esProfesorDelModulo) {
+                // Si es profesor del módulo que está filtrando, ve los Alumnos como Profesor
+                $joinMac = true;
+                $joinMp = true;
+                $conditions[] = "mp.idProfesor = :idUsuario";
+                $binds[':idUsuario'] = (int)$idUsuario;
+            } else {
+                if (strtoupper($rol) === 'COORDINADOR_GENERAL') {
+                    // El coordinador general no se restringe por idCoordinador
+                } else {
+                    // Coordinador normal: se restringe a los ciclos que coordina
+                    $joinClause .= " INNER JOIN Ciclo cic ON c.idCiclo = cic.idCiclo ";
+                    $conditions[] = "cic.idCoordinador = :idUsuario";
+                    $binds[':idUsuario'] = (int)$idUsuario;
+                }
             }
         }
         // Si es Profesor, ve los Alumnos de los modulos que imparte

@@ -183,8 +183,12 @@ export class AlumnosComponent implements OnInit, OnDestroy {
 
           this.cursosService.getCursosByProfesor(profesor.id).subscribe({
             next: (cursos: CursoDTO[]) => {
-              // Only keep courses whose siglasCiclo is coordinated by the coordinator
-              const cursosFiltrados = cursos.filter(c => c.siglasCiclo && ciclosCoordinados.includes(c.siglasCiclo));
+              // Only keep courses whose siglasCiclo is coordinated by the coordinator, UNLESS they are general coordinators OR viewing a specific module
+              let cursosFiltrados = cursos;
+              const hasModuloId = this.route.snapshot.queryParamMap.has('moduloId');
+              if (!usuarioActual.esGeneral && !hasModuloId) {
+                  cursosFiltrados = cursos.filter(c => c.siglasCiclo && ciclosCoordinados.includes(c.siglasCiclo));
+              }
 
               this.todosLosCursos = cursosFiltrados;
               this.cursosGestionados = cursosFiltrados.map(c => c.id);
@@ -250,12 +254,32 @@ export class AlumnosComponent implements OnInit, OnDestroy {
         this.modulosService.getModuloById(Number(this.moduloId)).subscribe((mod: any) => {
           this.nombreModulo = mod.nombre;
           this.moduloObj = mod;
-        });
-      }
 
-      setTimeout(() => {
-        this.inicializarTabla();
-      }, 100);
+          // Si el módulo tiene ciclos asignados, filtramos el desplegable por ciclo
+          if (mod.ciclos) {
+            const moduloCiclos = mod.ciclos.split(',').map((c: string) => c.trim().toUpperCase());
+            
+            // Filtramos para mostrar solo los cursos que pertenecen a los ciclos donde se imparte el módulo
+            this.todosLosCursos = this.todosLosCursos.filter(c => c.siglasCiclo && moduloCiclos.includes(c.siglasCiclo.toUpperCase()));
+            
+            // Re-agrupar para actualizar las opciones del HTML
+            this.cursosAgrupados = {};
+            this.todosLosCursos.forEach(c => {
+              const cicloKey = c.siglasCiclo || 'Sin ciclo';
+              if (!this.cursosAgrupados[cicloKey]) {
+                this.cursosAgrupados[cicloKey] = [];
+              }
+              this.cursosAgrupados[cicloKey].push(c);
+            });
+          }
+
+          this.inicializarTabla();
+        });
+      } else {
+        setTimeout(() => {
+          this.inicializarTabla();
+        }, 100);
+      }
     });
   }
 
@@ -284,9 +308,11 @@ export class AlumnosComponent implements OnInit, OnDestroy {
           dataTablesParameters.emailProfesor = usuarioActual.email;
         }
 
+        // Enviar filtros de curso solo si no estamos viendo un módulo en concreto (donde queremos ver todo el módulo por defecto)
+        // O si el usuario ha seleccionado explícitamente un filtro en el desplegable (cursosFiltradosIds > 0)
         if (this.cursosFiltradosIds.length > 0) {
           dataTablesParameters.idsCursos = this.cursosFiltradosIds;
-        } else if (this.cursosGestionados.length > 0) {
+        } else if (this.cursosGestionados.length > 0 && !this.moduloId) {
           dataTablesParameters.idsCursos = this.cursosGestionados;
         }
 

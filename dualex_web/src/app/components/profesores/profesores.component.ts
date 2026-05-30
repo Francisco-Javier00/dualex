@@ -76,7 +76,18 @@ export class ProfesoresComponent implements OnInit {
         { data: 'nombre', width: '15%', responsivePriority: 2 },
         { data: 'apellidos', width: '18%', responsivePriority: 3 },
         { data: 'correo', width: '22%', responsivePriority: 4 },
-        { data: 'rol', className: 'text-nowrap', width: '10%', responsivePriority: 5 },
+        { 
+          data: 'rol', 
+          className: 'text-nowrap', 
+          width: '10%', 
+          responsivePriority: 5,
+          render: (data: any, type: any, row: any) => {
+            if (data === 'COORDINADOR' && row.ciclos) {
+              return `COORDINADOR ${row.ciclos}`;
+            }
+            return data;
+          }
+        },
         ...(this.puedeEditar ? [{
           data: null,
           className: 'text-center align-middle',

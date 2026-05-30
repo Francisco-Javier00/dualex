@@ -108,16 +108,48 @@ class ModActividades {
         $start = isset($params['start']) ? (int)$params['start'] : 0;
         $length = isset($params['length']) ? (int)$params['length'] : 10;
         $searchVal = isset($params['search']['value']) ? trim($params['search']['value']) : '';
+        $rol = $params['rol'] ?? '';
+        $email = $params['email'] ?? '';
+
+        $binds = [];
+        $whereRol = "";
+
+        if (($rol === 'COORDINADOR' || $rol === 'COORDINADOR_GENERAL') && !empty($email)) {
+            $whereRol = " WHERE EXISTS (
+                            SELECT 1 
+                            FROM Modulo_Actividad ma2
+                            JOIN Modulo_Curso mc ON ma2.idModulo = mc.idModulo
+                            JOIN Curso cu ON mc.idCurso = cu.idCurso
+                            JOIN Ciclo c ON cu.idCiclo = c.idCiclo
+                            JOIN Usuario u ON c.idCoordinador = u.idUsuario
+                            WHERE ma2.idActividad = a.idActividad 
+                              AND u.correo = :email
+                          )";
+            $binds[':email'] = $email;
+        } elseif ($rol === 'PROFESOR' && !empty($email)) {
+            $whereRol = " WHERE EXISTS (
+                            SELECT 1 
+                            FROM Modulo_Actividad ma2
+                            JOIN Modulo_Profesor mp ON ma2.idModulo = mp.idModulo
+                            JOIN Usuario u ON mp.idProfesor = u.idUsuario
+                            WHERE ma2.idActividad = a.idActividad 
+                              AND u.correo = :email
+                          )";
+            $binds[':email'] = $email;
+        }
+
 
         // 1. Obtener el número total de registros sin filtrar
-        $queryTotal = "SELECT COUNT(*) as total FROM " . $this->table_name;
+        $queryTotal = "SELECT COUNT(*) as total FROM " . $this->table_name . " a " . $whereRol;
         $stmtTotal = $this->conn->prepare($queryTotal);
+        if (!empty($email) && strpos($whereRol, ':email') !== false) {
+            $stmtTotal->bindValue(':email', $email, PDO::PARAM_STR);
+        }
         $stmtTotal->execute();
         $totalRecords = (int)$stmtTotal->fetch(PDO::FETCH_ASSOC)['total'];
 
         // 2. Construir la consulta principal con filtros de búsqueda
         $whereClause = "";
-        $binds = [];
         if ($searchVal !== '') {
             $whereClause = " HAVING (a.titulo LIKE :search1 OR a.descripcion LIKE :search2 OR modulo LIKE :search3)";
             $binds[':search1'] = '%' . $searchVal . '%';
@@ -143,6 +175,7 @@ class ModActividades {
                   FROM " . $this->table_name . " a
                   LEFT JOIN Modulo_Actividad ma ON a.idActividad = ma.idActividad
                   LEFT JOIN Modulo m ON ma.idModulo = m.idModulo
+                  $whereRol
                   GROUP BY a.idActividad
                   $whereClause
                   ORDER BY $orderField $orderDir
@@ -164,16 +197,22 @@ class ModActividades {
         // 4. Calcular el total de registros filtrados
         $filteredRecords = $totalRecords;
         if ($searchVal !== '') {
-            $queryFiltered = "SELECT COUNT(DISTINCT a.idActividad) as total
-                              FROM " . $this->table_name . " a
-                              LEFT JOIN Modulo_Actividad ma ON a.idActividad = ma.idActividad
-                              LEFT JOIN Modulo m ON ma.idModulo = m.idModulo
-                              WHERE a.titulo LIKE :search1 OR a.descripcion LIKE :search2 OR m.nombre LIKE :search3 OR m.sigla LIKE :search4";
+            $queryFiltered = "SELECT COUNT(*) as total FROM (
+                                SELECT a.idActividad, a.titulo, a.descripcion, IFNULL(GROUP_CONCAT(m.sigla SEPARATOR ', '), 'Sin módulos') as modulo
+                                FROM " . $this->table_name . " a
+                                LEFT JOIN Modulo_Actividad ma ON a.idActividad = ma.idActividad
+                                LEFT JOIN Modulo m ON ma.idModulo = m.idModulo
+                                $whereRol
+                                GROUP BY a.idActividad
+                                HAVING (a.titulo LIKE :search1 OR a.descripcion LIKE :search2 OR modulo LIKE :search3)
+                              ) as sub";
             $stmtFiltered = $this->conn->prepare($queryFiltered);
+            if (!empty($email) && strpos($whereRol, ':email') !== false) {
+                $stmtFiltered->bindValue(':email', $email, PDO::PARAM_STR);
+            }
             $stmtFiltered->bindValue(':search1', '%' . $searchVal . '%', PDO::PARAM_STR);
             $stmtFiltered->bindValue(':search2', '%' . $searchVal . '%', PDO::PARAM_STR);
             $stmtFiltered->bindValue(':search3', '%' . $searchVal . '%', PDO::PARAM_STR);
-            $stmtFiltered->bindValue(':search4', '%' . $searchVal . '%', PDO::PARAM_STR);
             $stmtFiltered->execute();
             $filteredRecords = (int)$stmtFiltered->fetch(PDO::FETCH_ASSOC)['total'];
         }

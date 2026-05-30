@@ -104,8 +104,9 @@ class ConModulos extends BaseController {
         $params = json_decode($json, true);
 
         // Si el usuario es COORDINADOR, pasamos su correo de la sesión para filtrar sus ciclos de forma segura
-        if ($this->user && isset($this->user['roles']['dualex']) && strtoupper($this->user['roles']['dualex']) === 'COORDINADOR') {
-            $params['email'] = $this->user['email'] ?? null;
+        $rolesUpper = array_map('strtoupper', $this->user['data']['roles'] ?? []);
+        if (in_array('COORDINADOR_DUALEX', $rolesUpper) || in_array('COORDINADOR_GENERAL_DUALEX', $rolesUpper)) {
+            $params['email'] = $this->user['data']['email'] ?? null;
         }
 
         try {
@@ -193,7 +194,7 @@ class ConModulos extends BaseController {
             // Protección contra acceso a offset en null si el usuario no está autenticado
             $emailToken = null;
             if ($this->user) {
-                $emailToken = $this->user['email'] ?? ($this->user['correo'] ?? null);
+                $emailToken = $this->user['data']['email'] ?? null;
             }
             
             $emailProfesor = $_GET['emailProfesor'] ?? $emailToken;

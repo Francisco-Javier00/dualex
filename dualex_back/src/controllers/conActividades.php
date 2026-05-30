@@ -66,16 +66,22 @@ class ConActividades extends BaseController {
         $this->sendResponse($data);
     }
 
-    /**
-     * Obtiene las actividades formateadas para DataTables.
-     * 
-     * @return json Respuesta JSON con los datos o un error (vía sendResponse o sendError)
-     */
     public function obtenerDataTables() {
         $this->checkRole(['PROFESOR', 'COORDINADOR']);
         // Capturar parámetros de la petición (JSON POST)
         $json = file_get_contents('php://input');
         $params = json_decode($json, true) ?? [];
+
+        // Inyectar contexto de usuario para filtrar
+        $rolesUpper = array_map('strtoupper', $this->user['data']['roles'] ?? []);
+        $params['email'] = $this->user['data']['email'] ?? null;
+        if (in_array('COORDINADOR_GENERAL_DUALEX', $rolesUpper)) {
+            $params['rol'] = 'COORDINADOR_GENERAL';
+        } elseif (in_array('COORDINADOR_DUALEX', $rolesUpper)) {
+            $params['rol'] = 'COORDINADOR';
+        } else {
+            $params['rol'] = 'PROFESOR';
+        }
         
         $data = $this->modelo->obtenerDataTables($params);
         $this->sendResponse($data);
