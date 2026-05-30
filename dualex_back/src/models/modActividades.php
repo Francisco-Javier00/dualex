@@ -150,7 +150,6 @@ class ModActividades {
 
         // 2. Construir la consulta principal con filtros de búsqueda
         $whereClause = "";
-        $binds = [];
         if ($searchVal !== '') {
             $whereClause = " HAVING (a.titulo LIKE :search1 OR a.descripcion LIKE :search2 OR modulo LIKE :search3)";
             $binds[':search1'] = '%' . $searchVal . '%';
