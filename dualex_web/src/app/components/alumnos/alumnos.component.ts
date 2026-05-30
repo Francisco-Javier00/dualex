@@ -186,7 +186,7 @@ export class AlumnosComponent implements OnInit, OnDestroy {
               // Only keep courses whose siglasCiclo is coordinated by the coordinator, UNLESS they are general coordinators OR viewing a specific module
               let cursosFiltrados = cursos;
               const hasModuloId = this.route.snapshot.queryParamMap.has('moduloId');
-              if (!usuarioActual.esGeneral && !hasModuloId) {
+              if (ciclosCoordinados.length > 0 && !hasModuloId) {
                   cursosFiltrados = cursos.filter(c => c.siglasCiclo && ciclosCoordinados.includes(c.siglasCiclo));
               }
 

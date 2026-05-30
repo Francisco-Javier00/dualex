@@ -359,13 +359,17 @@ class ModAlumnos {
         }
 
         // Si es COORDINADOR o COORDINADOR_GENERAL
-        if (in_array(strtoupper($rol), ['COORDINADOR', 'COORDINADOR_GENERAL']) && !empty($idUsuario)) {
-            $esProfesorDelModulo = false;
-            if (!empty($idModulo) && $idModulo !== 'null') {
-                $stmtChk = $this->db->prepare("SELECT 1 FROM Modulo_Profesor WHERE idModulo = :idModChk AND idProfesor = :idProfChk LIMIT 1");
-                $stmtChk->execute([':idModChk' => (int)$idModulo, ':idProfChk' => (int)$idUsuario]);
-                $esProfesorDelModulo = (bool)$stmtChk->fetchColumn();
-            }
+        if (in_array(strtoupper($rol), ['COORDINADOR', 'COORDINADOR_GENERAL'])) {
+            if (empty($idUsuario)) {
+                // Failsafe: Si no encontramos el usuario en la BD, no devolvemos nada
+                $conditions[] = "1 = 0";
+            } else {
+                $esProfesorDelModulo = false;
+                if (!empty($idModulo) && $idModulo !== 'null') {
+                    $stmtChk = $this->db->prepare("SELECT 1 FROM Modulo_Profesor WHERE idModulo = :idModChk AND idProfesor = :idProfChk LIMIT 1");
+                    $stmtChk->execute([':idModChk' => (int)$idModulo, ':idProfChk' => (int)$idUsuario]);
+                    $esProfesorDelModulo = (bool)$stmtChk->fetchColumn();
+                }
 
             if ($esProfesorDelModulo) {
                 // Si es profesor del módulo que está filtrando, ve los Alumnos como Profesor
@@ -383,13 +387,18 @@ class ModAlumnos {
                     $binds[':idUsuario'] = (int)$idUsuario;
                 }
             }
+            } // Fin del else de if (empty($idUsuario))
         }
         // Si es Profesor, ve los Alumnos de los modulos que imparte
-        else if (strtoupper($rol) === 'PROFESOR' && !empty($idUsuario)) {
-            $joinMac = true;
-            $joinMp = true;
-            $conditions[] = "mp.idProfesor = :idUsuario";
-            $binds[':idUsuario'] = (int)$idUsuario;
+        else if (strtoupper($rol) === 'PROFESOR') {
+            if (empty($idUsuario)) {
+                $conditions[] = "1 = 0";
+            } else {
+                $joinMac = true;
+                $joinMp = true;
+                $conditions[] = "mp.idProfesor = :idUsuario";
+                $binds[':idUsuario'] = (int)$idUsuario;
+            }
         }
 
         // Construir los INNER JOINs segun las banderas para evitar duplicados
