@@ -198,7 +198,7 @@ class ModActividades {
         $filteredRecords = $totalRecords;
         if ($searchVal !== '') {
             $queryFiltered = "SELECT COUNT(*) as total FROM (
-                                SELECT a.idActividad, IFNULL(GROUP_CONCAT(m.sigla SEPARATOR ', '), 'Sin módulos') as modulo
+                                SELECT a.idActividad, a.titulo, a.descripcion, IFNULL(GROUP_CONCAT(m.sigla SEPARATOR ', '), 'Sin módulos') as modulo
                                 FROM " . $this->table_name . " a
                                 LEFT JOIN Modulo_Actividad ma ON a.idActividad = ma.idActividad
                                 LEFT JOIN Modulo m ON ma.idModulo = m.idModulo
