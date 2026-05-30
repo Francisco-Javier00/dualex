@@ -6,9 +6,9 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
 
 /**
- * IMPORTACIÃ“N DE COMPONENTES DE CKEDITOR 5
+ * IMPORTACIÓN DE COMPONENTES DE CKEDITOR 5
  * Se cargan todos los plugins necesarios para habilitar funciones avanzadas como
- * tablas, imÃ¡genes (Base64), redimensionamiento, alineaciÃ³n, etc.
+ * tablas, imágenes (Base64), redimensionamiento, alineación, etc.
  */
 import {
   ClassicEditor,
@@ -41,7 +41,7 @@ import {
   Base64UploadAdapter
 } from 'ckeditor5';
 
-// Traducciones al espaÃ±ol para CKEditor
+// Traducciones al español para CKEditor
 import translations from 'ckeditor5/translations/es.js';
 
 // Servicios y DTOs
@@ -57,7 +57,7 @@ import { SeleccionActividadesModalComponent } from '../shared/modals/seleccion-a
 
 /**
  * TareaFormComponent
- * Componente dinÃ¡mico que sirve tanto para CREAR como para EDITAR tareas del cuaderno del alumno.
+ * Componente dinámico que sirve tanto para CREAR como para EDITAR tareas del cuaderno del alumno.
  * Utiliza un formulario reactivo para la persistencia de datos complejos.
  */
 @Component({
@@ -68,7 +68,7 @@ import { SeleccionActividadesModalComponent } from '../shared/modals/seleccion-a
   styleUrls: ['./tarea-form.component.css']
 })
 export class TareaFormComponent implements OnInit {
-  // InyecciÃ³n de servicios utilizando la sintaxis 'inject' (Angular 16+)
+  // Inyección de servicios utilizando la sintaxis 'inject' (Angular 16+)
   private fb = inject(FormBuilder);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
@@ -84,17 +84,17 @@ export class TareaFormComponent implements OnInit {
   }
 
   // Variables de Estado
-  tareaForm!: FormGroup;               // Objeto raÃ­z del formulario reactivo
+  tareaForm!: FormGroup;               // Objeto raíz del formulario reactivo
   esEdicion = false;                    // Flag para diferenciar entre Crear y Editar
   idTarea: number | null = null;        // Almacena el ID si estamos editando
   idAlumno: number | null = null;       // Almacena el ID del alumno si lo estamos especificando
-  actividades: ActividadDTO[] = [];     // CatÃ¡logo maestro de actividades recuperado del servicio
-  modalActividadesVisible = false;      // Controla la visibilidad del modal de selecciÃ³n
+  actividades: ActividadDTO[] = [];     // Catálogo maestro de actividades recuperado del servicio
+  modalActividadesVisible = false;      // Controla la visibilidad del modal de selección
   esAlumno = false;                     // Flag para identificar si es un alumno
   esProfesor = false;                   // Flag para identificar si es un profesor/coordinador
-  modulosTutor: any[] = [];             // Listado de mÃ³dulos que imparte el profesor
-  tareaBloqueada = false;               // Flag para saber si la tarea estÃ¡ bloqueada
-  codigoTarea = '';                     // CÃ³digo auto-generado de la tarea
+  modulosTutor: any[] = [];             // Listado de módulos que imparte el profesor
+  tareaBloqueada = false;               // Flag para saber si la tarea está bloqueada
+  codigoTarea = '';                     // Código auto-generado de la tarea
   documentoFile: File | null = null;    // PDF nuevo seleccionado por el alumno
   documentoActual: string | null = null; // Nombre del PDF ya guardado
   modalSiguienteTareaVisible = false;
@@ -106,8 +106,8 @@ export class TareaFormComponent implements OnInit {
   public Editor = ClassicEditor;
 
   /**
-   * CONFIGURACIÃ“N DE CKEDITOR 5
-   * Define la barra de herramientas, plugins y comportamientos de imÃ¡genes/tablas.
+   * CONFIGURACIÓN DE CKEDITOR 5
+   * Define la barra de herramientas, plugins y comportamientos de imágenes/tablas.
    */
   public config = {
     licenseKey: 'GPL',
@@ -118,7 +118,7 @@ export class TareaFormComponent implements OnInit {
       Image, ImageToolbar, ImageCaption, ImageStyle, ImageUpload, ImageResize,
       MediaEmbed, Table, TableToolbar, TableColumnResize, Heading, Indent, BlockQuote, Autoformat,
       Underline, Strikethrough, Font, Alignment, Highlight, RemoveFormat,
-      Base64UploadAdapter // Permite subir imÃ¡genes directamente como cadenas Base64
+      Base64UploadAdapter // Permite subir imágenes directamente como cadenas Base64
     ],
     toolbar: [
       'undo', 'redo', '|',
@@ -143,7 +143,7 @@ export class TareaFormComponent implements OnInit {
     }
   };
 
-  // Opciones para el selector de evaluaciÃ³n de la empresa (segÃºn normativa Dualex)
+  // Opciones para el selector de evaluación de la empresa (según normativa Dualex)
   evaluacionEmpresaOptions = [
     'Sin Calificar',
     'Superado',
@@ -154,14 +154,14 @@ export class TareaFormComponent implements OnInit {
   ];
 
   /**
-   * INICIALIZACIÃ“N DEL COMPONENTE
+   * INICIALIZACIÓN DEL COMPONENTE
    */
   ngOnInit(): void {
     const user = this.authService.currentUserValue;
     this.esAlumno = user?.rol === 'ALUMNO';
     this.esProfesor = user?.rol === 'PROFESOR' || user?.rol === 'COORDINADOR';
     this.crearFormulario();
-    this.cargarActividades(); // Cargamos el catÃ¡logo para mapear IDs a TÃ­tulos
+    this.cargarActividades(); // Cargamos el catálogo para mapear IDs a Títulos
 
     if (this.esProfesor && user?.email) {
       this.modulosService.getModulosProfesor(user.email)
@@ -180,7 +180,7 @@ export class TareaFormComponent implements OnInit {
       }
     });
 
-    // Detectamos si la URL contiene un ID para activar el modo ediciÃ³n
+    // Detectamos si la URL contiene un ID para activar el modo edición
     this.route.paramMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
       const id = params.get('id');
       if (id && id !== 'nueva') {
@@ -192,7 +192,7 @@ export class TareaFormComponent implements OnInit {
   }
 
   /**
-   * Recupera el catÃ¡logo de actividades desde el servicio.
+   * Recupera el catálogo de actividades desde el servicio.
    */
   cargarActividades(): void {
     this.tareasService.getActividades()
@@ -211,7 +211,7 @@ export class TareaFormComponent implements OnInit {
   }
 
   /**
-   * Recupera los datos de una tarea especÃ­fica y los carga en el formulario.
+   * Recupera los datos de una tarea específica y los carga en el formulario.
    */
   cargarDatosTarea(id: number): void {
     this.tareasService.getTareaById(id)
@@ -229,11 +229,11 @@ export class TareaFormComponent implements OnInit {
           // Mapeamos los datos del objeto al formulario reactivo
           const actividadesNorm = this.normalizarIds(tarea.actividadesSeleccionadas);
           this.tareaForm.patchValue({ ...tarea, actividadesSeleccionadas: actividadesNorm });
-          // Regeneramos el listado de mÃ³dulos revisables segÃºn las actividades cargadas
+          // Regeneramos el listado de módulos revisables según las actividades cargadas
           if (actividadesNorm.length > 0) {
             this.actualizarRevisionesModulos(actividadesNorm, tarea.revisionesModulos);
           }
-          // Aplicamos la lÃ³gica de bloqueo y permisos
+          // Aplicamos la lógica de bloqueo y permisos
           this.aplicarBloqueos(tarea);
         }
       });
@@ -258,7 +258,7 @@ export class TareaFormComponent implements OnInit {
       actividadesSeleccionadas: [[]],
       evaluacionEmpresa: ['Sin Calificar'],
       comentarioEmpresa: [''],
-      revisionesModulos: this.fb.array([]), // Array dinÃ¡mico de revisiones por mÃ³dulo
+      revisionesModulos: this.fb.array([]), // Array dinámico de revisiones por módulo
       revisadoProfesor: [false],
       comentarioProfesor: ['']
     });
@@ -285,14 +285,14 @@ export class TareaFormComponent implements OnInit {
   }
 
   /**
-   * GestiÃ³n del Modal de Actividades
+   * Gestión del Modal de Actividades
    */
   abrirModalActividades(): void {
     this.modalActividadesVisible = true;
   }
 
   /**
-   * Se ejecuta cuando el modal de selecciÃ³n emite una nueva lista de IDs.
+   * Se ejecuta cuando el modal de selección emite una nueva lista de IDs.
    */
   onSeleccionChange(ids: number[]): void {
     const normalizadas = this.normalizarIds(ids);
@@ -301,7 +301,7 @@ export class TareaFormComponent implements OnInit {
   }
 
   /**
-   * Comprueba si un mÃ³dulo (por nombre o siglas) pertenece al profesor actual.
+   * Comprueba si un módulo (por nombre o siglas) pertenece al profesor actual.
    */
   perteneceAlTutor(nombreModulo: string): boolean {
     if (!this.esProfesor) return true;
@@ -312,7 +312,7 @@ export class TareaFormComponent implements OnInit {
   }
 
   /**
-   * Recorre la lista de controles de revisiÃ³n y deshabilita los que no pertenecen al tutor.
+   * Recorre la lista de controles de revisión y deshabilita los que no pertenecen al tutor.
    */
   actualizarControlesPorTutor(): void {
     if (!this.esProfesor) return;
@@ -329,9 +329,9 @@ export class TareaFormComponent implements OnInit {
   }
 
   /**
-   * Comprueba si la tarea debe bloquearse segÃºn las reglas del negocio:
-   * - Si estÃ¡ totalmente revisada (todas las revisiones de mÃ³dulos estÃ¡n en 'true')
-   * - O si se ha superado la fecha lÃ­mite (fechaFin).
+   * Comprueba si la tarea debe bloquearse según las reglas del negocio:
+   * - Si está totalmente revisada (todas las revisiones de módulos están en 'true')
+   * - O si se ha superado la fecha límite (fechaFin).
    */
   checkBloqueada(tarea: TareaDTO): boolean {
     if (!tarea) return false;
@@ -351,7 +351,7 @@ export class TareaFormComponent implements OnInit {
   }
 
   /**
-   * Comprueba si el usuario actual tiene permisos para modificar la secciÃ³n
+   * Comprueba si el usuario actual tiene permisos para modificar la sección
    * de actividades relacionadas.
    */
   puedoEditarActividades(): boolean {
@@ -362,7 +362,7 @@ export class TareaFormComponent implements OnInit {
   }
 
   /**
-   * Aplica la lÃ³gica de bloqueo sobre los controles del formulario segÃºn el rol y estado.
+   * Aplica la lógica de bloqueo sobre los controles del formulario según el rol y estado.
    */
   aplicarBloqueos(tarea: TareaDTO): void {
     this.tareaBloqueada = this.checkBloqueada(tarea);
@@ -389,9 +389,9 @@ export class TareaFormComponent implements OnInit {
   }
 
   /**
-   * LÃ³gica de MÃ³dulos DinÃ¡micos:
-   * Calcula los mÃ³dulos Ãºnicos presentes en las actividades seleccionadas y crea 
-   * un control de revisiÃ³n (checkbox) para cada uno de ellos.
+   * Lógica de Módulos Dinámicos:
+   * Calcula los módulos únicos presentes en las actividades seleccionadas y crea 
+   * un control de revisión (checkbox) para cada uno de ellos.
    */
   private actualizarRevisionesModulos(ids: number[], revisionesCargadas?: any[]): void {
     const idsNormalizadas = this.normalizarIds(ids);
@@ -400,7 +400,7 @@ export class TareaFormComponent implements OnInit {
       return;
     }
 
-    // Identificamos los nombres de los mÃ³dulos Ãºnicos implicados
+    // Identificamos los nombres de los módulos únicos implicados
     const modulosSeleccionados: string[] = [];
     this.actividades
       .filter(a => idsNormalizadas.includes(a.id))
@@ -408,7 +408,7 @@ export class TareaFormComponent implements OnInit {
         if (a.modulo) {
           a.modulo.split(',').forEach(m => {
             const trimmed = m.trim();
-            if (trimmed && trimmed !== 'Sin mÃ³dulos') {
+            if (trimmed && trimmed !== 'Sin módulos') {
               modulosSeleccionados.push(trimmed);
             }
           });
@@ -417,7 +417,7 @@ export class TareaFormComponent implements OnInit {
 
     const modulosUnicos = [...new Set(modulosSeleccionados)];
 
-    // Mantenemos el estado de los checkboxes y comentarios actuales para no resetearlos al aÃ±adir/quitar actividades
+    // Mantenemos el estado de los checkboxes y comentarios actuales para no resetearlos al añadir/quitar actividades
     const estadosActuales = new Map<string, boolean>();
     const comentariosActuales = new Map<string, string>();
 
@@ -429,14 +429,14 @@ export class TareaFormComponent implements OnInit {
       });
     }
 
-    // TambiÃ©n mantenemos el estado de los checkboxes y comentarios en pantalla si ya existen controles en el FormArray
+    // También mantenemos el estado de los checkboxes y comentarios en pantalla si ya existen controles en el FormArray
     this.revisionesModulosArray.controls.forEach(ctrl => {
       const val = ctrl.value;
       estadosActuales.set(val.modulo, val.revisado);
       comentariosActuales.set(val.modulo, val.comentario || '');
     });
 
-    // Reconstruimos el FormArray con los mÃ³dulos Ãºnicos detectados
+    // Reconstruimos el FormArray con los módulos únicos detectados
     this.revisionesModulosArray.clear();
     modulosUnicos.forEach(mod => {
       const grupo = this.fb.group({
@@ -463,7 +463,7 @@ export class TareaFormComponent implements OnInit {
   }
 
   /**
-   * Getter para acceder fÃ¡cilmente al FormArray de revisiones desde el HTML.
+   * Getter para acceder fácilmente al FormArray de revisiones desde el HTML.
    */
   get revisionesModulosArray(): FormArray {
     return this.tareaForm.get('revisionesModulos') as FormArray;
@@ -482,7 +482,7 @@ export class TareaFormComponent implements OnInit {
   }
 
   /**
-   * Permite aÃ±adir o quitar una actividad individualmente desde los badges de la UI.
+   * Permite añadir o quitar una actividad individualmente desde los badges de la UI.
    */
   toggleActividad(id: number): void {
     const seleccionadas = this.getActividadesSeleccionadasIds();
@@ -563,7 +563,7 @@ export class TareaFormComponent implements OnInit {
       }
     } else {
       this.tareaForm.markAllAsTouched();
-      this.alertService.advertencia('Formulario no vÃ¡lido', 'Por favor, completa los campos obligatorios antes de continuar.');
+      this.alertService.advertencia('Formulario no válido', 'Por favor, completa los campos obligatorios antes de continuar.');
     }
   }
 
@@ -652,13 +652,13 @@ export class TareaFormComponent implements OnInit {
   }
 
   /**
-   * NavegaciÃ³n hacia atrÃ¡s.
+   * Navegación hacia atrás.
    */
   volver(): void {
     this.location.back();
   }
 
-  // â”€â”€â”€ GestiÃ³n de Adjuntos â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // â”€â”€â”€ Gestión de Adjuntos â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   /**
    * Se ejecuta cuando el usuario selecciona archivos con el input nativo.
@@ -725,7 +725,7 @@ export class TareaFormComponent implements OnInit {
    * La visualización del PDF se mantiene en "Gestión de Tareas".
    */
   /**
-   * Devuelve la clase CSS del icono segÃºn la extensiÃ³n del archivo.
+   * Devuelve la clase CSS del icono según la extensión del archivo.
    */
   getAdjuntoIconClass(nombre: string): string {
     const ext = nombre.split('.').pop()?.toLowerCase() ?? '';
@@ -739,7 +739,7 @@ export class TareaFormComponent implements OnInit {
   }
 
   /**
-   * Devuelve la clase del icono Font Awesome segÃºn la extensiÃ³n del archivo.
+   * Devuelve la clase del icono Font Awesome según la extensión del archivo.
    */
   getAdjuntoIcon(nombre: string): string {
     const ext = nombre.split('.').pop()?.toLowerCase() ?? '';
@@ -754,7 +754,7 @@ export class TareaFormComponent implements OnInit {
   }
 
   /**
-   * Formatea el tamaÃ±o de un archivo en bytes a una representaciÃ³n legible.
+   * Formatea el tamaño de un archivo en bytes a una representación legible.
    */
   formatFileSize(bytes: number): string {
     if (bytes < 1024)        return `${bytes} B`;
