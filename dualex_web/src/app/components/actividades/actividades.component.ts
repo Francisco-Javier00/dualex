@@ -9,6 +9,8 @@ import { AlertService } from '../../services/alert.service';
 import { ActividadDTO } from '../../dto/dualex.dto';
 import { Config } from 'datatables.net';
 import 'datatables.net-responsive-bs5';
+import { AuthService } from '../../auth/services/auth.service';
+import { ProfesoresService } from '../../services/profesores.service';
 
 /**
  * Componente para el Catálogo de Actividades.
@@ -26,6 +28,8 @@ export class ActividadesComponent implements OnInit {
   private actividadesService = inject(ActividadesService);
   private alertService = inject(AlertService);
   private location = inject(Location);
+  private authService = inject(AuthService);
+  private profesoresService = inject(ProfesoresService);
 
   @ViewChild(DatatableComponent) datatable!: DatatableComponent;
 
@@ -33,14 +37,45 @@ export class ActividadesComponent implements OnInit {
   modalBorradoVisible = false;
   modalActividadVisible = false;
   actividadSeleccionada: ActividadDTO | null = null;
+  esCoordinadorSinCiclo = false;
+  ciclosCoordinados: string[] = [];
 
   ngOnInit(): void {
+    const usuarioActual = this.authService.currentUserValue;
+    if (usuarioActual && usuarioActual.rol === 'COORDINADOR' && usuarioActual.email) {
+      this.profesoresService.getProfesorByEmail(usuarioActual.email).subscribe({
+        next: (profesor) => {
+          const ciclos = profesor.ciclos ? profesor.ciclos.split(',').map((c: string) => c.trim()).filter(Boolean) : [];
+          this.ciclosCoordinados = ciclos;
+          this.esCoordinadorSinCiclo = !usuarioActual.esGeneral && ciclos.length === 0;
+          if (this.esCoordinadorSinCiclo && this.datatable) {
+            this.datatable.refrescar(false);
+          }
+        },
+        error: () => {
+          this.ciclosCoordinados = [];
+          this.esCoordinadorSinCiclo = !usuarioActual.esGeneral;
+          if (this.datatable) {
+            this.datatable.refrescar(false);
+          }
+        }
+      });
+    }
+
     this.dtOptions = {
       order: [],
       responsive: true,
       serverSide: true,
       processing: true,
       ajax: (dataTablesParameters: any, callback: any) => {
+        if (this.esCoordinadorSinCiclo) {
+          callback({
+            recordsTotal: 0,
+            recordsFiltered: 0,
+            data: []
+          });
+          return;
+        }
         this.actividadesService.obtenerActividadesDataTables(dataTablesParameters).subscribe((resp: any) => {
           callback({
             recordsTotal: resp.recordsTotal,

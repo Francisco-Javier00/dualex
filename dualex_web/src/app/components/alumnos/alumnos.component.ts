@@ -59,11 +59,13 @@ export class AlumnosComponent implements OnInit, OnDestroy {
   cursosAgrupados: { [ciclo: string]: CursoDTO[] } = {};
   cursosFiltradosIds: number[] = [];
   ciclosCoordinados: string[] = [];
+  esCoordinadorSinCiclo = false;
 
   private suscripcionUsuario?: Subscription;
   rolUsuarioActual: string | null = null;
 
   get puedeGestionarAlumnos(): boolean {
+    if (this.esCoordinadorSinCiclo) return false;
     // Desde "Mis Módulos" (con moduloId), ningún coordinador gestiona
     if (this.moduloId) return false;
     return this.rolUsuarioActual === 'COORDINADOR';
@@ -167,12 +169,20 @@ export class AlumnosComponent implements OnInit, OnDestroy {
     if (usuarioActual && usuarioActual.rol === 'COORDINADOR' && usuarioActual.email) {
       this.profesoresService.getProfesorByEmail(usuarioActual.email).subscribe({
         next: (profesor) => {
+          // Parse cycles coordinated by the coordinator (e.g. "DAW, DAM")
+          const ciclosCoordinados = profesor.ciclos ? profesor.ciclos.split(',').map((c: string) => c.trim()).filter(Boolean) : [];
+          this.ciclosCoordinados = ciclosCoordinados;
+          
+          const hasModuloId = this.route.snapshot.queryParamMap.has('moduloId');
+          this.esCoordinadorSinCiclo = !usuarioActual.esGeneral && ciclosCoordinados.length === 0 && !hasModuloId;
+
+          if (this.esCoordinadorSinCiclo) {
+            this.procesarParametrosRuta();
+            return;
+          }
+
           this.cursosService.getCursosByProfesor(profesor.id).subscribe({
             next: (cursos: CursoDTO[]) => {
-              // Parse cycles coordinated by the coordinator (e.g. "DAW, DAM")
-              const ciclosCoordinados = profesor.ciclos ? profesor.ciclos.split(',').map((c: string) => c.trim()) : [];
-              this.ciclosCoordinados = ciclosCoordinados;
-
               // Only keep courses whose siglasCiclo is coordinated by the coordinator
               const cursosFiltrados = cursos.filter(c => c.siglasCiclo && ciclosCoordinados.includes(c.siglasCiclo));
 
@@ -194,7 +204,12 @@ export class AlumnosComponent implements OnInit, OnDestroy {
             error: () => this.procesarParametrosRuta() // Continuar aunque falle
           });
         },
-        error: () => this.procesarParametrosRuta()
+        error: () => {
+          this.ciclosCoordinados = [];
+          const hasModuloId = this.route.snapshot.queryParamMap.has('moduloId');
+          this.esCoordinadorSinCiclo = !usuarioActual.esGeneral && !hasModuloId;
+          this.procesarParametrosRuta();
+        }
       });
     } else {
       this.procesarParametrosRuta();
@@ -251,6 +266,15 @@ export class AlumnosComponent implements OnInit, OnDestroy {
       serverSide: true,
       processing: true,
       ajax: (dataTablesParameters: any, callback: any) => {
+        if (this.esCoordinadorSinCiclo) {
+          callback({
+            recordsTotal: 0,
+            recordsFiltered: 0,
+            data: []
+          });
+          return;
+        }
+
         if (this.moduloId) {
           dataTablesParameters.idModulo = this.moduloId;
         }
