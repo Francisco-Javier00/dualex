@@ -39,12 +39,26 @@ class ConActividades extends BaseController {
 
     /**
      * Lista todas las actividades sin paginación.
+     * Si se pasa idAlumno por GET (o si el usuario es alumno), se filtran por su ciclo.
      * 
      * @return json Respuesta JSON con los datos o un error (vía sendResponse o sendError)
      */
     public function listar() {
         $this->checkRole(['ALUMNO', 'PROFESOR', 'COORDINADOR']);
-        $data = $this->modelo->listar();
+        
+        $idAlumno = $_GET['idAlumno'] ?? null;
+        
+        // Si el usuario logueado es alumno y NO tiene roles superiores, usar su propio ID para filtrar obligatoriamente.
+        $rolesUpper = array_map('strtoupper', $this->user['data']['roles'] ?? []);
+        $esProfesor = in_array('COORDINADOR_GENERAL_DUALEX', $rolesUpper) || 
+                      in_array('COORDINADOR_DUALEX', $rolesUpper) || 
+                      in_array('PROFESOR_DUALEX', $rolesUpper);
+
+        if (!$esProfesor && (in_array('ALUMNO_DUALEX', $rolesUpper) || in_array('ALUMNO', $rolesUpper))) {
+            $idAlumno = $this->user['data']['id'];
+        }
+
+        $data = $this->modelo->listar($idAlumno);
         $this->sendResponse($data);
     }
 

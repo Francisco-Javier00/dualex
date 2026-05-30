@@ -49,9 +49,20 @@ class ModModulos {
         // Eliminamos duplicados en PHP para mayor control
         $modulosUnicos = [];
         foreach ($resultados as $row) {
-            if (!isset($modulosUnicos[$row['id']])) {
-                $modulosUnicos[$row['id']] = $row;
+            $id = $row['id'];
+            if (!isset($modulosUnicos[$id])) {
+                $modulosUnicos[$id] = $row;
+                $modulosUnicos[$id]['ciclos_list'] = [$row['ciclo']];
+            } else {
+                if (!in_array($row['ciclo'], $modulosUnicos[$id]['ciclos_list'])) {
+                    $modulosUnicos[$id]['ciclos_list'][] = $row['ciclo'];
+                }
             }
+        }
+
+        foreach ($modulosUnicos as &$mod) {
+            $mod['ciclo'] = implode(',', $mod['ciclos_list']);
+            unset($mod['ciclos_list']);
         }
 
         return array_values($modulosUnicos);

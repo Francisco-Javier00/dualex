@@ -18,11 +18,17 @@ export class ActividadesService {
 
   /**
    * Obtiene la lista completa de todas las actividades registradas sin paginar.
+   * Si se proporciona un idAlumno, filtra las actividades por el ciclo del alumno.
    * 
+   * @param idAlumno (Opcional) ID del alumno para filtrar.
    * @returns Un `Observable` con un array de objetos `ActividadDTO`.
    */
-  getActividades(): Observable<ActividadDTO[]> {
-    return this.http.get<ActividadDTO[]>(`${this.API_URL}&m=listar`);
+  getActividades(idAlumno?: number): Observable<ActividadDTO[]> {
+    let url = `${this.API_URL}&m=listar`;
+    if (idAlumno) {
+      url += `&idAlumno=${idAlumno}`;
+    }
+    return this.http.get<ActividadDTO[]>(url);
   }
 
   /**

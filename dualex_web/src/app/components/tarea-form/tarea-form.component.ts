@@ -161,7 +161,6 @@ export class TareaFormComponent implements OnInit {
     this.esAlumno = user?.rol === 'ALUMNO';
     this.esProfesor = user?.rol === 'PROFESOR' || (user?.rol === 'COORDINADOR' || user?.rol === 'COORDINADOR_GENERAL');
     this.crearFormulario();
-    this.cargarActividades(); // Cargamos el catálogo para mapear IDs a Títulos
 
     if (this.esProfesor && user?.email) {
       this.modulosService.getModulosProfesor(user.email)
@@ -177,6 +176,12 @@ export class TareaFormComponent implements OnInit {
       const aId = params['alumnoId'];
       if (aId) {
         this.idAlumno = +aId;
+      } else if (this.esAlumno) {
+        this.idAlumno = user?.id ?? null;
+      }
+      
+      if (!this.esEdicion) {
+        this.cargarActividades();
       }
     });
 
@@ -195,7 +200,7 @@ export class TareaFormComponent implements OnInit {
    * Recupera el catálogo de actividades desde el servicio.
    */
   cargarActividades(): void {
-    this.tareasService.getActividades()
+    this.tareasService.getActividades(this.idAlumno ?? undefined)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(data => {
         // Normalizar IDs por si el backend los devuelve como string
@@ -221,6 +226,8 @@ export class TareaFormComponent implements OnInit {
           if (tarea.idAlumno) {
             this.idAlumno = tarea.idAlumno;
           }
+          this.cargarActividades();
+
           if (tarea.codigo_auto) {
             this.codigoTarea = tarea.codigo_auto;
           }

@@ -140,7 +140,7 @@ export class AlumnosComponent implements OnInit, OnDestroy {
       render: (_data: any, _type: string, row: any) => `
         <div class="d-flex gap-2 justify-content-center">
           ${(rol === 'PROFESOR' || this.moduloId) ? `
-            <button class="btn btn-sm ${Number(row?.numTareas || 0) > 0 ? 'btn-outline-success' : 'btn-outline-primary'} shadow-sm" data-action="tasks" title="Ver Tareas">
+            <button class="btn btn-sm btn-outline-success shadow-sm" data-action="tasks" title="Ver Tareas">
               <i class="fa-solid fa-clipboard-list"></i>
             </button>
           ` : ''}
@@ -186,7 +186,7 @@ export class AlumnosComponent implements OnInit, OnDestroy {
               // Only keep courses whose siglasCiclo is coordinated by the coordinator, UNLESS they are general coordinators OR viewing a specific module
               let cursosFiltrados = cursos;
               const hasModuloId = this.route.snapshot.queryParamMap.has('moduloId');
-              if (!usuarioActual.esGeneral && !hasModuloId) {
+              if (ciclosCoordinados.length > 0 && !hasModuloId) {
                   cursosFiltrados = cursos.filter(c => c.siglasCiclo && ciclosCoordinados.includes(c.siglasCiclo));
               }
 

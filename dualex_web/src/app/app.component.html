@@ -2,9 +2,23 @@
 
 <app-alerts></app-alerts>
 
-<div class="main-content">
-  <router-outlet></router-outlet>
-</div>
+@if (authService.bloqueado$ | async) {
+  <div class="main-content d-flex align-items-center justify-content-center" style="min-height: calc(100vh - 160px);">
+    <div class="container text-center max-w-md mx-auto" style="max-width: 600px;">
+      <div class="card border-0 shadow-sm rounded-4 p-5 text-center bg-white">
+        <i class="fa-solid fa-user-lock text-danger mb-4" style="font-size: 4rem;"></i>
+        <h2 class="h3 fw-bold text-dark mb-3">Acceso Bloqueado</h2>
+        <p class="text-secondary fs-5 mb-0 lh-base">
+          No estás registrado en Dualex. Tu coordinador de ciclo debe darte de alta primero.
+        </p>
+      </div>
+    </div>
+  </div>
+} @else {
+  <div class="main-content">
+    <router-outlet></router-outlet>
+  </div>
+}
 
 <app-footer></app-footer>
 

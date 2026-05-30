@@ -67,7 +67,7 @@ export class CiclosService {
     return this.http.delete<boolean>(`${this.API_URL}&m=eliminar&id=${id}`);
   }
 
-  vincularCoordinador(idCiclo: number, idProfesor: number): Observable<any> {
+  vincularCoordinador(idCiclo: number, idProfesor: number | null): Observable<any> {
     return this.http.post<any>(`${this.API_URL}&m=vincularCoordinador&id=${idCiclo}`, { idProfesor });
   }
 

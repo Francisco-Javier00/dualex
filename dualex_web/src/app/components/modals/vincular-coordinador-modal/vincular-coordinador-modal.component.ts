@@ -15,7 +15,7 @@ export class VincularCoordinadorModalComponent {
   @Input() coordinadorId: number | null = null;
 
   @Output() visibleChange = new EventEmitter<boolean>();
-  @Output() guardarEvent = new EventEmitter<number>();
+  @Output() guardarEvent = new EventEmitter<number | null>();
   @Output() cancelarEvent = new EventEmitter<void>();
 
   tempCoordinadorId: number | null = null;
@@ -35,11 +35,11 @@ export class VincularCoordinadorModalComponent {
     this.tempCoordinadorId = this.coordinadorId;
   }
 
-  seleccionarCoordinador(id: number) {
+  seleccionarCoordinador(id: number | null) {
     this.tempCoordinadorId = id;
   }
 
-  isCoordinador(id: number) {
+  isCoordinador(id: number | null) {
     return this.tempCoordinadorId === id;
   }
 
@@ -50,7 +50,8 @@ export class VincularCoordinadorModalComponent {
   }
 
   guardar() {
-    if (this.tempCoordinadorId !== null) {
+    // Permitir guardar null explícitamente si se seleccionó 'Sin Coordinador'
+    if (this.tempCoordinadorId !== undefined) {
       this.guardarEvent.emit(this.tempCoordinadorId);
     }
   }

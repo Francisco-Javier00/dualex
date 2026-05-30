@@ -62,19 +62,47 @@ class ModActividades {
 
     /**
      * Obtiene el listado completo de actividades con la concatenación de nombres e IDs de módulos.
+     * Si se proporciona un idAlumno, filtra las actividades para mostrar solo aquellas 
+     * cuyo módulo esté asociado a un curso del mismo ciclo que el curso actual del alumno.
      * 
+     * @param int|null $idAlumno ID del alumno para filtrar por ciclo (opcional).
      * @return array Lista de actividades.
      */
-    public function listar() {
+    public function listar($idAlumno = null) {
+        $where = "";
+        $binds = [];
+        
+        if ($idAlumno) {
+             $where = " WHERE EXISTS (
+                 SELECT 1 FROM Modulo_Actividad inner_ma
+                 JOIN Modulo_Curso inner_mc ON inner_ma.idModulo = inner_mc.idModulo
+                 JOIN Curso inner_cur ON inner_mc.idCurso = inner_cur.idCurso
+                 WHERE inner_ma.idActividad = a.idActividad 
+                 AND inner_cur.idCiclo = (
+                     SELECT cur_alum.idCiclo 
+                     FROM Alumno al_inner
+                     JOIN Curso cur_alum ON al_inner.idCurso = cur_alum.idCurso
+                     WHERE al_inner.idAlumno = :idAlumno
+                     LIMIT 1
+                 )
+             )";
+             $binds[':idAlumno'] = (int)$idAlumno;
+        }
+
         $query = "SELECT a.idActividad as id, a.titulo, a.descripcion, 
                          IFNULL(GROUP_CONCAT(m.sigla SEPARATOR ', '), 'Sin módulos') as modulo,
                          IFNULL(GROUP_CONCAT(m.idModulo SEPARATOR ','), '') as idModulos
                   FROM " . $this->table_name . " a
                   LEFT JOIN Modulo_Actividad ma ON a.idActividad = ma.idActividad
                   LEFT JOIN Modulo m ON ma.idModulo = m.idModulo
+                  $where
                   GROUP BY a.idActividad
                   ORDER BY a.idActividad DESC";
+                  
         $stmt = $this->conn->prepare($query);
+        foreach ($binds as $key => $val) {
+            $stmt->bindValue($key, $val, is_int($val) ? PDO::PARAM_INT : PDO::PARAM_STR);
+        }
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }

@@ -6,6 +6,9 @@ import { AlertsComponent } from './components/shared/alerts/alerts.component';
 import { PruebasSistemaComponent } from './components/shared/pruebas-sistema/pruebas-sistema.component';
 import { environment } from '../environments/environment';
 
+import { CommonModule } from '@angular/common';
+import { AuthService } from './auth/services/auth.service';
+
 /**
  * Componente principal de la aplicación Dualex.
  * Gestiona el layout base, la restauración de rutas y el estado de navegación.
@@ -13,13 +16,14 @@ import { environment } from '../environments/environment';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, HeaderComponent, FooterComponent, AlertsComponent, PruebasSistemaComponent],
+  imports: [CommonModule, RouterOutlet, HeaderComponent, FooterComponent, AlertsComponent, PruebasSistemaComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
 export class AppComponent implements OnInit {
   title = 'Dualex v19';
   developerMode = environment.developerMode;
+  public authService = inject(AuthService);
   private router = inject(Router);
 
   /**

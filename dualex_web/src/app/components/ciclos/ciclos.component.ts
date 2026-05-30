@@ -146,10 +146,9 @@ export class CiclosComponent implements OnInit {
     });
   }
 
-  guardarCoordinador(idProfesor: number) {
+  guardarCoordinador(idProfesor: number | null) {
     // Need to call a service method here. For now let's assume it exists or call updateCiclo
     // or add a dedicated method in CiclosService.
-    console.log('Vinculando profesor', idProfesor, 'al ciclo', this.cicloSeleccionado.id);
     this.ciclosService.vincularCoordinador(this.cicloSeleccionado.id, idProfesor).subscribe({
       next: () => {
         this.alertService.exito('Coordinador asignado', 'El coordinador ha sido asignado correctamente.');

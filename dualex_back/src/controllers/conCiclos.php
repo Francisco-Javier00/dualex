@@ -147,7 +147,7 @@ class ConCiclos extends BaseController {
         }
         $json = file_get_contents('php://input');
         $datos = json_decode($json, true);
-        if (!$datos || !isset($datos['idProfesor'])) {
+        if (!$datos || !array_key_exists('idProfesor', $datos)) {
             $this->sendError("ID de profesor no proporcionado.", 400);
         }
         

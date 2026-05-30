@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject } from 'rxjs';
 import { PerfilUsuarioDTO, JwtPayload } from '../../dto/dualex.dto';
 import { environment } from '../../../environments/environment';
+import { AlertService } from '../../services/alert.service';
 
 @Injectable({
   providedIn: 'root'
@@ -11,11 +12,14 @@ import { environment } from '../../../environments/environment';
 export class AuthService {
   private readonly COOKIE_NAME = 'auth_token';
   private http = inject(HttpClient);
+  private alertService = inject(AlertService);
 
   // La sesión se mantiene en memoria para que el header, el perfil y las vistas
   // compartan el mismo usuario sin depender de llamadas repetidas al backend.
   private sujetoPerfilUsuario = new BehaviorSubject<PerfilUsuarioDTO | null>(null);
   perfilUsuario$ = this.sujetoPerfilUsuario.asObservable();
+  
+  public bloqueado$ = new BehaviorSubject<boolean>(false);
 
   /**
    * Obtiene el valor actual del perfil de usuario sin necesidad de suscripción.
@@ -102,7 +106,10 @@ export class AuthService {
         }
       },
       error: (err) => {
-
+        if (err.status === 403 && err.error?.error) {
+          // Bloquear completamente la vista principal
+          this.bloqueado$.next(true);
+        }
       }
     });
   }

@@ -25,7 +25,7 @@ export class TareasTodosComponent implements OnInit {
   @ViewChild(DatatableComponent) datatable!: DatatableComponent;
 
   dtOptions: Config = {};
-  columnTitles = ['Nombre', 'Apellidos', 'Correo', 'Curso', ''];
+  columnTitles = ['Nombre', 'Apellidos', 'Correo', 'Curso', 'Acciones'];
   cargando = true;
 
   ngOnInit(): void {
@@ -61,7 +61,7 @@ export class TareasTodosComponent implements OnInit {
           width: '10%',
           render: (_data: any, _type: string, row: any) => `
             <div class="d-flex gap-2 justify-content-center">
-              <button class="btn btn-sm ${Number(row?.numTareas || 0) > 0 ? 'btn-outline-success' : 'btn-outline-primary'} shadow-sm" data-action="tasks" title="Ver Tareas">
+              <button class="btn btn-sm btn-outline-success shadow-sm" data-action="tasks" title="Ver Tareas">
                 <i class="fa-solid fa-clipboard-list"></i>
               </button>
             </div>
