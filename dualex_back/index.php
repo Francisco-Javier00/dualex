@@ -97,7 +97,14 @@ if ($authHeader && preg_match('/Bearer\s+(.*)$/i', $authHeader, $matches)) {
         $user = JWTHelper::validar($token, $secret);
         
         if ($user && isset($user['data']['email'])) {
-            $user = JWTHelper::syncUser($db, $user);
+            try {
+                $user = JWTHelper::syncUser($db, $user);
+            } catch (Exception $e) {
+                http_response_code(403);
+                echo json_encode(["error" => $e->getMessage(), "message" => $e->getMessage()]);
+                ob_end_flush();
+                exit;
+            }
         }
     }
 }

@@ -69,10 +69,14 @@ class JWTHelper {
                 $rol = 'ALUMNO';
             }
 
+            if ($rol === 'ALUMNO') {
+                throw new Exception("No estás registrado en Dualex. Tu coordinador de ciclo debe darte de alta primero.");
+            }
+
             try {
                 $db->beginTransaction();
 
-                $tipo = ($rol === 'ALUMNO') ? 'A' : 'P';
+                $tipo = 'P'; // Ya no insertamos alumnos automáticamente
 
                 $sqlU = "INSERT INTO Usuario (nombre, apellidos, correo, tipo) VALUES (:nombre, :apellidos, :correo, :tipo)";
                 $stmtU = $db->prepare($sqlU);
@@ -83,35 +87,7 @@ class JWTHelper {
                     ':tipo'      => $tipo
                 ]);
                 $idUsuario = $db->lastInsertId();
-
-                if ($rol === 'ALUMNO') {
-                    $stmtC = $db->query("SELECT idCurso FROM Curso LIMIT 1");
-                    $idCurso = $stmtC->fetchColumn();
-                    if (!$idCurso) {
-                        $stmtCiclo = $db->query("SELECT idCiclo FROM Ciclo LIMIT 1");
-                        $idCiclo = $stmtCiclo->fetchColumn();
-                        if (!$idCiclo) {
-                            $db->exec("INSERT INTO Ciclo (nombre, siglas, grado) VALUES ('Ciclo Temporal', 'TEMP', 'medio')");
-                            $idCiclo = $db->lastInsertId();
-                        }
-                        $db->exec("INSERT INTO Curso (nombre, anio_escolar, idCiclo) VALUES ('Curso Temporal', '24-25', $idCiclo)");
-                        $idCurso = $db->lastInsertId();
-                    }
-
-                    $dniPlaceholder = 'TEMP_' . str_pad($idUsuario, 8, '0', STR_PAD_LEFT);
-                    $niaPlaceholder = 'TEMP_' . str_pad($idUsuario, 6, '0', STR_PAD_LEFT);
-                    $telefonoPlaceholder = '000000000';
-
-                    $sqlA = "INSERT INTO Alumno (idAlumno, dni, nia, telefono, idCurso) VALUES (:idAlumno, :dni, :nia, :telefono, :idCurso)";
-                    $stmtA = $db->prepare($sqlA);
-                    $stmtA->execute([
-                        ':idAlumno' => $idUsuario,
-                        ':dni'      => $dniPlaceholder,
-                        ':nia'      => $niaPlaceholder,
-                        ':telefono' => $telefonoPlaceholder,
-                        ':idCurso'  => $idCurso
-                    ]);
-                } else if ($rol === 'COORDINADOR') {
+                if ($rol === 'COORDINADOR') {
                     $sqlP = "INSERT INTO Profesor (idProfesor) VALUES (:id)";
                     $stmtP = $db->prepare($sqlP);
                     $stmtP->execute([':id' => $idUsuario]);
