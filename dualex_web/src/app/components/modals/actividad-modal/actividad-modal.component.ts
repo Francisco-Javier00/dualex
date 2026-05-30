@@ -96,7 +96,11 @@ export class ActividadModalComponent implements OnChanges, OnDestroy, OnInit {
             nombre: c.nombre,
             siglas: c.siglas,
             expanded: true, // Auto-expand coordinator's cycles
-            modulos: modulos.filter((m: ModuloDTO) => m.ciclo === c.siglas)
+            modulos: modulos.filter((m: ModuloDTO) => {
+              if (!m.ciclo) return false;
+              const ciclosModulo = m.ciclo.split(',').map(s => s.trim().toUpperCase());
+              return ciclosModulo.includes(c.siglas.toUpperCase());
+            })
           }));
           this.cargandoArbol = false;
           
@@ -120,7 +124,11 @@ export class ActividadModalComponent implements OnChanges, OnDestroy, OnInit {
             nombre: c.nombre,
             siglas: c.siglas,
             expanded: false,
-            modulos: modulos.filter((m: ModuloDTO) => m.ciclo === c.siglas)
+            modulos: modulos.filter((m: ModuloDTO) => {
+              if (!m.ciclo) return false;
+              const ciclosModulo = m.ciclo.split(',').map(s => s.trim().toUpperCase());
+              return ciclosModulo.includes(c.siglas.toUpperCase());
+            })
           }));
           this.cargandoArbol = false;
           
