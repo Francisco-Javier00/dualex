@@ -1,28 +1,48 @@
-<div class="container-fluid py-4 animate-fade-in mt-4 px-md-5 px-3">
-  <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
-    <div class="d-flex align-items-start gap-3">
-      <button type="button" class="btn back-btn mt-1" title="Volver" (click)="irAtras()">
-        <i class="fa-solid fa-arrow-left"></i>
-      </button>
-      <div>
-        <h2 class="fw-bold text-dark mb-1">
-          <i class="fa-solid fa-list-check text-primary me-2"></i> Registro de Actividades
-        </h2>
-        <p class="text-muted mb-0">Consulta y gestiona las actividades realizadas durante las prácticas en empresa</p>
+@if (esCoordinadorSinCiclo) {
+  <div class="container py-5 text-center animate-fade-in mt-4">
+    <div class="card border-0 shadow-sm rounded-4 p-5 mx-auto" style="max-width: 600px; background-color: #fff;">
+      <div class="d-flex align-items-center justify-content-center mx-auto bg-warning bg-opacity-10 text-warning rounded-circle mb-4" style="width: 80px; height: 80px;">
+        <i class="fa-solid fa-triangle-exclamation" style="font-size: 2.5rem;"></i>
+      </div>
+      <h3 class="fw-bold text-dark mb-2">Ningún ciclo coordinado</h3>
+      <p class="text-muted fs-5 mb-4">
+        Actualmente no tienes ningún ciclo formativo asignado para coordinar. 
+        Solo puedes ver y gestionar la información de los ciclos que coordinas.
+      </p>
+      <div class="d-flex justify-content-center gap-3">
+        <button class="btn btn-outline-secondary px-4 py-2" (click)="irAtras()" style="border-radius: 10px;">
+          <i class="fa-solid fa-arrow-left me-2"></i>Volver
+        </button>
       </div>
     </div>
-    <button class="btn btn-primary" (click)="crearNueva()">
-      <i class="fa-solid fa-plus me-1"></i> Nueva Actividad
-    </button>
   </div>
+} @else {
+  <div class="container-fluid py-4 animate-fade-in mt-4 px-md-5 px-3">
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+      <div class="d-flex align-items-start gap-3">
+        <button type="button" class="btn back-btn mt-1" title="Volver" (click)="irAtras()">
+          <i class="fa-solid fa-arrow-left"></i>
+        </button>
+        <div>
+          <h2 class="fw-bold text-dark mb-1">
+            <i class="fa-solid fa-list-check text-primary me-2"></i> Registro de Actividades
+          </h2>
+          <p class="text-muted mb-0">Consulta y gestiona las actividades realizadas durante las prácticas en empresa</p>
+        </div>
+      </div>
+      <button class="btn btn-primary" (click)="crearNueva()">
+        <i class="fa-solid fa-plus me-1"></i> Nueva Actividad
+      </button>
+    </div>
 
-  <app-shared-datatable
-    tableId="tabla-actividades"
-    [dtOptions]="dtOptions"
-    [columnTitles]="[' ', 'Título', 'Descripción', 'Módulo', 'Acciones']"
-    (actionClick)="onTableAction($event)">
-  </app-shared-datatable>
-</div>
+    <app-shared-datatable
+      tableId="tabla-actividades"
+      [dtOptions]="dtOptions"
+      [columnTitles]="[' ', 'Título', 'Descripción', 'Módulo', 'Acciones']"
+      (actionClick)="onTableAction($event)">
+    </app-shared-datatable>
+  </div>
+}
 
 <!-- Modal de confirmación de borrado -->
 <app-confirmar-borrado-modal

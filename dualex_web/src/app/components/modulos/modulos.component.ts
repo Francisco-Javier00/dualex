@@ -62,6 +62,7 @@ export class ModulosComponent implements OnInit, OnDestroy {
   cursosAgrupados: { [ciclo: string]: CursoDTO[] } = {};
   cursosFiltradosIds: number[] = [];
   ciclosCoordinados: string[] = [];
+  esCoordinadorSinCiclo = false;
 
   private suscripcionUsuario?: Subscription;
   rolUsuarioActual: string | null = null;
@@ -77,12 +78,20 @@ export class ModulosComponent implements OnInit, OnDestroy {
     if (usuarioActual && usuarioActual.rol === 'COORDINADOR' && usuarioActual.email) {
       this.profesoresService.getProfesorByEmail(usuarioActual.email).subscribe({
         next: (profesor) => {
+          // Parse cycles coordinated by the coordinator (e.g. "DAW, DAM")
+          const ciclosCoordinados = profesor.ciclos ? profesor.ciclos.split(',').map((c: string) => c.trim()).filter(Boolean) : [];
+          this.ciclosCoordinados = ciclosCoordinados;
+          this.esCoordinadorSinCiclo = !usuarioActual.esGeneral && ciclosCoordinados.length === 0;
+          
+          if (this.esCoordinadorSinCiclo) {
+            if (this.datatable) {
+              this.datatable.refrescar(false);
+            }
+            return;
+          }
+
           this.cursosService.getCursosByProfesor(profesor.id).subscribe({
             next: (cursos: CursoDTO[]) => {
-              // Parse cycles coordinated by the coordinator (e.g. "DAW, DAM")
-              const ciclosCoordinados = profesor.ciclos ? profesor.ciclos.split(',').map((c: string) => c.trim()) : [];
-              this.ciclosCoordinados = ciclosCoordinados;
-              
               // Only keep courses whose siglasCiclo is coordinated by the coordinator
               const cursosFiltrados = cursos.filter(c => c.siglasCiclo && ciclosCoordinados.includes(c.siglasCiclo));
 
@@ -103,6 +112,13 @@ export class ModulosComponent implements OnInit, OnDestroy {
               this.datatable.refrescar(false);
             }
           });
+        },
+        error: () => {
+          this.ciclosCoordinados = [];
+          this.esCoordinadorSinCiclo = !usuarioActual.esGeneral;
+          if (this.datatable) {
+            this.datatable.refrescar(false);
+          }
         }
       });
     }
@@ -113,6 +129,15 @@ export class ModulosComponent implements OnInit, OnDestroy {
       serverSide: true,
       processing: true,
       ajax: (dataTablesParameters: any, callback: any) => {
+        if (this.esCoordinadorSinCiclo) {
+          callback({
+            recordsTotal: 0,
+            recordsFiltered: 0,
+            data: []
+          });
+          return;
+        }
+
         if (this.cursosFiltradosIds.length > 0) {
           dataTablesParameters.idsCursos = this.cursosFiltradosIds;
         } else if (this.cursosGestionados.length > 0) {
