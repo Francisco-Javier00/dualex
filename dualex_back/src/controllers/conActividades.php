@@ -48,9 +48,13 @@ class ConActividades extends BaseController {
         
         $idAlumno = $_GET['idAlumno'] ?? null;
         
-        // Si el usuario logueado es alumno, usar su propio ID para filtrar obligatoriamente.
+        // Si el usuario logueado es alumno y NO tiene roles superiores, usar su propio ID para filtrar obligatoriamente.
         $rolesUpper = array_map('strtoupper', $this->user['data']['roles'] ?? []);
-        if (in_array('ALUMNO_DUALEX', $rolesUpper) || in_array('ALUMNO', $rolesUpper)) {
+        $esProfesor = in_array('COORDINADOR_GENERAL_DUALEX', $rolesUpper) || 
+                      in_array('COORDINADOR_DUALEX', $rolesUpper) || 
+                      in_array('PROFESOR_DUALEX', $rolesUpper);
+
+        if (!$esProfesor && (in_array('ALUMNO_DUALEX', $rolesUpper) || in_array('ALUMNO', $rolesUpper))) {
             $idAlumno = $this->user['data']['id'];
         }
 
