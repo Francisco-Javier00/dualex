@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject } from 'rxjs';
 import { PerfilUsuarioDTO, JwtPayload } from '../../dto/dualex.dto';
 import { environment } from '../../../environments/environment';
+import { AlertService } from '../../services/alert.service';
 
 @Injectable({
   providedIn: 'root'
@@ -11,6 +12,7 @@ import { environment } from '../../../environments/environment';
 export class AuthService {
   private readonly COOKIE_NAME = 'auth_token';
   private http = inject(HttpClient);
+  private alertService = inject(AlertService);
 
   // La sesión se mantiene en memoria para que el header, el perfil y las vistas
   // compartan el mismo usuario sin depender de llamadas repetidas al backend.
@@ -102,7 +104,17 @@ export class AuthService {
         }
       },
       error: (err) => {
-
+        if (err.status === 403 && err.error?.error) {
+          // Mostrar mensaje persistente
+          this.alertService.error('Acceso bloqueado', err.error.error, false, 10000);
+          
+          // Limpiar la sesión localmente para que no intente usar un token inválido
+          this.sujetoPerfilUsuario.next(null);
+          if (isPlatformBrowser(this.platformId)) {
+            document.cookie = `${this.COOKIE_NAME}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; SameSite=Lax`;
+          }
+          // No redirigimos inmediatamente para que el usuario pueda leer la alerta
+        }
       }
     });
   }
