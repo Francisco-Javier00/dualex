@@ -18,6 +18,8 @@ export class AuthService {
   // compartan el mismo usuario sin depender de llamadas repetidas al backend.
   private sujetoPerfilUsuario = new BehaviorSubject<PerfilUsuarioDTO | null>(null);
   perfilUsuario$ = this.sujetoPerfilUsuario.asObservable();
+  
+  public bloqueado$ = new BehaviorSubject<boolean>(false);
 
   /**
    * Obtiene el valor actual del perfil de usuario sin necesidad de suscripción.
@@ -105,15 +107,8 @@ export class AuthService {
       },
       error: (err) => {
         if (err.status === 403 && err.error?.error) {
-          // Mostrar mensaje persistente
-          this.alertService.error('Acceso bloqueado', err.error.error, false, 10000);
-          
-          // Limpiar la sesión localmente para que no intente usar un token inválido
-          this.sujetoPerfilUsuario.next(null);
-          if (isPlatformBrowser(this.platformId)) {
-            document.cookie = `${this.COOKIE_NAME}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; SameSite=Lax`;
-          }
-          // No redirigimos inmediatamente para que el usuario pueda leer la alerta
+          // Bloquear completamente la vista principal
+          this.bloqueado$.next(true);
         }
       }
     });
