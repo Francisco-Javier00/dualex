@@ -109,9 +109,10 @@ export class TareasService {
    * Proxy auxiliar que conecta con `ActividadesService` para poblar listados desplegables
    * en los formularios de nueva tarea.
    * 
+   * @param idAlumno (Opcional) ID del alumno para filtrar por ciclo.
    * @returns Un `Observable` con la lista de actividades globales del sistema.
    */
-  getActividades(): Observable<any[]> {
-    return this.actividadesService.getActividades();
+  getActividades(idAlumno?: number): Observable<any[]> {
+    return this.actividadesService.getActividades(idAlumno);
   }
 }
