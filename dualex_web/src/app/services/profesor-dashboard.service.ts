@@ -16,7 +16,7 @@ export class ProfesorDashboardService {
   private readonly API_URL = `${environment.apiUrl}/index.php?c=Modulos`;
 
   obtenerModulosPorEmail(email: string): Observable<ModuloProfesorDTO[]> {
-    return this.http.get<ModuloProfesorDTO[]>(`${this.API_URL}&m=listarProfesor&emailProfesor=${email}`);
+    return this.http.get<ModuloProfesorDTO[]>(`${this.API_URL}&m=listarProfesor&emailProfesor=${encodeURIComponent(email)}`);
   }
 
   /**

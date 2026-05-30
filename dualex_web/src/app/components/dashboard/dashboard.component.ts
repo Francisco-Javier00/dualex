@@ -49,7 +49,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         }
         this.usuario = perfil;
         if (perfil.rol === 'PROFESOR') {
-          this.cargarModulosProfesor();
+          this.cargarModulosProfesor(perfil.email);
         } else if ((perfil.rol === 'COORDINADOR' || perfil.rol === 'COORDINADOR_GENERAL') && perfil.email) {
           this.profesoresService.getProfesorByEmail(perfil.email).subscribe({
             next: (profesor) => {
@@ -65,9 +65,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
   /**
    * Carga la lista de módulos asignados al profesor en sesión desde el backend.
    */
-  private cargarModulosProfesor(): void {
+  private cargarModulosProfesor(email: string): void {
     this.cargandoModulos = true;
-    this.profesorDashboardService.obtenerModulosDelProfesor().subscribe({
+    this.profesorDashboardService.obtenerModulosPorEmail(email).subscribe({
       next: (modulos) => {
         this.modulosProfesor = modulos;
         this.cargandoModulos = false;

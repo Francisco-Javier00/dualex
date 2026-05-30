@@ -1,6 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { filter, take } from 'rxjs/operators';
 import { AuthService } from '../../auth/services/auth.service';
 import { ProfesorDashboardService } from '../../services/profesor-dashboard.service';
 import { AlertService } from '../../services/alert.service';
@@ -27,11 +28,12 @@ export class MisModulosComponent implements OnInit {
   cargando = true;
 
   ngOnInit() {
-    this.authService.perfilUsuario$.subscribe(perfil => {
+    this.authService.perfilUsuario$.pipe(
+      filter(perfil => !!perfil?.email),
+      take(1)
+    ).subscribe(perfil => {
       this.usuario = perfil;
-      if (perfil && perfil.email) {
-        this.cargarModulos(perfil.email);
-      }
+      this.cargarModulos(perfil!.email);
     });
   }
 
