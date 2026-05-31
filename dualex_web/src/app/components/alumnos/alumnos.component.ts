@@ -350,7 +350,12 @@ export class AlumnosComponent implements OnInit, OnDestroy {
           this.inicializarTabla();
         });
       } else {
-        this.mostrarPopupCurso = false;
+        if (this.cursosFiltradosIds.length === 0 && (this.rolUsuarioActual === 'COORDINADOR' || this.rolUsuarioActual === 'COORDINADOR_GENERAL' || this.rolUsuarioActual === 'PROFESOR')) {
+          this.popupCursosDisponibles = [];
+          this.mostrarPopupCurso = true;
+        } else {
+          this.mostrarPopupCurso = false;
+        }
         setTimeout(() => {
           this.inicializarTabla();
         }, 100);
