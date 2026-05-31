@@ -98,6 +98,37 @@ class ModCiclos {
             ]);
             $idCiclo = $this->db->lastInsertId();
 
+            // 2. Obtener el año escolar más reciente
+            $stmtAnio = $this->db->query("SELECT anio_escolar FROM Curso ORDER BY idCurso DESC LIMIT 1");
+            $anio_escolar = $stmtAnio->fetchColumn();
+            if (!$anio_escolar) {
+                // Fallback dinámico si no hay ningún curso en la base de datos
+                $month = (int)date('n');
+                $year = (int)date('y');
+                if ($month >= 9) {
+                    $anio_escolar = sprintf("%02d-%02d", $year, $year + 1);
+                } else {
+                    $anio_escolar = sprintf("%02d-%02d", $year - 1, $year);
+                }
+            }
+
+            // 3. Insertar los cursos asociados (1º y 2º)
+            $siglas = $datos['siglas'];
+            $sqlCurso = "INSERT INTO Curso (nombre, anio_escolar, idCiclo) VALUES (:nombre, :anio_escolar, :idCiclo)";
+            $stmtCurso = $this->db->prepare($sqlCurso);
+            
+            $stmtCurso->execute([
+                ':nombre'       => "1º $siglas",
+                ':anio_escolar' => $anio_escolar,
+                ':idCiclo'      => $idCiclo
+            ]);
+            
+            $stmtCurso->execute([
+                ':nombre'       => "2º $siglas",
+                ':anio_escolar' => $anio_escolar,
+                ':idCiclo'      => $idCiclo
+            ]);
+
             $this->db->commit();
             return $this->obtener($idCiclo);
         } catch (Exception $e) {
