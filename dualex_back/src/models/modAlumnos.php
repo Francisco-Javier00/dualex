@@ -47,11 +47,12 @@ class ModAlumnos {
                        DNI as dni, NUSS as nuss, NIA as nia, telefono, 
                        CAST(repetidor AS UNSIGNED) as repetidor, 
                        a.idCurso, c.nombre as nombreCurso,
-                       idEmpresa
+                       ea.idEmpresa, emp.nombre as nombreEmpresa
                 FROM Usuario u
                 JOIN Alumno a ON u.idUsuario = a.idAlumno
                 JOIN Curso c ON a.idCurso = c.idCurso
                 LEFT JOIN Empresa_Alumno ea ON a.idAlumno = ea.idAlumno
+                LEFT JOIN Empresa emp ON ea.idEmpresa = emp.idEmpresa
                 WHERE tipo = 'A'
                 ORDER BY apellidos, u.nombre";
         $stmt = $this->db->prepare($sql);
@@ -322,18 +323,19 @@ class ModAlumnos {
         $sql = "SELECT DISTINCT idUsuario as id, u.nombre, apellidos, correo as email, 
                        DNI as dni, NUSS as nuss, NIA as nia, telefono, a.idCurso,
                        CAST(repetidor AS UNSIGNED) as repetidor,
-                       c.nombre as nombreCurso, idEmpresa,
+                       c.nombre as nombreCurso, ea.idEmpresa, emp.nombre as nombreEmpresa,
                        " . $numTareasQuery . " as numTareas
                 FROM Usuario u
                 INNER JOIN Alumno a ON u.idUsuario = a.idAlumno 
                 LEFT JOIN Curso c ON a.idCurso = c.idCurso
-                LEFT JOIN Empresa_Alumno ea ON a.idAlumno = ea.idAlumno ";
+                LEFT JOIN Empresa_Alumno ea ON a.idAlumno = ea.idAlumno
+                LEFT JOIN Empresa emp ON ea.idEmpresa = emp.idEmpresa ";
         $joinClause = "";
         $joinMac = false;
         $joinMp = false;
 
         if ($search) {
-            $conditions[] = "(u.nombre LIKE :search1 OR apellidos LIKE :search2 OR correo LIKE :search3 OR DNI LIKE :search4 OR NUSS LIKE :search5 OR NIA LIKE :search6 OR telefono LIKE :search7 OR c.nombre LIKE :search8)";
+            $conditions[] = "(u.nombre LIKE :search1 OR apellidos LIKE :search2 OR correo LIKE :search3 OR DNI LIKE :search4 OR NUSS LIKE :search5 OR NIA LIKE :search6 OR telefono LIKE :search7 OR c.nombre LIKE :search8 OR emp.nombre LIKE :search9)";
             $binds[':search1'] = "%$search%";
             $binds[':search2'] = "%$search%";
             $binds[':search3'] = "%$search%";
@@ -342,6 +344,7 @@ class ModAlumnos {
             $binds[':search6'] = "%$search%";
             $binds[':search7'] = "%$search%";
             $binds[':search8'] = "%$search%";
+            $binds[':search9'] = "%$search%";
         }
         
         // Filtrado por modulo especifico
@@ -449,7 +452,9 @@ class ModAlumnos {
         // Consulta de conteo para DataTables
         $sqlCount = "SELECT COUNT(DISTINCT a.idAlumno) FROM Usuario u 
                      INNER JOIN Alumno a ON u.idUsuario = a.idAlumno 
-                     LEFT JOIN Curso c ON a.idCurso = c.idCurso " . $joinClause . $whereClause;
+                     LEFT JOIN Curso c ON a.idCurso = c.idCurso 
+                     LEFT JOIN Empresa_Alumno ea ON a.idAlumno = ea.idAlumno
+                     LEFT JOIN Empresa emp ON ea.idEmpresa = emp.idEmpresa " . $joinClause . $whereClause;
         $stmtCount = $this->db->prepare($sqlCount);
         foreach ($binds as $key => $val) {
             if (strpos($sqlCount, $key) !== false) {
@@ -475,17 +480,18 @@ class ModAlumnos {
         $sql = "SELECT DISTINCT idUsuario as id, u.nombre, apellidos, correo as email,
                        DNI as dni, NUSS as nuss, NIA as nia, telefono, a.idCurso,
                        CAST(repetidor AS UNSIGNED) as repetidor,
-                       c.nombre as nombreCurso, idEmpresa,
+                       c.nombre as nombreCurso, ea.idEmpresa, emp.nombre as nombreEmpresa,
                        (SELECT COUNT(*) FROM Tarea t WHERE t.idAlumno = a.idAlumno AND t.calificacion IS NULL AND t.fecha_fin >= NOW()) as numTareas
                 FROM Usuario u
                 INNER JOIN Alumno a ON u.idUsuario = a.idAlumno
                 LEFT JOIN Curso c ON a.idCurso = c.idCurso
-                LEFT JOIN Empresa_Alumno ea ON a.idAlumno = ea.idAlumno";
+                LEFT JOIN Empresa_Alumno ea ON a.idAlumno = ea.idAlumno
+                LEFT JOIN Empresa emp ON ea.idEmpresa = emp.idEmpresa";
 
         $where = "";
         $binds = [];
         if ($search) {
-            $where = " WHERE (u.nombre LIKE :search1 OR apellidos LIKE :search2 OR correo LIKE :search3 OR DNI LIKE :search4 OR NUSS LIKE :search5 OR NIA LIKE :search6 OR telefono LIKE :search7 OR c.nombre LIKE :search8)";
+            $where = " WHERE (u.nombre LIKE :search1 OR apellidos LIKE :search2 OR correo LIKE :search3 OR DNI LIKE :search4 OR NUSS LIKE :search5 OR NIA LIKE :search6 OR telefono LIKE :search7 OR c.nombre LIKE :search8 OR emp.nombre LIKE :search9)";
             $binds[':search1'] = "%$search%";
             $binds[':search2'] = "%$search%";
             $binds[':search3'] = "%$search%";
@@ -494,12 +500,13 @@ class ModAlumnos {
             $binds[':search6'] = "%$search%";
             $binds[':search7'] = "%$search%";
             $binds[':search8'] = "%$search%";
+            $binds[':search9'] = "%$search%";
         }
 
         $total = $this->db->query("SELECT COUNT(*) FROM Alumno")->fetchColumn();
 
         if ($search) {
-            $stmtF = $this->db->prepare("SELECT COUNT(DISTINCT a.idAlumno) FROM Usuario u INNER JOIN Alumno a ON u.idUsuario = a.idAlumno LEFT JOIN Curso c ON a.idCurso = c.idCurso" . $where);
+            $stmtF = $this->db->prepare("SELECT COUNT(DISTINCT a.idAlumno) FROM Usuario u INNER JOIN Alumno a ON u.idUsuario = a.idAlumno LEFT JOIN Curso c ON a.idCurso = c.idCurso LEFT JOIN Empresa_Alumno ea ON a.idAlumno = ea.idAlumno LEFT JOIN Empresa emp ON ea.idEmpresa = emp.idEmpresa" . $where);
             $stmtF->execute($binds);
             $totalFiltrados = $stmtF->fetchColumn();
         } else {
@@ -542,11 +549,12 @@ class ModAlumnos {
     public function listarPorModulo($idModulo) {
         $sql = "SELECT idUsuario as id, u.nombre, apellidos, correo as email, 
                        DNI as dni, NUSS as nuss, NIA as nia, telefono, 
-                       CAST(repetidor AS UNSIGNED) as repetidor, idCurso, idEmpresa
+                       CAST(repetidor AS UNSIGNED) as repetidor, a.idCurso, ea.idEmpresa, emp.nombre as nombreEmpresa
                 FROM Usuario u
                 JOIN Alumno a ON u.idUsuario = a.idAlumno
                 JOIN Modulo_Alumno_Cursa mac ON a.idAlumno = mac.idAlumno
                 LEFT JOIN Empresa_Alumno ea ON a.idAlumno = ea.idAlumno
+                LEFT JOIN Empresa emp ON ea.idEmpresa = emp.idEmpresa
                 WHERE mac.idModulo = :idModulo
                 ORDER BY apellidos, u.nombre";
         $stmt = $this->db->prepare($sql);
