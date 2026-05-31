@@ -233,6 +233,9 @@ export class TareaFormComponent implements OnInit {
           }
           this.documentoActual = tarea.documento ?? null;
           this.documentoFile = null;
+          
+          this.revisionesModulosArray.clear();
+          
           // Mapeamos los datos del objeto al formulario reactivo
           const actividadesNorm = this.normalizarIds(tarea.actividadesSeleccionadas);
           this.tareaForm.patchValue({ ...tarea, actividadesSeleccionadas: actividadesNorm });
@@ -439,8 +442,10 @@ export class TareaFormComponent implements OnInit {
     // También mantenemos el estado de los checkboxes y comentarios en pantalla si ya existen controles en el FormArray
     this.revisionesModulosArray.controls.forEach(ctrl => {
       const val = ctrl.value;
-      estadosActuales.set(val.modulo, val.revisado);
-      comentariosActuales.set(val.modulo, val.comentario || '');
+      if (!estadosActuales.has(val.modulo)) {
+        estadosActuales.set(val.modulo, val.revisado);
+        comentariosActuales.set(val.modulo, val.comentario || '');
+      }
     });
 
     // Reconstruimos el FormArray con los módulos únicos detectados
