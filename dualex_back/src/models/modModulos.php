@@ -135,7 +135,10 @@ class ModModulos {
                        (SELECT COUNT(DISTINCT mac.idAlumno) FROM Modulo_Alumno_Cursa mac 
                         JOIN Alumno al ON mac.idAlumno = al.idAlumno
                         WHERE mac.idModulo = m.idModulo AND al.idCurso = c.idCurso) as numAlumnos,
-                       (SELECT COUNT(DISTINCT ma.idActividad) FROM Modulo_Actividad ma WHERE ma.idModulo = m.idModulo) as numActividades
+                       (SELECT COUNT(DISTINCT mtr.idTarea) FROM Modulo_Tarea_Revision mtr 
+                        JOIN Tarea t ON mtr.idTarea = t.idTarea 
+                        JOIN Alumno al2 ON t.idAlumno = al2.idAlumno 
+                        WHERE mtr.idModulo = m.idModulo AND al2.idCurso = c.idCurso) as numActividades
                 FROM Modulo m
                 JOIN Modulo_Profesor mp ON m.idModulo = mp.idModulo
                 JOIN Profesor p ON mp.idProfesor = p.idProfesor
