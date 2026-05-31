@@ -35,7 +35,7 @@
             <span class="badge rounded-pill text-white px-3 py-2 shadow-sm d-flex align-items-center gap-2"
               [style.background-color]="moduloObj.color" style="font-size: 0.85rem;">
               <i class="fa-solid fa-book"></i>
-              Módulo: {{ moduloObj.sigla }} - {{ moduloObj.nombre }}
+              Módulo: {{ moduloObj.sigla }} - {{ moduloObj.nombre }}@if (getNombreCursoFiltrado()) { ({{ getNombreCursoFiltrado() }})}
             </span>
           </div>
           }
@@ -53,7 +53,7 @@
           <label for="filtroCurso" class="text-muted mb-0 fw-semibold" style="white-space: nowrap;">
             <i class="fa-solid fa-filter me-1 text-primary"></i> Filtrar por:
           </label>
-          <select id="filtroCurso" class="form-select border shadow-sm rounded-3 px-3 bg-white text-dark fw-medium"
+          <select id="filtroCurso" [value]="getFiltroValue()" class="form-select border shadow-sm rounded-3 px-3 bg-white text-dark fw-medium"
             style="min-width: 210px; max-width: 250px; font-size: 0.85rem; height: 38px; cursor: pointer;"
             (change)="onFiltroChange($event)">
             <option value="all">Todos los ciclos y cursos</option>

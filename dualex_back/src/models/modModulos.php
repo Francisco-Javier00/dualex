@@ -130,15 +130,20 @@ class ModModulos {
      * @return array Módulos del profesor.
      */
     public function obtenerModulosProfesor($emailProfesor) {
-        $sql = "SELECT m.idModulo, m.nombre, m.sigla, m.color,
-                       (SELECT COUNT(DISTINCT mac.idAlumno) FROM Modulo_Alumno_Cursa mac WHERE mac.idModulo = m.idModulo) as numAlumnos,
+        $sql = "SELECT DISTINCT m.idModulo, m.nombre, m.sigla, m.color,
+                       c.idCurso, c.nombre as nombreCurso,
+                       (SELECT COUNT(DISTINCT mac.idAlumno) FROM Modulo_Alumno_Cursa mac 
+                        JOIN Alumno al ON mac.idAlumno = al.idAlumno
+                        WHERE mac.idModulo = m.idModulo AND al.idCurso = c.idCurso) as numAlumnos,
                        (SELECT COUNT(DISTINCT ma.idActividad) FROM Modulo_Actividad ma WHERE ma.idModulo = m.idModulo) as numActividades
                 FROM Modulo m
                 JOIN Modulo_Profesor mp ON m.idModulo = mp.idModulo
                 JOIN Profesor p ON mp.idProfesor = p.idProfesor
                 JOIN Usuario u ON p.idProfesor = u.idUsuario
+                JOIN Modulo_Curso mc ON m.idModulo = mc.idModulo
+                JOIN Curso c ON mc.idCurso = c.idCurso
                 WHERE u.correo = :emailProfesor
-                ORDER BY m.nombre";
+                ORDER BY m.nombre, c.nombre";
         $stmt = $this->db->prepare($sql);
         $stmt->bindParam(':emailProfesor', $emailProfesor, PDO::PARAM_STR);
         $stmt->execute();

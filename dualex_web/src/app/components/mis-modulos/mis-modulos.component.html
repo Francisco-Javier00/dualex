@@ -29,17 +29,17 @@
     </div>
   } @else {
     <div class="row g-4">
-      @for (modulo of modulos; track modulo.idModulo) {
+      @for (modulo of modulos; track modulo.idModulo + '-' + (modulo.idCurso || '')) {
       <div class="col-sm-6 col-lg-4 col-xl-3">
         <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden modulo-card" style="cursor: pointer;"
-          [routerLink]="['/alumnos']" [queryParams]="{ moduloId: modulo.idModulo }">
+          [routerLink]="['/alumnos']" [queryParams]="{ moduloId: modulo.idModulo, cursoId: modulo.idCurso }">
           <div class="modulo-header px-4 py-3 d-flex align-items-center gap-3" [style.background-color]="modulo.color">
             <span class="badge bg-white fw-bold rounded-2" [style.color]="modulo.color"
               style="font-size: 0.85rem; letter-spacing: 0.04em; padding: 6px 10px;">
               {{ modulo.sigla }}
             </span>
             <span class="text-white fw-semibold" style="font-size: 0.95rem; line-height: 1.3;">
-              {{ modulo.nombre }}
+              {{ modulo.nombre }}@if (modulo.nombreCurso) { - {{ modulo.nombreCurso }}}
             </span>
           </div>
           <div class="card-body px-4 py-3">
@@ -49,7 +49,7 @@
             </div>
           </div>
           <div class="card-footer border-0 bg-transparent px-4 pb-3 pt-0">
-            <button class="btn btn-sm w-100 text-white" [style.background-color]="modulo.color" [routerLink]="['/alumnos']" [queryParams]="{ moduloId: modulo.idModulo }">
+            <button class="btn btn-sm w-100 text-white" [style.background-color]="modulo.color" [routerLink]="['/alumnos']" [queryParams]="{ moduloId: modulo.idModulo, cursoId: modulo.idCurso }">
               Ver módulo <i class="fa-solid fa-arrow-right ms-1"></i>
             </button>
           </div>

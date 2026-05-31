@@ -52,6 +52,8 @@ export interface ModuloProfesorDTO {
   color: string;
   numAlumnos?: number;
   numActividades?: number;
+  idCurso?: number;
+  nombreCurso?: string;
 }
 
 export interface TareaDTO {

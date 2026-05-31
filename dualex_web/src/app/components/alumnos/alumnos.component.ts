@@ -296,11 +296,32 @@ export class AlumnosComponent implements OnInit, OnDestroy {
   mostrarPopupCurso = false;
   popupCursosDisponibles: CursoDTO[] = [];
 
+  getFiltroValue(): string {
+    if (this.cursosFiltradosIds.length === 1) {
+      return 'curso:' + this.cursosFiltradosIds[0];
+    }
+    return 'all';
+  }
+
+  getNombreCursoFiltrado(): string {
+    if (this.cursosFiltradosIds.length === 1) {
+      const curso = this.todosLosCursos.find(c => c.id === this.cursosFiltradosIds[0]);
+      return curso ? curso.nombre : '';
+    }
+    return '';
+  }
+
   private procesarParametrosRuta(): void {
     this.route.queryParamMap.subscribe(params => {
       this.moduloId = params.get('moduloId');
+      const cursoIdParam = params.get('cursoId');
       this.nombreModulo = null;
       this.moduloObj = null;
+
+      this.cursosFiltradosIds = [];
+      if (cursoIdParam) {
+        this.cursosFiltradosIds = [Number(cursoIdParam)];
+      }
 
       if (this.moduloId) {
         this.modulosService.getModuloById(Number(this.moduloId)).subscribe((mod: any) => {
@@ -325,18 +346,11 @@ export class AlumnosComponent implements OnInit, OnDestroy {
             });
           }
 
-          if (this.rolUsuarioActual === 'COORDINADOR' || this.rolUsuarioActual === 'COORDINADOR_GENERAL' || this.rolUsuarioActual === 'PROFESOR') {
-            this.popupCursosDisponibles = [...this.todosLosCursos];
-            this.mostrarPopupCurso = true;
-          }
+          this.mostrarPopupCurso = false;
           this.inicializarTabla();
         });
       } else {
-        // Mostrar popup de selección si no estamos en módulo
-        if (this.rolUsuarioActual === 'COORDINADOR' || this.rolUsuarioActual === 'COORDINADOR_GENERAL' || this.rolUsuarioActual === 'PROFESOR') {
-          this.popupCursosDisponibles = [];
-          this.mostrarPopupCurso = true;
-        }
+        this.mostrarPopupCurso = false;
         setTimeout(() => {
           this.inicializarTabla();
         }, 100);
