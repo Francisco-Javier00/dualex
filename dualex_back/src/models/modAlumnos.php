@@ -568,9 +568,7 @@ class ModAlumnos {
                     $binds[':idUsuario2'] = (int)$idUsuario;
                 }
             }
-        }
-        // Si es Profesor, ve los Alumnos de los modulos que imparte
-        else if (strtoupper($rol) === 'PROFESOR') {
+        } elseif (strtoupper($rol) === 'PROFESOR') {
             if (empty($idUsuario)) {
                 $conditions[] = "1 = 0";
             } else {

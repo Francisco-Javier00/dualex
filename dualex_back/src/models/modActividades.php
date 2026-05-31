@@ -76,13 +76,11 @@ class ModActividades {
              $where = " WHERE EXISTS (
                  SELECT 1 FROM Modulo_Actividad inner_ma
                  JOIN Modulo_Curso inner_mc ON inner_ma.idModulo = inner_mc.idModulo
-                 JOIN Curso inner_cur ON inner_mc.idCurso = inner_cur.idCurso
                  WHERE inner_ma.idActividad = a.idActividad 
-                 AND inner_cur.idCiclo = (
-                     SELECT cur_alum.idCiclo 
-                     FROM Alumno al_inner
-                     JOIN Curso cur_alum ON al_inner.idCurso = cur_alum.idCurso
-                     WHERE al_inner.idAlumno = :idAlumno
+                 AND inner_mc.idCurso = (
+                     SELECT idCurso 
+                     FROM Alumno 
+                     WHERE idAlumno = :idAlumno
                      LIMIT 1
                  )
              )";

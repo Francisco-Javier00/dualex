@@ -12,7 +12,7 @@
         <p class="text-muted">Gestiona el progreso y las calificaciones del curso</p>
       </div>
     </div>
-    <button *ngIf="!esProfesor" type="button" class="btn btn-primary rounded-3 px-4 py-2 shadow-sm" (click)="crearTarea()">
+    <button *ngIf="!esProfesor && !esCoordinador" type="button" class="btn btn-primary rounded-3 px-4 py-2 shadow-sm" (click)="crearTarea()">
       <i class="fa-solid fa-plus me-2"></i> Nueva Tarea
     </button>
   </div>
