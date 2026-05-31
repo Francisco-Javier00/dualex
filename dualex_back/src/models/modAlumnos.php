@@ -395,10 +395,11 @@ class ModAlumnos {
                         JOIN Modulo_Curso mc_chk ON mac_chk.idModulo = mc_chk.idModulo 
                         JOIN Curso c_chk ON mc_chk.idCurso = c_chk.idCurso 
                         JOIN Ciclo cic_chk ON c_chk.idCiclo = cic_chk.idCiclo 
-                        WHERE cic_chk.idCoordinador = :idUsuario
+                        WHERE cic_chk.idCoordinador = :idUsuario2
                     )
                 )";
                 $binds[':idUsuario'] = (int)$idUsuario;
+                $binds[':idUsuario2'] = (int)$idUsuario;
             } // Fin del else de if (empty($idUsuario))
         }
         // Si es Profesor, ve los Alumnos de los modulos que imparte
