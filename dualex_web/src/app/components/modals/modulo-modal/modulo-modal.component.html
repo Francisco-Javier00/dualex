@@ -51,14 +51,21 @@
             <label class="form-label small fw-bold text-uppercase opacity-75">Ciclo Formativo</label>
             <div class="input-group shadow-sm rounded-3 overflow-hidden border"
                  [class.is-invalid]="moduloForm.get('idCiclo')?.touched && moduloForm.get('idCiclo')?.invalid">
-              <span class="input-group-text bg-white border-0"><i class="fa-solid fa-graduation-cap text-muted"></i></span>
-              <select formControlName="idCiclo" class="form-select border-0 px-3"
+              <span class="input-group-text bg-white border-0" [ngClass]="{'bg-light': ciclos.length === 1}">
+                <i class="fa-solid fa-graduation-cap text-muted"></i>
+              </span>
+              
+              <select *ngIf="ciclos.length !== 1" formControlName="idCiclo" class="form-select border-0 px-3"
                       [class.is-invalid]="moduloForm.get('idCiclo')?.touched && moduloForm.get('idCiclo')?.invalid">
                 <option [ngValue]="null" disabled>Selecciona un ciclo...</option>
                 <option *ngFor="let ciclo of ciclos" [ngValue]="ciclo.id">
                   {{ ciclo.siglas }} - {{ ciclo.nombre }}
                 </option>
               </select>
+
+              <div *ngIf="ciclos.length === 1" class="form-control border-0 px-3 bg-light d-flex align-items-center text-muted">
+                {{ ciclos[0].siglas }} - {{ ciclos[0].nombre }}
+              </div>
             </div>
             <div class="text-danger small mt-1" *ngIf="moduloForm.get('idCiclo')?.touched && moduloForm.get('idCiclo')?.errors?.['required']">
               Debes seleccionar un ciclo

@@ -68,6 +68,13 @@ export class ModuloModalComponent implements OnInit, OnChanges, OnDestroy {
     } else {
       this.ciclos = [...this.todosLosCiclos];
     }
+
+    if (this.ciclos.length === 1) {
+      // Auto-seleccionar el único ciclo disponible
+      if (!this.moduloForm.get('idCiclo')?.value) {
+        this.moduloForm.get('idCiclo')?.setValue(this.ciclos[0].id);
+      }
+    }
   }
 
   cargarCursos(): void {
@@ -128,10 +135,16 @@ export class ModuloModalComponent implements OnInit, OnChanges, OnDestroy {
         this.moduloForm.get('idCurso')?.setValue(this.modulo.idCurso);
       }
     } else if (changes['visible'] && changes['visible'].currentValue === true && !this.modulo) {
+      const autoCicloId = this.ciclos.length === 1 ? this.ciclos[0].id : null;
       this.moduloForm.reset({
-        color: '#4e73df'
+        color: '#4e73df',
+        idCiclo: autoCicloId
       });
-      this.cursosFiltrados = [];
+      if (autoCicloId) {
+        this.filtrarCursos(autoCicloId);
+      } else {
+        this.cursosFiltrados = [];
+      }
     }
   }
 
