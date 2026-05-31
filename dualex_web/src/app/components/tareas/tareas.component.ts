@@ -35,12 +35,15 @@ export class TareasComponent implements OnInit {
   tareas: TareaDTO[] = [];                 // Lista de tareas cargadas
   alumnoId: number | null = null;       // ID del alumno si la ruta es /tareas/:alumnoId
   esProfesor = false;                   // Flag para saber si es perfil profesor
+  esCoordinador = false;                // Flag para saber si es perfil coordinador
 
   /**
    * Inicialización: Suscripción a los parámetros de la ruta para detectar cambios dinámicos.
    */
   ngOnInit(): void {
-    this.esProfesor = this.authService.currentUserValue?.rol === 'PROFESOR';
+    const rol = this.authService.currentUserValue?.rol;
+    this.esProfesor = rol === 'PROFESOR';
+    this.esCoordinador = rol === 'COORDINADOR' || rol === 'COORDINADOR_GENERAL';
     this.route.paramMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
       const id = params.get('alumnoId');
       this.alumnoId = id ? +id : null;
