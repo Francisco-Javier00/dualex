@@ -46,19 +46,13 @@ class ModAlumnos {
      * @return PDO Instancia de la conexión PDO.
      */
     private function getNewDbConnection() {
-        $host = $_ENV['DB_HOST'] ?? 'localhost';
-        $username = $_ENV['DB_USER'] ?? 'root';
-        $password = $_ENV['DB_PASS'] ?? '';
-        $db_name = $_ENV['DB_NAME_SECONDARY'] ?? 'proyectosevg_BD2-05';
-        $charset = 'utf8mb4';
-        
-        $dsn = "mysql:host=" . $host . ";dbname=" . $db_name . ";charset=" . $charset;
-        $options = [
-            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION, // Lanza excepciones en caso de error SQL
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,       // Devuelve arrays asociativos
-            PDO::ATTR_EMULATE_PREPARES   => true,                   // Emulación de sentencias preparadas
-        ];
-        return new PDO($dsn, $username, $password, $options);
+        $conexionSecundaria = new ConexionDB(
+            'DB_NAME_SECONDARY', 
+            'DB_HOST_SECONDARY', 
+            'DB_USER_SECONDARY', 
+            'DB_PASS_SECONDARY'
+        );
+        return $conexionSecundaria->getConnection();
     }
 
     /**
