@@ -223,7 +223,7 @@ export class AlumnosComponent implements OnInit, OnDestroy {
           this.ciclosCoordinados = ciclosCoordinados;
           
           const hasModuloId = this.route.snapshot.queryParamMap.has('moduloId');
-          this.esCoordinadorSinCiclo = !usuarioActual.esGeneral && (usuarioActual.rol === 'COORDINADOR') && ciclosCoordinados.length === 0 && !hasModuloId;
+          this.esCoordinadorSinCiclo = (usuarioActual.rol === 'COORDINADOR' || usuarioActual.rol === 'COORDINADOR_GENERAL') && ciclosCoordinados.length === 0 && !hasModuloId;
 
           if (this.esCoordinadorSinCiclo) {
             this.procesarParametrosRuta();
@@ -235,7 +235,7 @@ export class AlumnosComponent implements OnInit, OnDestroy {
               // Only keep courses whose siglasCiclo is coordinated by the coordinator, UNLESS they are general coordinators OR viewing a specific module OR just a professor
               let cursosFiltrados = cursos;
               const hasModuloId = this.route.snapshot.queryParamMap.has('moduloId');
-              if (usuarioActual.rol === 'COORDINADOR' && ciclosCoordinados.length > 0 && !hasModuloId) {
+              if ((usuarioActual.rol === 'COORDINADOR' || usuarioActual.rol === 'COORDINADOR_GENERAL') && ciclosCoordinados.length > 0 && !hasModuloId) {
                   cursosFiltrados = cursos.filter(c => c.siglasCiclo && ciclosCoordinados.includes(c.siglasCiclo));
               }
 

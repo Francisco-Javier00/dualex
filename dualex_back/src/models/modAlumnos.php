@@ -358,10 +358,10 @@ class ModAlumnos {
             $idsValidados = array_filter(array_map('intval', $idsCursos));
             if (!empty($idsValidados)) {
                 $idsCsv = implode(',', $idsValidados);
-                $conditions[] = "(a.idCurso IN ($idsCsv) OR EXISTS (
-                    SELECT 1 FROM Modulo_Alumno_Cursa mac_sub 
+                $conditions[] = "(a.idCurso IN ($idsCsv) OR a.idAlumno IN (
+                    SELECT mac_sub.idAlumno FROM Modulo_Alumno_Cursa mac_sub 
                     JOIN Modulo_Curso mc_sub ON mac_sub.idModulo = mc_sub.idModulo 
-                    WHERE mac_sub.idAlumno = a.idAlumno AND mc_sub.idCurso IN ($idsCsv)
+                    WHERE mc_sub.idCurso IN ($idsCsv)
                 ))";
             }
         }
@@ -379,32 +379,29 @@ class ModAlumnos {
                     $esProfesorDelModulo = (bool)$stmtChk->fetchColumn();
                 }
 
-            if ($esProfesorDelModulo) {
-                // Si es profesor del módulo que está filtrando, ve los Alumnos como Profesor
-                $joinMac = true;
-                $joinMp = true;
-                $conditions[] = "mp.idProfesor = :idUsuario";
-                $binds[':idUsuario'] = (int)$idUsuario;
-            } else {
-                if (strtoupper($rol) === 'COORDINADOR_GENERAL') {
-                    // El coordinador general no se restringe por idCoordinador
+                if ($esProfesorDelModulo) {
+                    // Si es profesor del módulo que está filtrando, ve los Alumnos como Profesor
+                    $joinMac = true;
+                    $joinMp = true;
+                    $conditions[] = "mp.idProfesor = :idUsuario";
+                    $binds[':idUsuario'] = (int)$idUsuario;
                 } else {
-                    // Coordinador normal: se restringe a los ciclos que coordina
+                    // Coordinador (General o Dual): se restringe a los ciclos que coordina
                     // (ya sea porque es su curso base, o porque cursa un módulo de ese ciclo)
                     $conditions[] = "(
-                        EXISTS (SELECT 1 FROM Curso c_chk JOIN Ciclo cic_chk ON c_chk.idCiclo = cic_chk.idCiclo WHERE c_chk.idCurso = a.idCurso AND cic_chk.idCoordinador = :idUsuario)
-                        OR EXISTS (
-                            SELECT 1 FROM Modulo_Alumno_Cursa mac_chk 
+                        a.idCurso IN (SELECT c_chk.idCurso FROM Curso c_chk JOIN Ciclo cic_chk ON c_chk.idCiclo = cic_chk.idCiclo WHERE cic_chk.idCoordinador = :idUsuario)
+                        OR a.idAlumno IN (
+                            SELECT mac_chk.idAlumno FROM Modulo_Alumno_Cursa mac_chk 
                             JOIN Modulo_Curso mc_chk ON mac_chk.idModulo = mc_chk.idModulo 
                             JOIN Curso c_chk ON mc_chk.idCurso = c_chk.idCurso 
                             JOIN Ciclo cic_chk ON c_chk.idCiclo = cic_chk.idCiclo 
-                            WHERE mac_chk.idAlumno = a.idAlumno AND cic_chk.idCoordinador = :idUsuario
+                            WHERE cic_chk.idCoordinador = :idUsuario2
                         )
                     )";
                     $binds[':idUsuario'] = (int)$idUsuario;
+                    $binds[':idUsuario2'] = (int)$idUsuario;
                 }
             }
-            } // Fin del else de if (empty($idUsuario))
         }
         // Si es Profesor, ve los Alumnos de los modulos que imparte
         else if (strtoupper($rol) === 'PROFESOR') {
