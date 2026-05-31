@@ -357,7 +357,12 @@ class ModAlumnos {
         if (!empty($idsCursos) && is_array($idsCursos)) {
             $idsValidados = array_filter(array_map('intval', $idsCursos));
             if (!empty($idsValidados)) {
-                $conditions[] = "a.idCurso IN (" . implode(',', $idsValidados) . ")";
+                $idsCsv = implode(',', $idsValidados);
+                $conditions[] = "(a.idCurso IN ($idsCsv) OR EXISTS (
+                    SELECT 1 FROM Modulo_Alumno_Cursa mac_sub 
+                    JOIN Modulo_Curso mc_sub ON mac_sub.idModulo = mc_sub.idModulo 
+                    WHERE mac_sub.idAlumno = a.idAlumno AND mc_sub.idCurso IN ($idsCsv)
+                ))";
             }
         }
 
@@ -385,8 +390,17 @@ class ModAlumnos {
                     // El coordinador general no se restringe por idCoordinador
                 } else {
                     // Coordinador normal: se restringe a los ciclos que coordina
-                    $joinClause .= " INNER JOIN Ciclo cic ON c.idCiclo = cic.idCiclo ";
-                    $conditions[] = "cic.idCoordinador = :idUsuario";
+                    // (ya sea porque es su curso base, o porque cursa un módulo de ese ciclo)
+                    $conditions[] = "(
+                        EXISTS (SELECT 1 FROM Curso c_chk JOIN Ciclo cic_chk ON c_chk.idCiclo = cic_chk.idCiclo WHERE c_chk.idCurso = a.idCurso AND cic_chk.idCoordinador = :idUsuario)
+                        OR EXISTS (
+                            SELECT 1 FROM Modulo_Alumno_Cursa mac_chk 
+                            JOIN Modulo_Curso mc_chk ON mac_chk.idModulo = mc_chk.idModulo 
+                            JOIN Curso c_chk ON mc_chk.idCurso = c_chk.idCurso 
+                            JOIN Ciclo cic_chk ON c_chk.idCiclo = cic_chk.idCiclo 
+                            WHERE mac_chk.idAlumno = a.idAlumno AND cic_chk.idCoordinador = :idUsuario
+                        )
+                    )";
                     $binds[':idUsuario'] = (int)$idUsuario;
                 }
             }
