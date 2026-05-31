@@ -102,7 +102,6 @@ class ConAlumnos extends BaseController {
         $params['rol_token'] = $rol_token;
         
         $data = $this->modelo->obtenerDataTables($params);
-        error_log("PARAMS: " . print_r($params, true) . " DATA: " . print_r($data, true));
         $this->sendResponse($data);
     }
 
