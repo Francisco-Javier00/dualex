@@ -183,6 +183,15 @@ class ModModulos {
                 }
             }
 
+            // Asignar automáticamente el módulo a los alumnos del curso(s)
+            $sqlAlumnos = "INSERT IGNORE INTO Modulo_Alumno_Cursa (idModulo, idAlumno)
+                           SELECT mc.idModulo, a.idAlumno 
+                           FROM Modulo_Curso mc
+                           JOIN Alumno a ON mc.idCurso = a.idCurso
+                           WHERE mc.idModulo = :idModulo";
+            $stmtAlumnos = $this->db->prepare($sqlAlumnos);
+            $stmtAlumnos->execute([':idModulo' => $idModulo]);
+
             $this->db->commit();
             return $this->obtener($idModulo);
         } catch (Exception $e) {
@@ -238,6 +247,25 @@ class ModModulos {
                     $stmtRel->execute([':idModulo' => $id, ':idCurso' => $curso['idCurso']]);
                 }
             }
+
+            // Actualizar alumnos asignados según los nuevos cursos vinculados
+            $sqlDeleteAlumnos = "DELETE mac FROM Modulo_Alumno_Cursa mac
+                                 LEFT JOIN (
+                                     SELECT mc.idModulo, a.idAlumno 
+                                     FROM Modulo_Curso mc
+                                     JOIN Alumno a ON mc.idCurso = a.idCurso
+                                     WHERE mc.idModulo = :idModulo
+                                 ) as validos ON mac.idModulo = validos.idModulo AND mac.idAlumno = validos.idAlumno
+                                 WHERE mac.idModulo = :idModulo AND validos.idAlumno IS NULL";
+            $this->db->prepare($sqlDeleteAlumnos)->execute([':idModulo' => $id]);
+
+            $sqlAlumnos = "INSERT IGNORE INTO Modulo_Alumno_Cursa (idModulo, idAlumno)
+                           SELECT mc.idModulo, a.idAlumno 
+                           FROM Modulo_Curso mc
+                           JOIN Alumno a ON mc.idCurso = a.idCurso
+                           WHERE mc.idModulo = :idModulo";
+            $stmtAlumnos = $this->db->prepare($sqlAlumnos);
+            $stmtAlumnos->execute([':idModulo' => $id]);
 
             $this->db->commit();
             return $this->obtener($id);
