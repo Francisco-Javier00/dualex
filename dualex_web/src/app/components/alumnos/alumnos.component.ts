@@ -75,13 +75,13 @@ export class AlumnosComponent implements OnInit, OnDestroy {
     // Desde "Mis Módulos" (con moduloId), todos son solo lectura
     if (this.moduloId) return true;
     // Los coordinadores (general y local) no son solo lectura en gestión
-    return this.rolUsuarioActual !== 'COORDINADOR';
+    return this.rolUsuarioActual !== 'COORDINADOR' && this.rolUsuarioActual !== 'COORDINADOR_GENERAL';
   }
 
   get columnTitles(): string[] {
     const base = [' ', 'Nombre', 'Apellidos', 'Correo', 'Curso/Ciclo', 'Repetidor'];
     if (!this.esSoloLectura) {
-      base.push('DNI', 'NUSS', 'NIA', 'Teléfono');
+      base.push('DNI', 'NUSS', 'NIA', 'Teléfono', 'Empresa asignada');
     }
     base.push('Acciones');
     return base;
@@ -103,14 +103,14 @@ export class AlumnosComponent implements OnInit, OnDestroy {
         defaultContent: '',
         responsivePriority: 1
       },
-      { data: 'nombre', width: ocultarSensibles ? '18%' : '11%', responsivePriority: 2 },
-      { data: 'apellidos', width: ocultarSensibles ? '26%' : '15%', responsivePriority: 3 },
-      { data: 'email', width: ocultarSensibles ? '30%' : '18%', responsivePriority: 4 },
-      { data: 'nombreCurso', className: 'text-nowrap', defaultContent: '<span class="text-muted">Sin curso</span>', width: ocultarSensibles ? '10%' : '9%', responsivePriority: 5 },
+      { data: 'nombre', width: ocultarSensibles ? '18%' : '10%', responsivePriority: 2 },
+      { data: 'apellidos', width: ocultarSensibles ? '26%' : '12%', responsivePriority: 3 },
+      { data: 'email', width: ocultarSensibles ? '30%' : '12%', responsivePriority: 4 },
+      { data: 'nombreCurso', className: 'text-nowrap', defaultContent: '<span class="text-muted">Sin curso</span>', width: ocultarSensibles ? '10%' : '8%', responsivePriority: 5 },
       {
         data: 'repetidor',
         className: 'text-center',
-        width: ocultarSensibles ? '10%' : '8%',
+        width: ocultarSensibles ? '10%' : '7%',
         responsivePriority: 6,
         render: (data: any) => {
           const isRepetidor = Number(data) === 1 || data === true;
@@ -124,10 +124,17 @@ export class AlumnosComponent implements OnInit, OnDestroy {
     // Desde "Mis Módulos" o Profesor: ocultar sensibles
     if (!ocultarSensibles) {
       cols.push(
-        { data: 'dni', className: 'text-nowrap', width: '8%', responsivePriority: 9 },
-        { data: 'nuss', className: 'text-nowrap', width: '8%', responsivePriority: 8 },
-        { data: 'nia', className: 'text-nowrap', width: '8%', responsivePriority: 7 },
-        { data: 'telefono', className: 'text-nowrap', width: '9%', responsivePriority: 10 }
+        { data: 'dni', className: 'text-nowrap', width: '7%', responsivePriority: 9 },
+        { data: 'nuss', className: 'text-nowrap', width: '7%', responsivePriority: 8 },
+        { data: 'nia', className: 'text-nowrap', width: '7%', responsivePriority: 7 },
+        { data: 'telefono', className: 'text-nowrap', width: '8%', responsivePriority: 10 },
+        { 
+          data: 'nombreEmpresa', 
+          className: 'text-nowrap', 
+          defaultContent: '<span class="text-muted">Sin empresa</span>', 
+          width: '16%', 
+          responsivePriority: 11 
+        }
       );
     }
     cols.push({

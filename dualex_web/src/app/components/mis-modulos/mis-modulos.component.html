@@ -11,9 +11,11 @@
       </div>
     </div>
     <div class="d-flex gap-2">
+      @if (usuario?.rol !== 'COORDINADOR' && usuario?.rol !== 'COORDINADOR_GENERAL') {
       <button class="btn btn-building shadow-sm" data-tooltip="Ver listado de empresas" routerLink="/empresas">
         <i class="fa-solid fa-building"></i>
       </button>
+      }
       <button class="btn btn-outline-success shadow-sm" data-tooltip="Ver tareas de todos los alumnos" routerLink="/tareas-todos" style="width:56px;height:56px;border-radius:14px;font-size:1.5rem;">
         <i class="fa-solid fa-clipboard-list"></i>
       </button>
