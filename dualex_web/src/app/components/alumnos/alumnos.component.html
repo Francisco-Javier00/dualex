@@ -112,3 +112,58 @@
   [importando]="importandoExcel" (cerrar)="onCerrarImportar()" (importar)="onConfirmarImportar($event)">
 </app-importar-alumnos-modal>
 }
+
+<!-- Modal de Selección de Curso (Primero/Segundo o Curso específico del Módulo) -->
+@if (mostrarPopupCurso) {
+<div class="modal-overlay">
+  <div class="modal-content animate-slide-up" style="max-width: 540px; width: 90%; margin: 0 auto;" (click)="$event.stopPropagation()">
+    <!-- CABECERA -->
+    <div class="modal-header d-flex justify-content-between align-items-center">
+      <h5 class="mb-0 fw-bold text-dark">
+        <i class="fa-solid fa-graduation-cap text-primary me-2"></i>
+        Selección de Curso
+      </h5>
+      <button class="btn-close" (click)="mostrarPopupCurso = false"></button>
+    </div>
+
+    <!-- CUERPO -->
+    <div class="modal-body py-4 text-center">
+      @if (popupCursosDisponibles.length > 0) {
+        <p class="text-secondary mb-4" style="font-size: 0.92rem; line-height: 1.5;">
+          Este módulo se imparte en varios cursos. Por favor, selecciona a cuál de ellos deseas acceder:
+        </p>
+        
+        <div class="d-grid gap-3 mb-2">
+          @for (curso of popupCursosDisponibles; track curso.id) {
+            <button type="button" class="btn btn-outline-primary btn-lg py-3 rounded-3 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2 transition" (click)="seleccionarCursoEspecifico(curso.id)" style="border-width: 2px; font-size: 1.05rem;">
+              {{ curso.nombre }}
+            </button>
+          }
+          
+          <button type="button" class="btn btn-link text-muted py-2 fw-semibold text-decoration-none mt-2" (click)="mostrarPopupCurso = false">
+            Ver todos los cursos del módulo
+          </button>
+        </div>
+      } @else {
+        <p class="text-secondary mb-4" style="font-size: 0.92rem; line-height: 1.5;">
+          Por favor, selecciona si deseas acceder a los alumnos matriculados en <strong>Primer Curso (1º)</strong> o en <strong>Segundo Curso (2º)</strong>.
+        </p>
+        
+        <div class="d-grid gap-3 mb-2">
+          <button type="button" class="btn btn-outline-primary btn-lg py-3 rounded-3 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2" (click)="seleccionarCursoNivel('1')" style="border-width: 2px; font-size: 1.05rem;">
+            Primero (1º Curso)
+          </button>
+          
+          <button type="button" class="btn btn-outline-primary btn-lg py-3 rounded-3 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2" (click)="seleccionarCursoNivel('2')" style="border-width: 2px; font-size: 1.05rem;">
+            Segundo (2º Curso)
+          </button>
+          
+          <button type="button" class="btn btn-link text-muted py-2 fw-semibold text-decoration-none mt-2" (click)="mostrarPopupCurso = false">
+            Ver todos los alumnos
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+</div>
+}
