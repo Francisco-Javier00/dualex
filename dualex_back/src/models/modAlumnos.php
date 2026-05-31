@@ -37,6 +37,127 @@ class ModAlumnos {
     }
 
     /**
+     * Establece y devuelve una conexión PDO a la base de datos secundaria (proyectosevg_BD2-05).
+     * 
+     * Se reutilizan el host, usuario y contraseña de la base de datos principal,
+     * pero cambiando el nombre de la base de datos al valor especificado en las
+     * variables de entorno (DB_NAME_SECONDARY).
+     * 
+     * @return PDO Instancia de la conexión PDO.
+     */
+    private function getNewDbConnection() {
+        $host = $_ENV['DB_HOST'] ?? 'localhost';
+        $username = $_ENV['DB_USER'] ?? 'root';
+        $password = $_ENV['DB_PASS'] ?? '';
+        $db_name = $_ENV['DB_NAME_SECONDARY'] ?? 'proyectosevg_BD2-05';
+        $charset = 'utf8mb4';
+        
+        $dsn = "mysql:host=" . $host . ";dbname=" . $db_name . ";charset=" . $charset;
+        $options = [
+            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION, // Lanza excepciones en caso de error SQL
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,       // Devuelve arrays asociativos
+            PDO::ATTR_EMULATE_PREPARES   => true,                   // Emulación de sentencias preparadas
+        ];
+        return new PDO($dsn, $username, $password, $options);
+    }
+
+    /**
+     * Sincroniza la información de un alumno en la base de datos secundaria (proyectosevg_BD2-05).
+     * 
+     * Este proceso realiza los siguientes pasos secuenciales:
+     * 1. Consulta la información del curso y ciclo en la base de datos principal.
+     * 2. Comprueba e inserta de forma automática la etapa correspondiente en la tabla `tm_etapas`.
+     * 3. Comprueba e inserta de forma automática la clase correspondiente en la tabla `tm_clases`.
+     * 4. Inserta o actualiza los datos del alumno en la tabla `alumnos` de la segunda BD,
+     *    garantizando que se marque como perteneciente a Dualex (`es_dualex = 1`) y activo.
+     * 
+     * @param string $email Correo electrónico único del alumno.
+     * @param string $nombre Nombre del alumno.
+     * @param string $apellidos Apellidos del alumno.
+     * @param int $idCurso Identificador único del curso en la BD principal.
+     * @throws Exception Si ocurre cualquier error durante la conexión o inserción en la BD secundaria.
+     */
+    private function sincronizarAlumnoNuevaBD($email, $nombre, $apellidos, $idCurso) {
+        try {
+            // Establece la conexión con la base de datos secundaria
+            $newDb = $this->getNewDbConnection();
+            
+            // 1. Obtiene la información del curso y ciclo asociado desde la base de datos principal (Dualex)
+            $sqlCursoInfo = "SELECT c.nombre as nombreCurso, cic.nombre as nombreCiclo, cic.siglas as siglasCiclo 
+                             FROM Curso c 
+                             JOIN Ciclo cic ON c.idCiclo = cic.idCiclo 
+                             WHERE c.idCurso = :idCurso";
+            $stmtCursoInfo = $this->db->prepare($sqlCursoInfo);
+            $stmtCursoInfo->execute([':idCurso' => $idCurso]);
+            $cursoInfo = $stmtCursoInfo->fetch(PDO::FETCH_ASSOC);
+            
+            if (!$cursoInfo) {
+                // Si el curso no existe en la base de datos principal, cancela la sincronización
+                return;
+            }
+            
+            // Limpieza y preparación de datos para cumplir con las longitudes de campo de la BD secundaria
+            $siglasCiclo = substr(trim($cursoInfo['siglasCiclo']), 0, 4); // tm_etapas.codigo es char(4)
+            $nombreCiclo = substr(trim($cursoInfo['nombreCiclo']), 0, 50); // tm_etapas.nombre es varchar(50)
+            $nombreCurso = trim($cursoInfo['nombreCurso']);
+            $claseCodigo = substr(strtoupper(str_replace(' ', '', $nombreCurso)), 0, 8); // tm_clases.codigo es char(8)
+            $claseNombre = substr($nombreCurso, 0, 100); // tm_clases.nombre es varchar(100)
+            
+            // 2. Verifica si la etapa del ciclo ya está registrada en la tabla `tm_etapas`
+            $stmtEtapaSel = $newDb->prepare("SELECT id FROM tm_etapas WHERE codigo = :codigo LIMIT 1");
+            $stmtEtapaSel->execute([':codigo' => $siglasCiclo]);
+            $etapaId = $stmtEtapaSel->fetchColumn();
+            
+            // Si la etapa no existe, se inserta un nuevo registro
+            if (!$etapaId) {
+                $stmtEtapaIns = $newDb->prepare("INSERT INTO tm_etapas (codigo, nombre) VALUES (:codigo, :nombre)");
+                $stmtEtapaIns->execute([
+                    ':codigo' => $siglasCiclo,
+                    ':nombre' => $nombreCiclo
+                ]);
+                $etapaId = $newDb->lastInsertId(); // Recupera el ID auto-incremental generado
+            }
+            
+            // 3. Verifica si la clase del curso ya está registrada en la tabla `tm_clases`
+            $stmtClaseSel = $newDb->prepare("SELECT codigo FROM tm_clases WHERE codigo = :codigo LIMIT 1");
+            $stmtClaseSel->execute([':codigo' => $claseCodigo]);
+            $claseCodigoExists = $stmtClaseSel->fetchColumn();
+            
+            // Si la clase no existe, se inserta relacionándola con la etapa obtenida anteriormente
+            if (!$claseCodigoExists) {
+                $stmtClaseIns = $newDb->prepare("INSERT INTO tm_clases (codigo, nombre, etapa_id) VALUES (:codigo, :nombre, :etapa_id)");
+                $stmtClaseIns->execute([
+                    ':codigo'   => $claseCodigo,
+                    ':nombre'   => $claseNombre,
+                    ':etapa_id' => $etapaId
+                ]);
+            }
+            
+            // 4. Inserta o actualiza los datos del alumno en la tabla `alumnos` de la base de datos secundaria.
+            // Se utiliza ON DUPLICATE KEY UPDATE para sobrescribir los datos si ya existe un alumno con el mismo email.
+            $stmtAlumnoIns = $newDb->prepare("
+                INSERT INTO alumnos (nombre, apellidos, email, clase_codigo, es_dualex, activo)
+                VALUES (:nombre, :apellidos, :email, :clase_codigo, 1, 1)
+                ON DUPLICATE KEY UPDATE 
+                    nombre = VALUES(nombre), 
+                    apellidos = VALUES(apellidos), 
+                    clase_codigo = VALUES(clase_codigo), 
+                    es_dualex = VALUES(es_dualex),
+                    activo = 1
+            ");
+            $stmtAlumnoIns->execute([
+                ':nombre'       => substr(trim($nombre), 0, 100),   // alumnos.nombre es varchar(100)
+                ':apellidos'    => substr(trim($apellidos), 0, 100), // alumnos.apellidos es varchar(100)
+                ':email'        => substr(trim($email), 0, 200),     // alumnos.email es varchar(200) y UNIQUE
+                ':clase_codigo' => $claseCodigo
+            ]);
+        } catch (Exception $e) {
+            // Relanza el error detallando el fallo en la base de datos secundaria para que se ejecute el rollback en la principal
+            throw new Exception("Error al sincronizar con la segunda base de datos: " . $e->getMessage(), 0, $e);
+        }
+    }
+
+    /**
      * Obtiene el listado completo de todos los Alumno registrados en el sistema,
      * asociando sus datos personales de usuario, curso y empresa vinculada.
      *
@@ -141,6 +262,11 @@ class ModAlumnos {
                 $stmtEA->execute();
             }
 
+            // --- NUEVO REQUERIMIENTO: REPLICACIÓN EN SEGUNDA BASE DE DATOS ---
+            // Sincronizamos la creación del alumno en la tabla `alumnos` de `proyectosevg_BD2-05`,
+            // insertando/asegurando previamente la etapa en `tm_etapas` y la clase en `tm_clases`.
+            $this->sincronizarAlumnoNuevaBD($datos['email'], $datos['nombre'], $datos['apellidos'], $datos['idCurso']);
+
             $this->db->commit();
             return $this->obtener($idUsuario);
         } catch (Exception $e) {
@@ -161,12 +287,13 @@ class ModAlumnos {
         try {
             $this->db->beginTransaction();
 
-            // Obtener el curso anterior antes de actualizar
-            $sqlGetOld = "SELECT idCurso FROM Alumno WHERE idAlumno = :id";
+            // Obtener el curso y correo anterior antes de actualizar para realizar comparaciones
+            $sqlGetOld = "SELECT idCurso, correo FROM Alumno a JOIN Usuario u ON a.idAlumno = u.idUsuario WHERE a.idAlumno = :id";
             $stmtGetOld = $this->db->prepare($sqlGetOld);
             $stmtGetOld->execute([':id' => $id]);
-            $oldCursoRow = $stmtGetOld->fetch(PDO::FETCH_ASSOC);
-            $oldCurso = $oldCursoRow ? (int)$oldCursoRow['idCurso'] : null;
+            $oldInfo = $stmtGetOld->fetch(PDO::FETCH_ASSOC);
+            $oldCurso = $oldInfo ? (int)$oldInfo['idCurso'] : null;
+            $oldEmail = $oldInfo ? $oldInfo['correo'] : null;
 
             $sqlU = "UPDATE Usuario SET nombre = :nombre, apellidos = :apellidos, correo = :correo WHERE idUsuario = :id";
             $stmtU = $this->db->prepare($sqlU);
@@ -259,6 +386,22 @@ class ModAlumnos {
                 $stmtEA->execute();
             }
 
+            // --- NUEVO REQUERIMIENTO: LIMPIEZA DE EMAIL ANTERIOR EN SEGUNDA BASE DE DATOS ---
+            // Si el correo ha cambiado, borramos el registro antiguo en la otra base de datos para no dejar duplicados.
+            if ($oldEmail && strtolower(trim($oldEmail)) !== strtolower(trim($datos['email']))) {
+                try {
+                    $newDb = $this->getNewDbConnection();
+                    $stmtDelOldNewDb = $newDb->prepare("DELETE FROM alumnos WHERE email = :email");
+                    $stmtDelOldNewDb->execute([':email' => $oldEmail]);
+                } catch (Exception $ex) {
+                    // Se captura la excepción silenciosamente para evitar caídas en limpieza secundaria no crítica
+                }
+            }
+
+            // --- NUEVO REQUERIMIENTO: REPLICACIÓN EN SEGUNDA BASE DE DATOS ---
+            // Sincronizamos los datos actualizados del alumno en la tabla `alumnos` de `proyectosevg_BD2-05`.
+            $this->sincronizarAlumnoNuevaBD($datos['email'], $datos['nombre'], $datos['apellidos'], $datos['idCurso']);
+
             $this->db->commit();
             return $this->obtener($id);
         } catch (Exception $e) {
@@ -274,10 +417,39 @@ class ModAlumnos {
      * @return bool True si la operación fue exitosa, false en caso contrario.
      */
     public function eliminar($id) {
-        $sql = "DELETE FROM Usuario WHERE idUsuario = :id";
-        $stmt = $this->db->prepare($sql);
-        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
-        return $stmt->execute();
+        try {
+            // --- NUEVO REQUERIMIENTO: OBTENER EMAIL PARA ELIMINACIÓN REPLICADA ---
+            // Obtenemos el correo electrónico del alumno antes de borrarlo de la base de datos principal
+            $email = null;
+            $stmtMail = $this->db->prepare("SELECT correo FROM Usuario WHERE idUsuario = :id LIMIT 1");
+            $stmtMail->execute([':id' => $id]);
+            $email = $stmtMail->fetchColumn();
+
+            $this->db->beginTransaction();
+
+            $sql = "DELETE FROM Usuario WHERE idUsuario = :id";
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+            $res = $stmt->execute();
+
+            if ($res && $email) {
+                // --- NUEVO REQUERIMIENTO: ELIMINACIÓN EN SEGUNDA BASE DE DATOS ---
+                // Eliminamos también el alumno correspondiente de la tabla `alumnos` en `proyectosevg_BD2-05`.
+                try {
+                    $newDb = $this->getNewDbConnection();
+                    $stmtDelNew = $newDb->prepare("DELETE FROM alumnos WHERE email = :email");
+                    $stmtDelNew->execute([':email' => $email]);
+                } catch (Exception $ex) {
+                    throw new Exception("Error al borrar en la segunda base de datos: " . $ex->getMessage(), 0, $ex);
+                }
+            }
+
+            $this->db->commit();
+            return $res;
+        } catch (Exception $e) {
+            $this->db->rollBack();
+            throw $e;
+        }
     }
 
     /**
