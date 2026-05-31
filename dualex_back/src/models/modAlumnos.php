@@ -400,6 +400,7 @@ class ModAlumnos {
                 )";
                 $binds[':idUsuario'] = (int)$idUsuario;
                 $binds[':idUsuario2'] = (int)$idUsuario;
+            } // Fin del else de esProfesorDelModulo
             } // Fin del else de if (empty($idUsuario))
         }
         // Si es Profesor, ve los Alumnos de los modulos que imparte
