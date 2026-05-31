@@ -386,24 +386,19 @@ class ModAlumnos {
                 $conditions[] = "mp.idProfesor = :idUsuario";
                 $binds[':idUsuario'] = (int)$idUsuario;
             } else {
-                if (strtoupper($rol) === 'COORDINADOR_GENERAL') {
-                    // El coordinador general no se restringe por idCoordinador
-                } else {
-                    // Coordinador normal: se restringe a los ciclos que coordina
-                    // (ya sea porque es su curso base, o porque cursa un módulo de ese ciclo)
-                    $conditions[] = "(
-                        a.idCurso IN (SELECT c_chk.idCurso FROM Curso c_chk JOIN Ciclo cic_chk ON c_chk.idCiclo = cic_chk.idCiclo WHERE cic_chk.idCoordinador = :idUsuario)
-                        OR a.idAlumno IN (
-                            SELECT mac_chk.idAlumno FROM Modulo_Alumno_Cursa mac_chk 
-                            JOIN Modulo_Curso mc_chk ON mac_chk.idModulo = mc_chk.idModulo 
-                            JOIN Curso c_chk ON mc_chk.idCurso = c_chk.idCurso 
-                            JOIN Ciclo cic_chk ON c_chk.idCiclo = cic_chk.idCiclo 
-                            WHERE cic_chk.idCoordinador = :idUsuario
-                        )
-                    )";
-                    $binds[':idUsuario'] = (int)$idUsuario;
-                }
-            }
+                // Coordinador (General o Dual): se restringe a los ciclos que coordina
+                // (ya sea porque es su curso base, o porque cursa un módulo de ese ciclo)
+                $conditions[] = "(
+                    a.idCurso IN (SELECT c_chk.idCurso FROM Curso c_chk JOIN Ciclo cic_chk ON c_chk.idCiclo = cic_chk.idCiclo WHERE cic_chk.idCoordinador = :idUsuario)
+                    OR a.idAlumno IN (
+                        SELECT mac_chk.idAlumno FROM Modulo_Alumno_Cursa mac_chk 
+                        JOIN Modulo_Curso mc_chk ON mac_chk.idModulo = mc_chk.idModulo 
+                        JOIN Curso c_chk ON mc_chk.idCurso = c_chk.idCurso 
+                        JOIN Ciclo cic_chk ON c_chk.idCiclo = cic_chk.idCiclo 
+                        WHERE cic_chk.idCoordinador = :idUsuario
+                    )
+                )";
+                $binds[':idUsuario'] = (int)$idUsuario;
             } // Fin del else de if (empty($idUsuario))
         }
         // Si es Profesor, ve los Alumnos de los modulos que imparte
